@@ -1,0 +1,30 @@
+java/target/
+java/pom.xml.tag
+java/pom.xml.releaseBackup
+java/pom.xml.versionsBackup
+java/pom.xml.next
+java/release.properties
+java/dependency-reduced-pom.xml
+java/buildNumber.properties
+java/.mvn/timing.properties
+# https://github.com/takari/maven-wrapper#usage-without-binary-jar
+java/.mvn/wrapper/maven-wrapper.jar
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# mypy
+.mypy_cache/
+test/file/a.txt
+test/file/a-kana-sjis.txt
+test/file/a-kana-utf8.txt
+test/file/a-kana.txt
+test/misc/dict_saved.json
+test/misc/dict_saved_None.json
+test/log.txt
+test/dict/data/dict_saved.json
+
+vba/Util.xlsm
+vba/~$Util.xlsm
