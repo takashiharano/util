@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202007300000
+v = 202008030217
 
 import os
 import sys
@@ -1227,6 +1227,38 @@ def read_file(path, mode='t', encoding=DEFAULT_ENCODING):
   elif mode == 'b':
     return read_binary_file(path)
 
+# Read file as text
+def read_text_file(path, encoding=DEFAULT_ENCODING):
+  # f = TextIOWrapper
+  f = open(path, 'r', encoding=encoding)
+  text = f.read()
+  f.close()
+  return text
+
+# Read text file as list
+def read_text_file_as_list(path, default=[], encoding=DEFAULT_ENCODING):
+  text_list = default
+  if path_exists(path):
+    text = read_text_file(path, encoding=encoding)
+    text_list = text2list(text)
+    if len(text_list) == 1 and text_list[0] == '':
+      text_list = default
+  return text_list
+
+# Read file as binary
+# return type: 'bytes'
+def read_binary_file(path):
+  # f = BufferedReader
+  f = open(path, 'rb')
+  b = f.read()
+  f.close()
+  return b
+
+# Read file as Base64
+def read_file_as_base64(path):
+  b = read_binary_file(path)
+  return base64.b64encode(b).decode()
+
 # Write File
 # mode:
 #  't' = text
@@ -1237,15 +1269,7 @@ def write_file(path, data, mode='t', encoding=DEFAULT_ENCODING, make_dir=True):
   elif mode == 'b':
     write_binary_file(path, data, make_dir)
 
-# Read Text File
-def read_text_file(path, encoding=DEFAULT_ENCODING):
-  # f = TextIOWrapper
-  f = open(path, 'r', encoding=encoding)
-  text = f.read()
-  f.close()
-  return text
-
-# Write Text File
+# Write text file
 def write_text_file(path, text, encoding=DEFAULT_ENCODING, make_dir=True):
   if typename(text) == 'list':
     text = list2text(text)
@@ -1256,31 +1280,12 @@ def write_text_file(path, text, encoding=DEFAULT_ENCODING, make_dir=True):
   f.write(text)
   f.close()
 
-# Read Text File as List
-def read_text_file_as_list(path, default=[], encoding=DEFAULT_ENCODING):
-  text_list = default
-  if path_exists(path):
-    text = read_text_file(path, encoding=encoding)
-    text_list = text2list(text)
-    if len(text_list) == 1 and text_list[0] == '':
-      text_list = default
-  return text_list
-
-# Write Text File from List
+# Write text file from list
 def write_text_file_from_list(path, text_list, encoding=DEFAULT_ENCODING, make_dir=True, line_sep='\n'):
   text = list2text(text_list, line_sep)
   write_text_file(path, text, encoding, make_dir)
 
-# Read Binary File
-# return type: 'bytes'
-def read_binary_file(path):
-  # f = BufferedReader
-  f = open(path, 'rb')
-  b = f.read()
-  f.close()
-  return b
-
-# Write Binary File
+# Write binary file
 def write_binary_file(path, data, make_dir=True):
   if make_dir:
     make_parent_dir(path)
@@ -1300,17 +1305,12 @@ def _read_chunk(file_object, chunk_size=102400):
       break
     yield data
 
-# Read Binary File As Base64
-def read_file_as_base64(path):
-  b = read_binary_file(path)
-  return base64.b64encode(b).decode()
-
-# Write File from Base64
+# Write file from Base64
 def write_file_from_base64(path, data):
   b = base64.b64decode(data)
   write_binary_file(path, b)
 
-# Append Text File
+# Append a line to text file
 def append_text_file(path, text, encoding=DEFAULT_ENCODING, max=0):
   text_list = read_text_file_as_list(path, default=[], encoding=encoding)
   new_data = ''
