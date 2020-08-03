@@ -10,7 +10,7 @@ def test1():
   s = '\n'
   s += util.read_file_as_base64('./dir1/a.txt') + '\n'
   s += '\n'
-  s += util.read_file_as_base64('C:/tmp/img.jpg') + '\n'
+  s += util.read_file_as_base64('C:/test/img.jpg') + '\n'
   return s
 
 def main():

@@ -20,11 +20,11 @@ def _recursive_dir(parent, dir_name, lv):
 
   target_path = this_path
 
-  list = util.listdir(target_path)
+  list = util.list_dir(target_path)
   for item in list:
     path = this_path + item
-    is_dir = util.isdir(path)
-    file_info = util.str_padding(' ', lv) + item + ' ' + str(is_dir)  + '\n'
+    is_dir = util.is_dir(path)
+    file_info = util.str_padding(item + ' ' + str(is_dir) , ' ', lv) + '\n'
     ret += file_info
     if is_dir:
       ret += _recursive_dir(this_path, item, lv + 1)

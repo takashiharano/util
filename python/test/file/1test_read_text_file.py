@@ -4,7 +4,7 @@ import os
 import sys
 import re
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 import util
 
 def test_typename():
@@ -19,23 +19,23 @@ def test_typename():
   s += '\n'
   return s
 
-def test_contains():
+def test_match():
   s = '\n'
-  s += str(util.contains('abc', 'a'))
+  s += str(util.match('abc', 'a'))
   s += '\n'
-  s += str(util.contains('abc123', 'bc'))
+  s += str(util.match('abc123', 'bc'))
   s += '\n'
-  s += str(util.contains('abc123', '123'))
+  s += str(util.match('abc123', '123'))
   s += '\n'
-  s += str(util.contains('abc 123', '\s'))
+  s += str(util.match('abc 123', '\s'))
   s += '\n'
-  s += str(util.contains('abc 123xyz', '\d'))
+  s += str(util.match('abc 123xyz', '\d'))
   s += '\n'
-  s += str(util.contains('abc123', '^abc'))
+  s += str(util.match('abc123', '^abc'))
   s += '\n'
-  s += str(util.contains('abc123', '^123'))
+  s += str(util.match('abc123', '^123'))
   s += '\n'
-  s += str(util.contains('abc', 'z'))
+  s += str(util.match('abc', 'z'))
   return s
 
 def test_replace():
@@ -189,7 +189,7 @@ def test():
   ret += '\n'
   ret += 'test_typename() = ' + test_typename() + '\n'
   ret += '\n'
-  ret += 'test_contains() = ' + test_contains() + '\n'
+  ret += 'test_match() = ' + test_match() + '\n'
   ret += '\n'
   ret += 'test_replace() = ' + test_replace() + '\n'
   ret += '\n'

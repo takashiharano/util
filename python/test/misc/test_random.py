@@ -8,47 +8,47 @@ import util
 
 def test_random():
   s = '\n'
-  s += 'randint(1) = ' + str(util.randint(1)) + '\n'
+  s += 'random_int(1) = ' + str(util.random_int(1)) + '\n'
   s += '\n'
-  s += 'randint(10) = ' + str(util.randint(10)) + '\n'
+  s += 'random_int(10) = ' + str(util.random_int(10)) + '\n'
   s += '\n'
-  s += 'randint(5, 20) = ' + str(util.randint(5, 20)) + '\n'
+  s += 'random_int(5, 20) = ' + str(util.random_int(5, 20)) + '\n'
   s += '\n'
-  s += 'randint(a, b, step) = ' + str(util.randint(10, 20, 5)) + '\n'
+  s += 'random_int(a, b, step) = ' + str(util.random_int(10, 20, 5)) + '\n'
 
   s += '\n'
-  s += 'randfloat(5, 10) = ' + str(util.randfloat(5, 10)) + '\n'
-  s += 'randfloat(-1, 1) = ' + str(util.randfloat(-1, 1)) + '\n'
-  s += 'randfloat(0, 1) = ' + str(util.randfloat(0, 1)) + '\n'
-  s += 'randfloat(1.9, 2) = ' + str(util.randfloat(1.9, 2)) + '\n'
+  s += 'random_float(5, 10) = ' + str(util.random_float(5, 10)) + '\n'
+  s += 'random_float(-1, 1) = ' + str(util.random_float(-1, 1)) + '\n'
+  s += 'random_float(0, 1) = ' + str(util.random_float(0, 1)) + '\n'
+  s += 'random_float(1.9, 2) = ' + str(util.random_float(1.9, 2)) + '\n'
 
-  s += 'randfloat(0, 1.1) = ' + str(util.randfloat(0, 1.1)) + '\n'
-
-  s += '\n'
-  s += 'randbool() = ' + str(util.randbool()) + '\n'
-  s += 'randbool(0) = ' + str(util.randbool(0)) + '\n'
-  s += 'randbool(1/10) = ' + str(util.randbool(1/10)) + '\n'
-  s += 'randbool(1/90) = ' + str(util.randbool(90/100)) + '\n'
-  s += 'randbool(100/100) = ' + str(util.randbool(100/100)) + '\n'
-  s += 'randbool(2) = ' + str(util.randbool(2)) + '\n'
+  s += 'random_float(0, 1.1) = ' + str(util.random_float(0, 1.1)) + '\n'
 
   s += '\n'
-  s += 'randascii() = ' + util.randascii() + '\n'
+  s += 'random_bool() = ' + str(util.random_bool()) + '\n'
+  s += 'random_bool(0) = ' + str(util.random_bool(0)) + '\n'
+  s += 'random_bool(1/10) = ' + str(util.random_bool(1/10)) + '\n'
+  s += 'random_bool(1/90) = ' + str(util.random_bool(90/100)) + '\n'
+  s += 'random_bool(100/100) = ' + str(util.random_bool(100/100)) + '\n'
+  s += 'random_bool(2) = ' + str(util.random_bool(2)) + '\n'
 
   s += '\n'
-  s += 'randstr(4) = "' + util.randstr(4) + '"\n'
-  s += '\n'
-  s += 'randstr(1, 3) = "' + util.randstr(1, 3) + '"\n'
+  s += 'random_ascii() = ' + util.random_ascii() + '\n'
 
   s += '\n'
-  s += 'randstr(4, tbl=\'ABC123\') = "' + util.randstr(4, tbl='ABC123') + '"\n'
+  s += 'random_str(4) = "' + util.random_str(4) + '"\n'
   s += '\n'
-  s += 'randstr(1, 3, tbl=\'ABC123\') = "' + util.randstr(1, 3, tbl='ABC123') + '"\n'
+  s += 'random_str(1, 3) = "' + util.random_str(1, 3) + '"\n'
 
   s += '\n'
-  s += 'randstr(4, tbl=\'ABC123あいうえお\') = "' + util.randstr(4, tbl='ABC123あいうえお') + '"\n'
+  s += 'random_str(4, tbl=\'ABC123\') = "' + util.random_str(4, tbl='ABC123') + '"\n'
   s += '\n'
-  s += 'randstr(1, 3, tbl=\'ABC123あいうえお\') = "' + util.randstr(1, 3, tbl='ABC123あいうえお') + '"\n'
+  s += 'random_str(1, 3, tbl=\'ABC123\') = "' + util.random_str(1, 3, tbl='ABC123') + '"\n'
+
+  s += '\n'
+  s += 'random_str(4, tbl=\'ABC123あいうえお\') = "' + util.random_str(4, tbl='ABC123あいうえお') + '"\n'
+  s += '\n'
+  s += 'random_str(1, 3, tbl=\'ABC123あいうえお\') = "' + util.random_str(1, 3, tbl='ABC123あいうえお') + '"\n'
 
   return s
 

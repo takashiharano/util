@@ -51,6 +51,8 @@ text4 += '13: FFFFFFFFFF\n'
 def test1():
   ret = ''
   ret += '------------\n'
+  ret += 'test1\n'
+  ret += '------------\n'
   ret += 'start, end\n'
   ret += util.extract_text(text1, 'start', 'end')
   ret += '\n'
@@ -71,6 +73,8 @@ def test1():
 def test2():
   ret = '---------------------------------------'
   ret += '------------\n'
+  ret += 'test2\n'
+  ret += '------------\n'
   ret += 'nostart, end\n'
   ret += util.extract_text(text1, 'nostart', 'end')
   ret += '\n'
@@ -87,6 +91,8 @@ def test2():
 def test3():
   ret = ''
   ret += '------------\n'
+  ret += 'test3\n'
+  ret += '------------\n'
   ret += '\\d, \\d\\s\\d\n'
   ret += util.extract_text(text1, r'\d', r'\d\s\d')
   ret += '\n'
@@ -94,6 +100,8 @@ def test3():
 
 def test4():
   ret = ''
+  ret += '------------\n'
+  ret += 'test4\n'
   ret += '------------\n'
   ret += 'start, 123\n'
   ret += util.extract_text(text1, r'start', '123')
@@ -119,6 +127,8 @@ def test5():
 def test6():
   ret = ''
   ret += '------------\n'
+  ret += 'test6\n'
+  ret += '------------\n'
   ret += 'start, end, greedy=True\n'
   ret += util.extract_text(text3, r'start', 'end', greedy=True)
   ret += '\n'
@@ -131,6 +141,8 @@ def test6():
 def test7():
   ret = ''
   ret += '------------\n'
+  ret += 'test7\n'
+  ret += '------------\n'
   ret += 'start, end, greedy=True, count=1\n'
   ret += util.extract_text(text4, r'start', 'end', greedy=True, count=1)
   ret += '\n'
@@ -142,6 +154,8 @@ def test7():
 
 def test8():
   ret = ''
+  ret += '------------\n'
+  ret += 'test8\n'
   ret += '------------\n'
   ret += 'start=None\n'
   ret += util.extract_text(text1, start=None, end='end')
