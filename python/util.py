@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202008030217
+v = 202008040033
 
 import os
 import sys
@@ -337,7 +337,7 @@ def extract_text(src, start=None, end=None, include_start=True, include_end=True
   for i in range(rows):
     line = text_list[i]
     if target:
-      if not greedy and match(line, start, flags_s):
+      if start is not None and not greedy and match(line, start, flags_s):
         start_line = i
       if end is not None and match(line, end, flags_e):
         end_line = i
