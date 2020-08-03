@@ -17,14 +17,14 @@ __pycache__/
 
 # mypy
 .mypy_cache/
-test/file/a.txt
-test/file/a-kana-sjis.txt
-test/file/a-kana-utf8.txt
-test/file/a-kana.txt
-test/misc/dict_saved.json
-test/misc/dict_saved_None.json
-test/log.txt
-test/dict/data/dict_saved.json
+python/test/file/a.txt
+python/test/file/a-kana-sjis.txt
+python/test/file/a-kana-utf8.txt
+python/test/file/a-kana.txt
+python/test/misc/dict_saved.json
+python/test/misc/dict_saved_None.json
+python/test/dict/data/dict_saved.json
+python/test/log.txt
 
 vba/Util.xlsm
 vba/~$Util.xlsm
