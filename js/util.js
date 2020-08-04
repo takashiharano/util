@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008041255';
+util.v = '202008050003';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -78,19 +78,14 @@ util.WDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 /**
  * DateTime class
  * dt
- *  Date / seconds / milli seconds / date-string
+ *  Date / millis from 1970-01-01T00:00:00Z / date-string
  * offset
  *  minutes (-0800=480 / +0000=0 / +0900=-540)
  */
 util.DateTime = function(dt, offset) {
-  if ((dt == undefined) || (dt === '')) {
+  if ((dt !== 0) && !dt) {
     dt = new Date();
   } else if (!(dt instanceof Date)) {
-    if (typeof dt == 'number') {
-      if ((dt + '').match(/\./)) {
-        dt = util.sec2ms(dt);
-      }
-    }
     dt = new Date(dt);
   }
   this.timestamp = dt.getTime();
@@ -363,24 +358,23 @@ util.Time = function(t) {
 };
 util.Time.prototype = {
   /**
-   * To string the time.
+   * To clock format
    *
    * fmt
-   *  '%Ddays %HH:%mm:%SS.%sss'
-   *  '%Hhr %m\\m %Ss %s'
+   *  'DHMSs'
    */
-  toString: function(fmt) {
-    if (!fmt) fmt = '%HH:%mm:%SS.%sss';
+  toClock: function(fmt) {
+    if (!fmt) fmt = 'HMSs';
     var d = this.days;
     var h = this.hours;
     var m = this.minutes;
     var s = this.seconds;
     var ms = this.milliseconds;
 
-    if (fmt.match(/%D/)) h = this.hrs;
-    if (!fmt.match(/%H/)) m += h * 60;
-    if (!fmt.match(/%m/)) s += m * 60;
-    if (!fmt.match(/%S/)) ms += s * 1000;
+    if (fmt.match(/D/)) h = this.hrs;
+    if (!fmt.match(/H/)) m += h * 60;
+    if (!fmt.match(/M/)) s += m * 60;
+    if (!fmt.match(/S/)) ms += s * 1000;
 
     d += '';
     h += '';
@@ -388,52 +382,56 @@ util.Time.prototype = {
     s += '';
     ms += '';
 
-    var hh = h;
-    if (h < 10) hh = '0' + h;
-    var mm = ('0' + m).slice(-2);
-    var ss = ('0' + s).slice(-2);
-    var sss = ('00' + ms).slice(-3);
+    if (h < 10) h = '0' + h;
+    m = ('0' + m).slice(-2);
+    s = ('0' + s).slice(-2);
+    ms = ('00' + ms).slice(-3);
 
-    var r = fmt;
-    r = r.replace(/%D/, d);
-    r = r.replace(/%HH/, hh);
-    r = r.replace(/%H/, h);
-    r = r.replace(/%mm/, mm);
-    r = r.replace(/%m/, m);
-    r = r.replace(/%SS/, ss);
-    r = r.replace(/%S/, s);
-    r = r.replace(/%sss/, sss);
-    r = r.replace(/%s/, ms);
+    var r = '';
+    if (fmt.match(/D/)) r += d + 'd ';
+    if (fmt.match(/H/)) r += h + ':';
+    if (fmt.match(/M/)) r += m;
+    if (fmt.match(/S/)) r += ':' + s;
+    if (fmt.match(/s/)) r += '.' + ms;
+    return r;
+  },
 
-    // '%Hhr %m\\m %Ss %s\\' -> 12hr 34m 56s 789\
-    r = r.replace(/\\([^\\])/g, '$1');
+  /**
+   * To string the time.
+   *
+   * 1d 23h 45m 59s
+   * h=true: 47h 45m 59s
+   * f=true: 1d 23h 45m 59s 123
+   */
+  toString: function(h, f) {
+    var r = '';
+    var d = 0;
+    if (!h && (this.days > 0)) {
+      d = 1;
+      r += this.days + 'd ';
+    }
+    if (h && (this.hours > 0)) {
+      d = 1;
+      r += this.hours + 'h ';
+    } else if (d || (this.hrs > 0)) {
+      d = 1;
+      r += this.hrs + 'h ';
+    }
+    if (d || (this.minutes > 0)) {
+      d = 1;
+      r += this.minutes + 'm ';
+    }
+    r += this.seconds + 's';
+    if (f) r += ' ' + ('00' + this.milliseconds).slice(-3);
     return r;
   }
 };
 
 /**
- * 1d 23h 45m 59s
- * f=true: 1d 23h 45m 59s 123
+ * 171959000 -> '1d 23h 45m 59s'
  */
-util.getTimeString = function(ms, f) {
-  var t = new util.Time(ms);
-  var r = '';
-  var d = 0;
-  if (t.days > 0) {
-    d = 1;
-    r += t.days + 'd ';
-  }
-  if (d || (t.hrs > 0)) {
-    d = 1;
-    r += t.hrs + 'h ';
-  }
-  if (d || (t.minutes > 0)) {
-    d = 1;
-    r += t.minutes + 'm ';
-  }
-  r += t.seconds + 's';
-  if (f) r += ' ' + ('00' + t.milliseconds).slice(-3);
-  return r;
+util.getTimeString = function(ms, h, f) {
+  return new util.Time(ms).toString(h, f);
 };
 
 //------------------------------------------------
