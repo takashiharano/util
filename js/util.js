@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202007300000';
+util.v = '202008041255';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -409,6 +409,31 @@ util.Time.prototype = {
     r = r.replace(/\\([^\\])/g, '$1');
     return r;
   }
+};
+
+/**
+ * 1d 23h 45m 59s
+ * f=true: 1d 23h 45m 59s 123
+ */
+util.getTimeString = function(ms, f) {
+  var t = new util.Time(ms);
+  var r = '';
+  var d = 0;
+  if (t.days > 0) {
+    d = 1;
+    r += t.days + 'd ';
+  }
+  if (d || (t.hrs > 0)) {
+    d = 1;
+    r += t.hrs + 'h ';
+  }
+  if (d || (t.minutes > 0)) {
+    d = 1;
+    r += t.minutes + 'm ';
+  }
+  r += t.seconds + 's';
+  if (f) r += ' ' + ('00' + t.milliseconds).slice(-3);
+  return r;
 };
 
 //------------------------------------------------
