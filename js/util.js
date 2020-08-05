@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008050003';
+util.v = '202008052307';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -80,7 +80,7 @@ util.WDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
  * dt
  *  Date / millis from 1970-01-01T00:00:00Z / date-string
  * offset
- *  minutes (-0800=480 / +0000=0 / +0900=-540)
+ *  minutes (-480=-0800 / 0=+0000 / 540=+0900)
  */
 util.DateTime = function(dt, offset) {
   if ((dt !== 0) && !dt) {
@@ -91,10 +91,10 @@ util.DateTime = function(dt, offset) {
   this.timestamp = dt.getTime();
   var os = dt.getTimezoneOffset();
   if (offset == undefined) {
-    this.offset = os;
+    this.offset = os * (-1);
   } else {
     this.offset = offset;
-    var ts = this.timestamp + (os - offset) * 60000;
+    var ts = this.timestamp + (os + offset) * 60000;
     dt = new Date(ts);
   }
   var year = dt.getFullYear();
@@ -127,7 +127,7 @@ util.DateTime.prototype = {
   setWdays: function(wdays) {
     this.WDAYS = wdays;
   },
-  // +0900 / e=true: +09:00
+  // -> '+0900' : e=true -> '+09:00'
   getTZ: function(e) {
     return util.formatTZ(this.offset, e);
   },
@@ -152,8 +152,8 @@ util.DateTime.prototype = {
  * Returns DateTime object
  * dt: timestamp / Date object
  */
-util.getDateTime = function(dt) {
-  return new util.DateTime(dt);
+util.getDateTime = function(dt, ofst) {
+  return new util.DateTime(dt, ofst);
 };
 
 /**
@@ -180,7 +180,7 @@ util.getDateTimeStringFromSec = function(s, fmt) {
 /**
  * '12:34:56.987' -> DateTime object
  * offset: -1 -> Yesterday
- *          0 -> Today
+ *          0 -> Today (default)
  *          1 -> Tomorrow
  */
 util.getDateTimeFromTime = function(timeString, offset) {
@@ -189,9 +189,9 @@ util.getDateTimeFromTime = function(timeString, offset) {
 };
 
 /**
- * '12:34:56.987' -> timestamp(milli sec)
+ * '12:34:56.987' -> timestamp (millis from 1970-01-01T00:00:00Z)
  * offset: -1 -> Yesterday
- *          0 -> Today
+ *          0 -> Today (default)
  *          1 -> Tomorrow
  */
 util.getTimeStampOfDay = function(timeString, offset) {
@@ -209,6 +209,9 @@ util.getTimeStampOfDay = function(timeString, offset) {
   return ts;
 };
 
+/**
+ * millis to struct
+ */
 util.ms2struct = function(ms) {
   var wk = ms;
   var sign = false;
@@ -273,16 +276,16 @@ util.ms2sec = function(ms, toString) {
 
 /**
  * Returns time zone offset string from minutes
- *  480       -> -0800
- * -540       -> +0900
- * -540, true -> +09:00
+ * -480       -> -0800
+ *  540       -> +0900
+ *  540, true -> +09:00
  */
 util.formatTZ = function(v, e) {
   v |= 0;
-  var s = '-';
-  if (v <= 0) {
-    v *= (-1);
-    s = '+';
+  var s = '+';
+  if (v < 0) {
+    s = '-';
+    v *= -1;
   }
   var h = (v / 60) | 0;
   var m = v - h * 60;
@@ -297,7 +300,7 @@ util.formatTZ = function(v, e) {
  * ext=true: +09:00
  */
 util.getTZ = function(ext) {
-  return util.formatTZ((new Date()).getTimezoneOffset(), ext);
+  return util.formatTZ((new Date()).getTimezoneOffset() * (-1), ext);
 };
 
 /**
@@ -308,6 +311,15 @@ util.getTzName = function() {
   var n = Intl.DateTimeFormat().resolvedOptions().timeZone;
   if (!n) n = '';
   return n;
+};
+
+/**
+ * Returns TZ offset in minutes
+ * +0900 ->  540
+ * -0800 -> -480
+ */
+util.getTzOffset = function() {
+  return (new Date()).getTimezoneOffset() * -1;
 };
 
 /**
