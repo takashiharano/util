@@ -71,7 +71,8 @@ public class StrUtil {
    * @param target
    * @param regex
    * @param flags
-   * @return
+   * @return true if, and only if, a subsequence of the input sequence matches
+   *         this matcher's pattern
    */
   public static boolean match(String target, String regex, int flags) {
     Pattern p = Pattern.compile(regex, flags);
@@ -200,7 +201,7 @@ public class StrUtil {
    *
    * @param src
    * @param newLine
-   * @return
+   * @return converted string
    */
   public static String convertNewLine(String src, String newLine) {
     return src.replaceAll("\r\n", "\n").replaceAll("\r", "\n").replaceAll("\n", newLine);
