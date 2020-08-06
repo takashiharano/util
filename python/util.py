@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202008040033
+v = 202008070000
 
 import os
 import sys
@@ -29,6 +29,7 @@ import logging
 
 DEFAULT_ENCODING = 'utf-8'
 DEFAULT_HTTP_TIMEOUT = 15
+LINE_SEP = '\n'
 
 MINUTE = 60
 HOUR = 3600
@@ -360,7 +361,7 @@ def extract_text(src, start=None, end=None, include_start=True, include_end=True
   ret = ''
   if start_line >= 0 and end_line >= 0:
     if start_line == end_line:
-      ret = text_list[start_line] + '\n'
+      ret = text_list[start_line] + LINE_SEP
     else:
       if not include_start:
         start_line += 1
@@ -370,7 +371,7 @@ def extract_text(src, start=None, end=None, include_start=True, include_end=True
         return ''
 
       for i in range(start_line, end_line + 1):
-        ret += text_list[i] + '\n'
+        ret += text_list[i] + LINE_SEP
 
   return ret
 
@@ -1311,7 +1312,7 @@ def write_file_from_base64(path, data):
   write_binary_file(path, b)
 
 # Append a line to text file
-def append_text_file(path, text, encoding=DEFAULT_ENCODING, max=0):
+def append_line_to_text_file(path, text, encoding=DEFAULT_ENCODING, max=0):
   text_list = read_text_file_as_list(path, default=[], encoding=encoding)
   new_data = ''
 
@@ -1320,9 +1321,9 @@ def append_text_file(path, text, encoding=DEFAULT_ENCODING, max=0):
     start = len(text_list) - (max - 1)
 
   for i in range(start, len(text_list)):
-    new_data += text_list[i] + '\n'
+    new_data += text_list[i] + LINE_SEP
 
-  new_data = new_data + text + '\n'
+  new_data = new_data + text + LINE_SEP
   write_text_file(path, new_data)
 
 def path_exists(path):
@@ -1574,7 +1575,7 @@ def grep(path, pattern, flags=0, filename=None, filename_flags=0, recursive=True
     for k in results:
       result = results[k]
       for i in range(len(result)):
-        ret += k + '(' + str(result[i]['line']) + '): ' + result[i]['matched'] + '\n'
+        ret += k + '(' + str(result[i]['line']) + '): ' + result[i]['matched'] + LINE_SEP
   else:
     if len(results) == 0:
       ret = None
@@ -2250,14 +2251,14 @@ def hexdump(src, limit=0, last_rows=16, header=True, address=True, ascii=True):
     sb += '+0 +1 +2 +3 +4 +5 +6 +7  +8 +9 +A +B +C +D +E +F'
     if ascii:
       sb += '  ASCII'
-    sb += '\n'
+    sb += LINE_SEP
 
     if address:
       sb += '----------'
     sb += '------------------------------------------------'
     if ascii:
       sb += '------------------'
-    sb += '\n'
+    sb += LINE_SEP
 
   for addr in range(0, dump_len, 16):
     if address:
@@ -2266,7 +2267,7 @@ def hexdump(src, limit=0, last_rows=16, header=True, address=True, ascii=True):
     if ascii:
       sb += '  '
       sb += dump_ascii(src, addr)
-    sb += '\n'
+    sb += LINE_SEP
 
   if byte_len > limit:
     if byte_len - limit > 0x10 * last_rows:
@@ -2291,7 +2292,7 @@ def hexdump(src, limit=0, last_rows=16, header=True, address=True, ascii=True):
         if ascii:
           sb += '  '
           sb += dump_ascii(src, addr)
-        sb += '\n'
+        sb += LINE_SEP
 
   return sb
 
