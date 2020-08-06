@@ -20,7 +20,17 @@ import java.util.List;
 public class FileUtil {
 
   public static final String DEFAULT_CHARSET = "UTF-8";
-  public static final String LINE_SEPARATOR = System.lineSeparator();
+  public static String LINE_SEPARATOR = System.lineSeparator();
+
+  /**
+   * Sets line separator.
+   *
+   * @param sep
+   *          line separator
+   */
+  public static void setLineSeparator(String sep) {
+    LINE_SEPARATOR = sep;
+  }
 
   /**
    * Read a binary file.
@@ -196,25 +206,30 @@ public class FileUtil {
   }
 
   /**
-   * Append content into text file with List.
+   * Append a line to text file.
    *
    * @param path
+   *          file path
    * @param newLine
+   *          new line
    * @throws IOException
    */
-  public static void appendTextFile(String path, String newLine) throws IOException {
-    appendTextFile(path, newLine, 0);
+  public static void appendLine(String path, String newLine) throws IOException {
+    appendLine(path, newLine, 0);
   }
 
   /**
-   * Append content into text file with List.
+   * Append a line to text file.
    *
    * @param path
+   *          file path
    * @param newLine
+   *          new line
    * @param maxLines
+   *          number of lines to limit
    * @throws IOException
    */
-  public static void appendTextFile(String path, String newLine, int maxLines) throws IOException {
+  public static void appendLine(String path, String newLine, int maxLines) throws IOException {
     String[] lines = readTextFileAsArray(path);
     int start = 0;
     if ((maxLines > 0) && (lines.length >= maxLines)) {
@@ -264,6 +279,7 @@ public class FileUtil {
    * exists.
    *
    * @param path
+   *          the path of file or directory
    * @return true if and only if the file or directory denoted by this abstract
    *         pathname exists; false otherwise
    */
@@ -278,6 +294,7 @@ public class FileUtil {
    * deleted.
    *
    * @param path
+   *          the path of file or directory
    * @return true if and only if the file or directory is successfully deleted;
    *         false otherwise
    */
@@ -294,6 +311,7 @@ public class FileUtil {
    * directories.
    *
    * @param path
+   *          the path of directory
    * @return true if and only if the directory was created,along with all
    *         necessary parent directories; false otherwise
    */
@@ -307,6 +325,7 @@ public class FileUtil {
    * Creates the parent directories.
    *
    * @param path
+   *          the path of directory
    * @return true if and only if the directory was created
    */
   public static boolean mkParentDir(String path) {
@@ -318,6 +337,7 @@ public class FileUtil {
    * Creates the parent directories.
    *
    * @param file
+   *          the target file
    * @return true if and only if the directory was created
    */
   public static boolean mkParentDir(File file) {
