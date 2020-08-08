@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008052307';
+util.v = '202008090009';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1658,6 +1658,15 @@ $el.fn = {
     if (speed == undefined) speed = 0;
     util.writeHTML(this, html, speed);
   },
+  textseq: function(text, speed, step) {
+    return util.textseq(this, text, speed, step);
+  },
+  startTextSeq: function() {
+    util.textseq.start(this);
+  },
+  stopTextSeq: function() {
+    util.textseq.stop(this);
+  },
   setStyle: function(n, v) {
     util.setStyle(this, n, v);
   },
@@ -1805,6 +1814,14 @@ util.setPosition = function(el, x, y) {
   util.setStyles(el, style);
 };
 
+util.isTextInput = function(el) {
+  if (el.tagName == 'TEXTAREA') return true;
+  if (el.tagName == 'INPUT') {
+    if ((el.type == 'text') || (el.type == 'password')) return true;
+  }
+  return false;
+};
+
 util.getClientWidth = function() {
   return document.documentElement.clientWidth;
 };
@@ -1946,6 +1963,98 @@ util._clearHTML = function(el) {
   el.innerHTML = '';
   util.removeClass(el, 'fadeout');
 };
+
+//-----------------------------------------------------------------------------
+// Text Sequencer
+//-----------------------------------------------------------------------------
+util.textseq = function(el, text, speed, step) {
+  if (speed == undefined) speed = 20;
+  if (step == undefined) step = 1;
+  var ctx = util.textseq.getCtx(el);
+  if (ctx) util.textseq._stop(ctx);
+  ctx = util.textseq.createCtx(el, text, speed, step);
+  var i = util.textseq.idx(el);
+  if (i < 0) {
+    util.textseq.ctxs.push(ctx);
+  } else {
+    util.textseq.ctxs[i] = ctx;
+  }
+  util._textseq(ctx);
+  return ctx;
+};
+util._textseq = function(ctx) {
+  var el = ctx.el;
+  var speed = ctx.speed;
+  var step = ctx.step;
+  if ((speed == 0) || (step == 0)) {
+    ctx.i = ctx.text.length;
+  } else {
+    ctx.i += step;
+  }
+  ctx.tmrId = 0;
+  var text = ctx.text.substr(0, ctx.i);
+  if (ctx.isInp) {
+    el.value = text;
+  } else {
+    el.innerText = text;
+  }
+  if (ctx.i < ctx.text.length) {
+    ctx.tmrId = setTimeout(util._textseq, speed, ctx);
+  } else {
+    util.textseq.oncomplete(ctx);
+  }
+};
+util.textseq.start = function(el) {
+  var ctx = util.textseq.getCtx(el);
+  if (!ctx) return;
+  util.textseq._stop(ctx);
+  util._textseq(ctx);
+};
+util.textseq.stop = function(el) {
+  var i = util.textseq.idx(el);
+  if (i < 0) return;
+  var ctx = util.textseq.ctxs[i];
+  util.textseq._stop(ctx);
+};
+util.textseq._stop = function(ctx) {
+  if (ctx.tmrId > 0) {
+    clearTimeout(ctx.tmrId);
+    ctx.tmrId = 0;
+  }
+};
+util.textseq.oncomplete = function(ctx) {
+  var i = util.textseq.idx(ctx.el);
+  util.textseq.ctxs.splice(i, 1);
+  if (ctx.oncomplete) ctx.oncomplete(ctx.el);
+};
+util.textseq.createCtx = function(el, text, speed, step) {
+  var ctx = {
+    el: el,
+    text: text,
+    speed: speed,
+    step: step,
+    isInp: util.isTextInput(el),
+    tmrId: 0,
+    i: 0,
+    oncomplete: null
+  };
+  return ctx;
+};
+util.textseq.idx = function(el) {
+  var ctxs = util.textseq.ctxs;
+  for (var i = 0; i < ctxs.length; i++) {
+    var ctx = ctxs[i];
+    if (ctx.el == el) return i;
+  }
+  return -1;
+};
+util.textseq.getCtx = function(el) {
+  var ctx = null;
+  var i = util.textseq.idx(el);
+  if (i >= 0) ctx = util.textseq.ctxs[i];
+  return ctx;
+};
+util.textseq.ctxs = [];
 
 //-----------------------------------------------------------------------------
 // Styles
