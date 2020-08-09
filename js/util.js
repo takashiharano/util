@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008090009';
+util.v = '202008091334';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1717,6 +1717,12 @@ $el.fn = {
   },
   getRect: function() {
     return this.getBoundingClientRect();
+  },
+  prev: function() {
+    return util.prevElement(this);
+  },
+  next: function() {
+    return util.nextElement(this);
   }
 };
 
@@ -1784,8 +1790,42 @@ util.hasParent = function(el, parent) {
       }
     }
     el = el.parentNode;
-  } while (el != null);
+  } while (el);
   return false;
+};
+
+util.prevElement = function(node) {
+  var el = node.previousElementSibling;
+  if (el) {
+    if (el.childElementCount > 0) {
+      var lastChild = el.lastElementChild;
+      while (lastChild.childElementCount > 0) {
+        lastChild = lastChild.lastElementChild;
+      }
+      el = lastChild;
+    }
+  } else {
+    el = node.parentNode;
+  }
+  return el;
+};
+
+util.nextElement = function(node) {
+  var el = node.firstElementChild;
+  if (!el) {
+    el = node.nextElementSibling;
+    if (el == null) {
+      var parent = node.parentNode;
+      if (parent) {
+        do {
+          el = parent.nextElementSibling;
+          if (el) break;
+          parent = parent.parentNode;
+        } while (parent);
+      }
+    }
+  }
+  return el;
 };
 
 util.center = function(el) {
