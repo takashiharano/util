@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008091334';
+util.v = '202008091435';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2007,8 +2007,13 @@ util._clearHTML = function(el) {
 //-----------------------------------------------------------------------------
 // Text Sequencer
 //-----------------------------------------------------------------------------
+/**
+ * var ctx = util.textseq(el, text, speed, step);
+ * ctx.onprogress = <callback-function(ctx, ch)>;
+ * ctx.oncomplete = <callback-function(ctx)>;
+ */
 util.textseq = function(el, text, speed, step) {
-  if (speed == undefined) speed = 20;
+  if (speed == undefined) speed = util.textseq.DFLT_SPEED;
   if (step == undefined) step = 1;
   var ctx = util.textseq.getCtx(el);
   if (ctx) util.textseq._stop(ctx);
@@ -2019,12 +2024,13 @@ util.textseq = function(el, text, speed, step) {
   } else {
     util.textseq.ctxs[i] = ctx;
   }
-  util._textseq(ctx);
+  ctx.tmrId = setTimeout(util._textseq, speed, ctx);
   return ctx;
 };
 util._textseq = function(ctx) {
   var el = ctx.el;
   var speed = ctx.speed;
+  if (speed < 0) speed = util.textseq.DFLT_SPEED;
   var step = ctx.step;
   if ((speed == 0) || (step == 0)) {
     ctx.i = ctx.text.length;
@@ -2038,7 +2044,9 @@ util._textseq = function(ctx) {
   } else {
     el.innerText = text;
   }
+  util.textseq.onprogress(ctx);
   if (ctx.i < ctx.text.length) {
+    speed = ctx.speed;
     ctx.tmrId = setTimeout(util._textseq, speed, ctx);
   } else {
     util.textseq.oncomplete(ctx);
@@ -2062,10 +2070,15 @@ util.textseq._stop = function(ctx) {
     ctx.tmrId = 0;
   }
 };
+util.textseq.onprogress = function(ctx) {
+  if (!ctx.onprogress) return;
+  var ch = ctx.text.substr(ctx.i - ctx.step, 1);
+  ctx.onprogress(ctx, ch);
+};
 util.textseq.oncomplete = function(ctx) {
   var i = util.textseq.idx(ctx.el);
   util.textseq.ctxs.splice(i, 1);
-  if (ctx.oncomplete) ctx.oncomplete(ctx.el);
+  if (ctx.oncomplete) ctx.oncomplete(ctx);
 };
 util.textseq.createCtx = function(el, text, speed, step) {
   var ctx = {
@@ -2076,6 +2089,7 @@ util.textseq.createCtx = function(el, text, speed, step) {
     isInp: util.isTextInput(el),
     tmrId: 0,
     i: 0,
+    onprogress: null,
     oncomplete: null
   };
   return ctx;
@@ -2094,6 +2108,7 @@ util.textseq.getCtx = function(el) {
   if (i >= 0) ctx = util.textseq.ctxs[i];
   return ctx;
 };
+util.textseq.DFLT_SPEED = 20;
 util.textseq.ctxs = [];
 
 //-----------------------------------------------------------------------------
