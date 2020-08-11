@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202008070000
+v = 202008112235
 
 import os
 import sys
@@ -1698,17 +1698,15 @@ def hash(src, algorithm='SHA-256'):
     m = hashlib.sha1()
   elif algorithm == 'MD5':
     m = hashlib.md5()
-  else:
-    v = get_python_version()
-    if v['major'] >= 3 and v['minor'] >= 6:
-      if algorithm == 'SHA3-256':
-        m = hashlib.sha3_256()
-      elif algorithm == 'SHA3-512':
-        m = hashlib.sha3_512()
-      elif algorithm == 'SHA3-224':
-        m = hashlib.sha3_224()
-      elif algorithm == 'SHA3-384':
-        m = hashlib.sha3_384()
+  # Python >= 3.6
+  elif algorithm == 'SHA3-256':
+    m = hashlib.sha3_256()
+  elif algorithm == 'SHA3-512':
+    m = hashlib.sha3_512()
+  elif algorithm == 'SHA3-224':
+    m = hashlib.sha3_224()
+  elif algorithm == 'SHA3-384':
+    m = hashlib.sha3_384()
 
   if m is None:
     return ''
