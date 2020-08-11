@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202008112235
+v = 202008112305
 
 import os
 import sys
@@ -29,6 +29,7 @@ import logging
 
 DEFAULT_ENCODING = 'utf-8'
 DEFAULT_HTTP_TIMEOUT = 15
+#LINE_SEP = os.linesep
 LINE_SEP = '\n'
 
 MINUTE = 60
@@ -1276,9 +1277,9 @@ def write_text_file(path, text, encoding=DEFAULT_ENCODING, make_dir=True):
     text = list2text(text)
   if make_dir:
     make_parent_dir(path)
-  # f = TextIOWrapper
-  f = open(path, 'wt', encoding=encoding)
-  f.write(text)
+  b = text.encode(encoding=encoding)
+  f = open(path, 'wb')
+  f.write(b)
   f.close()
 
 # Write text file from list
