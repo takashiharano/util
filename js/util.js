@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008091435';
+util.v = '202008122100';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2008,23 +2008,25 @@ util._clearHTML = function(el) {
 // Text Sequencer
 //-----------------------------------------------------------------------------
 /**
- * var ctx = util.textseq(el, text, speed, step);
- * ctx.onprogress = <callback-function(ctx, ch)>;
+ * var ctx = util.textseq(el, text, speed, step, start, len);
+ * ctx.onprogress = <callback-function(ctx, chunk)>;
  * ctx.oncomplete = <callback-function(ctx)>;
  */
-util.textseq = function(el, text, speed, step) {
+util.textseq = function(el, text, speed, step, start, len) {
   if (speed == undefined) speed = util.textseq.DFLT_SPEED;
   if (step == undefined) step = 1;
+  if (start == undefined) start = 0;
+  if ((len == undefined) || (len < 0)) len = -1;
   var ctx = util.textseq.getCtx(el);
   if (ctx) util.textseq._stop(ctx);
-  ctx = util.textseq.createCtx(el, text, speed, step);
+  ctx = util.textseq.createCtx(el, text, speed, step, start, len);
   var i = util.textseq.idx(el);
   if (i < 0) {
     util.textseq.ctxs.push(ctx);
   } else {
     util.textseq.ctxs[i] = ctx;
   }
-  ctx.tmrId = setTimeout(util._textseq, speed, ctx);
+  ctx.tmrId = setTimeout(util._textseq, 0, ctx);
   return ctx;
 };
 util._textseq = function(ctx) {
@@ -2032,20 +2034,32 @@ util._textseq = function(ctx) {
   var speed = ctx.speed;
   if (speed < 0) speed = util.textseq.DFLT_SPEED;
   var step = ctx.step;
+  var prevPos = ctx.pos;
+  var cutLen = step;
+  if (ctx.pos < ctx.start) {
+    ctx.pos = ctx.start - 1;
+    if (ctx.pos < 0) ctx.pos = 0;
+    cutLen = ctx.start;
+  }
   if ((speed == 0) || (step == 0)) {
-    ctx.i = ctx.text.length;
+    ctx.pos = ctx.text.length;
+    cutLen = ctx.pos;
   } else {
-    ctx.i += step;
+    ctx.pos += step;
+  }
+  if (ctx.pos > ctx.end) {
+    ctx.pos = ctx.text.length;
+    cutLen = ctx.text.length - prevPos;
   }
   ctx.tmrId = 0;
-  var text = ctx.text.substr(0, ctx.i);
+  var text = ctx.text.substr(0, ctx.pos);
   if (ctx.isInp) {
     el.value = text;
   } else {
     el.innerText = text;
   }
-  util.textseq.onprogress(ctx);
-  if (ctx.i < ctx.text.length) {
+  util.textseq.onprogress(ctx, prevPos, cutLen);
+  if (ctx.pos < ctx.text.length) {
     speed = ctx.speed;
     ctx.tmrId = setTimeout(util._textseq, speed, ctx);
   } else {
@@ -2070,25 +2084,31 @@ util.textseq._stop = function(ctx) {
     ctx.tmrId = 0;
   }
 };
-util.textseq.onprogress = function(ctx) {
+util.textseq.onprogress = function(ctx, prevPos, cutLen) {
   if (!ctx.onprogress) return;
-  var ch = ctx.text.substr(ctx.i - ctx.step, 1);
-  ctx.onprogress(ctx, ch);
+  var chunk = ctx.text.substr(prevPos, cutLen);
+  ctx.onprogress(ctx, chunk);
 };
 util.textseq.oncomplete = function(ctx) {
   var i = util.textseq.idx(ctx.el);
   util.textseq.ctxs.splice(i, 1);
   if (ctx.oncomplete) ctx.oncomplete(ctx);
 };
-util.textseq.createCtx = function(el, text, speed, step) {
+util.textseq.createCtx = function(el, text, speed, step, start, len) {
+  var end = text.length;
+  if (len > 0) end = start + len;
+  var pos = start - 1;
+  if (pos < 0) pos = 0;
   var ctx = {
     el: el,
     text: text,
     speed: speed,
     step: step,
+    start: start,
+    end: end,
     isInp: util.isTextInput(el),
     tmrId: 0,
-    i: 0,
+    pos: 0,
     onprogress: null,
     oncomplete: null
   };
