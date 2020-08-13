@@ -62,7 +62,7 @@ public class Hash {
       byte[] b = md.digest(input);
       hash = DatatypeConverter.printHexBinary(b);
     } catch (NoSuchAlgorithmException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     return hash;
   }

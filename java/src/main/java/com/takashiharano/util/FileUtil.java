@@ -95,7 +95,7 @@ public class FileUtil {
     try {
       text = new String(content, charsetName);
     } catch (UnsupportedEncodingException e) {
-      text = null;
+      throw new RuntimeException(e);
     }
     return text;
   }

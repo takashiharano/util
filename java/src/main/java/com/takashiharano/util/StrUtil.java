@@ -415,7 +415,7 @@ public class StrUtil {
     try {
       encoded = URLEncoder.encode(src, encoding);
     } catch (UnsupportedEncodingException e) {
-      encoded = null;
+      throw new RuntimeException(e);
     }
     return encoded;
   }
@@ -450,7 +450,7 @@ public class StrUtil {
     try {
       decoded = URLDecoder.decode(src, encoding);
     } catch (UnsupportedEncodingException e) {
-      decoded = null;
+      throw new RuntimeException(e);
     }
     return decoded;
   }

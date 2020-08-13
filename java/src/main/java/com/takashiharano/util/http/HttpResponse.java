@@ -112,13 +112,7 @@ public class HttpResponse {
    * @return response text
    */
   public String getResponseText() {
-    String b;
-    try {
-      b = getResponseText(null);
-    } catch (UnsupportedEncodingException e) {
-      b = null;
-    }
-    return b;
+    return getResponseText("UTF-8");
   }
 
   /**
@@ -129,14 +123,16 @@ public class HttpResponse {
    * @return
    * @throws UnsupportedEncodingException
    */
-  public String getResponseText(String charsetName) throws UnsupportedEncodingException {
+  public String getResponseText(String charsetName) {
     if (body == null) {
       return null;
     }
-    if (charsetName == null) {
-      charsetName = "UTF-8";
+    String b;
+    try {
+      b = new String(body, charsetName);
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
     }
-    String b = new String(body, charsetName);
     return b;
   }
 

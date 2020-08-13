@@ -38,7 +38,7 @@ public class StreamGobbler implements Runnable {
     try {
       result = new String(output, charset);
     } catch (UnsupportedEncodingException e) {
-      result = null;
+      throw new RuntimeException(e);
     }
     return result;
   }

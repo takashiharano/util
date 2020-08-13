@@ -55,7 +55,7 @@ public class Util {
       srcBytes = src.getBytes(charsetName);
       encoded = Base64.getEncoder().encodeToString(srcBytes);
     } catch (UnsupportedEncodingException e) {
-      Log.e("Base64 encode error: " + e);
+      throw new RuntimeException(e);
     }
     return encoded;
   }
@@ -107,7 +107,7 @@ public class Util {
     try {
       str = new String(decoded, charsetName);
     } catch (UnsupportedEncodingException e) {
-      Log.e("Base64 decode error: " + e);
+      throw new RuntimeException(e);
     }
     return str;
   }
