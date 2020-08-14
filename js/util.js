@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008122100';
+util.v = '202008141415';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -144,6 +144,7 @@ util.DateTime.prototype = {
     s = s.replace(/%s/, this.sss);
     s = s.replace(/%z/, this.getTZ());
     s = s.replace(/%Z/, this.getTZ(true));
+    s = s.replace(/%N/, util.getTzName());
     return s;
   }
 };
