@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202008112305
+v = 202008160023
 
 import os
 import sys
@@ -599,9 +599,15 @@ def next_list_val(arr, val, offset=1):
 #-----------------
 # DateTime Class
 #-----------------
-# src: datetime / timestamp / date-time-string
-# tz : datetime.timezone(offset, name=None)
-#  offset: datetime.timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
+# src:
+#   timestamp
+#   date-time-string
+#   datetime
+# fmt:
+#   %Y-%m-%d %H:%M:%S.%f = 2020-01-02 12:34:56.123456
+# tz :
+#   datetime.timezone(offset, name=None)
+#     offset: datetime.timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
 class DateTime:
   def __init__(self, src=None, fmt='%Y-%m-%d %H:%M:%S.%f', tz=None):
     if typename(src) == 'datetime':
@@ -640,6 +646,7 @@ class DateTime:
         offset = (86400 - offset) * (-1)
       self.offset = offset
 
+  # 2020-01-02 12:34:56.123456 +09:00
   def to_str(self, fmt='%Y-%m-%d %H:%M:%S.%f %Z'):
     s = fmt
     s = replace(s, '%Y', self.yyyy)
@@ -657,8 +664,8 @@ class DateTime:
 def now():
   return get_timestamp()
 
-# 1546400096.987654 (float)    -> datetime
-# '2019-01-02 12:34:56.987654' -> datetime
+# 1546400096.123456 (float)    -> datetime
+# '2019-01-02 12:34:56.123456' -> datetime
 def get_datetime(src=None, fmt='%Y-%m-%d %H:%M:%S.%f', tz=None):
   if src is None:
     dt = datetime.datetime.today()
@@ -671,8 +678,8 @@ def get_datetime(src=None, fmt='%Y-%m-%d %H:%M:%S.%f', tz=None):
     dt = datetime.datetime.fromtimestamp(src, tz)
   return dt
 
-# datetime                  -> '2019-01-02 12:34:56.987654'
-# 1546400096.987654 (float) -> '2019-01-02 12:34:56.987654'
+# datetime                  -> '2019-01-02 12:34:56.123456'
+# 1546400096.123456 (float) -> '2019-01-02 12:34:56.123456'
 def get_datetime_str(dt=datetime.datetime.today(), fmt='%Y-%m-%d %H:%M:%S.%f', tz=None):
   s = None
   if typename(dt) == 'float' or typename(dt) == 'int':
@@ -681,8 +688,8 @@ def get_datetime_str(dt=datetime.datetime.today(), fmt='%Y-%m-%d %H:%M:%S.%f', t
   return s
 
 # POSIX timestamp (float)
-# datetime                     -> 1546400096.987654
-# '2019-01-02 12:34:56.987654' -> 1546400096.987654
+# datetime                     -> 1546400096.123456
+# '2019-01-02 12:34:56.123456' -> 1546400096.123456
 def get_timestamp(dt=datetime.datetime.today(), fmt='%Y-%m-%d %H:%M:%S.%f'):
   if typename(dt) == 'str':
     dt = datetime.datetime.strptime(dt, fmt)
