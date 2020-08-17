@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008141415';
+util.v = '202008171958';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -212,6 +212,7 @@ util.getTimeStampOfDay = function(timeString, offset) {
 
 /**
  * millis to struct
+ * -> {'sign': false, 'days': 1, 'hrs': 0, 'hours': 24, 'minutes': 34, 'seconds': 56, 'milliseconds': 123}
  */
 util.ms2struct = function(ms) {
   var wk = ms;
@@ -235,12 +236,12 @@ util.ms2struct = function(ms) {
   var sss = wk - (ss * 1000);
   var tm = {
     sign: sign,
-    d: d,
-    hr: hh - d * 24,
-    hh: hh,
-    mi: mi,
-    ss: ss,
-    sss: sss
+    days: d,
+    hrs: hh - d * 24,
+    hours: hh,
+    minutes: mi,
+    seconds: ss,
+    milliseconds: sss
   };
   return tm;
 };
@@ -342,8 +343,8 @@ util.diffDays = function(ms1, ms2, abs) {
 //-----------------------------------------------------------------------------
 /**
  * Time class
- * t
- *   millis / '12:34:56.789'
+ * t:
+ *   millis or '12:34:56.789'
  */
 util.Time = function(t) {
   if (typeof t == 'string') {
@@ -362,12 +363,12 @@ util.Time = function(t) {
   this.millis = t;
   var tm = util.ms2struct(t);
   this.sign = tm.sign;
-  this.days = tm.d;
-  this.hrs = tm.hr;
-  this.hours = tm.hh;
-  this.minutes = tm.mi;
-  this.seconds = tm.ss;
-  this.milliseconds = tm.sss;
+  this.days = tm.days;
+  this.hrs = tm.hrs;
+  this.hours = tm.hours;
+  this.minutes = tm.minutes;
+  this.seconds = tm.seconds;
+  this.milliseconds = tm.milliseconds;
 };
 util.Time.prototype = {
   /**
@@ -413,8 +414,12 @@ util.Time.prototype = {
    * To string the time.
    *
    * 1d 23h 45m 59s
-   * h=true: 47h 45m 59s
-   * f=true: 1d 23h 45m 59s 123
+   * h:
+   *   >= 24h instead of days
+   *   true: 47h 45m 59s
+   * f:
+   *   to display millis
+   *   true: 1d 23h 45m 59s 123
    */
   toString: function(h, f) {
     var r = '';
@@ -441,7 +446,14 @@ util.Time.prototype = {
 };
 
 /**
- * 171959000 -> '1d 23h 45m 59s'
+ * Millis to a string. (171959000 -> '1d 23h 45m 59s')
+ *
+ * h:
+ *   >= 24h instead of days
+ *   true: 47h 45m 59s
+ * f:
+ *   to display millis
+ *   true: 1d 23h 45m 59s 123
  */
 util.getTimeString = function(ms, h, f) {
   return new util.Time(ms).toString(h, f);
@@ -453,8 +465,8 @@ util.getTimeString = function(ms, h, f) {
 /**
  * ClockTime Class
  */
-util.ClockTime = function(secs, days, integratedSt, clocklikeSt) {
-  this.secs = secs;
+util.ClockTime = function(msecs, days, integratedSt, clocklikeSt) {
+  this.msecs = msecs;
   this.days = days;
   this.integratedSt = integratedSt;
   this.clocklikeSt = clocklikeSt;
@@ -465,15 +477,15 @@ util.ClockTime.prototype = {
   // %H:%m:%S.%s      '25:00:00.000'
   // %H:%m:%S.%s (%d) '01:00:00.000 (+1 Day)'
   toString: function(fmt) {
-    if (!fmt) fmt = '%H:%m:%S.%s (%d)';
+    if (!fmt) fmt = '%H:%m:%S.%s';
     var byTheDay = fmt.match(/%d/) != null;
 
-    var h = this.toHoursStr(byTheDay);
-    var m = this.toMinutesStr(byTheDay);
-    var s = this.toSecondsStr(byTheDay);
-    var ms = this.toMillisecondsStr(byTheDay);
+    var h = this.toHrStr(byTheDay);
+    var m = this.toMinStr(byTheDay);
+    var s = this.toSecStr(byTheDay);
+    var ms = this.toMilliSecStr(byTheDay);
 
-    if ((this.secs < 0) && !byTheDay) {
+    if ((this.msecs < 0) && !byTheDay) {
       h = '-' + h;
     }
 
@@ -492,7 +504,7 @@ util.ClockTime.prototype = {
 
   toDaysStr: function() {
     var days;
-    if (this.secs < 0) {
+    if (this.msecs < 0) {
       days = '-';
     } else {
       days = '+';
@@ -501,16 +513,16 @@ util.ClockTime.prototype = {
     return days;
   },
 
-  toHoursStr: function(byTheDay) {
+  toHrStr: function(byTheDay) {
     var h;
     var hh;
     if (byTheDay === undefined) {
       byTheDay = false;
     }
     if (byTheDay) {
-      h = this.clocklikeSt['hours'];
+      h = this.clocklikeSt['hrs'];
     } else {
-      h = this.integratedSt['hrs'];
+      h = this.integratedSt['hours'];
     }
     if (h < 10) {
       hh = ('0' + h).slice(-2);
@@ -520,7 +532,7 @@ util.ClockTime.prototype = {
     return hh;
   },
 
-  toMinutesStr: function(byTheDay) {
+  toMinStr: function(byTheDay) {
     if (byTheDay === undefined) {
       byTheDay = false;
     }
@@ -528,7 +540,7 @@ util.ClockTime.prototype = {
     return ('0' + st['minutes']).slice(-2);
   },
 
-  toSecondsStr: function(byTheDay) {
+  toSecStr: function(byTheDay) {
     if (byTheDay === undefined) {
       byTheDay = false;
     }
@@ -536,12 +548,12 @@ util.ClockTime.prototype = {
     return ('0' + st['seconds']).slice(-2);
   },
 
-  toMillisecondsStr: function(byTheDay) {
+  toMilliSecStr: function(byTheDay) {
     if (byTheDay === undefined) {
       byTheDay = false;
     }
     var st = (byTheDay ? this.clocklikeSt : this.integratedSt);
-    return ('00' + ((st['milliseconds'] * 1000) | 0)).slice(-3);
+    return ('00' + (st['milliseconds'] | 0)).slice(-3);
   }
 };
 
@@ -555,21 +567,21 @@ util.ClockTime.prototype = {
  */
 util.addTime = function(t1, t2, fmt) {
   if (!fmt) fmt = '%H:%m';
-  var s1 = util.time2sec(t1);
-  var s2 = util.time2sec(t2);
-  var t = util._addTime(s1, s2);
+  var ms1 = util.time2msec(t1);
+  var ms2 = util.time2msec(t2);
+  var t = util._addTime(ms1, ms2);
   return t.toString(fmt);
 };
 // Returns ClockTime object
-util._addTime = function(t1, t2) {
-  var totalSecs = t1 + t2;
-  var wkSecs = totalSecs;
+util._addTime = function(ms1, ms2) {
+  var totalMillis = ms1 + ms2;
+  var wkMillis = totalMillis;
   var days = 0;
-  if (wkSecs >= util.DAY_SEC) {
-    days = (wkSecs / util.DAY_SEC) | 0;
-    wkSecs -= days * util.DAY_SEC;
+  if (wkMillis >= util.DAY) {
+    days = (wkMillis / util.DAY) | 0;
+    wkMillis -= days * util.DAY;
   }
-  return util._calcTime(totalSecs, wkSecs, days);
+  return util._calcTime(totalMillis, wkMillis, days);
 };
 
 /**
@@ -582,28 +594,28 @@ util._addTime = function(t1, t2) {
  */
 util.subTime = function(t1, t2, fmt) {
   if (!fmt) fmt = '%H:%m';
-  var s1 = util.time2sec(t1);
-  var s2 = util.time2sec(t2);
-  var t = util._subTime(s1, s2);
+  var ms1 = util.time2msec(t1);
+  var ms2 = util.time2msec(t2);
+  var t = util._subTime(ms1, ms2);
   return t.toString(fmt);
 };
 // Returns ClockTime object
-util._subTime = function(t1, t2) {
-  var totalSecs = t1 - t2;
-  var wkSecs = totalSecs;
+util._subTime = function(ms1, ms2) {
+  var totalMillis = ms1 - ms2;
+  var wkMillis = totalMillis;
   var days = 0;
-  if (wkSecs < 0) {
-    wkSecs *= -1;
-    days = (wkSecs / util.DAY_SEC) | 0;
-    days = days + ((wkSecs % util.DAY_SEC == 0) ? 0 : 1);
-    if (t1 != 0) {
-      if ((wkSecs % util.DAY_SEC == 0) && (wkSecs != util.DAY_SEC)) {
+  if (wkMillis < 0) {
+    wkMillis *= -1;
+    days = (wkMillis / util.DAY) | 0;
+    days = days + ((wkMillis % util.DAY == 0) ? 0 : 1);
+    if (ms1 != 0) {
+      if ((wkMillis % util.DAY == 0) && (wkMillis != util.DAY)) {
         days += 1;
       }
     }
-    wkSecs = util.DAY_SEC - (wkSecs - days * util.DAY_SEC);
+    wkMillis = util.DAY - (wkMillis - days * util.DAY);
   }
-  return util._calcTime(totalSecs, wkSecs, days);
+  return util._calcTime(totalMillis, wkMillis, days);
 };
 
 /**
@@ -616,20 +628,20 @@ util._subTime = function(t1, t2) {
  */
 util.multiTime = function(t, v, fmt) {
   if (!fmt) fmt = '%H:%m';
-  var s = util.time2sec(t);
-  var c = util._multiTime(s, v);
+  var ms = util.time2msec(t);
+  var c = util._multiTime(ms, v);
   return c.toString(fmt);
 };
 // Returns ClockTime object
-util._multiTime = function(s, v) {
-  var totalSecs = s * v;
-  var wkSecs = totalSecs;
+util._multiTime = function(ms, v) {
+  var totalMillis = ms * v;
+  var wkMillis = totalMillis;
   var days = 0;
-  if (wkSecs >= util.DAY_SEC) {
-    days = (wkSecs / util.DAY_SEC) | 0;
-    wkSecs -= days * util.DAY_SEC;
+  if (wkMillis >= util.DAY) {
+    days = (wkMillis / util.DAY) | 0;
+    wkMillis -= days * util.DAY;
   }
-  return util._calcTime(totalSecs, wkSecs, days);
+  return util._calcTime(totalMillis, wkMillis, days);
 };
 
 /**
@@ -642,27 +654,27 @@ util._multiTime = function(s, v) {
  */
 util.divTime = function(t, v, fmt) {
   if (!fmt) fmt = '%H:%m';
-  var s = util.time2sec(t);
-  var c = util._divTime(s, v);
+  var ms = util.time2msec(t);
+  var c = util._divTime(ms, v);
   return c.toString(fmt);
 };
 // Returns ClockTime object
-util._divTime = function(s, v) {
-  var totalSecs = s / v;
-  var wkSecs = totalSecs;
+util._divTime = function(ms, v) {
+  var totalMillis = ms / v;
+  var wkMillis = totalMillis;
   var days = 0;
-  if (wkSecs >= util.DAY_SEC) {
-    days = (wkSecs / util.DAY_SEC) | 0;
-    wkSecs -= days * util.DAY_SEC;
+  if (wkMillis >= util.DAY) {
+    days = (wkMillis / util.DAY) | 0;
+    wkMillis -= days * util.DAY;
   }
-  return util._calcTime(totalSecs, wkSecs, days);
+  return util._calcTime(totalMillis, wkMillis, days);
 };
 
 // Calc time (convert to struct)
-util._calcTime = function(totalSecs, wkSecs, days) {
-  var integratedSt = util.sec2struct(totalSecs);
-  var clocklikeSt = util.sec2struct(wkSecs);
-  var ret = new util.ClockTime(totalSecs, days, integratedSt, clocklikeSt);
+util._calcTime = function(totalMillis, wkMillis, days) {
+  var integratedSt = util.ms2struct(totalMillis);
+  var clocklikeSt = util.ms2struct(wkMillis);
+  var ret = new util.ClockTime(totalMillis, days, integratedSt, clocklikeSt);
   return ret;
 };
 
@@ -670,9 +682,9 @@ util._calcTime = function(totalSecs, wkSecs, days) {
 // '10:00', '10:00' -> 0
 // '10:00', '09:00' -> 1
 util.timecmp = function(t1, t2) {
-  var s1 = util.time2sec(t1);
-  var s2 = util.time2sec(t2);
-  var d = s1 - s2;
+  var ms1 = util.time2msec(t1);
+  var ms2 = util.time2msec(t2);
+  var d = ms1 - ms2;
   if (d == 0) {
     return 0;
   } else if (d < 0) {
@@ -681,102 +693,61 @@ util.timecmp = function(t1, t2) {
   return 1;
 };
 
-// timestr: 'HH:MI:SS.sss'
-// '01:00'        -> 3600.0
-// '01:00:30'     -> 3630.0
-// '01:00:30.123' -> 3630.123
-// '0100'         -> 3600.0
-// '010030'       -> 3630.0
-// '010030.123'   -> 3630.123
-util.time2sec = function(timestr) {
+// timeStr: 'HH:MI:SS.sss'
+// '01:00'        -> 3600000
+// '01:00:30'     -> 3630000
+// '01:00:30.123' -> 3630123
+// '0100'         -> 3600000
+// '010030'       -> 3630000
+// '010030.123'   -> 3630123
+util.time2msec = function(timeStr) {
   var hour = 0;
   var min = 0;
   var sec = 0;
   var msec = 0;
-  var s = '0';
-  var times;
-  var ss;
+  var wkSs = '0';
+  var wkTimes;
+  var sPrt;
   var tm;
 
-  if (timestr.match(/:/)) {
-    times = timestr.split(':');
-    if (times.length == 3) {
-      hour = times[0] | 0;
-      min = times[1] | 0;
-      s = times[2];
-    } else if (times.length == 2) {
-      hour = times[0] | 0;
-      min = times[1] | 0;
+  if (timeStr.match(/:/)) {
+    wkTimes = timeStr.split(':');
+    if (wkTimes.length == 3) {
+      hour = wkTimes[0] | 0;
+      min = wkTimes[1] | 0;
+      wkSs = wkTimes[2];
+    } else if (wkTimes.length == 2) {
+      hour = wkTimes[0] | 0;
+      min = wkTimes[1] | 0;
     } else {
-      return null;
+      return -1;
     }
-    ss = s.split('.');
-    sec = ss[0] | 0;
-    if (ss.length >= 2) {
-      msec = parseFloat('0.' + ss[1]);
+    sPrt = wkSs.split('.');
+    sec = sPrt[0] | 0;
+    if (sPrt.length >= 2) {
+      msec = sPrt[1] | 0;
     }
   } else {
-    tm = timestr.split('.');
-    times = tm[0];
+    tm = timeStr.split('.');
+    wkTimes = tm[0];
     if (tm.length >= 2) {
-      msec = parseFloat('0.' + tm[1]);
+      msec = tm[1] | 0;
     }
 
-    if (times.length == 6) {
-      hour = times.substr(0, 2) | 0;
-      min = times.substr(2, 2) | 0;
-      sec = times.substr(4, 2) | 0;
-    } else if (times.length == 4) {
-      hour = times.substr(0, 2) | 0;
-      min = times.substr(2, 2) | 0;
+    if (wkTimes.length == 6) {
+      hour = wkTimes.substr(0, 2) | 0;
+      min = wkTimes.substr(2, 2) | 0;
+      sec = wkTimes.substr(4, 2) | 0;
+    } else if (wkTimes.length == 4) {
+      hour = wkTimes.substr(0, 2) | 0;
+      min = wkTimes.substr(2, 2) | 0;
     } else {
-      return null;
+      return -1;
     }
   }
 
-  var time = (hour * util.HOUR_SEC) + (min * util.MINUTE_SEC) + sec + msec;
+  var time = (hour * util.HOUR) + (min * util.MINUTE) + sec * 1000 + msec;
   return time;
-};
-
-util.time2ms = function(t) {
-  return util.time2sec(t) * 1000;
-};
-
-// 86567.123
-// -> {'sign': false, 'days': 1, 'hrs': 24, 'hours': 0, 'minutes': 2, 'seconds': 47, 'milliseconds': 0.123}
-util.sec2struct = function(seconds) {
-  var wk = seconds;
-  var sign = false;
-  if (seconds < 0) {
-    sign = true;
-    wk *= (-1);
-  }
-
-  var days = (wk / util.DAY_SEC) | 0;
-  var hh = 0;
-  if (wk >= util.HOUR_SEC) {
-    hh = (wk / util.HOUR_SEC) | 0;
-    wk -= (hh * util.HOUR_SEC);
-  }
-
-  var mi = 0;
-  if (wk >= util.MINUTE_SEC) {
-    mi = (wk / util.MINUTE_SEC) | 0;
-    wk -= (mi * util.MINUTE_SEC);
-  }
-
-  var ss = wk | 0;
-  var ms = util.round(wk - ss, 3);
-  var tm = {
-    sign: sign,
-    days: days,
-    hrs: hh,
-    hours: hh - days * 24,
-    minutes: mi,
-    seconds: ss,
-    milliseconds: ms
-  };
-  return tm;
 };
 
 //-----------------------------------------------------------------------------
