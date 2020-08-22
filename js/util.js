@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008222033';
+util.v = '202008230004';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -3695,38 +3695,34 @@ util.Meter.buildHTML = function(val, opt) {
  *   color: '#0f0',
  *   shadow: '0 0 5px',
  *   className: 'xxx',
+ *   labelClassName: 'xxx',
  *   active: true
  * };
  */
 util.Led = function(target, opt) {
-  var el = $el(target);
-  var size = '16px';
-  var color = util.Led.DFLT_COLOR;
-  var shadow = '0 0 5px';
-  var className = '';
-  var active = false;
+  var baseEl = $el(target);
+  if (!opt) opt = {};
+  if (opt.size == undefined) opt.size = '16px';
+  if (opt.color == undefined) opt.color = util.Led.DFLT_COLOR;
+  if (opt.shadow == undefined) opt.shadow = '0 0 5px';
+  var active = opt.active ? true : false;
 
-  if (opt) {
-    if (opt.size != undefined) size = opt.size;
-    if (opt.color != undefined) color = opt.color;
-    if (opt.shadow != undefined) shadow = opt.shadow;
-    if (opt.className != undefined) className = opt.className;
-    if (opt.active) active = true;
-  }
-
-  util.addClass(el, 'led');
-  if (className) util.addClass(el, className);
+  var ledEl = document.createElement('span');
+  util.addClass(ledEl, 'led');
+  if (opt.className) util.addClass(ledEl, opt.className);
   var style = {
-    'font-size': size,
-    color: (active ? color : util.Led.INACTV_COLOR)
+    'font-size': opt.size,
+    color: (active ? opt.color : util.Led.INACTV_COLOR)
   };
-  if (shadow) style['text-shadow'] = shadow;
-  util.setStyles(el, style);
-  el.innerHTML = '&#x25CF;';
+  if (opt.shadow) style['text-shadow'] = opt.shadow;
+  util.setStyles(ledEl, style);
+  ledEl.innerHTML = '&#x25CF;';
+  baseEl.appendChild(ledEl);
 
-  this.el = el;
-  this.size = size;
-  this.color = color;
+  this.opt = opt;
+  this.baseEl = baseEl;
+  this.ledEl = ledEl;
+  this.labelEl = null;
   this.active = active;
   this.lighted = active;
   this.timerId = 0;
@@ -3756,11 +3752,11 @@ util.Led.prototype = {
   },
   _on: function(ctx) {
     ctx.lighted = true;
-    util.setStyle(ctx.el, 'color', ctx.color);
+    util.setStyle(ctx.ledEl, 'color', ctx.opt.color);
   },
   _off: function(ctx) {
     ctx.lighted = false;
-    util.setStyle(ctx.el, 'color', util.Led.INACTV_COLOR);
+    util.setStyle(ctx.ledEl, 'color', util.Led.INACTV_COLOR);
   },
   startBlink: function(d) {
     var ctx = this;
@@ -3797,7 +3793,7 @@ util.Led.prototype = {
     ctx.timerId = setTimeout(ctx.blink, ctx.blinkDuration, ctx);
   },
   setColor: function(c) {
-    this.color = c;
+    this.opt.color = c;
     if (this.active) {
       this.on();
     }
@@ -3805,8 +3801,24 @@ util.Led.prototype = {
   isActive: function() {
     return this.active;
   },
+  setLabel: function(txt) {
+    var ctx = this;
+    var el = ctx.labelEL;
+    if (!el) {
+      el = document.createElement('span');
+      util.addClass(el, 'led-label');
+      if (ctx.opt.labelClassName) {
+        util.addClass(el, ctx.opt.labelClassName);
+      } else {
+        el.style.marginLeft = '4px';
+      }
+      ctx.baseEl.appendChild(el);
+    }
+    el.innerHTML = txt;
+    ctx.labelEL = el;
+  },
   getElement: function() {
-    return this.el;
+    return this.baseEl;
   }
 };
 
