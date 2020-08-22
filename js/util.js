@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008171958';
+util.v = '202008222033';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -170,12 +170,8 @@ util.now = function() {
  * fmt: '%Y-%M-%D %H:%m:%S.%s'
  */
 util.getDateTimeString = function(t, fmt) {
-  var d = util.getDateTime(t);
-  return d.toString(fmt);
-};
-util.getDateTimeStringFromSec = function(s, fmt) {
-  var t = util.sec2ms(s);
-  return util.getDateTimeString(t, fmt);
+  var dt = new util.DateTime(t);
+  return dt.toString(fmt);
 };
 
 /**
