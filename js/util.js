@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008232120';
+util.v = '202008232150';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1609,7 +1609,7 @@ var $el = function(target, idx) {
   var el = util.getElement(target, idx);
   if (el) {
     for (var k in $el.fn) {
-      if (!el[k]) el[k] = $el.fn[k];
+      if (el[k] == undefined) el[k] = $el.fn[k];
     }
   }
   return el;
@@ -1626,7 +1626,7 @@ $el.fn = {
     if (speed == undefined) speed = 0;
     util.writeHTML(this, html, speed);
   },
-  clear: function(speed) {
+  clear: function(speed) { // Not available for <pre> on IE11
     var el = this;
     if (util.isTextInput(el)) {
       el.value = '';
