@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008231441';
+util.v = '202008232033';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1626,6 +1626,15 @@ $el.fn = {
     if (speed == undefined) speed = 0;
     util.writeHTML(this, html, speed);
   },
+  clear: function(speed) {
+    var el = this;
+    if (util.isTextInput(el)) {
+      el.value = '';
+    } else {
+      if (speed == undefined) speed = 0;
+      util.clearHTML(el, speed);
+    }
+  },
   textseq: function(text, speed, step) {
     return util.textseq(this, text, speed, step);
   },
@@ -1659,11 +1668,15 @@ $el.fn = {
   position: function(x, y) {
     util.setPosition(this, x, y);
   },
-  blink: function() {
-    util.addClass(this, 'blink');
+  blink: function(a) {
+    if (a == undefined) a = true;
+    var f = a ? util.addClass : util.removeClass;
+    f(this, 'blink');
   },
-  stopBlink: function() {
-    util.removeClass(this, 'blink');
+  blink2: function(a) {
+    if (a == undefined) a = true;
+    var f = a ? util.addClass : util.removeClass;
+    f(this, 'blink2');
   },
   hide: function() {
     var el = this;
