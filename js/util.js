@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008232033';
+util.v = '202008232120';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -3754,14 +3754,14 @@ util.Led.DFLT_BLINK_DURATION = 700;
 util.Led.prototype = {
   on: function(color) {
     var ctx = this;
-    ctx.stopBlink();
+    ctx._stopBlink();
     if (color) ctx.opt.color = color;
     ctx.active = true;
     ctx._on(ctx);
   },
   off: function(color) {
     var ctx = this;
-    ctx.stopBlink();
+    ctx._stopBlink();
     if (color) ctx.opt.offColor = color;
     ctx.active = false;
     ctx._off(ctx);
@@ -3784,12 +3784,11 @@ util.Led.prototype = {
   },
   blink: function(d) {
     var ctx = this;
+    ctx._stopBlink();
+    if (d === false) return;
     d |= 0;
-    if (d <= 0) {
-      d = util.Led.DFLT_BLINK_DURATION;
-    }
+    if (d <= 0) d = util.Led.DFLT_BLINK_DURATION;
     ctx.blinkDuration = d;
-    ctx.stopBlink();
     ctx._blink(ctx);
   },
   _blink: function(ctx) {
@@ -3800,8 +3799,18 @@ util.Led.prototype = {
     }
     ctx.timerId = setTimeout(ctx._blink, ctx.blinkDuration, ctx);
   },
-  stopBlink: function() {
+  blink2: function(a) {
     var ctx = this;
+    if (a == undefined) a = true;
+    ctx._stopBlink();
+    if (a) {
+      ctx._on(ctx);
+      util.addClass(ctx.ledEl, 'blink2');
+    }
+  },
+  _stopBlink: function() {
+    var ctx = this;
+    util.removeClass(ctx.ledEl, 'blink2');
     if (ctx.timerId > 0) {
       clearTimeout(ctx.timerId);
       ctx.timerId = 0;
