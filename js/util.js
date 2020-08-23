@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008240020';
+util.v = '202008240120';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -3736,7 +3736,8 @@ util.Led = function(target, opt) {
   if (opt.className) util.addClass(ledEl, opt.className);
   var style = {
     'font-size': opt.size,
-    color: (active ? opt.color : opt.offColor)
+    color: (active ? opt.color : opt.offColor),
+    cursor: 'default'
   };
   if (opt.shadow) style['text-shadow'] = opt.shadow;
   util.setStyles(ledEl, style);
@@ -3861,6 +3862,9 @@ util.Led.prototype = {
   },
   getElement: function() {
     return this.baseEl;
+  },
+  getLedElement: function() {
+    return this.ledEl;
   }
 };
 
