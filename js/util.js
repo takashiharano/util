@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008231353';
+util.v = '202008231441';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -3689,10 +3689,16 @@ util.Meter.buildHTML = function(val, opt) {
 //-----------------------------------------------------------------------------
 // LED
 //-----------------------------------------------------------------------------
+// var led = new util.Led('#led1', opt);
+// led.on();
+// led.off();
+// led.blink();
+// led.setLavel('TEXT');
 /**
  * opt = {
  *   size: '16px',
  *   color: '#0f0',
+ *   offColor: '#888',
  *   shadow: '0 0 5px',
  *   className: 'xxx',
  *   labelClassName: 'xxx',
@@ -3704,6 +3710,7 @@ util.Led = function(target, opt) {
   if (!opt) opt = {};
   if (opt.size == undefined) opt.size = '16px';
   if (opt.color == undefined) opt.color = util.Led.DFLT_COLOR;
+  if (opt.offColor == undefined) opt.offColor = util.Led.DFLT_INACTV_COLOR;
   if (opt.shadow == undefined) opt.shadow = '0 0 5px';
   var active = opt.active ? true : false;
 
@@ -3712,7 +3719,7 @@ util.Led = function(target, opt) {
   if (opt.className) util.addClass(ledEl, opt.className);
   var style = {
     'font-size': opt.size,
-    color: (active ? opt.color : util.Led.INACTV_COLOR)
+    color: (active ? opt.color : opt.offColor)
   };
   if (opt.shadow) style['text-shadow'] = opt.shadow;
   util.setStyles(ledEl, style);
@@ -3729,25 +3736,29 @@ util.Led = function(target, opt) {
   this.blinkDuration = util.Led.DFLT_BLINK_DURATION;
 };
 util.Led.DFLT_COLOR = '#0f0';
-util.Led.INACTV_COLOR = '#888';
+util.Led.DFLT_INACTV_COLOR = '#888';
 util.Led.DFLT_BLINK_DURATION = 700;
 util.Led.prototype = {
-  on: function() {
+  on: function(color) {
     var ctx = this;
+    ctx.stopBlink();
+    if (color) ctx.opt.color = color;
     ctx.active = true;
     ctx._on(ctx);
   },
-  off: function() {
+  off: function(color) {
     var ctx = this;
+    ctx.stopBlink();
+    if (color) ctx.opt.offColor = color;
     ctx.active = false;
     ctx._off(ctx);
   },
   toggle: function() {
     var ctx = this;
     if (ctx.active) {
-      ctx.off(ctx);
+      ctx.off();
     } else {
-      ctx.on(ctx);
+      ctx.on();
     }
   },
   _on: function(ctx) {
@@ -3756,9 +3767,9 @@ util.Led.prototype = {
   },
   _off: function(ctx) {
     ctx.lighted = false;
-    util.setStyle(ctx.ledEl, 'color', util.Led.INACTV_COLOR);
+    util.setStyle(ctx.ledEl, 'color', ctx.opt.offColor);
   },
-  startBlink: function(d) {
+  blink: function(d) {
     var ctx = this;
     d |= 0;
     if (d <= 0) {
@@ -3766,40 +3777,45 @@ util.Led.prototype = {
     }
     ctx.blinkDuration = d;
     ctx.stopBlink();
-    ctx.blink(ctx);
+    ctx._blink(ctx);
   },
-  stopBlink: function(on) {
+  _blink: function(ctx) {
+    if (ctx.lighted) {
+      ctx._off(ctx);
+    } else {
+      ctx._on(ctx);
+    }
+    ctx.timerId = setTimeout(ctx._blink, ctx.blinkDuration, ctx);
+  },
+  stopBlink: function() {
     var ctx = this;
     if (ctx.timerId > 0) {
       clearTimeout(ctx.timerId);
       ctx.timerId = 0;
     }
-    var active = on;
-    if (on == undefined) {
-      active = ctx.active;
-    }
+    var active = ctx.active;
     if (active) {
       ctx._on(ctx);
     } else {
       ctx._off(ctx);
     }
   },
-  blink: function(ctx) {
-    if (ctx.lighted) {
-      ctx._off(ctx);
-    } else {
-      ctx._on(ctx);
-    }
-    ctx.timerId = setTimeout(ctx.blink, ctx.blinkDuration, ctx);
-  },
-  setColor: function(c) {
-    this.opt.color = c;
-    if (this.active) {
-      this.on();
-    }
-  },
   isActive: function() {
     return this.active;
+  },
+  setColor: function(c) {
+    var ctx = this;
+    ctx.opt.color = c;
+    if (ctx.lighted) {
+      ctx._on(ctx);
+    }
+  },
+  setOffColor: function(c) {
+    var ctx = this;
+    ctx.opt.offColor = c;
+    if (!ctx.lighted) {
+      ctx._off(ctx);
+    }
   },
   setLabel: function(txt) {
     var ctx = this;
