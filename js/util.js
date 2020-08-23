@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008230004';
+util.v = '202008231353';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -4163,6 +4163,13 @@ util.RingBuffer.prototype = {
 //-----------------------------------------------------------------------------
 // Interval Proc
 //-----------------------------------------------------------------------------
+// Start  : startIntervalProc('proc-id', fn, 1000, [async(true|false)]);
+// Stop   : stopIntervalProc('proc-id');
+// Restart: startIntervalProc('proc-id');
+//
+// Async:
+// -> call in fn: nextIntervalProc('proc-id');
+//-----------------------------------------------------------------------------
 // {
 //   id: {
 //     fn: function(),
@@ -4200,7 +4207,7 @@ util.startIntervalProc = function(id, fn, interval, async) {
   var p = util.intervalProcs[id];
   if (p) {
     util._stopIntervalProc(p);
-    util.execIntervalProc(id);
+    util._execIntervalProc(id);
   }
 };
 
@@ -4219,17 +4226,6 @@ util._stopIntervalProc = function(p) {
 };
 
 /**
- * Execute an interval proc.
- */
-util.execIntervalProc = function(id) {
-  var p = util.intervalProcs[id];
-  if (p) {
-    p.fn();
-    if (!p.async) util.nextIntervalProc(id);
-  }
-};
-
-/**
  * Sets a timer which executes an intefval proc function.
  */
 util.nextIntervalProc = function(id, interval) {
@@ -4237,7 +4233,7 @@ util.nextIntervalProc = function(id, interval) {
   if (p) {
     util._stopIntervalProc(p);
     if (interval == undefined) interval = p.interval;
-    p.tmrId = setTimeout(util.execIntervalProc, interval, id);
+    p.tmrId = setTimeout(util._execIntervalProc, interval, id);
   }
 };
 
@@ -4247,6 +4243,17 @@ util.nextIntervalProc = function(id, interval) {
 util.setInterval = function(id, interval) {
   var p = util.intervalProcs[id];
   if (p) p.interval = interval;
+};
+
+/**
+ * Execute an interval proc.
+ */
+util._execIntervalProc = function(id) {
+  var p = util.intervalProcs[id];
+  if (p) {
+    p.fn();
+    if (!p.async) util.nextIntervalProc(id);
+  }
 };
 
 //-----------------------------------------------------------------------------
