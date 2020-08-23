@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008232150';
+util.v = '202008240020';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -127,9 +127,9 @@ util.DateTime.prototype = {
   setWdays: function(wdays) {
     this.WDAYS = wdays;
   },
-  // -> '+0900' : e=true -> '+09:00'
-  getTZ: function(e) {
-    return util.formatTZ(this.offset, e);
+  // -> '+0900' : ext=true -> '+09:00'
+  getTZ: function(ext) {
+    return util.formatTZ(this.offset, ext);
   },
   toString: function(fmt) {
     if (!fmt) fmt = '%Y-%M-%D %H:%m:%S.%s %Z';
@@ -1495,15 +1495,19 @@ util.http.onDone = function(xhr, req) {
   var res = xhr.responseText;
   if (util.http.logging) {
     var m = res;
-    if (m) {
-      if (m.length > util.http.LOG_LIMIT) {
-        m = '[size=' + m.length + ']';
-      } else if (m.length > util.http.MAX_LOG_LEN) {
-        m = m.substr(0, util.http.MAX_LOG_LEN) + '... (size=' + m.length + ')';
+    if (xhr.status == 0) {
+      m = 'ERROR =>X|';
+    } else {
+      if (m) {
+        if (m.length > util.http.LOG_LIMIT) {
+          m = '[size=' + m.length + ']';
+        } else if (m.length > util.http.MAX_LOG_LEN) {
+          m = m.substr(0, util.http.MAX_LOG_LEN) + '... (size=' + m.length + ')';
+        }
       }
+      m = '<= ' + util.escHTML(m);
     }
-    m = util.escHTML(m);
-    util._log.v('[' + req.trcid + '] <= ' + m);
+    util._log.v('[' + req.trcid + '] ' + m);
   }
   if (util.http.onReceive(xhr, res, req)) {
     if (xhr.status == 200) {
