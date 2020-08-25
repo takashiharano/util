@@ -1007,6 +1007,20 @@ End Function
 ' ("ABC123", "abc", True) -> True
 '
 Public Function Match(target As String, pattern As String, Optional ignoreCase As Boolean = False) As Boolean
+    pattern = Replace(pattern, "\", "\\")
+    pattern = Replace(pattern, "^", "\^")
+    pattern = Replace(pattern, "$", "\$")
+    pattern = Replace(pattern, "(", "\(")
+    pattern = Replace(pattern, ")", "\)")
+    pattern = Replace(pattern, "[", "\[")
+    pattern = Replace(pattern, "]", "\]")
+    pattern = Replace(pattern, ".", "\.")
+    pattern = Replace(pattern, "*", "\*")
+    pattern = Replace(pattern, "+", "\+")
+    pattern = Replace(pattern, "?", "\?")
+    pattern = Replace(pattern, "|", "\|")
+    pattern = Replace(pattern, "{", "\{")
+    pattern = Replace(pattern, "}", "\}")
     Dim regexp As Object
     Set regexp = CreateObject("VBScript.RegExp")
     With regexp
@@ -1737,7 +1751,7 @@ Public Sub ScrollToA1Cell(Optional ws As Worksheet = Nothing)
         Set ws = ActiveSheet
     End If
     ws.Activate
-    Application.Goto Reference:=Cells(1, 1), Scroll:=True
+    Application.GoTo Reference:=Cells(1, 1), Scroll:=True
 End Sub
 
 ''
@@ -1752,7 +1766,7 @@ Public Sub ResetAllSheetsToA1(Optional wb As Workbook = Nothing)
     For i = wb.Sheets.count To 1 Step -1
         Set ws = wb.Sheets(i)
         ws.Activate
-        Application.Goto Reference:=ws.Cells(1, 1), Scroll:=True
+        Application.GoTo Reference:=ws.Cells(1, 1), Scroll:=True
     Next i
 End Sub
 
