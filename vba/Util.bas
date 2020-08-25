@@ -1006,21 +1006,10 @@ End Function
 ' ("ABC123", "abc") -> False
 ' ("ABC123", "abc", True) -> True
 '
-Public Function Match(target As String, pattern As String, Optional ignoreCase As Boolean = False) As Boolean
-    pattern = Replace(pattern, "\", "\\")
-    pattern = Replace(pattern, "^", "\^")
-    pattern = Replace(pattern, "$", "\$")
-    pattern = Replace(pattern, "(", "\(")
-    pattern = Replace(pattern, ")", "\)")
-    pattern = Replace(pattern, "[", "\[")
-    pattern = Replace(pattern, "]", "\]")
-    pattern = Replace(pattern, ".", "\.")
-    pattern = Replace(pattern, "*", "\*")
-    pattern = Replace(pattern, "+", "\+")
-    pattern = Replace(pattern, "?", "\?")
-    pattern = Replace(pattern, "|", "\|")
-    pattern = Replace(pattern, "{", "\{")
-    pattern = Replace(pattern, "}", "\}")
+Public Function Match(target As String, pattern As String, Optional ignoreCase As Boolean = False, Optional escMeta As Boolean = False) As Boolean
+    If escMeta Then
+        pattern = EscapeMetaChars(pattern)
+    End If
     Dim regexp As Object
     Set regexp = CreateObject("VBScript.RegExp")
     With regexp
@@ -1028,11 +1017,7 @@ Public Function Match(target As String, pattern As String, Optional ignoreCase A
         .ignoreCase = ignoreCase
         .Global = True
     End With
-
-    Dim result As Boolean
-    result = regexp.test(target)
-
-    Match = result
+    Match = regexp.test(target)
 End Function
 
 ''
@@ -1040,9 +1025,7 @@ End Function
 ' ("abc123xyz", ".+?(\d+).*") -> "123"
 '
 Public Function GetPattern(target As String, pattern As String) As String
-    Dim result As String
     Dim regexp As Object
-
     Set regexp = CreateObject("VBScript.RegExp")
     With regexp
         .pattern = pattern
@@ -1050,6 +1033,7 @@ Public Function GetPattern(target As String, pattern As String) As String
         .Global = True
     End With
 
+    Dim result As String
     result = ""
     Dim matches As Variant
     Set matches = regexp.Execute(target)
@@ -1060,6 +1044,27 @@ Public Function GetPattern(target As String, pattern As String) As String
     End If
 
     GetPattern = result
+End Function
+
+''
+' 正規表現のメタ文字をエスケープして返します。
+'
+Public Function EscapeMetaChars(str As String) As String
+    str = Replace(str, "\", "\\")
+    str = Replace(str, "^", "\^")
+    str = Replace(str, "$", "\$")
+    str = Replace(str, "(", "\(")
+    str = Replace(str, ")", "\)")
+    str = Replace(str, "[", "\[")
+    str = Replace(str, "]", "\]")
+    str = Replace(str, ".", "\.")
+    str = Replace(str, "*", "\*")
+    str = Replace(str, "+", "\+")
+    str = Replace(str, "?", "\?")
+    str = Replace(str, "|", "\|")
+    str = Replace(str, "{", "\{")
+    str = Replace(str, "}", "\}")
+    EscapeMetaChars = str
 End Function
 
 ''
