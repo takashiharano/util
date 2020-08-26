@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008240120';
+util.v = '202008270001';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1427,7 +1427,7 @@ util.removeListener = function(listeners, fn) {
  */
 util.http = function(req) {
   var trc = util.http.trace;
-  var trcid = util.getRandomString(util.http.trcIdChars, util.http.trcIdLen);
+  var trcid = util.getRandomString(util.http.TRC_ID_CHARS, util.http.TRC_ID_LEN);
   req.trcid = trcid;
   if (util.http.conn == 0) {
     util.http.onStart();
@@ -1496,7 +1496,7 @@ util.http.onDone = function(xhr, req) {
   if (util.http.logging) {
     var m = res;
     if (xhr.status == 0) {
-      m = 'ERROR =>X|';
+      m = 'ERROR =>X';
     } else {
       if (m) {
         if (m.length > util.http.LOG_LIMIT) {
@@ -1584,19 +1584,13 @@ util.http.callListeners = function(type, a1, a2, a3) {
 util.http.countConnections = function() {
   return util.http.conn;
 };
-util.http.setTraceIdChars = function(c) {
-  util.http.trcIdChars = c;
-};
-util.http.setTraceIdLen = function(n) {
-  util.http.trcIdLen = n;
-};
+util.http.TRC_ID_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+util.http.TRC_ID_LEN = 4;
 util.http.LOG_LIMIT = 3145728;
 util.http.MAX_LOG_LEN = 4096;
 util.http.logging = false;
 util.http.trace = false;
 util.http.conn = 0;
-util.http.trcIdChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-util.http.trcIdLen = 4;
 util.http.listeners = {
   start: [],
   send: [],
