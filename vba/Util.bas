@@ -111,8 +111,10 @@ End Function
 
 ''
 ' フォルダを選択します。
+' 選択ダイアログを表示、選択するとそのパスを返します。
+' outCell:="A1" A1セルにパス文字列を設定します。
 '
-Public Function SelectFolderPath(Optional outputCell As String = "", Optional ws As Worksheet = Nothing)
+Public Function SelectFolderPath(Optional outCell As String = "", Optional ws As Worksheet = Nothing)
     If ws Is Nothing Then
         Set ws = ActiveSheet
     End If
@@ -126,8 +128,8 @@ Public Function SelectFolderPath(Optional outputCell As String = "", Optional ws
         End If
     End With
 
-    If path <> "" And outputCell <> "" Then
-        ws.Range(outputCell).value = path
+    If path <> "" And outCell <> "" Then
+        ws.Range(outCell).value = path
     End If
 
     SelectFolderPath = path
@@ -135,10 +137,14 @@ End Function
 
 ''
 ' ファイルパスを選択します。
+' 選択ダイアログを表示、選択するとそのパスを返します。
+' title:="ダイアログタイトル"
+' fileFilter:="ファイル種別フィルター"
+' outCell:="A1" A1セルにパス文字列を設定します。
 '
-Public Function SelectFilePath(title As String, _
+Public Function SelectFilePath(Optional title As String = "", _
                                Optional fileFilter As String = "All Files (*.*),*.*", _
-                               Optional outputCell As String = "", _
+                               Optional outCell As String = "", _
                                Optional ws As Worksheet = Nothing)
     If ws Is Nothing Then
         Set ws = ActiveSheet
@@ -149,8 +155,8 @@ Public Function SelectFilePath(title As String, _
     If path = "False" Then
         path = ""
     End If
-    If path <> "" And outputCell <> "" Then
-        ws.Range(outputCell).value = path
+    If path <> "" And outCell <> "" Then
+        ws.Range(outCell).value = path
     End If
     SelectFilePath = path
 End Function
@@ -1005,6 +1011,8 @@ End Function
 ' ("ABC123", "\d") -> True
 ' ("ABC123", "abc") -> False
 ' ("ABC123", "abc", True) -> True
+' ("A(B)", "A(B)", escMeta:=True) -> True
+' ("A(B)", "A(B)", escMeta:=False) -> False
 '
 Public Function Match(target As String, pattern As String, Optional ignoreCase As Boolean = False, Optional escMeta As Boolean = False) As Boolean
     If escMeta Then
@@ -1017,7 +1025,7 @@ Public Function Match(target As String, pattern As String, Optional ignoreCase A
         .ignoreCase = ignoreCase
         .Global = True
     End With
-    Match = regexp.test(target)
+    Match = regexp.Test(target)
 End Function
 
 ''
