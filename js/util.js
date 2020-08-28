@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008270001';
+util.v = '202008290203';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1855,6 +1855,26 @@ util.getZoomRatio = function() {
 
 util.escHTML = function(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+};
+
+// f = function() {/*
+// ABC
+// 123
+// */};
+//
+// -> fn2txt(f) = 'ABC\n123'
+// s, e: start/end offset
+//
+util.fn2txt = function(f, s, e) {
+  var b = f.toString().replace(/\r\n/g, '\n');
+  var a = b.split('\n');
+  var t = '';
+  if ((s == undefined) || (s < 0)) s = 1;
+  if ((e == undefined) || (e < 0)) e = 1;
+  for (var i = s; i < a.length - e; i++) {
+    t += a[i] + '\n';
+  }
+  return t;
 };
 
 //-----------------------------------------------------------------------------
