@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202008290203';
+util.v = '202009030007';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1488,8 +1488,12 @@ util.http = function(req) {
     if (data) m += ' : ' + data.substr(0, util.http.MAX_LOG_LEN);
     util._log.v(m);
   }
-  xhr.send(data);
+  if (util.http.online) xhr.send(data);
   util.http.onSent(req);
+  if (!util.http.online) {
+    var o = {xhr: xhr, req: req};
+    setTimeout(util.http.pseudoDone, 0, o);
+  }
 };
 util.http.onDone = function(xhr, req) {
   var res = xhr.responseText;
@@ -1527,6 +1531,10 @@ util.http.onDone = function(xhr, req) {
   if (util.http.conn == 0) {
     util.http.onStop();
   }
+};
+util.http.pseudoDone = function(o) {
+  o.xhr.status = 0;
+  util.http.onDone(o.xhr, o.req);
 };
 util.http.buildQueryString = function(p) {
   var s = '';
@@ -1588,6 +1596,7 @@ util.http.TRC_ID_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 util.http.TRC_ID_LEN = 4;
 util.http.LOG_LIMIT = 3145728;
 util.http.MAX_LOG_LEN = 4096;
+util.http.online = true;
 util.http.logging = false;
 util.http.trace = false;
 util.http.conn = 0;
