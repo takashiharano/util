@@ -1929,7 +1929,9 @@ Public Sub DbgLog(v As Variant, Optional dumpBytes As Boolean = False)
     t = "[" & Format(Now, "yyyy-mm-dd hh:mm:ss") & "] "
     Dim s As String
     Dim i As Long
+    Dim vType As Integer
     Dim arrSize As Long
+    vType = VarType(v)
     arrSize = -1
     On Error Resume Next
     If IsEmptyArray(v) Then
@@ -1944,7 +1946,11 @@ Public Sub DbgLog(v As Variant, Optional dumpBytes As Boolean = False)
             Debug.Print t & "(" & i & ") = " & v(i)
         Next i
     Else
-        s = v
+        If vType = 9 Then
+            s = "Nothing"
+        Else
+            s = v
+        End If
         If dumpBytes Then
             ' String Byte Array Dump
             Dim h As String
