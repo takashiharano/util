@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202008160023
+v = 202009042240
 
 import os
 import sys
@@ -2100,7 +2100,7 @@ def send_response_debug(enable=True):
 #   'Field-Name': 'Field-Value',
 #   ...
 # }
-def send_binary(content_type, body, headers=None, status=200):
+def send_binary(body, content_type='application/octet-stream', filename='', headers=None, status=200):
   # Prevent the following error:
   #  ap_content_length_filter: apr_bucket_read() failed
   #  Failed to flush CGI output to client
@@ -2118,10 +2118,13 @@ def send_binary(content_type, body, headers=None, status=200):
   st = 'Status: ' + get_status_message(status)
   print(st)
 
-  if headers is not None and 'Content-Type' not in headers:
+  if headers is None or 'Content-Type' not in headers:
     print('Content-Type: ' + content_type)
-  if headers is not None and 'Content-Length' not in headers:
+  if headers is None or 'Content-Length' not in headers:
     print('Content-Length: ' + str(content_len))
+
+  if headers is None or 'Content-Disposition' not in headers and filename != '':
+    print('Content-Disposition: attachment;filename="' + filename + '"')
 
   if headers is not None:
     for i in range(len(headers)):
@@ -2203,7 +2206,7 @@ def round_angle(v):
   return v
 
 #------------------------------------------------------------------------------
-# Data
+# Record Data
 #------------------------------------------------------------------------------
 class Record:
   def __init__(self, fields=None, sep='\t'):
@@ -2233,6 +2236,31 @@ class Record:
           v = '"' + v + '"'
       r += v
     return r
+
+#------------------------------------------------------------------------------
+# Test Data
+#------------------------------------------------------------------------------
+# [s]234567890123...[e]
+# s: -1 -> '1'
+# e: -1 -> [0-9] of the end position
+def gen_test_bin(size, s=-1, e=-1):
+  buf = []
+  for i in range(1, size + 1):
+    if i == 1:
+      if s == -1:
+        v = 0x31
+      else:
+        v = s
+    elif i == size:
+      if e == -1:
+        v = i % 10 + 0x30
+      else:
+        v = e
+    else:
+      v = i % 10 + 0x30
+    buf.append(v)
+  b = bytearray(buf)
+  return b
 
 #------------------------------------------------------------------------------
 # HEX Dump
