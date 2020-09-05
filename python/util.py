@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202009060001
+v = 202009060039
 
 import os
 import sys
@@ -680,9 +680,11 @@ def get_datetime(src=None, fmt='%Y-%m-%d %H:%M:%S.%f', tz=None):
 
 # datetime                  -> '2019-01-02 12:34:56.123456'
 # 1546400096.123456 (float) -> '2019-01-02 12:34:56.123456'
-def get_datetime_str(dt=datetime.datetime.today(), fmt='%Y-%m-%d %H:%M:%S.%f', tz=None):
+def get_datetime_str(dt=None, fmt='%Y-%m-%d %H:%M:%S.%f', tz=None):
   s = None
-  if typename(dt) == 'float' or typename(dt) == 'int':
+  if dt is None:
+    dt = datetime.datetime.today()
+  elif typename(dt) == 'float' or typename(dt) == 'int':
     dt = datetime.datetime.fromtimestamp(dt, tz)
   s = dt.strftime(fmt)
   return s
@@ -690,8 +692,10 @@ def get_datetime_str(dt=datetime.datetime.today(), fmt='%Y-%m-%d %H:%M:%S.%f', t
 # POSIX timestamp (float)
 # datetime                     -> 1546400096.123456
 # '2019-01-02 12:34:56.123456' -> 1546400096.123456
-def get_timestamp(dt=datetime.datetime.today(), fmt='%Y-%m-%d %H:%M:%S.%f'):
-  if typename(dt) == 'str':
+def get_timestamp(dt=None, fmt='%Y-%m-%d %H:%M:%S.%f'):
+  if dt is None:
+    dt = datetime.datetime.today()
+  elif typename(dt) == 'str':
     dt = datetime.datetime.strptime(dt, fmt)
   ts = dt.timestamp()
   return ts
@@ -735,12 +739,16 @@ def is_leap_year(year):
 # moment='2020-07-01 06:00:00.0000' -> '2020-07-01 09:00:00.0000'
 # moment='2020-07-01 19:00:00.0000' -> '2020-07-02 03:00:00.0000'
 # moment='2020-07-01 00:00:00.0000', offset=-1 -> '2020-06-30 18:00:00.0000'
-def next_date_time(time_list, offset=1, moment=datetime.datetime.today(), tz=None):
+def next_date_time(time_list, offset=1, moment=None, tz=None):
+  if moment is None:
+    moment = datetime.datetime.today()
   dt = next_datetime(time_list=time_list, offset=offset, moment=moment, tz=tz)
   return DateTime(dt)
 
-def next_datetime(time_list, offset=1, moment=datetime.datetime.today(), tz=None):
-  if typename(moment) == 'float' or typename(moment) == 'int':
+def next_datetime(time_list, offset=1, moment=None, tz=None):
+  if moment is None:
+    moment = datetime.datetime.today()
+  elif typename(moment) == 'float' or typename(moment) == 'int':
     moment = datetime.datetime.fromtimestamp(moment, tz)
 
   time_list = sorted(time_list)
@@ -782,9 +790,9 @@ def _get_next_datetime(year, month, day, time_list, index):
   hhmm = time_list[index]
   hour = int(hhmm[0:2])
   min = int(hhmm[2:4])
-  sec = 59
-  msec = 999
-  return datetime.datetime(year, month, day, hour, min, sec, msec)
+  sec = 0
+  usec = 0
+  return datetime.datetime(year, month, day, hour, min, sec, usec)
 
 # ['20190627T090000', '20190627T123000', '20190628T010000']
 # '20190627T150000' -> '20190627T123000'
@@ -991,7 +999,7 @@ def timestr2seconds(timestr):
   hour = 0
   min = 0
   sec = 0
-  msec = 0
+  usec = 0
   s = '0'
 
   if match(timestr, ':'):
@@ -1008,13 +1016,13 @@ def timestr2seconds(timestr):
     ss = s.split('.')
     sec = int(ss[0])
     if len(ss) >= 2:
-      msec = float('0.' + ss[1])
+      usec = float('0.' + ss[1])
 
   else:
     tm = timestr.split('.')
     times = tm[0]
     if len(tm) >= 2:
-      msec = float('0.' + tm[1])
+      usec = float('0.' + tm[1])
 
     if len(times) == 6:
       hour = int(times[0:2])
@@ -1026,7 +1034,7 @@ def timestr2seconds(timestr):
     else:
       return None
 
-  time = (hour * HOUR) + (min * MINUTE) + sec + msec
+  time = (hour * HOUR) + (min * MINUTE) + sec + usec
   return time
 
 # 86567.123456
