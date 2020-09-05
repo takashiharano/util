@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202009030007';
+util.v = '202009052015';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1488,6 +1488,7 @@ util.http = function(req) {
     if (data) m += ' : ' + data.substr(0, util.http.MAX_LOG_LEN);
     util._log.v(m);
   }
+  if (util.debug.mode) $dbg[trcid] = {req: req};
   if (util.http.online) xhr.send(data);
   util.http.onSent(req);
   if (!util.http.online) {
@@ -1497,9 +1498,11 @@ util.http = function(req) {
 };
 util.http.onDone = function(xhr, req) {
   var res = xhr.responseText;
+  var st = xhr.status;
+  if (util.debug.mode) $dbg[req.trcid].res = res;
   if (util.http.logging) {
     var m = res;
-    if (xhr.status == 0) {
+    if (st == 0) {
       m = 'ERROR =>X';
     } else {
       if (m) {
@@ -1509,18 +1512,19 @@ util.http.onDone = function(xhr, req) {
           m = m.substr(0, util.http.MAX_LOG_LEN) + '... (size=' + m.length + ')';
         }
       }
-      m = '<= ' + util.escHTML(m);
+      m = '<= [' + st + '] ' + util.escHTML(m);
     }
     util._log.v('[' + req.trcid + '] ' + m);
   }
   if (util.http.onReceive(xhr, res, req)) {
-    if (xhr.status == 200) {
+    if (st == 200) {
       if (util.http.isJSONable(xhr, req)) {
         res = util.fromJSON(res);
+        if (util.debug.mode) $dbg[req.trcid].res = res;
       }
     }
     if (req.cb) req.cb(xhr, res, req);
-    if (((xhr.status >= 200) && (xhr.status < 300)) || (xhr.status == 304)) {
+    if (((st >= 200) && (st < 300)) || (st == 304)) {
       if (req.onsuccess) req.onsuccess(xhr, res, req);
     } else {
       util.http.onError(xhr, res, req);
@@ -1558,7 +1562,14 @@ util.http.isJSONable = function(xhr, req) {
 };
 
 /**
- * addListener('start|send|receive|stop|error', fn);
+ * addListener('start|send|sent|receive|stop|error', fn);
+ *  callback args:
+ *   start: ()
+ *   send: (req)
+ *   sent: (req)
+ *   receive: (xhr, res, req)
+ *   stop: ()
+ *   error: (xhr, res, req)
  */
 util.http.addListener = function(type, fn) {
   util.addListener(util.http.listeners[type], fn);
@@ -4717,6 +4728,20 @@ util.$onResize = function(e) {
 util.$onScroll = function(e) {
   var fn = window.$onScroll;
   if (fn) fn(e);
+};
+
+//-----------------------------------------------------------------------------
+var $dbg = {};
+util.debug = {};
+util.debug.mode = 0;
+util.debug.on = function() {
+  util.debug.mode = 1;
+};
+util.debug.off = function() {
+  util.debug.mode = 0;
+};
+util.debug.reset = function() {
+  $dbg = {};
 };
 
 //-----------------------------------------------------------------------------
