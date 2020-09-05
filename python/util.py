@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202009042240
+v = 202009052035
 
 import os
 import sys
@@ -2093,14 +2093,16 @@ def send_response_debug(enable=True):
   res_debug = enable
 
 # Send binary response
-# content_type = MIME Type
-# body = bytes or
+# content: bytes or hex string
 #        '89 50 4E 47 0D 0A 1A 0A ...'
-# headers = {
+# content_type: MIME Type
+# filename: default filename to download
+# headers: {
 #   'Field-Name': 'Field-Value',
 #   ...
 # }
-def send_binary(body, content_type='application/octet-stream', filename='', headers=None, status=200):
+# status: HTTP status code for response
+def send_binary(content, content_type='application/octet-stream', filename='', headers=None, status=200):
   # Prevent the following error:
   #  ap_content_length_filter: apr_bucket_read() failed
   #  Failed to flush CGI output to client
@@ -2109,21 +2111,22 @@ def send_binary(body, content_type='application/octet-stream', filename='', head
   if stdin_data is None and form_data is None:
     stdin_data = sys.stdin.read()
 
-  if typename(body) == 'str':
-    b = hex2bytes(body)
+  if typename(content) == 'str':
+    b = hex2bytes(content)
   else:
-    b = body
-  content_len = len(body)
+    b = content
 
   st = 'Status: ' + get_status_message(status)
   print(st)
 
-  if headers is None or 'Content-Type' not in headers:
+  if content_type != '':
     print('Content-Type: ' + content_type)
+
   if headers is None or 'Content-Length' not in headers:
+    content_len = len(b)
     print('Content-Length: ' + str(content_len))
 
-  if headers is None or 'Content-Disposition' not in headers and filename != '':
+  if filename != '':
     print('Content-Disposition: attachment;filename="' + filename + '"')
 
   if headers is not None:
