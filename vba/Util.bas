@@ -339,25 +339,45 @@ End Function
 '# セル値
 '------------------------------------------------------------------------------
 ''
-' 指定されたセルの値を返します。(Rangeラッパー)
+' 指定されたセルの値を返します。(シート名指定可能Rangeラッパー)
 ' GetCellValue("A1")
+' GetCellValue("Sheet1!A1")
 '
 Public Function GetCellValue(ref As String, Optional ws As Worksheet = Nothing) As Variant
     If ws Is Nothing Then
-        Set ws = ActiveSheet
+        Dim refPrts As Variant
+        refPrts = Split(ref, "!")
+        If UBound(refPrts) = 0 Then
+            Set ws = ActiveSheet
+        Else
+            Dim sheetName As String
+            sheetName = refPrts(0)
+            Set ws = Sheets(sheetName)
+            ref = refPrts(1)
+        End If
     End If
-    GetCellValue = Range(ref).value
+    GetCellValue = ws.Range(ref).value
 End Function
 
 ''
-' 指定されたセルの値を設定します。(Rangeラッパー)
+' 指定されたセルの値を設定します。(シート名指定可能Rangeラッパー)
 ' SetCellValue("A1", "abc")
+' SetCellValue("Sheet1!A1", "abc")
 '
 Public Sub SetCellValue(ref As String, val As Variant, Optional ws As Worksheet = Nothing)
     If ws Is Nothing Then
-        Set ws = ActiveSheet
+        Dim refPrts As Variant
+        refPrts = Split(ref, "!")
+        If UBound(refPrts) = 0 Then
+            Set ws = ActiveSheet
+        Else
+            Dim sheetName As String
+            sheetName = refPrts(0)
+            Set ws = Sheets(sheetName)
+            ref = refPrts(1)
+        End If
     End If
-    Range(ref).value = val
+    ws.Range(ref).value = val
 End Sub
 
 ''
@@ -393,6 +413,7 @@ End Function
 ' 指定されたセル範囲の値を2次元配列で返します。
 '
 ' GetRangeValues("A1:B2")
+' GetRangeValues("Sheet1!A1:B2")
 ' -> ret(1, 1) = A1
 '    ret(1, 2) = B1
 '
@@ -413,7 +434,16 @@ Public Function GetRangeValues(refs As String, _
                                Optional idxOrigin As Long = 1, _
                                Optional ws As Worksheet = Nothing) As Variant
     If ws Is Nothing Then
-        Set ws = ActiveSheet
+        Dim refsPrts As Variant
+        refsPrts = Split(refs, "!")
+        If UBound(refsPrts) = 0 Then
+            Set ws = ActiveSheet
+        Else
+            Dim sheetName As String
+            sheetName = refsPrts(0)
+            Set ws = Sheets(sheetName)
+            refs = refsPrts(1)
+        End If
     End If
 
     Dim rangeVals As Variant
@@ -505,7 +535,16 @@ Public Sub SetRangeValues(refs As String, values As Variant, _
                           Optional transpose As Boolean = False, _
                           Optional ws As Worksheet = Nothing)
     If ws Is Nothing Then
-        Set ws = ActiveSheet
+        Dim refsPrts As Variant
+        refsPrts = Split(refs, "!")
+        If UBound(refsPrts) = 0 Then
+            Set ws = ActiveSheet
+        Else
+            Dim sheetName As String
+            sheetName = refsPrts(0)
+            Set ws = Sheets(sheetName)
+            refs = refsPrts(1)
+        End If
     End If
 
     Dim refRowLen As Long
@@ -649,17 +688,16 @@ End Sub
 '
 Public Function RowToArray(refs As String, Optional ws As Worksheet = Nothing) As Variant
     If ws Is Nothing Then
-        Set ws = ActiveSheet
-    End If
-
-    Dim sheetName As String
-    Dim pos As Long
-    sheetName = ""
-    pos = InStr(refs, "!")
-    If pos > 0 Then
-        sheetName = Left(refs, pos - 1)
-        Set ws = Sheets(sheetName)
-        refs = Mid(refs, pos + 1)
+        Dim refsPrts As Variant
+        refsPrts = Split(refs, "!")
+        If UBound(refsPrts) = 0 Then
+            Set ws = ActiveSheet
+        Else
+            Dim sheetName As String
+            sheetName = refsPrts(0)
+            Set ws = Sheets(sheetName)
+            refs = refsPrts(1)
+        End If
     End If
 
     Dim rangeVals As Variant
@@ -702,17 +740,16 @@ End Function
 '
 Public Function ColToArray(refs As String, Optional ws As Worksheet = Nothing) As Variant
     If ws Is Nothing Then
-        Set ws = ActiveSheet
-    End If
-
-    Dim sheetName As String
-    Dim pos As Long
-    sheetName = ""
-    pos = InStr(refs, "!")
-    If pos > 0 Then
-        sheetName = Left(refs, pos - 1)
-        Set ws = Sheets(sheetName)
-        refs = Mid(refs, pos + 1)
+        Dim refsPrts As Variant
+        refsPrts = Split(refs, "!")
+        If UBound(refsPrts) = 0 Then
+            Set ws = ActiveSheet
+        Else
+            Dim sheetName As String
+            sheetName = refsPrts(0)
+            Set ws = Sheets(sheetName)
+            refs = refsPrts(1)
+        End If
     End If
 
     Dim rangeVals As Variant
@@ -756,7 +793,16 @@ End Function
 '
 Public Sub ArrayToRow(arr As Variant, targetStartCell As String, Optional ws As Worksheet = Nothing)
     If ws Is Nothing Then
-        Set ws = ActiveSheet
+        Dim refPrts As Variant
+        refPrts = Split(targetStartCell, "!")
+        If UBound(refPrts) = 0 Then
+            Set ws = ActiveSheet
+        Else
+            Dim sheetName As String
+            sheetName = refPrts(0)
+            Set ws = Sheets(sheetName)
+            targetStartCell = refPrts(1)
+        End If
     End If
 
     Dim arrLastIdx As Long
@@ -769,24 +815,11 @@ Public Sub ArrayToRow(arr As Variant, targetStartCell As String, Optional ws As 
         rangeArr(0, i) = arr(i)
     Next i
 
-    Dim sheetName As String
-    Dim pos As Long
-    sheetName = ""
-    pos = InStr(targetStartCell, "!")
-    If pos > 0 Then
-        sheetName = Left(targetStartCell, pos - 1)
-        targetStartCell = Mid(targetStartCell, pos + 1)
-    End If
-
     Dim targetEndCell As String
     targetEndCell = RelativeCellAddr(targetStartCell, arrLastIdx, 0)
 
     Dim rangeAddr As String
     rangeAddr = targetStartCell & ":" & targetEndCell
-
-    If sheetName <> "" Then
-        Set ws = Sheets(sheetName)
-    End If
 
     ws.Range(rangeAddr) = rangeArr
 End Sub
@@ -803,7 +836,16 @@ End Sub
 '
 Public Sub ArrayToCol(arr As Variant, targetStartCell As String, Optional ws As Worksheet = Nothing)
     If ws Is Nothing Then
-        Set ws = ActiveSheet
+        Dim refPrts As Variant
+        refPrts = Split(targetStartCell, "!")
+        If UBound(refPrts) = 0 Then
+            Set ws = ActiveSheet
+        Else
+            Dim sheetName As String
+            sheetName = refPrts(0)
+            Set ws = Sheets(sheetName)
+            targetStartCell = refPrts(1)
+        End If
     End If
 
     Dim arrLastIdx As Long
@@ -816,24 +858,11 @@ Public Sub ArrayToCol(arr As Variant, targetStartCell As String, Optional ws As 
         rangeArr(i, 0) = arr(i)
     Next i
 
-    Dim sheetName As String
-    Dim pos As Long
-    sheetName = ""
-    pos = InStr(targetStartCell, "!")
-    If pos > 0 Then
-        sheetName = Left(targetStartCell, pos - 1)
-        targetStartCell = Mid(targetStartCell, pos + 1)
-    End If
-
     Dim targetEndCell As String
     targetEndCell = RelativeCellAddr(targetStartCell, 0, arrLastIdx)
 
     Dim rangeAddr As String
     rangeAddr = targetStartCell & ":" & targetEndCell
-
-    If sheetName <> "" Then
-        Set ws = Sheets(sheetName)
-    End If
 
     ws.Range(rangeAddr) = rangeArr
 End Sub
@@ -958,6 +987,7 @@ End Function
 ''
 ' 指定された列範囲の値を重複要素のないSetコレクションに変換して返します。
 ' ExtractUniqueValues("A1:B20")
+' ExtractUniqueValues("Sheet1!A1:B20")
 '
 Public Function ExtractUniqueValues(refs As String, Optional ws As Worksheet = Nothing) As Variant
     Dim arr As Variant
