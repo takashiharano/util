@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202009052035
+v = 202009060001
 
 import os
 import sys
@@ -2097,12 +2097,13 @@ def send_response_debug(enable=True):
 #        '89 50 4E 47 0D 0A 1A 0A ...'
 # content_type: MIME Type
 # filename: default filename to download
+# etag: "xyzzy"
 # headers: {
 #   'Field-Name': 'Field-Value',
 #   ...
 # }
 # status: HTTP status code for response
-def send_binary(content, content_type='application/octet-stream', filename='', headers=None, status=200):
+def send_binary(content, content_type='application/octet-stream', filename='', etag='', headers=None, status=200):
   # Prevent the following error:
   #  ap_content_length_filter: apr_bucket_read() failed
   #  Failed to flush CGI output to client
@@ -2128,6 +2129,9 @@ def send_binary(content, content_type='application/octet-stream', filename='', h
 
   if filename != '':
     print('Content-Disposition: attachment;filename="' + filename + '"')
+
+  if etag != '':
+    print('ETag: "' + etag + '"')
 
   if headers is not None:
     for i in range(len(headers)):
