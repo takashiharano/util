@@ -47,6 +47,8 @@ public class HexDumpTest {
     dumpBytesTest(255, 64, 3);
     dumpBytesTest(256, 64, 3);
     dumpBytesTest(257, 64, 3);
+
+    dumpBytesTest0();
   }
 
   private static void str2hexTest(int len, int limit) {
@@ -108,6 +110,10 @@ public class HexDumpTest {
     t2 = Util.now();
     Log.d(d);
     Log.d("elapsed=" + (t2 - t1));
+
+    d = HexDumper.toHex(b, 3, 4);
+    Log.d("toHex(b, 4)");
+    Log.d(d);
 
     Log.d("");
     Log.d("Log.d()");

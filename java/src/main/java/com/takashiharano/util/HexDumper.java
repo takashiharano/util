@@ -67,25 +67,27 @@ public class HexDumper {
       sb.append(" ..");
     }
 
-    for (int i = lastStartPos; i < len; i++) {
-      sb.append(' ');
+    if (lastStartPos > 0) {
+      for (int i = lastStartPos; i < len; i++) {
+        sb.append(' ');
 
-      byte b = src[i];
-      int upperBits = (b >>> 4) & 0xF;
-      int lowerBits = b & 0xF;
-      char offset;
-      if (upperBits < 10) {
-        offset = '0';
-      } else {
-        offset = '7';
+        byte b = src[i];
+        int upperBits = (b >>> 4) & 0xF;
+        int lowerBits = b & 0xF;
+        char offset;
+        if (upperBits < 10) {
+          offset = '0';
+        } else {
+          offset = '7';
+        }
+        sb.append((char) (offset + upperBits));
+        if (lowerBits < 10) {
+          offset = '0';
+        } else {
+          offset = '7';
+        }
+        sb.append((char) (offset + lowerBits));
       }
-      sb.append((char) (offset + upperBits));
-      if (lowerBits < 10) {
-        offset = '0';
-      } else {
-        offset = '7';
-      }
-      sb.append((char) (offset + lowerBits));
     }
 
     return sb.toString();
