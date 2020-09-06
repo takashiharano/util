@@ -45,18 +45,12 @@ Public Function ReadTextFile(path As String, Optional charset As String = "UTF-8
 End Function
 
 ''
-' テキストファイルを読み込んで配列で返します。
+' テキストファイルを読み込んで改行で区切った配列として返します。
 '
 Public Function ReadTextFileAsArray(path As String, Optional charset As String = "UTF-8") As String()
-    Dim buf As String
-    buf = ReadTextFile(path, charset)
-    buf = ReplaceLineSeparator(buf, vbLf)
-    Dim arr() As String
-    arr = Split(buf, vbLf)
-    If arr(UBound(arr)) = "" Then
-        ReDim Preserve arr(UBound(arr) - 1)
-    End If
-    ReadTextFileAsArray = arr
+    Dim txt As String
+    txt = ReadTextFile(path, charset)
+    ReadTextFileAsArray = TextToArray(txt)
 End Function
 
 ''
@@ -333,6 +327,19 @@ Public Function Array2Set(ByRef arr As Variant) As Variant
         End If
     Next
     Array2Set = dic.Keys()
+End Function
+
+''
+' テキストを改行で区切って配列として返します。
+'
+Public Function TextToArray(txt As String) As String()
+    txt = ReplaceLineSeparator(txt, vbLf)
+    Dim arr() As String
+    arr = Split(txt, vbLf)
+    If arr(UBound(arr)) = "" Then
+        ReDim Preserve arr(UBound(arr) - 1)
+    End If
+    TextToArray = arr
 End Function
 
 '------------------------------------------------------------------------------
