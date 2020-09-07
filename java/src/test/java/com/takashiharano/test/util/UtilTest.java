@@ -11,6 +11,7 @@ public class UtilTest {
     decodeBase64Test();
     randomTest();
     execCommandTest();
+    getTestBytesTest();
     fileHashTest();
   }
 
@@ -92,6 +93,33 @@ public class UtilTest {
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+  private static void getTestBytesTest() {
+    byte[] b;
+    b = Util.getTestBytes(1, -1, -1);
+    Log.d(b);
+
+    b = Util.getTestBytes(2, -1, -1);
+    Log.d(b);
+
+    b = Util.getTestBytes(10, -1, -1);
+    Log.d(b);
+
+    b = Util.getTestBytes(1, 0x21, 0x23);
+    Log.d(b);
+
+    b = Util.getTestBytes(2, 0x21, 0x23);
+    Log.d(b);
+
+    b = Util.getTestBytes(3, 0x21, 0x23);
+    Log.d(b);
+
+    b = Util.getTestBytes(10, 0x21, 0x23);
+    Log.d(b);
+
+    b = Util.getTestBytes(12, 0x21, 0x23);
+    Log.d(b);
   }
 
   private static void fileHashTest() {

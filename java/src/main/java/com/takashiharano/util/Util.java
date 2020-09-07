@@ -403,6 +403,41 @@ public class Util {
   }
 
   /**
+   * [s]234567890123...[e]
+   *
+   * @param size
+   *          size to generate in bytes
+   * @param s
+   *          value of the first byte. -1 -> '1'
+   * @param e
+   *          value of the last byte. -1 -> [0-9] of the end position
+   * @return bytes
+   */
+  public static byte[] getTestBytes(int size, int s, int e) {
+    byte[] bytes = new byte[size];
+    byte b;
+    for (int i = 1; i <= size; i++) {
+      if (i == 1) {
+        if (s == -1) {
+          b = 0x31;
+        } else {
+          b = (byte) s;
+        }
+      } else if (i == size) {
+        if (s == -1) {
+          b = (byte) (i % 10 + 0x30);
+        } else {
+          b = (byte) e;
+        }
+      } else {
+        b = (byte) (i % 10 + 0x30);
+      }
+      bytes[i - 1] = b;
+    }
+    return bytes;
+  }
+
+  /**
    * Returns hash value of the file content.
    *
    * @param path
