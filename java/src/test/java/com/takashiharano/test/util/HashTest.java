@@ -17,6 +17,9 @@ public class HashTest {
     Log.d("hash=" + Hash.sha1(str));
     Log.d("hash=" + Hash.sha256(str));
     Log.d("hash=" + Hash.sha512(str));
+
+    // NullPointerException at md.digest(input);
+    // Log.d("hash=" + Hash.sha256((String) null));
   }
 
   private static void fromFile() {

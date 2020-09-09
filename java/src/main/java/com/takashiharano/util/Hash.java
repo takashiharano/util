@@ -60,7 +60,7 @@ public class Hash {
     try {
       MessageDigest md = MessageDigest.getInstance(algorithm);
       byte[] b = md.digest(input);
-      hash = DatatypeConverter.printHexBinary(b);
+      hash = DatatypeConverter.printHexBinary(b).toLowerCase();
     } catch (NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
     }
