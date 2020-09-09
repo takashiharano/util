@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202009060039
+v = 202009092221
 
 import os
 import sys
@@ -81,6 +81,14 @@ def free_stdin_data():
 # -> ['foo.py', 'a', 'b', 'c']
 def get_args():
   return sys.argv
+
+def get_args_len():
+  return len(sys.argv)
+
+def get_arg(n, default=''):
+  if n >= len(sys.argv):
+    return default
+  return sys.argv[n]
 
 #------------------------------------------------------------------------------
 # lang
