@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202009092221
+v = 202009102213
 
 import os
 import sys
@@ -952,9 +952,9 @@ class ClockTime:
 
   def str_hours(self, by_the_day=False):
     if by_the_day:
-      h = self.clocklike_st['hours']
+      h = self.clocklike_st['hrs']
     else:
-      h = self.integrated_st['hrs']
+      h = self.integrated_st['hours']
     if h < 10:
       hh = ('0' + str(h))[-2:]
     else:
@@ -1046,7 +1046,7 @@ def timestr2seconds(timestr):
   return time
 
 # 86567.123456
-# -> {'sign': False, 'days': 1, 'hrs': 24, 'hours': 0, 'minutes': 2, 'seconds': 47, 'microseconds': 0.123456}
+# -> {'sign': False, 'days': 1, 'hours': 24, 'hrs': 0, 'minutes': 2, 'seconds': 47, 'microseconds': 0.123456}
 def seconds2struct(seconds):
   wk = seconds
   sign = False
@@ -1066,15 +1066,15 @@ def seconds2struct(seconds):
     wk -= (mi * MINUTE)
 
   ss = int(wk)
-  ms = round(wk - ss, 6)
+  us = round(wk - ss, 6)
   tm = {
     'sign': sign,
     'days': days,
-    'hrs': hh,
-    'hours': hh - days * 24,
+    'hrs': hh - days * 24,
+    'hours': hh,
     'minutes': mi,
     'seconds': ss,
-    'microseconds': ms
+    'microseconds': us
   }
   return tm
 
@@ -1102,7 +1102,7 @@ def float2clock(v):
 # 3600 -> '01:00'
 def seconds2clock(v):
   s = seconds2struct(v)
-  h = str(s['hrs'])
+  h = str(s['hours'])
   if len(h) == 1:
     h = '0' + h
   return h + ':' + ('0' + str(s['minutes']))[-2:]
@@ -1125,6 +1125,34 @@ def clock2float(s, ndigits=None):
   if ndigits is not None:
     r = round(f, ndigits)
   return r
+
+# 171959.123456 -> '1d 23h 45m 59s 123456'
+# h=True: 47h / h=False: 1d 23h
+# f=True: 59.123456s / f=False: 59s
+def sec2str(sec, h=False, f=False):
+  st = seconds2struct(sec)
+  p = False
+  s = ''
+  if st['days'] > 0 and not h:
+    p = True
+    s += str(st['days']) + 'd '
+  if st['hours'] > 0:
+    p = True
+    if h:
+      s += str(st['hours'])
+    else:
+      s += str(st['hrs'])
+    s += 'h '
+  if st['minutes'] > 0 or p:
+    p = True
+    s += str(st['minutes']) + 'm '
+  s += str(st['seconds'])
+  if f:
+    us = replace(f'{st["microseconds"]:,.6f}'[2:], '0+$', '')
+    if st['microseconds'] > 0:
+      s += '.' + us
+  s += 's'
+  return s
 
 # Sleep
 def sleep(seconds):
