@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202009102213
+v = 202009110005
 
 import os
 import sys
@@ -645,7 +645,7 @@ class DateTime:
     self.hh = ('0' + str(dt.hour))[-2:]
     self.mi = ('0' + str(dt.minute))[-2:]
     self.ss = ('0' + str(dt.second))[-2:]
-    self.ms = ('00000' + str(dt.microsecond))[-6:]
+    self.us = ('00000' + str(dt.microsecond))[-6:]
     if tz is None:
       self.offset = LOCAL_TZ_OFFSET
     else:
@@ -663,7 +663,8 @@ class DateTime:
     s = replace(s, '%H', self.hh)
     s = replace(s, '%M', self.mi)
     s = replace(s, '%S', self.ss)
-    s = replace(s, '%f', self.ms)
+    s = replace(s, '%F', self.us[:-3])
+    s = replace(s, '%f', self.us)
     s = replace(s, '%W', WDAYS[self.weekday])
     s = replace(s, '%z', format_tz(self.offset))
     s = replace(s, '%Z', format_tz(self.offset, True))
@@ -2432,6 +2433,18 @@ def file_dump(path, limit=0, last_rows=16):
   return hexdump(b, limit, last_rows)
 
 #------------------------------------------------------------------------------
+# Console Print
+#------------------------------------------------------------------------------
+def printlog(msg=''):
+  t = DateTime().to_str('%Y-%m-%d %H:%M:%S.%F %Z')
+  print(t + '  ' + msg)
+
+def print_elapsed_time(prefix='', suffix=''):
+  t = elapsed_time()
+  m = prefix + t + suffix
+  printlog(m)
+
+#------------------------------------------------------------------------------
 # Debugging
 #------------------------------------------------------------------------------
 # Start debugging
@@ -2466,13 +2479,18 @@ def start_timetest():
   time_start = datetime.datetime.today()
 
 # End time test
-def end_timetest(to_str=True):
+def end_timetest():
   global time_start
   time_end = datetime.datetime.today()
   delta = time_end - time_start
-  if to_str:
-    delta = str(delta.total_seconds())
-  return delta
+  return delta.total_seconds()
+
+# Returns elapsed time
+def elapsed_time():
+  if not 'time_start' in globals():
+    return ''
+  t = end_timetest()
+  return sec2str(t)
 
 if __name__ == '__main__':
   print('util.py')
