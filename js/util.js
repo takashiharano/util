@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202009052015';
+util.v = '202009130023';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -4019,6 +4019,67 @@ util.getBrowserType = function(ua) {
     return brws;
   }
   return brws;
+};
+util.getColoredBrowserName = function(n, dark) {
+  if (!n) {
+    var b = util.getBrowserType();
+    n = b.name;
+  }
+  var s = n;
+  var c;
+  switch (n) {
+    case 'Chrome':
+      if (dark) {
+        s = '<span style="color:#f44">Ch</span><span style="color:#ff0">ro</span><span style="color:#4f4">m</span><span style="color:#6cf">e</span>';
+      } else {
+        s = '<span style="color:#f44">Ch</span><span style="color:#cc0">ro</span><span style="color:#2d2">m</span><span style="color:#0af">e</span>';
+      }
+      break;
+    case 'Edge':
+      if (dark) {
+        s = '<span style="color:#4e7">E</span><span style="color:#3df">d</span><span style="color:#0af">ge</span>';
+      } else {
+        s = '<span style="color:#2c4">E</span><span style="color:#0cf">d</span><span style="color:#08d">ge</span>';
+      }
+      break;
+    case 'Edge Legacy':
+      if (dark) {
+        c = '#0af';
+      } else {
+        c = '#08d';
+      }
+      s = '<span style="color:' + c + '">Edge</span>';
+      break;
+    case 'Firefox':
+      if (dark) {
+        c = '#e57f25';
+      } else {
+        c = '#e60';
+      }
+      s = '<span style="color:' + c + '">' + n + '</span>';
+      break;
+    case 'Opera':
+      if (dark) {
+        c = '#f44';
+      } else {
+        c = '#ff1b2c';
+      }
+      s = '<span style="color:' + c + '">' + n + '</span>';
+      break;
+    case 'IE11':
+    case 'IE10':
+    case 'IE9':
+      if (dark) {
+        c = '#61d5f8';
+      } else {
+        c = '#0af';
+      }
+      s = '<span style="color:' + c + '">' + n + '</span>';
+      break;
+    case 'Safari':
+      s = '<span style="color:#86c8e8">Safa</span><span style="color:#dd5651">r</span><span style="color:#ececec">i</span>';
+  }
+  return s;
 };
 
 //-----------------------------------------------------------------------------
