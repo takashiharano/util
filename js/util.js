@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202009130023';
+util.v = '202009160006';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1882,10 +1882,10 @@ util.escHTML = function(s) {
 // 123
 // */};
 //
-// -> fn2txt(f) = 'ABC\n123'
+// -> fn2text(f) = 'ABC\n123'
 // s, e: start/end offset
 //
-util.fn2txt = function(f, s, e) {
+util.fn2text = function(f, s, e) {
   var b = f.toString().replace(/\r\n/g, '\n');
   var a = b.split('\n');
   var t = '';
@@ -2154,13 +2154,45 @@ util.textseq.ctxs = [];
 // Styles
 //-----------------------------------------------------------------------------
 util.CSS = '';
+util.STYLE = function() {/*
+.pointable:hover {
+  cursor: pointer !important;
+}
+.pseudo-link {
+  cursor: pointer;
+}
+.pseudo-link:hover {
+  text-decoration: underline;
+}
+.blink {animation: blinker 1.5s step-end infinite;}
+@keyframes blinker {
+  50% {opacity: 0;}
+  100% {opacity: 0;}
+}
+.blink2 {animation: blinker2 1s ease-in-out infinite alternate;}
+@keyframes blinker2 {
+  0% {opacity: 0;}
+  70% {opacity: 1;}
+}
+.progdot:after {content:"..."; animation: progdot1 1.2s linear infinite;}
+@keyframes progdot1 {
+  10% {content: "";}
+  20% {content: ".";}
+  30% {content: "..";}
+  40% {content: "...";}
+}
+.dialog {
+  background: #fff;
+  color: #000;
+}
+*/};
 
 util.registerStyle = function(style) {
   util.CSS += style;
 };
 
 util.setupStyle = function() {
-  util._registerStyle();
+  util.registerStyle(util.fn2text(util.STYLE));
   util.infotip.registerStyle();
   util.registerFadeStyle();
   util.loader.registerStyle();
@@ -2189,44 +2221,6 @@ util.setStyles = function(el, s) {
   for (var k in s) {
     util.setStyle(el, k, s[k]);
   }
-};
-
-util._registerStyle = function() {
-  var style = '.pointable:hover {';
-  style += 'cursor: pointer !important;';
-  style += '}';
-  style += '.pseudo-link {';
-  style += 'cursor: pointer;';
-  style += '}';
-  style += '.pseudo-link:hover {';
-  style += 'text-decoration: underline;';
-  style += '}';
-
-  style += '.blink {animation: blinker 1.5s step-end infinite;}';
-  style += '@keyframes blinker {';
-  style += '50% {opacity: 0;}';
-  style += '100% {opacity: 0;}';
-  style += '}';
-
-  style += '.blink2 {animation: blinker2 1s ease-in-out infinite alternate;}';
-  style += '@keyframes blinker2 {';
-  style += '0% {opacity: 0;}';
-  style += '70% {opacity: 1;}';
-  style += '}';
-
-  style += '.progdot:after {content:"..."; animation: progdot1 1.2s linear infinite;}';
-  style += '@keyframes progdot1 {';
-  style += '10% {content: "";}';
-  style += '20% {content: ".";}';
-  style += '30% {content: "..";}';
-  style += '40% {content: "...";}';
-  style += '}';
-
-  style += '.dialog {';
-  style += 'background: #fff;';
-  style += 'color: #000;';
-  style += '}';
-  util.registerStyle(style);
 };
 
 //-----------------------------------------------------------------------------
