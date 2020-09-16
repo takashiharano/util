@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202009160006';
+util.v = '202009170017';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -4072,6 +4072,10 @@ util.getColoredBrowserName = function(n, dark) {
       break;
     case 'Safari':
       s = '<span style="color:#86c8e8">Safa</span><span style="color:#dd5651">r</span><span style="color:#ececec">i</span>';
+      break;
+    default:
+      b = util.getBrowserType(n);
+      if (b.name) s = util.getColoredBrowserName(b.name);
   }
   return s;
 };
