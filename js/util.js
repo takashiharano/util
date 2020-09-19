@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202009170017';
+util.v = '202009200010';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -418,7 +418,7 @@ util.Time.prototype = {
    *   true: 1d 23h 45m 59s 123
    */
   toString: function(h, f) {
-    var r = '';
+    var r = (this.sign ? '-' : '');
     var d = 0;
     if (!h && (this.days > 0)) {
       d = 1;
@@ -453,6 +453,19 @@ util.Time.prototype = {
  */
 util.getTimeString = function(ms, h, f) {
   return new util.Time(ms).toString(h, f);
+};
+
+/**
+ * Elapsed Time String
+ *
+ * t1: from in millis
+ * t2: to in millis (default=current time)
+ *
+ * t2:1600000083000 - t1:1600000000000 = 83000 -> '1m 23s'
+ */
+util.getElapsedTimeString = function(t1, t2, h, f) {
+  if (t2 == undefined) t2 = new Date().getTime();
+  return util.getTimeString(t2 - t1, h, f);
 };
 
 //------------------------------------------------
