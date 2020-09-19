@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202009110005
+v = 202009191340
 
 import os
 import sys
@@ -2295,7 +2295,7 @@ class Record:
 # [s]234567890123...[e]
 # s: -1 -> '1'
 # e: -1 -> [0-9] of the end position
-def gen_test_bin(size, s=-1, e=-1):
+def get_test_bytes(size, s=-1, e=-1):
   buf = []
   for i in range(1, size + 1):
     if i == 1:
