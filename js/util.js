@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202009200010';
+util.v = '202009210001';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -77,49 +77,66 @@ util.WDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 /**
  * DateTime class
- * dt
- *  Date / millis from 1970-01-01T00:00:00Z / date-string
- * offset
+ * dt:
+ *  timestamp (millis from 1970-01-01T00:00:00Z) / Date-Time-String / Date object
+ * offset:
  *  minutes (-480=-0800 / 0=+0000 / 540=+0900)
  */
 util.DateTime = function(dt, offset) {
+  var st;
   if ((dt !== 0) && !dt) {
     dt = new Date();
+  } else if (typeof dt == 'string') {
+    st = util.datetime2struct(dt);
+    dt = new Date(st.year, st.month - 1, st.day, st.hour, st.minute, st.second);
   } else if (!(dt instanceof Date)) {
     dt = new Date(dt);
   }
-  this.timestamp = dt.getTime();
+
+  var timestamp = dt.getTime();
   var os = dt.getTimezoneOffset();
   if (offset == undefined) {
     this.offset = os * (-1);
   } else {
     this.offset = offset;
-    var ts = this.timestamp + (os + offset) * 60000;
-    dt = new Date(ts);
+    dt = new Date(timestamp + (os + offset) * 60000);
+    timestamp = dt.getTime();
   }
+
+  if (st) {
+    timestamp += st.millisecond;
+    if (st.tz != '') {
+      var osms = util.getTzOffset() * 60000;
+      var tzms = util.time2ms(st.tz);
+      var tzdf = tzms - osms;
+      timestamp -= tzdf;
+    }
+  }
+
   var year = dt.getFullYear();
   var month = dt.getMonth() + 1;
   var day = dt.getDate();
-  var hours = dt.getHours();
-  var minutes = dt.getMinutes();
-  var seconds = dt.getSeconds();
-  var milliseconds = dt.getMilliseconds();
+  var hour = dt.getHours();
+  var minute = dt.getMinutes();
+  var second = dt.getSeconds();
+  var millisecond = (st ? st.millisecond : dt.getMilliseconds());
 
+  this.timestamp = timestamp;
   this.year = year;
   this.month = month;
   this.day = day;
-  this.hours = hours;
-  this.minutes = minutes;
-  this.seconds = seconds;
-  this.milliseconds = milliseconds;
+  this.hour = hour;
+  this.minute = minute;
+  this.second = second;
+  this.millisecond = millisecond;
 
   this.yyyy = year + '';
   this.mm = ('0' + month).slice(-2);
   this.dd = ('0' + day).slice(-2);
-  this.hh = ('0' + hours).slice(-2);
-  this.mi = ('0' + minutes).slice(-2);
-  this.ss = ('0' + seconds).slice(-2);
-  this.sss = ('00' + milliseconds).slice(-3);
+  this.hh = ('0' + hour).slice(-2);
+  this.mi = ('0' + minute).slice(-2);
+  this.ss = ('0' + second).slice(-2);
+  this.sss = ('00' + millisecond).slice(-3);
   this.wday = dt.getDay(); // Sunday - Saturday : 0 - 6
   this.WDAYS = util.WDAYS;
 };
@@ -273,6 +290,79 @@ util.ms2sec = function(ms, toString) {
 };
 
 /**
+ * 20200920T123456
+ * 20200920T123456+0900
+ * 20200920T123456.789
+ * 20200920T123456.789+0900
+ * 2020-09-20T12:34:56
+ * 2020-09-20T12:34:56+09:00
+ * 2020-09-20T12:34:56.789
+ * 2020-09-20T12:34:56.789+09:00
+ * 2020-09-20 12:34:56
+ * 2020-09-20 12:34:56 +09:00
+ * 2020-09-20 12:34:56.789
+ * 2020-09-20 12:34:56.789 +09:00
+ * 2020/09/20 12:34:56
+ * 2020/09/20 12:34:56.789
+ * 2020/09/20 12:34:56.789 +09:00
+ */
+util.datetime2ms = function(s) {
+  return new util.DateTime(s).timestamp;
+};
+util._getTzPos = function(s) {
+  var tzSign = '+';
+  var tzSnCnt = util.countStr(s, tzSign);
+  if (tzSnCnt == 1) return s.indexOf(tzSign);
+  tzSign = '-';
+  tzSnCnt = util.countStr(s, tzSign);
+  if (tzSnCnt > 0) return s.indexOf(tzSign, s.length - 6);
+  return -1;
+};
+
+util.datetime2struct = function(s) {
+  var w = s;
+  var tz = '';
+  var zPos = util._getTzPos(w);
+  if (zPos > 0) {
+    tz = w.substr(zPos);
+    w = w.substr(0, zPos);
+  }
+
+  w = util.getSerializedDateTimeString(w);
+  var yyyy = w.substr(0, 4) | 0;
+  var mm = w.substr(4, 2) | 0;
+  var dd = w.substr(6, 2) | 0;
+  var hh = w.substr(8, 2) | 0;
+  var mi = w.substr(10, 2) | 0;
+  var ss = w.substr(12, 2) | 0;
+  var sss = w.substr(14, 3) | 0;
+
+  var st = {
+    year: yyyy,
+    month: mm,
+    day: dd,
+    hour: hh,
+    minute: mi,
+    second: ss,
+    millisecond: sss,
+    tz: tz
+  };
+  return st;
+};
+util.getSerializedDateTimeString = function(s) {
+  var w = s;
+  w = w.replace(/-/g, '');
+  w = w.replace(/\//g, '');
+  w = w.replace(/\s/g, '');
+  w = w.replace(/T/, '');
+  w = w.replace(/:/g, '');
+  w = w.replace(/\./, '');
+  w = w.replace(/,/, '');
+  w = (w + '000000000').substr(0, 17);
+  return w;
+};
+
+/**
  * Returns time zone offset string from minutes
  * -480       -> -0800
  *  540       -> +0900
@@ -340,22 +430,10 @@ util.diffDays = function(ms1, ms2, abs) {
 /**
  * Time class
  * t:
- *   millis or '12:34:56.789'
+ *   millis or '[+|-]12:34:56.789'
  */
 util.Time = function(t) {
-  if (typeof t == 'string') {
-    // HH:MI:SS.sss
-    var wk = t.split('.');
-    var sss = wk[1] | 0;
-    if (sss) {
-      sss = (sss + '000').substr(0, 3) | 0;
-    }
-    wk = wk[0].split(':');
-    var hh = wk[0] | 0;
-    var mi = wk[1] | 0;
-    var ss = wk[2] | 0;
-    t = (hh * 3600 + mi * 60 + ss) * 1000 + sss;
-  }
+  if (typeof t == 'string') t = util.time2ms(t);
   this.millis = t;
   var tm = util.ms2struct(t);
   this.sign = tm.sign;
@@ -455,17 +533,89 @@ util.getTimeString = function(ms, h, f) {
   return new util.Time(ms).toString(h, f);
 };
 
+//------------------------------------------------
+// Time Diff String
+//------------------------------------------------
 /**
- * Elapsed Time String
+ * Time Difference String
  *
- * t1: from in millis
- * t2: to in millis (default=current time)
+ * t1: from in millis / Date-Time-String
+ * t2: to in millis / Date-Time-String (default=current time)
  *
  * t2:1600000083000 - t1:1600000000000 = 83000 -> '1m 23s'
+ * t2:'2020-09-20 20:01:23' - t1:'2020-09-20 20:00:00' = 83000 -> '1m 23s'
  */
-util.getElapsedTimeString = function(t1, t2, h, f) {
-  if (t2 == undefined) t2 = new Date().getTime();
+util.getTimeDiffString = function(t1, t2, h, f) {
+  t1 = util.datetime2ms(t1);
+  if (t2 == undefined) {
+    t2 = new Date().getTime();
+  } else {
+    t2 = util.datetime2ms(t2);
+  }
   return util.getTimeString(t2 - t1, h, f);
+};
+
+/**
+ * Start to display the time diff
+ */
+util.startTimeDiff = function(el, t1, interval, h, f) {
+  var o = util.IntervalTimeDiff.getObj(el);
+  if (o) util._stopTimeDiff(o);
+  util._startTimeDiff(el, t1, interval, h, f);
+};
+util._startTimeDiff = function(el, t1, interval, h, f) {
+  var o = new util.IntervalTimeDiff(el, t1, interval, h, f);
+  o.start();
+  util.IntervalTimeDiff.objects[o.id] = o;
+};
+
+/**
+ * Stop to display the time diff
+ */
+util.stopTimeDiff = function(el) {
+  var o = util.IntervalTimeDiff.getObj(el);
+  if (o) util._stopTimeDiff(o);
+};
+util._stopTimeDiff = function(o) {
+  o.stop();
+  delete util.IntervalTimeDiff.objects[o.id];
+};
+
+/**
+ * IntervalTimeDiff Class
+ */
+util.IntervalTimeDiff = function(el, t1, interval, h, f) {
+  this.el = el;
+  this.t1 = t1;
+  this.interval = (interval == undefined ? 500 : interval);
+  this.h = h;
+  this.f = f;
+  this.id = '_difftime-' + ++util.IntervalTimeDiff.id;
+};
+util.IntervalTimeDiff.prototype = {
+  start: function(interval) {
+    if (interval != undefined) this.interval = interval;
+    util.startIntervalProc(this.id, this.update, this.interval, this);
+  },
+  update: function(ctx) {
+    var el = util.getElement(ctx.el);
+    var s = util.getTimeDiffString(ctx.t1, null, ctx.h, ctx.f);
+    el.innerHTML = s.replace('-', '');
+  },
+  stop: function() {
+    util.stopIntervalProc(this.id);
+  }
+};
+util.IntervalTimeDiff.id = 0;
+util.IntervalTimeDiff.objects = {};
+util.IntervalTimeDiff.getObj = function(el) {
+  if (!el) return null;
+  var objs = util.IntervalTimeDiff.objects;
+  for (var k in objs) {
+    var o = objs[k];
+    if (o.el == el) return o;
+  }
+  return null;
 };
 
 //------------------------------------------------
@@ -576,8 +726,8 @@ util.ClockTime.prototype = {
  */
 util.addTime = function(t1, t2, fmt) {
   if (!fmt) fmt = '%H:%m';
-  var ms1 = util.time2msec(t1);
-  var ms2 = util.time2msec(t2);
+  var ms1 = util.time2ms(t1);
+  var ms2 = util.time2ms(t2);
   var t = util._addTime(ms1, ms2);
   return t.toString(fmt);
 };
@@ -603,8 +753,8 @@ util._addTime = function(ms1, ms2) {
  */
 util.subTime = function(t1, t2, fmt) {
   if (!fmt) fmt = '%H:%m';
-  var ms1 = util.time2msec(t1);
-  var ms2 = util.time2msec(t2);
+  var ms1 = util.time2ms(t1);
+  var ms2 = util.time2ms(t2);
   var t = util._subTime(ms1, ms2);
   return t.toString(fmt);
 };
@@ -637,7 +787,7 @@ util._subTime = function(ms1, ms2) {
  */
 util.multiTime = function(t, v, fmt) {
   if (!fmt) fmt = '%H:%m';
-  var ms = util.time2msec(t);
+  var ms = util.time2ms(t);
   var c = util._multiTime(ms, v);
   return c.toString(fmt);
 };
@@ -663,7 +813,7 @@ util._multiTime = function(ms, v) {
  */
 util.divTime = function(t, v, fmt) {
   if (!fmt) fmt = '%H:%m';
-  var ms = util.time2msec(t);
+  var ms = util.time2ms(t);
   var c = util._divTime(ms, v);
   return c.toString(fmt);
 };
@@ -691,8 +841,8 @@ util._calcTime = function(totalMillis, wkMillis, days) {
 // '10:00', '10:00' -> 0
 // '10:00', '09:00' -> 1
 util.timecmp = function(t1, t2) {
-  var ms1 = util.time2msec(t1);
-  var ms2 = util.time2msec(t2);
+  var ms1 = util.time2ms(t1);
+  var ms2 = util.time2ms(t2);
   var d = ms1 - ms2;
   if (d == 0) {
     return 0;
@@ -702,14 +852,15 @@ util.timecmp = function(t1, t2) {
   return 1;
 };
 
-// timeStr: 'HH:MI:SS.sss'
-// '01:00'        -> 3600000
-// '01:00:30'     -> 3630000
-// '01:00:30.123' -> 3630123
-// '0100'         -> 3600000
-// '010030'       -> 3630000
-// '010030.123'   -> 3630123
-util.time2msec = function(timeStr) {
+// timeStr: '[+|-]HH:MI:SS.sss'
+// '01:00'        ->  3600000
+// '01:00:30'     ->  3630000
+// '01:00:30.123' ->  3630123
+// '0100'         ->  3600000
+// '010030'       ->  3630000
+// '010030.123'   ->  3630123
+// '-01:00'       -> -3600000
+util.time2ms = function(timeStr) {
   var hour = 0;
   var min = 0;
   var sec = 0;
@@ -718,6 +869,14 @@ util.time2msec = function(timeStr) {
   var wkTimes;
   var sPrt;
   var tm;
+
+  var sn = false;
+  if (timeStr.charAt(0) == '+') {
+    timeStr = timeStr.substr(1);
+  } else if (timeStr.charAt(0) == '-') {
+    sn = true;
+    timeStr = timeStr.substr(1);
+  }
 
   if (timeStr.match(/:/)) {
     wkTimes = timeStr.split(':');
@@ -729,7 +888,7 @@ util.time2msec = function(timeStr) {
       hour = wkTimes[0] | 0;
       min = wkTimes[1] | 0;
     } else {
-      return -1;
+      return 0;
     }
     sPrt = wkSs.split('.');
     sec = sPrt[0] | 0;
@@ -751,11 +910,12 @@ util.time2msec = function(timeStr) {
       hour = wkTimes.substr(0, 2) | 0;
       min = wkTimes.substr(2, 2) | 0;
     } else {
-      return -1;
+      return 0;
     }
   }
 
   var time = (hour * util.HOUR) + (min * util.MINUTE) + sec * 1000 + msec;
+  if (sn) time *= (-1);
   return time;
 };
 
@@ -4315,7 +4475,7 @@ util.RingBuffer.prototype = {
 //-----------------------------------------------------------------------------
 // Interval Proc
 //-----------------------------------------------------------------------------
-// Start  : startIntervalProc('proc-id', fn, 1000, [async(true|false)]);
+// Start  : startIntervalProc('proc-id', fn, 1000, ARG, [async(true|false)]);
 // Stop   : stopIntervalProc('proc-id');
 // Restart: startIntervalProc('proc-id');
 //
@@ -4326,6 +4486,7 @@ util.RingBuffer.prototype = {
 //   id: {
 //     fn: function(),
 //     interval: millis,
+//     arg: argument for fn,
 //     async: true|false,
 //     tmrId: timer-id
 //   }
@@ -4335,10 +4496,11 @@ util.intervalProcs = {};
 /**
  * Register an interval proc.
  */
-util.registerIntervalProc = function(id, fn, interval, async) {
+util.registerIntervalProc = function(id, fn, interval, arg, async) {
   util.intervalProcs[id] = {
     fn: fn,
     interval: interval,
+    arg: arg,
     async: (async ? true : false),
     tmrId: 0
   };
@@ -4354,8 +4516,8 @@ util.removeIntervalProc = function(id) {
 /**
  * Start an interval proc.
  */
-util.startIntervalProc = function(id, fn, interval, async) {
-  if (fn) util.registerIntervalProc(id, fn, interval, async);
+util.startIntervalProc = function(id, fn, interval, arg, async) {
+  if (fn) util.registerIntervalProc(id, fn, interval, arg, async);
   var p = util.intervalProcs[id];
   if (p) {
     util._stopIntervalProc(p);
@@ -4403,7 +4565,7 @@ util.setInterval = function(id, interval) {
 util._execIntervalProc = function(id) {
   var p = util.intervalProcs[id];
   if (p) {
-    p.fn();
+    p.fn(p.arg);
     if (!p.async) util.nextIntervalProc(id);
   }
 };
