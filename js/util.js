@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202009210102';
+util.v = '202009211418';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -560,13 +560,22 @@ util.getTimeDiffString = function(t1, t2, h, f) {
  */
 util.startTimeDiff = function(el, t1, interval, h, f) {
   var o = util.IntervalTimeDiff.getObj(el);
-  if (o) util._stopTimeDiff(o);
-  util._startTimeDiff(el, t1, interval, h, f);
+  if (o) {
+    if (t1 != undefined) o.t1 = t1;
+    if (interval != undefined) o.interval = interval;
+    if (h != undefined) o.h = h;
+    if (f != undefined) o.f = f;
+  } else {
+    o = util._startTimeDiff(el, t1, interval, h, f);
+  }
+  o.start();
 };
 util._startTimeDiff = function(el, t1, interval, h, f) {
+  h = h ? true : false;
+  f = f ? true : false;
   var o = new util.IntervalTimeDiff(el, t1, interval, h, f);
-  o.start();
   util.IntervalTimeDiff.objects[o.id] = o;
+  return o;
 };
 
 /**
@@ -594,8 +603,10 @@ util.IntervalTimeDiff = function(el, t1, interval, h, f) {
 };
 util.IntervalTimeDiff.prototype = {
   start: function(interval) {
-    if (interval != undefined) this.interval = interval;
-    util.startIntervalProc(this.id, this.update, this.interval, this);
+    var ctx = this;
+    if (interval != undefined) ctx.interval = interval;
+    util.stopIntervalProc(ctx.id);
+    util.startIntervalProc(ctx.id, ctx.update, ctx.interval, ctx);
   },
   update: function(ctx) {
     var el = util.getElement(ctx.el);
@@ -605,8 +616,14 @@ util.IntervalTimeDiff.prototype = {
     }
   },
   stop: function() {
-    util.stopIntervalProc(this.id);
+    var ctx = this;
+    util.stopIntervalProc(ctx.id);
+    util.removeIntervalProc(ctx.id);
   }
+};
+// for debug
+util.IntervalTimeDiff.ids = function() {
+  return util.objKeys(util.IntervalTimeDiff.objects);
 };
 util.IntervalTimeDiff.id = 0;
 util.IntervalTimeDiff.objects = {};
@@ -4572,6 +4589,10 @@ util._execIntervalProc = function(id) {
   }
 };
 
+util.intervalProcIds = function() {
+  return util.objKeys(util.intervalProcs);
+};
+
 //-----------------------------------------------------------------------------
 // Events
 //-----------------------------------------------------------------------------
@@ -4978,6 +4999,14 @@ util.debug.off = function() {
 };
 util.debug.reset = function() {
   $dbg = {};
+};
+
+util.objKeys = function(o) {
+  var a = [];
+  for (var k in o) {
+    a.push(k);
+  }
+  return a;
 };
 
 //-----------------------------------------------------------------------------
