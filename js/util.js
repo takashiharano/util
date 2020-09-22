@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202009230047';
+util.v = '202009230100';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -4382,6 +4382,7 @@ util.encodeBSB64 = function(s, n) {
   return util.BSB64.encode(a, n);
 };
 util.decodeBSB64 = function(s, n) {
+  s = util.convertNewLine(s, '\n').replace(/\n/g, '');
   if (s.match(/\$\d+$/)) {
     var v = s.split('$');
     s = v[0];
