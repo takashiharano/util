@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202009230100';
+util.v = '202009230852';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -550,8 +550,36 @@ util.Time.prototype = {
       d = 1;
       r += ctx.minutes + 'm ';
     }
-    r += ctx.seconds + 's';
-    if (f) r += ' ' + ('00' + ctx.milliseconds).slice(-3);
+    if (f) {
+      if (ctx.millis >= 60000) {
+        if (ctx.milliseconds == 0) {
+          r += ctx.seconds + 's';
+        } else {
+          r += ctx.seconds + 's ' + ctx.milliseconds + 'ms';
+        }
+      } else {
+        if (ctx.seconds == 0) {
+          if (ctx.milliseconds == 0) {
+            r += '0s';
+          } else {
+            r += ctx.milliseconds + 'ms';
+          }
+        } else {
+          var ms = (ctx.milliseconds + '').replace(/0+$/, '');
+          if (ctx.milliseconds == 0) {
+            r += ctx.seconds + 's';
+          } else if (ctx.milliseconds < 10) {
+            r += ctx.seconds + '.00' + ms + 's';
+          } else if (ctx.milliseconds < 100) {
+            r += ctx.seconds + '.0' + ms + 's';
+          } else {
+            r += ctx.seconds + '.' + ms + 's';
+          }
+        }
+      }
+    } else {
+      r += ctx.seconds + 's';
+    }
     return r;
   }
 };
