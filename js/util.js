@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202009221625';
+util.v = '202009221843';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -322,10 +322,12 @@ util._getTzPos = function(s) {
 util.datetime2struct = function(s) {
   var w = s;
   var tz = '';
-  var zPos = util._getTzPos(w);
-  if (zPos > 0) {
-    tz = w.substr(zPos);
-    w = w.substr(0, zPos);
+  if (w.length > 10) {
+    var zPos = util._getTzPos(w);
+    if (zPos != -1) {
+      tz = w.substr(zPos);
+      w = w.substr(0, zPos);
+    }
   }
 
   w = util.getSerializedDateTimeString(w);
@@ -349,17 +351,54 @@ util.datetime2struct = function(s) {
   };
   return st;
 };
+
+/**
+ * Format the date and time string in YYYYMMDDHHMISSsss format.
+ * 20200920                -> 20200920000000000
+ * 20200920T1234           -> 20200920123400000
+ * 20200920T123456.789     -> 20200920123456789
+ * 2020-09-20 12:34:56.789 -> 20200920123456789
+ * 2020/9/3 12:34:56.789   -> 20200903123456789
+ */
 util.getSerializedDateTimeString = function(s) {
   var w = s;
-  w = w.replace(/-/g, '');
-  w = w.replace(/\//g, '');
-  w = w.replace(/\s/g, '');
-  w = w.replace(/T/, '');
-  w = w.replace(/:/g, '');
-  w = w.replace(/\./, '');
-  w = w.replace(/,/, '');
-  w = (w + '000000000').substr(0, 17);
-  return w;
+  w = w.trim().replace(/\s{2,}/g, ' ');
+  w = w.replace(/T/, ' ');
+  if (!w.match(/[-/:]/)) return util.serializeDateTimeString(w);
+
+  var prt = w.split(' ');
+  var date = prt[0];
+  var time = (prt[1] ? prt[1] : '');
+  date = date.replace(/\//g, '-');
+  prt = date.split('-');
+  var y = prt[0];
+  var m = util.lpad(prt[1], '0', 2);
+  var d = util.lpad(prt[2], '0', 2);
+  date = y + m + d;
+
+  prt = time.split('.');
+  var ms = '';
+  if (prt[1]) {
+    ms = prt[1];
+    time = prt[0];
+  }
+  prt = time.split(':');
+  var hh = prt[0] | 0;
+  var mi = prt[1] | 0;
+  var ss = prt[2] | 0;
+  hh = util.lpad(hh, '0', 2);
+  mi = util.lpad(mi, '0', 2);
+  ss = util.lpad(ss, '0', 2);
+  time = hh + mi + ss + ms;
+  return util.serializeDateTimeString(date + time);
+};
+util.serializeDateTimeString = function(s) {
+  s = s.replace(/-/g, '');
+  s = s.replace(/\s/g, '');
+  s = s.replace(/:/g, '');
+  s = s.replace(/\./g, '');
+  s = (s + '000000000').substr(0, 17);
+  return s;
 };
 
 /**
@@ -412,7 +451,7 @@ util.getTzOffset = function() {
 
 /**
  * baseline, comparisonValue, abs(opt)
- * 1581217200000, 1581066000000 -> -1 (1: abs=true)
+ * 1581217200000, 1581066000000 -> -1 (abs=true: 1)
  * 1581217200000, 1581217200000 ->  0
  * 1581217200000, 1581318000000 ->  1
  */
@@ -988,7 +1027,7 @@ util.decimalPadding = function(v, scale) {
   var w = r.split('.');
   var i = w[0];
   var d = (w[1] == undefined ? '' : w[1]);
-  d = util.strPadding(d, '0', scale, 'R');
+  d = util.rpad(d, '0', scale);
   r = i + '.' + d;
   return r;
 };
@@ -1150,17 +1189,37 @@ util.repeatCh = function(c, n) {
   return s;
 };
 
-util.strPadding = function(str, ch, len, pos) {
-  var t = str + '';
-  var d = len - t.length;
-  if (d <= 0) return t;
-  var pd = util.repeatCh(ch, d);
-  if (pos == 'R') {
-    t += pd;
-  } else {
-    t = pd + t;
-  }
-  return t;
+/**
+ * lpad(str, '0', 5)
+ * 'ABC'   -> '00ABC'
+ * 'ABCEF' -> 'ABCEF'
+ * adj:
+ * 'ABCEFG' -> false='ABCEFG' / true='ABCEF'
+ */
+util.lpad = function(str, pad, len, adj) {
+  var r = str + '';
+  var d = len - r.length;
+  if (d <= 0) return r;
+  var pd = util.repeatCh(pad, d);
+  r = pd + r;
+  if (adj) r = r.substr(0, len);
+  return r;
+};
+/**
+ * rpad('str, '0', 5)
+ * 'ABC'   -> 'ABC00'
+ * 'ABCEF' -> 'ABCEF'
+ * adj:
+ * 'ABCEFG' -> false='ABCEFG' / true='ABCEF'
+ */
+util.rpad = function(str, pad, len, adj) {
+  var r = str + '';
+  var d = len - r.length;
+  if (d <= 0) return r;
+  var pd = util.repeatCh(pad, d);
+  r += pd;
+  if (adj) r = r.substr(0, len);
+  return r;
 };
 
 util.null2empty = function(s) {
