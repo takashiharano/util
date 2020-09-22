@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202009211418';
+util.v = '202009221625';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -871,68 +871,48 @@ util.timecmp = function(t1, t2) {
   return 1;
 };
 
-// timeStr: '[+|-]HH:MI:SS.sss'
-// '01:00'        ->  3600000
-// '01:00:30'     ->  3630000
-// '01:00:30.123' ->  3630123
-// '0100'         ->  3600000
-// '010030'       ->  3630000
-// '010030.123'   ->  3630123
-// '-01:00'       -> -3600000
-util.time2ms = function(timeStr) {
-  var hour = 0;
-  var min = 0;
-  var sec = 0;
-  var msec = 0;
-  var wkSs = '0';
-  var wkTimes;
-  var sPrt;
-  var tm;
-
+// str: '[+|-]HH:MI:SS.sss'
+// '01:00'         ->    3600000
+// '01:00:30'      ->    3630000
+// '01:00:30.123'  ->    3630123
+// '0100'          ->    3600000
+// '010030'        ->    3630000
+// '010030.123'    ->    3630123
+// '100:30:45.789' ->  361845789
+// '+01:00'        ->    3600000
+// '-01:00'        ->   -3600000
+util.time2ms = function(str) {
+  var hour;
+  var msec;
+  var wk = str;
   var sn = false;
-  if (timeStr.charAt(0) == '+') {
-    timeStr = timeStr.substr(1);
-  } else if (timeStr.charAt(0) == '-') {
+  if (wk.charAt(0) == '+') {
+    wk = wk.substr(1);
+  } else if (wk.charAt(0) == '-') {
     sn = true;
-    timeStr = timeStr.substr(1);
+    wk = wk.substr(1);
   }
 
-  if (timeStr.match(/:/)) {
-    wkTimes = timeStr.split(':');
-    if (wkTimes.length == 3) {
-      hour = wkTimes[0] | 0;
-      min = wkTimes[1] | 0;
-      wkSs = wkTimes[2];
-    } else if (wkTimes.length == 2) {
-      hour = wkTimes[0] | 0;
-      min = wkTimes[1] | 0;
-    } else {
-      return 0;
-    }
-    sPrt = wkSs.split('.');
-    sec = sPrt[0] | 0;
-    if (sPrt.length >= 2) {
-      msec = sPrt[1] | 0;
-    }
+  if (wk.match(/\./)) {
+    var prt = wk.split('.');
+    wk = prt[0];
+    msec = (prt[1] + '000').substr(0, 3);
+  }
+
+  var pos = wk.indexOf(':');
+  if (pos != -1) {
+    hour = wk.substr(0, pos);
+    wk = wk.substr(pos + 1).replace(/:/g, '');
   } else {
-    tm = timeStr.split('.');
-    wkTimes = tm[0];
-    if (tm.length >= 2) {
-      msec = tm[1] | 0;
-    }
-
-    if (wkTimes.length == 6) {
-      hour = wkTimes.substr(0, 2) | 0;
-      min = wkTimes.substr(2, 2) | 0;
-      sec = wkTimes.substr(4, 2) | 0;
-    } else if (wkTimes.length == 4) {
-      hour = wkTimes.substr(0, 2) | 0;
-      min = wkTimes.substr(2, 2) | 0;
-    } else {
-      return 0;
-    }
+    hour = wk.substr(0, 2);
+    wk = wk.substr(2);
   }
+  wk = (wk + '00').substr(0, 4);
 
+  hour |= 0;
+  var min = wk.substr(0, 2) | 0;
+  var sec = wk.substr(2, 2) | 0;
+  msec |= 0;
   var time = (hour * util.HOUR) + (min * util.MINUTE) + sec * 1000 + msec;
   if (sn) time *= (-1);
   return time;
