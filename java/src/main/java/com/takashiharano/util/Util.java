@@ -590,6 +590,17 @@ public class Util {
   }
 
   /**
+   * Print the system environment.
+   */
+  public static void printSystemEnv() {
+    Log.i("[env]");
+    Map<String, String> envMap = System.getenv();
+    for (Map.Entry<String, String> entry : envMap.entrySet()) {
+      Log.i(entry);
+    }
+  }
+
+  /**
    * Returns the heap information string.
    */
   public static String getHeapInfoString() {
@@ -602,15 +613,14 @@ public class Util {
     return "Heap: total=" + total + " / used=" + used + "(" + percent + "%) / free=" + free + " / max=" + max;
   }
 
-  /**
-   * Print the system environment.
-   */
-  public static void printSystemEnv() {
-    Log.i("[env]");
-    Map<String, String> envMap = System.getenv();
-    for (Map.Entry<String, String> entry : envMap.entrySet()) {
-      Log.i(entry);
-    }
+  public static void gc() {
+    HeapInfo info1 = new HeapInfo();
+    long t1 = System.currentTimeMillis();
+    System.gc();
+    long t2 = System.currentTimeMillis();
+    HeapInfo info2 = new HeapInfo();
+    String elapsed = getTimeString(t2 - t1, false, true);
+    Log.i("[GC] " + info1.getPercent() + "% -> " + info2.getPercent() + "% (" + elapsed + ")");
   }
 
 }
