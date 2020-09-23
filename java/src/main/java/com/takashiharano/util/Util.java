@@ -615,15 +615,19 @@ public class Util {
 
   /**
    * Runs the garbage collector.
+   *
+   * @return execution result details
    */
-  public static void gc() {
+  public static String gc() {
     HeapInfo info1 = new HeapInfo();
     long t1 = System.currentTimeMillis();
     Runtime.getRuntime().gc();
     long t2 = System.currentTimeMillis();
     HeapInfo info2 = new HeapInfo();
     String elapsed = getTimeString(t2 - t1, false, true);
-    Log.i("[GC] " + info1.getPercent() + "% -> " + info2.getPercent() + "% (" + elapsed + ")");
+    String details = info1.getPercent() + "% -> " + info2.getPercent() + "% (" + elapsed + ")";
+    Log.i("GC: " + details);
+    return details;
   }
 
 }
