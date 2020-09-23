@@ -613,10 +613,13 @@ public class Util {
     return "Heap: total=" + total + " / used=" + used + "(" + percent + "%) / free=" + free + " / max=" + max;
   }
 
+  /**
+   * Runs the garbage collector.
+   */
   public static void gc() {
     HeapInfo info1 = new HeapInfo();
     long t1 = System.currentTimeMillis();
-    System.gc();
+    Runtime.getRuntime().gc();
     long t2 = System.currentTimeMillis();
     HeapInfo info2 = new HeapInfo();
     String elapsed = getTimeString(t2 - t1, false, true);
