@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202009230852';
+util.v = '202009250057';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1286,24 +1286,23 @@ util.formatHex = function(hex, uc, d, pFix) {
  * -> '-1,234.98765'
  */
 util.formatNumber = function(v) {
-  var v0 = v + '';
-  var v1 = '';
-  if (v0.match(/\./)) {
-    var a = v0.split('.');
-    v0 = a[0];
-    v1 = '.' + a[1];
-  }
-  var len = v0.length;
+  v += '';
+  if (!v.match(/\d+/)) return v;
+  var d = v.replace(/.*?(\d+).*/, '$1');
+  var f = util.separateDigits(d);
+  var re = new RegExp(d);
+  var r = v.replace(re, f);
+  return r;
+};
+util.separateDigits = function(v) {
+  var len = v.length;
   var r = '';
   for (var i = 0; i < len; i++) {
     if ((i != 0) && ((len - i) % 3 == 0)) {
-      if (!((i == 1) && (v0.charAt(0) == '-'))) {
-        r += ',';
-      }
+      r += ',';
     }
-    r += v0.charAt(i);
+    r += v.charAt(i);
   }
-  r += v1;
   return r;
 };
 
