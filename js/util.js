@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202009250057';
+util.v = '202009252257';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -77,42 +77,48 @@ util.WDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 /**
  * DateTime class
- * dt:
+ * src:
  *  timestamp (millis from 1970-01-01T00:00:00Z) / Date-Time-String / Date object
- * offset:
- *  minutes (-480=-0800 / 0=+0000 / 540=+0900)
+ * tzOffset: (OPT)
+ *  -480='-0800' / 0='+0000'='Z' / 540='+0900'
  */
-util.DateTime = function(dt, offset) {
-  var st;
-  if ((dt !== 0) && !dt) {
+util.DateTime = function(src, tzOffset) {
+  var dt, st;
+  if (!src && (src !== 0)) {
     dt = new Date();
-  } else if (typeof dt == 'string') {
-    st = util.datetime2struct(dt);
+  } else if (typeof src == 'string') {
+    st = util.datetime2struct(src);
     dt = new Date(st.year, st.month - 1, st.day, st.hour, st.minute, st.second);
-  } else if (!(dt instanceof Date)) {
-    dt = new Date(dt);
-  }
-
-  var timestamp = dt.getTime();
-  var os = dt.getTimezoneOffset();
-  if (offset == undefined) {
-    offset = os * (-1);
+  } else if (src instanceof Date) {
+    dt = src;
   } else {
-    dt = new Date(timestamp + (os + offset) * 60000);
+    dt = new Date(src);
+  }
+  var timestamp = dt.getTime();
+
+  if (tzOffset == undefined) {
+    tzOffset = util.getTZ();
+  } else {
+    var os = tzOffset;
+    if (typeof os == 'string') {
+      os = util.getTzLocalOffset(os);
+    }
+    dt = new Date(timestamp + os);
     timestamp = dt.getTime();
   }
 
   if (st) {
     timestamp += st.millisecond;
     if (st.tz != '') {
-      var osms = util.getTzOffset() * 60000;
-      var tzms = util.time2ms(st.tz);
-      var tzdf = tzms - osms;
+      var tzdf = util.getTzLocalOffset(st.tz);
       timestamp -= tzdf;
-      offset = tzms / 60000;
     }
   }
 
+  var tzOffsetMin = tzOffset;
+  if (typeof tzOffset == 'string') {
+    tzOffsetMin = util.tz2ms(tzOffset) / 60000;
+  }
   var year = dt.getFullYear();
   var month = dt.getMonth() + 1;
   var day = dt.getDate();
@@ -129,7 +135,8 @@ util.DateTime = function(dt, offset) {
   this.minute = minute;
   this.second = second;
   this.millisecond = millisecond;
-  this.offset = offset;
+  this.tzOffset = tzOffset;
+  this.tzOffsetMin = tzOffsetMin;
 
   this.yyyy = year + '';
   this.mm = ('0' + month).slice(-2);
@@ -147,7 +154,7 @@ util.DateTime.prototype = {
   },
   // -> '+0900' : ext=true -> '+09:00'
   getTZ: function(ext) {
-    return util.formatTZ(this.offset, ext);
+    return util.formatTZ(this.tzOffsetMin, ext);
   },
   toString: function(fmt) {
     if (!fmt) fmt = '%Y-%M-%D %H:%m:%S.%s %Z';
@@ -198,6 +205,8 @@ util.datetime2struct = function(s) {
   return st;
 };
 util._getTzPos = function(s) {
+  var p = s.indexOf('Z');
+  if (p != -1) return p;
   var tzSign = '+';
   var tzSnCnt = util.countStr(s, tzSign);
   if (tzSnCnt == 1) return s.indexOf(tzSign);
@@ -424,7 +433,7 @@ util.formatTZ = function(v, e) {
  * ext=true: +09:00
  */
 util.getTZ = function(ext) {
-  return util.formatTZ((new Date()).getTimezoneOffset() * (-1), ext);
+  return util.formatTZ(new Date().getTimezoneOffset() * (-1), ext);
 };
 
 /**
@@ -443,7 +452,28 @@ util.getTzName = function() {
  * -0800 -> -480
  */
 util.getTzOffset = function() {
-  return (new Date()).getTimezoneOffset() * -1;
+  return new Date().getTimezoneOffset() * -1;
+};
+
+/**
+ * '+0100'  ->  3600000
+ * '+01:00' ->  3600000
+ * '-0100'  -> -3600000
+ * '-01:00' -> -3600000
+ */
+util.tz2ms = function(tz) {
+  if (tz == 'Z') tz = '+0000';
+  return util.time2ms(tz);
+};
+
+/**
+ * +0900: +0000 -> -32400000
+ */
+util.getTzLocalOffset = function(tz) {
+  if (!tz) return 0;
+  var ms = util.tz2ms(tz);
+  var os = new Date().getTimezoneOffset() * 60000;
+  return os + ms;
 };
 
 /**
@@ -639,7 +669,7 @@ util._startTimeDiff = function(el, t1, interval, h, f) {
   h = h ? true : false;
   f = f ? true : false;
   var o = new util.IntervalTimeDiff(el, t1, interval, h, f);
-  util.IntervalTimeDiff.objects[o.id] = o;
+  util.IntervalTimeDiff.objs[o.id] = o;
   return o;
 };
 
@@ -652,7 +682,7 @@ util.stopTimeDiff = function(el) {
 };
 util._stopTimeDiff = function(o) {
   o.stop();
-  delete util.IntervalTimeDiff.objects[o.id];
+  delete util.IntervalTimeDiff.objs[o.id];
 };
 
 /**
@@ -688,18 +718,83 @@ util.IntervalTimeDiff.prototype = {
 };
 // for debug
 util.IntervalTimeDiff.ids = function() {
-  return util.objKeys(util.IntervalTimeDiff.objects);
+  return util.objKeys(util.IntervalTimeDiff.objs);
 };
 util.IntervalTimeDiff.id = 0;
-util.IntervalTimeDiff.objects = {};
+util.IntervalTimeDiff.objs = {};
 util.IntervalTimeDiff.getObj = function(el) {
-  if (!el) return null;
-  var objs = util.IntervalTimeDiff.objects;
-  for (var k in objs) {
-    var o = objs[k];
-    if (o.el == el) return o;
+  return util.getElRelObj(util.IntervalTimeDiff.objs, el);
+};
+
+//------------------------------------------------
+// Clock
+//------------------------------------------------
+util.clock = function(el, opt) {
+  var o = util.IntervalTimeDiff.getObj(el);
+  if (!o) {
+    o = new util.Clock(el, opt);
+    util.Clock.objs[o.id] = o;
   }
-  return null;
+  o.start(o);
+  return o;
+};
+util.startClock = function(el) {
+  var o = util.Clock.getObj(el);
+  if (o) o.start(o);
+};
+util.stopClock = function(el) {
+  var o = util.Clock.getObj(el);
+  if (o) o.stop(o);
+};
+
+/**
+ * Clock class
+ */
+util.Clock = function(el, opt) {
+  if (typeof opt == 'string') {
+    opt = {fmt: opt};
+  } else if (typeof a1 == 'number') {
+    opt = {offset: opt};
+  }
+  if (!opt) opt = {};
+  if (opt.interval == undefined) opt.interval = 500;
+  if (!opt.fmt) opt.fmt = '%Y-%M-%D %W %H:%m:%S';
+  if (opt.offset == undefined) opt.offset = 0;
+  if (opt.tz == undefined) opt.tz = util.getTZ();
+  this.el = el;
+  this.opt = opt;
+  this.interval = opt.interval;
+  this.offset = opt.offset;
+  this.tz = opt.tz;
+  this.fmt = opt.fmt;
+  this.tmId = 0;
+  this.id = ++util.Clock.id;
+};
+util.Clock.prototype = {
+  start: function(ctx) {
+    ctx.stop(ctx);
+    ctx.update(ctx);
+  },
+  update: function(ctx) {
+    var el = util.getElement(ctx.el);
+    if (el) {
+      var t = new Date().getTime();
+      t += ctx.offset;
+      el.innerHTML = new util.DateTime(t, ctx.tz).toString(ctx.fmt);
+    }
+    ctx.tmId = setTimeout(ctx.update, ctx.opt.interval, ctx);
+  },
+  stop: function(ctx) {
+    if (ctx.tmId > 0) {
+      clearTimeout(ctx.tmId);
+      ctx.tmId = 0;
+    }
+  }
+};
+util.Clock.id = 0;
+util.Clock.objs = {};
+util.Clock.getObj = function(el) {
+  return util.getElRelObj(util.Clock.objs, el);
 };
 
 //------------------------------------------------
@@ -1683,7 +1778,7 @@ util.http = function(req) {
     if (data) m += ' : ' + data.substr(0, util.http.MAX_LOG_LEN);
     util._log.v(m);
   }
-  if (util.debug.mode) $dbg[trcid] = {req: req};
+  if (util.debug) $dbg[trcid] = {req: req};
   if (util.http.online) xhr.send(data);
   util.http.onSent(req);
   if (!util.http.online) {
@@ -1694,7 +1789,7 @@ util.http = function(req) {
 util.http.onDone = function(xhr, req) {
   var res = xhr.responseText;
   var st = xhr.status;
-  if (util.debug.mode) $dbg[req.trcid].res = res;
+  if (util.debug) $dbg[req.trcid].res = res;
   if (util.http.logging) {
     var m = res;
     if (st == 0) {
@@ -1715,7 +1810,7 @@ util.http.onDone = function(xhr, req) {
     if (st == 200) {
       if (util.http.isJSONable(xhr, req)) {
         res = util.fromJSON(res);
-        if (util.debug.mode) $dbg[req.trcid].res = res;
+        if (util.debug) $dbg[req.trcid].res = res;
       }
     }
     if (req.cb) req.cb(xhr, res, req);
@@ -4993,17 +5088,7 @@ util.$onScroll = function(e) {
 
 //-----------------------------------------------------------------------------
 var $dbg = {};
-util.debug = {};
-util.debug.mode = 0;
-util.debug.on = function() {
-  util.debug.mode = 1;
-};
-util.debug.off = function() {
-  util.debug.mode = 0;
-};
-util.debug.reset = function() {
-  $dbg = {};
-};
+util.debug = 0;
 
 util.objKeys = function(o) {
   var a = [];
@@ -5011,6 +5096,15 @@ util.objKeys = function(o) {
     a.push(k);
   }
   return a;
+};
+
+util.getElRelObj = function(objs, el) {
+  if (!el) return null;
+  for (var k in objs) {
+    var o = objs[k];
+    if (o.el == el) return o;
+  }
+  return null;
 };
 
 //-----------------------------------------------------------------------------
