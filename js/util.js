@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202009252257';
+util.v = '202009261705';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -581,31 +581,14 @@ util.Time.prototype = {
       r += ctx.minutes + 'm ';
     }
     if (f) {
-      if (ctx.millis >= 60000) {
+      if (ctx.millis >= 1000) {
         if (ctx.milliseconds == 0) {
           r += ctx.seconds + 's';
         } else {
           r += ctx.seconds + 's ' + ctx.milliseconds + 'ms';
         }
       } else {
-        if (ctx.seconds == 0) {
-          if (ctx.milliseconds == 0) {
-            r += '0s';
-          } else {
-            r += ctx.milliseconds + 'ms';
-          }
-        } else {
-          var ms = (ctx.milliseconds + '').replace(/0+$/, '');
-          if (ctx.milliseconds == 0) {
-            r += ctx.seconds + 's';
-          } else if (ctx.milliseconds < 10) {
-            r += ctx.seconds + '.00' + ms + 's';
-          } else if (ctx.milliseconds < 100) {
-            r += ctx.seconds + '.0' + ms + 's';
-          } else {
-            r += ctx.seconds + '.' + ms + 's';
-          }
-        }
+        r += ctx.milliseconds + 'ms';
       }
     } else {
       r += ctx.seconds + 's';
@@ -617,15 +600,36 @@ util.Time.prototype = {
 /**
  * Millis to a string. (171959000 -> '1d 23h 45m 59s')
  *
- * h:
- *   >= 24h instead of days
- *   true: 47h 45m 59s
  * f:
  *   to display millis
- *   true: 1d 23h 45m 59s 123
+ *   true : 1ms
+ *   false: 0s
  */
-util.getTimeString = function(ms, h, f) {
-  return new util.Time(ms).toString(h, f);
+util.ms2str = function(ms, mode) {
+  var t = new util.Time(ms);
+  if (mode == 1) return t.toString(false, true);
+  if ((mode == 2) || (ms >= 60000)) return t.toString(false, false);
+  var ss = t.seconds;
+  var sss = t.milliseconds;
+  var r = '';
+  if (ms < 1000) {
+    r += sss + 'ms';
+  } else {
+    if (ms < 10000) {
+      sss = sss - sss % 10;
+    } else {
+      sss = sss - sss % 100;
+    }
+    ms = (sss + '').replace(/0+$/, '');
+    if (sss == 0) {
+      r += ss + 's';
+    } else if (sss < 100) {
+      r += ss + '.0' + ms + 's';
+    } else {
+      r += ss + '.' + ms + 's';
+    }
+  }
+  return r;
 };
 
 //------------------------------------------------
@@ -640,35 +644,34 @@ util.getTimeString = function(ms, h, f) {
  * t2:1600000083000 - t1:1600000000000 = 83000 -> '1m 23s'
  * t2:'2020-09-20 20:01:23' - t1:'2020-09-20 20:00:00' = 83000 -> '1m 23s'
  */
-util.getTimeDiffString = function(t1, t2, h, f) {
+util.getTimeDiffString = function(t1, t2, f) {
   t1 = util.datetime2ms(t1);
   if (t2 == undefined) {
     t2 = new Date().getTime();
   } else {
     t2 = util.datetime2ms(t2);
   }
-  return util.getTimeString(t2 - t1, h, f);
+  var mode = (f ? 1 : 2);
+  return util.ms2str(t2 - t1, mode);
 };
 
 /**
  * Start to display the time diff
  */
-util.startTimeDiff = function(el, t1, interval, h, f) {
+util.startTimeDiff = function(el, t1, interval, f) {
   var o = util.IntervalTimeDiff.getObj(el);
   if (o) {
     if (t1 != undefined) o.t1 = t1;
     if (interval != undefined) o.interval = interval;
-    if (h != undefined) o.h = h;
     if (f != undefined) o.f = f;
   } else {
-    o = util._startTimeDiff(el, t1, interval, h, f);
+    o = util._startTimeDiff(el, t1, interval, f);
   }
   o.start();
 };
-util._startTimeDiff = function(el, t1, interval, h, f) {
-  h = h ? true : false;
+util._startTimeDiff = function(el, t1, interval, f) {
   f = f ? true : false;
-  var o = new util.IntervalTimeDiff(el, t1, interval, h, f);
+  var o = new util.IntervalTimeDiff(el, t1, interval, f);
   util.IntervalTimeDiff.objs[o.id] = o;
   return o;
 };
@@ -688,11 +691,10 @@ util._stopTimeDiff = function(o) {
 /**
  * IntervalTimeDiff Class
  */
-util.IntervalTimeDiff = function(el, t1, interval, h, f) {
+util.IntervalTimeDiff = function(el, t1, interval, f) {
   this.el = el;
   this.t1 = t1;
   this.interval = (interval == undefined ? 500 : interval);
-  this.h = h;
   this.f = f;
   this.id = '_difftime-' + ++util.IntervalTimeDiff.id;
 };
@@ -706,7 +708,7 @@ util.IntervalTimeDiff.prototype = {
   update: function(ctx) {
     var el = util.getElement(ctx.el);
     if (el) {
-      var s = util.getTimeDiffString(ctx.t1, null, ctx.h, ctx.f);
+      var s = util.getTimeDiffString(ctx.t1, null, ctx.f);
       el.innerHTML = s.replace('-', '');
     }
   },
