@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202009191340
+v = 202009280003
 
 import os
 import sys
@@ -862,8 +862,8 @@ def get_tz(ext=None):
 # '12:00' + '13:00' -> '01:00 (+1 Day)' / '25:00'
 # * Returns ClockTime object
 def time_add(t1, t2):
-  s1 = timestr2seconds(t1)
-  s2 = timestr2seconds(t2)
+  s1 = clock2sec(t1)
+  s2 = clock2sec(t2)
   return _time_add(s1, s2)
 
 def _time_add(t1, t2):
@@ -880,8 +880,8 @@ def _time_add(t1, t2):
 # '12:00' - '13:00' -> '23:00 (-1 Day)' / '-01:00'
 # * Returns ClockTime object
 def time_sub(t1, t2):
-  s1 = timestr2seconds(t1)
-  s2 = timestr2seconds(t2)
+  s1 = clock2sec(t1)
+  s2 = clock2sec(t2)
   return _time_sub(s1, s2)
 
 def _time_sub(t1, t2):
@@ -979,80 +979,16 @@ class ClockTime:
 
 # Calc time (convert to struct)
 def _calc_time(total_secs, wk_secs, days):
-  integrated_st = seconds2struct(total_secs)
-  clocklike_st = seconds2struct(wk_secs)
+  integrated_st = sec2struct(total_secs)
+  clocklike_st = sec2struct(wk_secs)
   ret = ClockTime(total_secs, days, integrated_st, clocklike_st)
   return ret
 
-# '09:00', '10:00' -> -1
-# '10:00', '10:00' -> 0
-# '10:00', '09:00' -> 1
-def timecmp(t1, t2):
-  s1 = timestr2seconds(t1)
-  s2 = timestr2seconds(t2)
-  d = s1 - s2
-  if d == 0:
-    return 0
-  elif d < 0:
-    return -1
-  return 1
-
-# timestr: 'HH:MI:SS.ssssss'
-# '01:00'           -> 3600.0
-# '01:00:30'        -> 3630.0
-# '01:00:30.123456' -> 3630.123456
-# '0100'            -> 3600.0
-# '010030'          -> 3630.0
-# '010030.123456'   -> 3630.123456
-def timestr2seconds(timestr):
-  hour = 0
-  min = 0
-  sec = 0
-  usec = 0
-  s = '0'
-
-  if match(timestr, ':'):
-    times = timestr.split(':')
-    if len(times) == 3:
-      hour = int(times[0])
-      min = int(times[1])
-      s = times[2]
-    elif len(times) == 2:
-      hour = int(times[0])
-      min = int(times[1])
-    else:
-      return None
-    ss = s.split('.')
-    sec = int(ss[0])
-    if len(ss) >= 2:
-      usec = float('0.' + ss[1])
-
-  else:
-    tm = timestr.split('.')
-    times = tm[0]
-    if len(tm) >= 2:
-      usec = float('0.' + tm[1])
-
-    if len(times) == 6:
-      hour = int(times[0:2])
-      min = int(times[2:4])
-      sec = int(times[4:6])
-    elif len(times) == 4:
-      hour = int(times[0:2])
-      min = int(times[2:4])
-    else:
-      return None
-
-  time = (hour * HOUR) + (min * MINUTE) + sec + usec
-  return time
-
 # 86567.123456
-# -> {'sign': False, 'days': 1, 'hours': 24, 'hrs': 0, 'minutes': 2, 'seconds': 47, 'microseconds': 0.123456}
-def seconds2struct(seconds):
+# -> {'s': seconds, 'days': 1, 'hours': 24, 'hrs': 0, 'minutes': 2, 'seconds': 47, 'microseconds': 0.123456}
+def sec2struct(seconds):
   wk = seconds
-  sign = False
   if seconds < 0:
-    sign = True
     wk *= (-1)
 
   days = int(wk / DAY)
@@ -1069,7 +1005,7 @@ def seconds2struct(seconds):
   ss = int(wk)
   us = round(wk - ss, 6)
   tm = {
-    'sign': sign,
+    's': seconds,
     'days': days,
     'hrs': hh - days * 24,
     'hours': hh,
@@ -1079,61 +1015,80 @@ def seconds2struct(seconds):
   }
   return tm
 
-# 7    -> '07:00'
-# 7.5  -> '07:30'
-# 7.75 -> '07:45'
-def float2clock(v):
-  sign = ''
-  if v < 0:
-    v *= -1
-    sign = '-'
-  i = int(v)
-  f = v - int(v)
-  h = i
-  m = int(60 * f)
-  hh = str(i)
-  if i < 10:
-    hh = '0' + hh
-  mm = str(m)
-  if m < 10:
-    mm = '0' + mm
-  s = sign + hh + ':' + mm
+# timestr: '[+|-]HH:MI:SS.ssssss'
+# '01:00'           -> 3600.0
+# '01:00:30'        -> 3630.0
+# '01:00:30.123456' -> 3630.123456
+# '0100'            -> 3600.0
+# '010030'          -> 3630.0
+# '010030.123456'   -> 3630.123456
+# '-01:00'          -> -3600.0
+# '-010030.123456'  -> -3630.123456
+# '+01:00'          -> 3600.0
+# '+010030.123456'  -> 3630.123456
+def clock2sec(timestr):
+  wk = timestr
+  hours = 0
+  minutes = 0
+  seconds = 0
+  usecs = 0
+  sign = False
+
+  if wk[:1] == '-':
+    sign = True
+    wk = wk[1:]
+  elif wk[:1] == '+':
+    wk = wk[1:]
+
+  prt = wk.split('.')
+  if len(prt) >= 2:
+    wk = prt[0]
+    usecs = float('0.' + prt[1])
+
+  if match(wk, ':'):
+    pos = wk.index(':')
+    h = wk[:pos]
+    hours = int(h)
+    wk = wk[pos + 1:]
+    wk = replace(wk, ':', '')
+  else:
+    h = wk[:2]
+    hours = int(h)
+    wk = wk[2:]
+
+  wk = (wk + '00')[:4]
+  minutes = int(wk[0:2])
+  seconds = int(wk[2:4])
+
+  s = (hours * HOUR) + (minutes * MINUTE) + seconds + usecs
+  if sign:
+    s *= (-1)
   return s
 
-# 3600 -> '01:00'
-def seconds2clock(v):
-  s = seconds2struct(v)
-  h = str(s['hours'])
+#     60 ->  '00:01'
+#   3600 ->  '01:00'
+#  86399 ->  '23:59'
+# 360000 -> '100:00'
+#    -60 -> '-00:01'
+def sec2clock(v):
+  st = sec2struct(v)
+  h = str(st['hours'])
   if len(h) == 1:
     h = '0' + h
-  return h + ':' + ('0' + str(s['minutes']))[-2:]
-
-# '07:00' -> 7.0
-# '07:30' -> 7.5
-# '07:45' -> 7.75
-def clock2float(s, ndigits=None):
-  a = s.split(':')
-  hh = a[0]
-  mm = a[1]
-  h = int(hh)
-  m = int(mm)
-  sign = 1
-  if h < 0:
-    h *= -1
-    sign = -1
-  f = (h + m / 60) * sign
-  r = f
-  if ndigits is not None:
-    r = round(f, ndigits)
-  return r
+  s = h + ':' + ('0' + str(st['minutes']))[-2:]
+  if v < 0:
+    s = '-' + s
+  return s
 
 # 171959.123456 -> '1d 23h 45m 59s 123456'
 # h=True: 47h / h=False: 1d 23h
 # f=True: 59.123456s / f=False: 59s
 def sec2str(sec, h=False, f=False):
-  st = seconds2struct(sec)
+  st = sec2struct(sec)
   p = False
   s = ''
+  if sec < 0:
+    s = '-'
   if st['days'] > 0 and not h:
     p = True
     s += str(st['days']) + 'd '
@@ -1154,6 +1109,60 @@ def sec2str(sec, h=False, f=False):
       s += '.' + us
   s += 's'
   return s
+
+# '07:00' -> 7.0
+# '07:30' -> 7.5
+# '07:45' -> 7.75
+def clock2float(s, ndigits=None):
+  a = s.split(':')
+  hh = a[0]
+  mm = a[1]
+  h = int(hh)
+  m = int(mm)
+  sign = 1
+  if h < 0:
+    h *= -1
+    sign = -1
+  f = (h + m / 60) * sign
+  r = f
+  if ndigits is not None:
+    r = round(f, ndigits)
+  return r
+
+#  7    -> '07:00'
+#  7.5  -> '07:30'
+#  7.75 -> '07:45'
+# -7.75 -> '-07:45'
+def float2clock(v):
+  sign = ''
+  if v < 0:
+    v *= -1
+    sign = '-'
+  i = int(v)
+  f = v - int(v)
+  h = i
+  m = int(60 * f)
+  hh = str(i)
+  if i < 10:
+    hh = '0' + hh
+  mm = str(m)
+  if m < 10:
+    mm = '0' + mm
+  s = sign + hh + ':' + mm
+  return s
+
+# '09:00', '10:00' -> -1
+# '10:00', '10:00' -> 0
+# '10:00', '09:00' -> 1
+def timecmp(t1, t2):
+  s1 = clock2sec(t1)
+  s2 = clock2sec(t2)
+  d = s1 - s2
+  if d == 0:
+    return 0
+  elif d < 0:
+    return -1
+  return 1
 
 # Sleep
 def sleep(seconds):

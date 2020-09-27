@@ -136,6 +136,7 @@ def test():
 
   s += 'datetime:\n'
   dt = util.get_datetime()
+  s += 'timestamp() = ' + str(dt.timestamp()) + '\n'
   s += 'year        = ' + str(dt.year) + '\n'
   s += 'month       = ' + str(dt.month) + '\n'
   s += 'day         = ' + str(dt.day) + '\n'
