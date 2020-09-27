@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202009261705';
+util.v = '202009271451';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -463,7 +463,7 @@ util.getTzOffset = function() {
  */
 util.tz2ms = function(tz) {
   if (tz == 'Z') tz = '+0000';
-  return util.time2ms(tz);
+  return util.clock2ms(tz);
 };
 
 /**
@@ -499,7 +499,7 @@ util.diffDays = function(ms1, ms2, abs) {
  *   millis or '[+|-]12:34:56.789'
  */
 util.Time = function(t) {
-  if (typeof t == 'string') t = util.time2ms(t);
+  if (typeof t == 'string') t = util.clock2ms(t);
   var tm = util.ms2struct(t);
   this.millis = t;
   this.days = tm.days;
@@ -620,13 +620,13 @@ util.ms2str = function(ms, mode) {
     } else {
       sss = sss - sss % 100;
     }
-    ms = (sss + '').replace(/0+$/, '');
+    var msec = (sss + '').replace(/0+$/, '');
     if (sss == 0) {
       r += ss + 's';
     } else if (sss < 100) {
-      r += ss + '.0' + ms + 's';
+      r += ss + '.0' + msec + 's';
     } else {
-      r += ss + '.' + ms + 's';
+      r += ss + '.' + msec + 's';
     }
   }
   return r;
@@ -905,8 +905,8 @@ util.ClockTime.prototype = {
  */
 util.addTime = function(t1, t2, fmt) {
   if (!fmt) fmt = '%H:%m';
-  var ms1 = util.time2ms(t1);
-  var ms2 = util.time2ms(t2);
+  var ms1 = util.clock2ms(t1);
+  var ms2 = util.clock2ms(t2);
   var c = new util.ClockTime(ms1 + ms2);
   return c.toString(fmt);
 };
@@ -921,8 +921,8 @@ util.addTime = function(t1, t2, fmt) {
  */
 util.subTime = function(t1, t2, fmt) {
   if (!fmt) fmt = '%H:%m';
-  var ms1 = util.time2ms(t1);
-  var ms2 = util.time2ms(t2);
+  var ms1 = util.clock2ms(t1);
+  var ms2 = util.clock2ms(t2);
   var c = new util.ClockTime(ms1 - ms2);
   return c.toString(fmt);
 };
@@ -937,7 +937,7 @@ util.subTime = function(t1, t2, fmt) {
  */
 util.multiTime = function(t, v, fmt) {
   if (!fmt) fmt = '%H:%m';
-  var ms = util.time2ms(t);
+  var ms = util.clock2ms(t);
   var c = new util.ClockTime(ms * v);
   return c.toString(fmt);
 };
@@ -952,7 +952,7 @@ util.multiTime = function(t, v, fmt) {
  */
 util.divTime = function(t, v, fmt) {
   if (!fmt) fmt = '%H:%m';
-  var ms = util.time2ms(t);
+  var ms = util.clock2ms(t);
   var c = new util.ClockTime(ms / v);
   return c.toString(fmt);
 };
@@ -961,8 +961,8 @@ util.divTime = function(t, v, fmt) {
 // '10:00', '10:00' -> 0
 // '10:00', '09:00' -> 1
 util.timecmp = function(t1, t2) {
-  var ms1 = util.time2ms(t1);
-  var ms2 = util.time2ms(t2);
+  var ms1 = util.clock2ms(t1);
+  var ms2 = util.clock2ms(t2);
   var d = ms1 - ms2;
   if (d == 0) {
     return 0;
@@ -982,7 +982,7 @@ util.timecmp = function(t1, t2) {
 // '100:30:45.789' ->  361845789
 // '+01:00'        ->    3600000
 // '-01:00'        ->   -3600000
-util.time2ms = function(str) {
+util.clock2ms = function(str) {
   var hour;
   var msec;
   var wk = str;
