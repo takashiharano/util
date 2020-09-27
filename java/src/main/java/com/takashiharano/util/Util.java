@@ -218,128 +218,6 @@ public class Util {
   }
 
   /**
-   * Returns human-readable time string.<br>
-   * 171959000 -> "1d 23h 45m 59s"
-   *
-   * @param millis
-   *          milliseconds
-   * @return time string
-   */
-  public static String getTimeString(long millis) {
-    return getTimeString(millis, false, false);
-  }
-
-  /**
-   * Returns human-readable time string.<br>
-   * 171959789 -> "1d 23h 45m 59s 789ms"
-   *
-   * @param millis
-   *          milliseconds
-   * @param hr
-   *          true=24h : false=1d 0h
-   * @param precision
-   *          set true to treat milliseconds
-   * @return time string
-   */
-  public static String getTimeString(long millis, boolean hr, boolean precision) {
-    long DAY = 86400000;
-    long HOUR = 3600000;
-    long MINUTE = 60000;
-    long SECOND = 1000;
-
-    long wk = millis;
-    boolean sign = false;
-    long days = 0;
-    long hours = 0;
-    long hrs = 0;
-    long minutes = 0;
-    long seconds = 0;
-    long milliseconds = 0;
-    boolean flg = false;
-
-    if (wk < 0) {
-      sign = true;
-      wk *= (-1);
-    }
-
-    if (wk >= DAY) {
-      days = wk / DAY;
-    }
-
-    if (wk >= HOUR) {
-      hours = (wk / HOUR);
-      wk -= hours * HOUR;
-    }
-    hrs = hours - days * 24;
-
-    if (wk >= MINUTE) {
-      minutes = wk / MINUTE;
-      wk -= minutes * MINUTE;
-    }
-
-    if (wk >= SECOND) {
-      seconds = wk / 1000;
-    }
-
-    milliseconds = wk - (seconds * 1000);
-
-    StringBuilder sb = new StringBuilder();
-    if (sign) {
-      sb.append("-");
-    }
-
-    if (!hr && (days > 0)) {
-      flg = true;
-      sb.append(days + "d ");
-    }
-
-    if (hr && (hours > 0)) {
-      flg = true;
-      sb.append(hours + "h ");
-    } else if (flg || (hrs > 0)) {
-      flg = true;
-      sb.append(hrs + "h ");
-    }
-
-    if (flg || (minutes > 0)) {
-      sb.append(minutes + "m ");
-    }
-
-    if (precision) {
-      if (millis >= 60000) {
-        if (milliseconds == 0) {
-          sb.append(seconds + "s");
-        } else {
-          sb.append(seconds + "s " + milliseconds + "ms");
-        }
-      } else {
-        if (seconds == 0) {
-          if (milliseconds == 0) {
-            sb.append("0s");
-          } else {
-            sb.append(milliseconds + "ms");
-          }
-        } else {
-          String ms = Long.toString(milliseconds).replaceAll("0+$", "");
-          if (milliseconds == 0) {
-            sb.append(seconds + "s");
-          } else if (milliseconds < 10) {
-            sb.append(seconds + ".00" + ms + "s");
-          } else if (milliseconds < 100) {
-            sb.append(seconds + ".0" + ms + "s");
-          } else {
-            sb.append(seconds + "." + ms + "s");
-          }
-        }
-      }
-    } else {
-      sb.append(seconds + "s");
-    }
-
-    return sb.toString();
-  }
-
-  /**
    * Copy byte array.
    *
    * @param src
@@ -624,7 +502,7 @@ public class Util {
     Runtime.getRuntime().gc();
     long t2 = System.currentTimeMillis();
     HeapInfo info2 = new HeapInfo();
-    String elapsed = getTimeString(t2 - t1, false, true);
+    String elapsed = Time.ms2str(t2 - t1);
     String details = info1.getPercent() + "% -> " + info2.getPercent() + "% (" + elapsed + ")";
     Log.i("GC: " + details);
     return details;
