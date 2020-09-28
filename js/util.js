@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202009290033';
+util.v = '202009290108';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -702,8 +702,8 @@ util.IntervalTimeDiff.prototype = {
   start: function(interval) {
     var ctx = this;
     if (interval != undefined) ctx.interval = interval;
-    util.stopIntervalProc(ctx.id);
-    util.startIntervalProc(ctx.id, ctx.update, ctx.interval, ctx);
+    util.IntervalProc.stop(ctx.id);
+    util.IntervalProc.start(ctx.id, ctx.update, ctx.interval, ctx);
   },
   update: function(ctx) {
     var el = util.getElement(ctx.el);
@@ -714,8 +714,8 @@ util.IntervalTimeDiff.prototype = {
   },
   stop: function() {
     var ctx = this;
-    util.stopIntervalProc(ctx.id);
-    util.removeIntervalProc(ctx.id);
+    util.IntervalProc.stop(ctx.id);
+    util.IntervalProc.remove(ctx.id);
   }
 };
 // for debug
