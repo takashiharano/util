@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202009271451';
+util.v = '202009290033';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1014,9 +1014,9 @@ util.clock2ms = function(str) {
   var min = wk.substr(0, 2) | 0;
   var sec = wk.substr(2, 2) | 0;
   msec |= 0;
-  var time = (hour * util.HOUR) + (min * util.MINUTE) + sec * 1000 + msec;
-  if (sn) time *= (-1);
-  return time;
+  var ms = (hour * util.HOUR) + (min * util.MINUTE) + sec * 1000 + msec;
+  if (sn) ms *= (-1);
+  return ms;
 };
 
 //-----------------------------------------------------------------------------
@@ -4595,14 +4595,16 @@ util.RingBuffer.prototype = {
 //-----------------------------------------------------------------------------
 // Interval Proc
 //-----------------------------------------------------------------------------
-// Start  : startIntervalProc('proc-id', fn, 1000, ARG, [async(true|false)]);
-// Stop   : stopIntervalProc('proc-id');
-// Restart: startIntervalProc('proc-id');
+// Start  : util.IntervalProc.start('<PROC_ID>', fn, 1000, ARG, [async(true|false)]);
+// Stop   : util.IntervalProc.stop('<PROC_ID>');
+// Restart: util.IntervalProc.start('<PROC_ID>');
 //
 // Async:
-// -> call in fn: nextIntervalProc('proc-id');
+// -> call in fn: util.IntervalProc.next('<PROC_ID>');
 //-----------------------------------------------------------------------------
-// {
+util.IntervalProc = {};
+
+// proc = {
 //   id: {
 //     fn: function(),
 //     interval: millis,
@@ -4611,13 +4613,13 @@ util.RingBuffer.prototype = {
 //     tmrId: timer-id
 //   }
 // }
-util.intervalProcs = {};
+util.IntervalProc.procs = {};
 
 /**
  * Register an interval proc.
  */
-util.registerIntervalProc = function(id, fn, interval, arg, async) {
-  util.intervalProcs[id] = {
+util.IntervalProc.register = function(id, fn, interval, arg, async) {
+  util.IntervalProc.procs[id] = {
     fn: fn,
     interval: interval,
     arg: arg,
@@ -4629,30 +4631,30 @@ util.registerIntervalProc = function(id, fn, interval, arg, async) {
 /**
  * Remove an interval proc.
  */
-util.removeIntervalProc = function(id) {
-  delete util.intervalProcs[id];
+util.IntervalProc.remove = function(id) {
+  delete util.IntervalProc.procs[id];
 };
 
 /**
  * Start an interval proc.
  */
-util.startIntervalProc = function(id, fn, interval, arg, async) {
-  if (fn) util.registerIntervalProc(id, fn, interval, arg, async);
-  var p = util.intervalProcs[id];
+util.IntervalProc.start = function(id, fn, interval, arg, async) {
+  if (fn) util.IntervalProc.register(id, fn, interval, arg, async);
+  var p = util.IntervalProc.procs[id];
   if (p) {
-    util._stopIntervalProc(p);
-    util._execIntervalProc(id);
+    util.IntervalProc._stop(p);
+    util.IntervalProc.exec(id);
   }
 };
 
 /**
  * Stop an interval proc.
  */
-util.stopIntervalProc = function(id) {
-  var p = util.intervalProcs[id];
-  if (p) util._stopIntervalProc(p);
+util.IntervalProc.stop = function(id) {
+  var p = util.IntervalProc.procs[id];
+  if (p) util.IntervalProc._stop(p);
 };
-util._stopIntervalProc = function(p) {
+util.IntervalProc._stop = function(p) {
   if (p.tmrId > 0) {
     clearTimeout(p.tmrId);
     p.tmrId = 0;
@@ -4662,36 +4664,36 @@ util._stopIntervalProc = function(p) {
 /**
  * Sets a timer which executes an intefval proc function.
  */
-util.nextIntervalProc = function(id, interval) {
-  var p = util.intervalProcs[id];
+util.IntervalProc.next = function(id, interval) {
+  var p = util.IntervalProc.procs[id];
   if (p) {
-    util._stopIntervalProc(p);
+    util.IntervalProc._stop(p);
     if (interval == undefined) interval = p.interval;
-    p.tmrId = setTimeout(util._execIntervalProc, interval, id);
+    p.tmrId = setTimeout(util.IntervalProc.exec, interval, id);
   }
 };
 
 /**
  * Sets interval in milliseconds.
  */
-util.setInterval = function(id, interval) {
-  var p = util.intervalProcs[id];
+util.IntervalProc.setInterval = function(id, interval) {
+  var p = util.IntervalProc.procs[id];
   if (p) p.interval = interval;
 };
 
 /**
  * Execute an interval proc.
  */
-util._execIntervalProc = function(id) {
-  var p = util.intervalProcs[id];
+util.IntervalProc.exec = function(id) {
+  var p = util.IntervalProc.procs[id];
   if (p) {
     p.fn(p.arg);
-    if (!p.async) util.nextIntervalProc(id);
+    if (!p.async) util.IntervalProc.next(id);
   }
 };
 
-util.intervalProcIds = function() {
-  return util.objKeys(util.intervalProcs);
+util.IntervalProc.ids = function() {
+  return util.objKeys(util.IntervalProc.procs);
 };
 
 //-----------------------------------------------------------------------------
