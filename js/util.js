@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202009290108';
+util.v = '202009300006';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -581,7 +581,7 @@ util.Time.prototype = {
       r += ctx.minutes + 'm ';
     }
     if (f) {
-      if (ctx.millis >= 1000) {
+      if (Math.abs(ctx.millis) >= 1000) {
         if (ctx.milliseconds == 0) {
           r += ctx.seconds + 's';
         } else {
@@ -633,10 +633,14 @@ util.ms2str = function(ms, mode) {
 };
 
 //------------------------------------------------
-// Time Diff String
+// Time Counter
 //------------------------------------------------
+util.timecounter = {};
+util.timecounter.id = 0;
+util.timecounter.objs = {};
+
 /**
- * Time Difference String
+ * Returns time delta string
  *
  * t1: from in millis / Date-Time-String
  * t2: to in millis / Date-Time-String (default=current time)
@@ -644,7 +648,7 @@ util.ms2str = function(ms, mode) {
  * t2:1600000083000 - t1:1600000000000 = 83000 -> '1m 23s'
  * t2:'2020-09-20 20:01:23' - t1:'2020-09-20 20:00:00' = 83000 -> '1m 23s'
  */
-util.getTimeDiffString = function(t1, t2, f) {
+util.timecounter.delta = function(t1, t2, f) {
   t1 = util.datetime2ms(t1);
   if (t2 == undefined) {
     t2 = new Date().getTime();
@@ -656,49 +660,54 @@ util.getTimeDiffString = function(t1, t2, f) {
 };
 
 /**
- * Start to display the time diff
+ * Start to display the time delta
  */
-util.startTimeDiff = function(el, t1, interval, f) {
-  var o = util.IntervalTimeDiff.getObj(el);
+util.timecounter.start = function(el, t1, interval, f, cb) {
+  var o = util.timecounter.getObj(el);
   if (o) {
-    if (t1 != undefined) o.t1 = t1;
+    if (t1 !== undefined) o.t1 = t1;
     if (interval != undefined) o.interval = interval;
-    if (f != undefined) o.f = f;
+    if (f !== undefined) o.f = f;
+    if (cb !== undefined) o.cb = cb;
   } else {
-    o = util._startTimeDiff(el, t1, interval, f);
+    f = f ? true : false;
+    o = new util.TimeCounter(el, t1, interval, f, cb);
+    util.timecounter.objs[o.id] = o;
   }
   o.start();
 };
-util._startTimeDiff = function(el, t1, interval, f) {
-  f = f ? true : false;
-  var o = new util.IntervalTimeDiff(el, t1, interval, f);
-  util.IntervalTimeDiff.objs[o.id] = o;
-  return o;
+
+/**
+ * Stop to display the time delta
+ */
+util.timecounter.stop = function(el) {
+  var o = util.timecounter.getObj(el);
+  if (o) {
+    o.stop();
+    delete util.timecounter.objs[o.id];
+  }
+};
+
+util.timecounter.getObj = function(el) {
+  return util.getElRelObj(util.timecounter.objs, el);
+};
+
+util.timecounter.ids = function() {
+  return util.objKeys(util.timecounter.objs);
 };
 
 /**
- * Stop to display the time diff
+ * TimeCounter Class
  */
-util.stopTimeDiff = function(el) {
-  var o = util.IntervalTimeDiff.getObj(el);
-  if (o) util._stopTimeDiff(o);
-};
-util._stopTimeDiff = function(o) {
-  o.stop();
-  delete util.IntervalTimeDiff.objs[o.id];
-};
-
-/**
- * IntervalTimeDiff Class
- */
-util.IntervalTimeDiff = function(el, t1, interval, f) {
+util.TimeCounter = function(el, t1, interval, f, cb) {
   this.el = el;
   this.t1 = t1;
   this.interval = (interval == undefined ? 500 : interval);
   this.f = f;
-  this.id = '_difftime-' + ++util.IntervalTimeDiff.id;
+  this.cb = cb;
+  this.id = '_timecounter-' + util.timecounter.id++;
 };
-util.IntervalTimeDiff.prototype = {
+util.TimeCounter.prototype = {
   start: function(interval) {
     var ctx = this;
     if (interval != undefined) ctx.interval = interval;
@@ -706,11 +715,13 @@ util.IntervalTimeDiff.prototype = {
     util.IntervalProc.start(ctx.id, ctx.update, ctx.interval, ctx);
   },
   update: function(ctx) {
+    var now = new Date().getTime();
     var el = util.getElement(ctx.el);
     if (el) {
-      var s = util.getTimeDiffString(ctx.t1, null, ctx.f);
+      var s = util.timecounter.delta(ctx.t1, now, ctx.f);
       el.innerHTML = s.replace('-', '');
     }
+    if (ctx.cb) ctx.cb(now - ctx.t1);
   },
   stop: function() {
     var ctx = this;
@@ -718,34 +729,30 @@ util.IntervalTimeDiff.prototype = {
     util.IntervalProc.remove(ctx.id);
   }
 };
-// for debug
-util.IntervalTimeDiff.ids = function() {
-  return util.objKeys(util.IntervalTimeDiff.objs);
-};
-util.IntervalTimeDiff.id = 0;
-util.IntervalTimeDiff.objs = {};
-util.IntervalTimeDiff.getObj = function(el) {
-  return util.getElRelObj(util.IntervalTimeDiff.objs, el);
-};
 
 //------------------------------------------------
 // Clock
 //------------------------------------------------
 util.clock = function(el, opt) {
-  var o = util.IntervalTimeDiff.getObj(el);
+  var o = util.clock.getObj(el);
   if (!o) {
     o = new util.Clock(el, opt);
-    util.Clock.objs[o.id] = o;
+    util.clock.objs[o.id] = o;
   }
   o.start(o);
   return o;
 };
-util.startClock = function(el) {
-  var o = util.Clock.getObj(el);
+util.clock.id = 0;
+util.clock.objs = {};
+util.clock.getObj = function(el) {
+  return util.getElRelObj(util.clock.objs, el);
+};
+util.clock.start = function(el) {
+  var o = util.clock.getObj(el);
   if (o) o.start(o);
 };
-util.stopClock = function(el) {
-  var o = util.Clock.getObj(el);
+util.clock.stop = function(el) {
+  var o = util.clock.getObj(el);
   if (o) o.stop(o);
 };
 
@@ -770,7 +777,7 @@ util.Clock = function(el, opt) {
   this.tz = opt.tz;
   this.fmt = opt.fmt;
   this.tmId = 0;
-  this.id = ++util.Clock.id;
+  this.id = util.clock.id++;
 };
 util.Clock.prototype = {
   start: function(ctx) {
@@ -792,11 +799,6 @@ util.Clock.prototype = {
       ctx.tmId = 0;
     }
   }
-};
-util.Clock.id = 0;
-util.Clock.objs = {};
-util.Clock.getObj = function(el) {
-  return util.getElRelObj(util.Clock.objs, el);
 };
 
 //------------------------------------------------
