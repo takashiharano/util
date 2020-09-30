@@ -5,55 +5,12 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202009300006';
+util.v = '202010010000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
 util.mouseX = 0;
 util.mouseY = 0;
-
-/*\
-|*| Polyfill which enables the passage of arbitrary arguments to the
-|*| callback functions of JavaScript timers (HTML5 standard syntax).
-|*|
-|*| https://developer.mozilla.org/en-US/docs/DOM/window.setInterval
-|*|
-|*| Syntax:
-|*| var timeoutID = window.setTimeout(func, delay[, param1, param2, ...]);
-|*| var timeoutID = window.setTimeout(code, delay);
-|*| var intervalID = window.setInterval(func, delay[, param1, param2, ...]);
-|*| var intervalID = window.setInterval(code, delay);
-\*/
-(function() {
-  setTimeout(function(arg1) {
-    if (arg1 === 'test') {
-      // feature test is passed, no need for polyfill
-      return;
-    }
-    var __nativeST__ = window.setTimeout;
-    window.setTimeout = function(vCallback, nDelay /*, argumentToPass1, argumentToPass2, etc. */) {
-      var aArgs = Array.prototype.slice.call(arguments, 2);
-      return __nativeST__(vCallback instanceof Function ? function() {
-        vCallback.apply(null, aArgs);
-      } : vCallback, nDelay);
-    };
-  }, 0, 'test');
-
-  var interval = setInterval(function(arg1) {
-    clearInterval(interval);
-    if (arg1 === 'test') {
-      // feature test is passed, no need for polyfill
-      return;
-    }
-    var __nativeSI__ = window.setInterval;
-    window.setInterval = function(vCallback, nDelay /*, argumentToPass1, argumentToPass2, etc. */) {
-      var aArgs = Array.prototype.slice.call(arguments, 2);
-      return __nativeSI__(vCallback instanceof Function ? function() {
-        vCallback.apply(null, aArgs);
-      } : vCallback, nDelay);
-    };
-  }, 0, 'test');
-}());
 
 //-----------------------------------------------------------------------------
 // Date & Time
