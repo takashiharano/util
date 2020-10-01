@@ -55,7 +55,7 @@ public class FileUtil {
       @SuppressWarnings("unused")
       int readSize = fis.read(content, 0, content.length);
     } catch (IOException ioe) {
-      content = null;
+      content = new byte[0];
     }
     return content;
   }
@@ -83,7 +83,7 @@ public class FileUtil {
     File file = new File(path);
     byte[] content = readFile(file);
     if (content == null) {
-      return null;
+      return "";
     }
     if (charsetName == null) {
       charsetName = getCharsetName(content);
@@ -126,7 +126,7 @@ public class FileUtil {
     try {
       lines = Files.readAllLines(file, Charset.forName(charsetName));
     } catch (IOException e) {
-      return null;
+      return new String[0];
     }
     String[] text = new String[lines.size()];
     lines.toArray(text);
