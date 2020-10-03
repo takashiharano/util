@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202010010000';
+util.v = '202010031237';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -434,6 +434,17 @@ util.getTzLocalOffset = function(tz) {
 };
 
 /**
+ * t0: YYYY-MM-DD HH:MI:SS.sss
+ * t1: YYYY-MM-DD HH:MI:SS.sss
+ * return t1 - t0 in millis
+ */
+util.difftime = function(t0, t1) {
+  t0 = util.datetime2ms(t0);
+  t1 = (t1 == undefined ? util.now() : util.datetime2ms(t1));
+  return t1 - t0;
+};
+
+/**
  * baseline, comparisonValue, abs(opt)
  * 1581217200000, 1581066000000 -> -1 (abs=true: 1)
  * 1581217200000, 1581217200000 ->  0
@@ -599,36 +610,31 @@ util.timecounter.objs = {};
 /**
  * Returns time delta string
  *
- * t1: from in millis / Date-Time-String
- * t2: to in millis / Date-Time-String (default=current time)
+ * t0: from in millis / Date-Time-String
+ * t1: to in millis / Date-Time-String (default=current time)
  *
- * t2:1600000083000 - t1:1600000000000 = 83000 -> '1m 23s'
- * t2:'2020-09-20 20:01:23' - t1:'2020-09-20 20:00:00' = 83000 -> '1m 23s'
+ * t1:1600000083000 - t0:1600000000000 = 83000 -> '1m 23s'
+ * t1:'2020-09-20 20:01:23' - t0:'2020-09-20 20:00:00' = 83000 -> '1m 23s'
  */
-util.timecounter.delta = function(t1, t2, f) {
-  t1 = util.datetime2ms(t1);
-  if (t2 == undefined) {
-    t2 = new Date().getTime();
-  } else {
-    t2 = util.datetime2ms(t2);
-  }
+util.timecounter.delta = function(t0, t1, f) {
+  var ms = util.difftime(t0, t1);
   var mode = (f ? 1 : 2);
-  return util.ms2str(t2 - t1, mode);
+  return util.ms2str(ms, mode);
 };
 
 /**
  * Start to display the time delta
  */
-util.timecounter.start = function(el, t1, interval, f, cb) {
+util.timecounter.start = function(el, t0, interval, f, cb) {
   var o = util.timecounter.getObj(el);
   if (o) {
-    if (t1 !== undefined) o.t1 = t1;
+    if (t0 !== undefined) o.t0 = t0;
     if (interval != undefined) o.interval = interval;
     if (f !== undefined) o.f = f;
     if (cb !== undefined) o.cb = cb;
   } else {
     f = f ? true : false;
-    o = new util.TimeCounter(el, t1, interval, f, cb);
+    o = new util.TimeCounter(el, t0, interval, f, cb);
     util.timecounter.objs[o.id] = o;
   }
   o.start();
@@ -656,9 +662,9 @@ util.timecounter.ids = function() {
 /**
  * TimeCounter Class
  */
-util.TimeCounter = function(el, t1, interval, f, cb) {
+util.TimeCounter = function(el, t0, interval, f, cb) {
   this.el = el;
-  this.t1 = t1;
+  this.t0 = t0;
   this.interval = (interval == undefined ? 500 : interval);
   this.f = f;
   this.cb = cb;
@@ -675,10 +681,10 @@ util.TimeCounter.prototype = {
     var now = new Date().getTime();
     var el = util.getElement(ctx.el);
     if (el) {
-      var s = util.timecounter.delta(ctx.t1, now, ctx.f);
+      var s = util.timecounter.delta(ctx.t0, now, ctx.f);
       el.innerHTML = s.replace('-', '');
     }
-    if (ctx.cb) ctx.cb(now - ctx.t1);
+    if (ctx.cb) ctx.cb(now - ctx.t0);
   },
   stop: function() {
     var ctx = this;
