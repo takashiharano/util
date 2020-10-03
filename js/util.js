@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202010031237';
+util.v = '202010040125';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -141,7 +141,7 @@ util.datetime2struct = function(s) {
       w = w.substr(0, zPos);
     }
   }
-  w = util.getSerializedDateTimeString(w);
+  w = util.serializeDateTimeString(w);
   var yyyy = w.substr(0, 4) | 0;
   var mm = w.substr(4, 2) | 0;
   var dd = w.substr(6, 2) | 0;
@@ -181,11 +181,11 @@ util._getTzPos = function(s) {
  * 2020-09-20 12:34:56.789 -> 20200920123456789
  * 2020/9/3 12:34:56.789   -> 20200903123456789
  */
-util.getSerializedDateTimeString = function(s) {
+util.serializeDateTimeString = function(s) {
   var w = s;
   w = w.trim().replace(/\s{2,}/g, ' ');
   w = w.replace(/T/, ' ');
-  if (!w.match(/[-/:]/)) return util.serializeDateTimeString(w);
+  if (!w.match(/[-/:]/)) return util._serializeDateTimeString(w);
 
   var prt = w.split(' ');
   var date = prt[0];
@@ -211,9 +211,9 @@ util.getSerializedDateTimeString = function(s) {
   mi = util.lpad(mi, '0', 2);
   ss = util.lpad(ss, '0', 2);
   time = hh + mi + ss + ms;
-  return util.serializeDateTimeString(date + time);
+  return util._serializeDateTimeString(date + time);
 };
-util.serializeDateTimeString = function(s) {
+util._serializeDateTimeString = function(s) {
   s = s.replace(/-/g, '');
   s = s.replace(/\s/g, '');
   s = s.replace(/:/g, '');
@@ -4394,6 +4394,7 @@ util.Base64.decode = function(str) {
 };
 
 util.encodeBase64 = function(s) {
+  if (s == undefined) return '';
   var r;
   try {
     r = btoa(s);
@@ -4403,8 +4404,8 @@ util.encodeBase64 = function(s) {
   return r;
 };
 util.decodeBase64 = function(s) {
-  var r = '';
-  if (!window.atob) return r;
+  if ((s == undefined) || !window.atob) return '';
+  var r;
   try {
     r = decodeURIComponent(Array.prototype.map.call(atob(s), function(c) {
       return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
