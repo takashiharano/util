@@ -3,7 +3,7 @@ package com.takashiharano.util;
 /**
  * A mutable sequence of characters.
  */
-public class TextBuilder {
+public class StrBuilder {
 
   private StringBuilder buf;
   private String lineseparator = System.lineSeparator();
@@ -12,7 +12,7 @@ public class TextBuilder {
    * Constructs a string builder with no characters in it and an initial capacity
    * of 16 characters.
    */
-  public TextBuilder() {
+  public StrBuilder() {
     this.buf = new StringBuilder();
   }
 
@@ -23,7 +23,7 @@ public class TextBuilder {
    * @param capacity
    *          the initial capacity
    */
-  public TextBuilder(int capacity) {
+  public StrBuilder(int capacity) {
     this.buf = new StringBuilder(capacity);
   }
 
@@ -34,7 +34,7 @@ public class TextBuilder {
    * @param str
    *          the initial contents of the buffer
    */
-  public TextBuilder(String str) {
+  public StrBuilder(String str) {
     this.buf = new StringBuilder(str);
   }
 

@@ -1,15 +1,15 @@
 package com.takashiharano.test.util;
 
 import com.takashiharano.util.Log;
-import com.takashiharano.util.TextBuilder;
+import com.takashiharano.util.StrBuilder;
 
-public class TextBuilder_substrTest {
+public class StrBuilder_substrTest {
 
   public static void main(String args[]) {
-    TextBuilder tb;
+    StrBuilder tb;
 
     Log.d("---");
-    tb = new TextBuilder();
+    tb = new StrBuilder();
     tb.append("0123456789");
     Log.d(tb.substr(0, 3));
     Log.d(tb.substr(0, 0));
