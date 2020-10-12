@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202010111620';
+util.v = '202010122032';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1397,32 +1397,37 @@ util.trimZeros = function(v) {
  * 1 -> '1'
  * 1024 -> '1K'
  * 1048576 -> '1M'
+ * sep=true: '1,023K'
+ * sp=true: '1 K'
  */
-util.byte = function(v) {
+util.convByte = function(v, sep, sp) {
   var K = 1024;
   var M = 1048576;
   var G = 1073741824;
   var T = 1099511627776;
   var P = 1125899906842624;
-  var r, b;
+  var b = v;
+  var u = '';
   if (v >= P) {
     b = v / P;
-    r = util.formatNumber(Math.floor(b)) + 'P';
+    u = 'P';
   } else if (v >= T) {
     b = v / T;
-    r = util.formatNumber(Math.floor(b)) + 'T';
+    u = 'T';
   } else if (v >= G) {
     b = v / G;
-    r = util.formatNumber(Math.floor(b)) + 'G';
+    u = 'G';
   } else if (v >= M) {
     b = v / M;
-    r = util.formatNumber(Math.floor(b)) + 'M';
+    u = 'M';
   } else if (v >= K) {
     b = v / K;
-    r = util.formatNumber(Math.floor(b)) + 'K';
-  } else {
-    r = util.formatNumber(v);
+    u = 'K';
   }
+  var r = Math.floor(b);
+  if (sep) r = util.formatNumber(r);
+  if (sp && u) r += ' ';
+  r += u;
   return r;
 };
 
