@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202010131918';
+util.v = '202010140018';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1431,7 +1431,7 @@ util.convByte = function(v, sep, sp) {
     b = v / K;
     u = 'K';
   }
-  var r = Math.floor(b);
+  var r = util.floor(b, 1);
   if (sep) r = util.formatNumber(r);
   if (sp && u) r += ' ';
   r += u;
