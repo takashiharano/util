@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202010122032';
+util.v = '202010131918';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1021,8 +1021,15 @@ util.calcNextTime = function(times) {
  * 12345, -2-  > 12300
  */
 util.round = function(number, precision) {
-  precision |= 0;
   return util._shift(Math.round(util._shift(number, precision, false)), precision, true);
+};
+
+util.floor = function(number, precision) {
+  return util._shift(Math.floor(util._shift(number, precision, false)), precision, true);
+};
+
+util.ceil = function(number, precision) {
+  return util._shift(Math.ceil(util._shift(number, precision, false)), precision, true);
 };
 
 util._shift = function(number, precision, reverseShift) {
