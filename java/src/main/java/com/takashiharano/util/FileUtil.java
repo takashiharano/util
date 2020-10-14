@@ -382,7 +382,7 @@ public class FileUtil {
   public static String[] listDirNames(String dirPath) {
     File dir = new File(dirPath);
     if (!dir.exists() || !dir.isDirectory()) {
-      return null;
+      return new String[0];
     }
     File[] files = listFiles(dirPath);
     List<String> names = new ArrayList<>();
@@ -406,7 +406,7 @@ public class FileUtil {
   public static String[] listFileNames(String dirPath) {
     File dir = new File(dirPath);
     if (!dir.exists() || !dir.isDirectory()) {
-      return null;
+      return new String[0];
     }
     File[] files = listFiles(dirPath);
     List<String> names = new ArrayList<>();
@@ -431,7 +431,7 @@ public class FileUtil {
   public static String[] listDirFileNames(String dirPath) {
     File dir = new File(dirPath);
     if (!dir.exists() || !dir.isDirectory()) {
-      return null;
+      return new String[0];
     }
     File[] files = listFiles(dirPath);
     List<String> names = new ArrayList<>();
