@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202010140018';
+util.v = '202010160001';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2478,9 +2478,9 @@ util.STYLE = function() {/*
 }
 .progdot:after {content:"..."; animation: progdot1 1.2s linear infinite;}
 @keyframes progdot1 {
-  10% {content: "";}
-  20% {content: ".";}
-  30% {content: "..";}
+  10% {content: "   ";}
+  20% {content: ".  ";}
+  30% {content: ".. ";}
   40% {content: "...";}
 }
 .dialog {
