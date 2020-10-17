@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202010160001';
+util.v = '202010171702';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2537,45 +2537,16 @@ util.infotip.ST_FADEOUT = 4;
 util.DFLT_DURATION = 1500;
 util.infotip.FADE_SPEED = 250;
 util.infotip.obj = {
-  id: 'infotip',
+  type: 'infotip',
   st: util.infotip.ST_HIDE,
   el: {
     body: null,
     pre: null
   },
-  duration: 0
+  duration: 0,
+  timerId: 0
 };
 util.infotip.opt = null;
-util.infotip.timerId = 0;
-
-util.infotip.registerStyle = function() {
-  var style = '.infotip-wrp {';
-  style += '  position: fixed !important;';
-  style += '  display: inline-block !important;';
-  style += '  max-width: calc(100vw - 35px) !important;';
-  style += '  max-height: calc(100vh - 35px) !important;';
-  style += '  overflow: auto !important;';
-  style += '  padding: 4px !important;';
-  style += '  box-sizing: content-box !important;';
-  style += '  z-index: 2147483647 !important;';
-  style += '  box-shadow: 8px 8px 10px rgba(0,0,0,.3) !important;';
-  style += '  border-radius: 3px !important;';
-  style += '  color: #fff! important;';
-  style += '  background: rgba(0,0,0,0.65) !important;';
-  style += '}';
-  style += '.infotip {';
-  style += '  width: auto !important;';
-  style += '  height: auto !important;';
-  style += '  min-height: 1em !important;';
-  style += '  margin: 0 !important;';
-  style += '  padding: 0 !important;';
-  style += '  line-height: 1.2 !important;';
-  style += '  color: #fff !important;';
-  style += '  font-size: 12px !important;';
-  style += '  font-family: Consolas, Monaco, Menlo, monospace, sans-serif !important;';
-  style += '}';
-  util.registerStyle(style);
-};
 
 /**
  * show("message");
@@ -2611,12 +2582,10 @@ util.infotip.show = function(msg, duration, opt) {
       } else if (opt.pos.x != undefined) {
         x = opt.pos.x;
       }
-
       if (opt.pos.y != undefined) {
         y = opt.pos.y;
       }
     }
-
     if (opt.style) {
       style = opt.style;
     }
@@ -2633,7 +2602,6 @@ util.infotip.show = function(msg, duration, opt) {
     util.infotip._center(obj);
   }
   util.infotip.opt = opt;
-
 };
 
 util.infotip._show = function(obj, msg, style) {
@@ -2655,25 +2623,30 @@ util.infotip._show = function(obj, msg, style) {
   msg = (msg + '').replace(/\\n/g, '\n');
   obj.el.pre.innerHTML = msg;
   document.body.appendChild(obj.el.body);
-  if (obj.st != util.infotip.ST_SHOW) {
+  if (obj.st == util.infotip.ST_SHOW) {
+    util.infotip.setHideTimer(obj);
+  } else {
     obj.st = util.infotip.ST_FADEIN;
-     setTimeout(util.infotip.fadeIn, 10, obj);
+    setTimeout(util.infotip.fadeIn, 10, obj);
   }
 };
 
 util.infotip.fadeIn = function(obj) {
   var cb = util.infotip.onFadeInCompleted;
   util.fadeIn(obj.el.body, util.infotip.FADE_SPEED, cb, obj);
-  var duration = obj.duration;
-  if (duration > 0) {
-    if (util[obj.id].timerId) {
-      clearTimeout(util[obj.id].timerId);
-    }
-    util[obj.id].timerId = setTimeout(util.infotip.hide, duration, obj);
-  }
+  util.infotip.setHideTimer(obj);
 };
 util.infotip.onFadeInCompleted = function(el, obj) {
   obj.st = util.infotip.ST_SHOW;
+};
+
+util.infotip.setHideTimer = function(obj) {
+  if (obj.duration > 0) {
+    if (obj.timerId) {
+      clearTimeout(obj.timerId);
+    }
+    obj.timerId = setTimeout(util.infotip._hide, obj.duration, obj);
+  }
 };
 
 /**
@@ -2713,16 +2686,24 @@ util.infotip._center = function(obj) {
 /**
  * Hide a infotip
  */
-util.infotip.hide = function(obj) {
-  var delay = util.infotip.FADE_SPEED;
-  obj.st = util.infotip.ST_FADEOUT;
-  util.fadeOut(obj.el.body, delay);
-  util[obj.id].timerId = setTimeout(util.infotip.onFadeOutCompleted, delay, null, obj);
-};
-util.infotip.onFadeOutCompleted = function(el, obj) {
+util.infotip.hide = function() {
+  var obj = util.infotip.obj;
+  if (obj.timerId) {
+    clearTimeout(obj.timerId);
+    obj.timerId = 0;
+  }
   util.infotip._hide(obj);
 };
 util.infotip._hide = function(obj) {
+  var delay = util.infotip.FADE_SPEED;
+  obj.st = util.infotip.ST_FADEOUT;
+  util.fadeOut(obj.el.body, delay);
+  obj.timerId = setTimeout(util.infotip.onFadeOutCompleted, delay, null, obj);
+};
+util.infotip.onFadeOutCompleted = function(el, obj) {
+  util.infotip.__hide(obj);
+};
+util.infotip.__hide = function(obj) {
   var div = obj.el.body;
   if ((div != null) && (div.parentNode)) {
     document.body.removeChild(div);
@@ -2751,6 +2732,35 @@ util.infotip.onMouseMove = function(x, y) {
   }
 };
 
+util.infotip.registerStyle = function() {
+  var style = '.infotip-wrp {';
+  style += '  position: fixed !important;';
+  style += '  display: inline-block !important;';
+  style += '  max-width: calc(100vw - 35px) !important;';
+  style += '  max-height: calc(100vh - 35px) !important;';
+  style += '  overflow: auto !important;';
+  style += '  padding: 4px !important;';
+  style += '  box-sizing: content-box !important;';
+  style += '  z-index: 2147483647 !important;';
+  style += '  box-shadow: 8px 8px 10px rgba(0,0,0,.3) !important;';
+  style += '  border-radius: 3px !important;';
+  style += '  color: #fff! important;';
+  style += '  background: rgba(0,0,0,0.65) !important;';
+  style += '}';
+  style += '.infotip {';
+  style += '  width: auto !important;';
+  style += '  height: auto !important;';
+  style += '  min-height: 1em !important;';
+  style += '  margin: 0 !important;';
+  style += '  padding: 0 !important;';
+  style += '  line-height: 1.2 !important;';
+  style += '  color: #fff !important;';
+  style += '  font-size: 12px !important;';
+  style += '  font-family: Consolas, Monaco, Menlo, monospace, sans-serif !important;';
+  style += '}';
+  util.registerStyle(style);
+};
+
 //-----------------------------------------------------------------------------
 // Tooltip
 //-----------------------------------------------------------------------------
@@ -2761,41 +2771,43 @@ util.tooltip.offset = {
   y: -8
 };
 util.tooltip.targetEl = null;
-util.tooltip.timerId = 0;
 util.tooltip.obj = {
-  id: 'tooltip',
+  type: 'tooltip',
   st: util.infotip.ST_HIDE,
   el: {
     body: null,
     pre: null
-  }
+  },
+  timerId: 0
 };
 util.tooltip.disabled = false;
 util.tooltip.show = function(el, msg, x, y) {
-  if (util.tooltip.obj.st == util.infotip.ST_FADEOUT) {
-    util.tooltip.cancel();
+  var obj = util.tooltip.obj;
+  if (obj.st == util.infotip.ST_FADEOUT) {
+    util.tooltip.cancel(obj);
   }
-  if ((el == util.tooltip.targetEl) && (util.tooltip.obj.st >= util.infotip.ST_OPEN)) {
-    util.infotip._move(util.tooltip.obj, x, y, util.tooltip.offset);
+  if ((el == util.tooltip.targetEl) && (obj.st >= util.infotip.ST_OPEN)) {
+    util.infotip._move(obj, x, y, util.tooltip.offset);
   } else {
-    if (util.tooltip.obj.st != util.infotip.ST_SHOW) {
-      util.tooltip.obj.st = util.infotip.ST_OPEN;
+    if (obj.st != util.infotip.ST_SHOW) {
+      obj.st = util.infotip.ST_OPEN;
     }
     util.tooltip.targetEl = el;
-    if (util.tooltip.obj.el.body) {
+    if (obj.el.body) {
       util.tooltip._show(msg);
     } else {
-      if (util.tooltip.timerId) {
-        clearTimeout(util.tooltip.timerId);
+      if (obj.timerId) {
+        clearTimeout(obj.timerId);
       }
-      util.tooltip.timerId = setTimeout(util.tooltip._show, util.tooltip.DELAY, msg);
+      obj.timerId = setTimeout(util.tooltip._show, util.tooltip.DELAY, msg);
     }
   }
 };
 util.tooltip._show = function(msg) {
-  var st = util.tooltip.obj.st;
+  var obj = util.tooltip.obj;
+  var st = obj.st;
   if ((st == util.infotip.ST_FADEOUT) || (st == util.infotip.ST_HIDE)) {
-    util.tooltip.cancel();
+    util.tooltip.cancel(obj);
     return;
   }
   var x = util.mouseX;
@@ -2804,22 +2816,22 @@ util.tooltip._show = function(msg) {
   if (!el || (el != util.tooltip.targetEl)) {
     return;
   }
-  util.infotip._show(util.tooltip.obj, msg);
-  util.infotip._move(util.tooltip.obj, x, y, util.tooltip.offset);
+  util.infotip._show(obj, msg);
+  util.infotip._move(obj, x, y, util.tooltip.offset);
 };
 
 util.tooltip.hide = function() {
-  util.infotip.hide(util.tooltip.obj);
+  util.infotip._hide(util.tooltip.obj);
   util.tooltip.targetEl = null;
 };
 
-util.tooltip.cancel = function() {
+util.tooltip.cancel = function(obj) {
   util.tooltip.targetEl = null;
-  if (util.tooltip.timerId) {
-    clearTimeout(util.tooltip.timerId);
-    util.tooltip.timerId = 0;
+  if (obj.timerId) {
+    clearTimeout(obj.timerId);
+    obj.timerId = 0;
   }
-  util.infotip.onFadeOutCompleted(null, util.tooltip.obj);
+  util.infotip.__hide(obj);
 };
 
 util.tooltip.onMouseMove = function(x, y) {
