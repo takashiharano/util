@@ -11,7 +11,21 @@ public class ZipUtil {
    *          ZIP file path
    */
   public static void zip(String inPath, String zipPath) {
-    ZipCompressor zip = new ZipCompressor(inPath);
+    zip(inPath, zipPath, false);
+  }
+
+  /**
+   * Compresses the files or directories into a ZIP file.
+   *
+   * @param inPath
+   *          Target files/directories to compress
+   * @param zipPath
+   *          ZIP file path
+   * @param junkPath
+   *          Set true not to store the top directory name
+   */
+  public static void zip(String inPath, String zipPath, boolean junkPath) {
+    ZipCompressor zip = new ZipCompressor(inPath, junkPath);
     zip.compress(zipPath);
   }
 
