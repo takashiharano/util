@@ -81,13 +81,19 @@ public class ZipCompressor {
       itemPath = file.getAbsolutePath().replace(topLevelDirPath, "");
     }
 
+    ZipEntry entry;
     if (file.isDirectory()) {
-      ZipEntry entry = new ZipEntry(itemPath + File.separator);
-      zos.putNextEntry(entry);
-      return;
+      entry = new ZipEntry(itemPath + File.separator);
     } else {
-      ZipEntry entry = new ZipEntry(itemPath);
-      zos.putNextEntry(entry);
+      entry = new ZipEntry(itemPath);
+    }
+
+    long lastModified = file.lastModified();
+    entry.setTime(lastModified);
+    zos.putNextEntry(entry);
+
+    if (file.isDirectory()) {
+      return;
     }
 
     try (InputStream is = new BufferedInputStream(new FileInputStream(file));) {
