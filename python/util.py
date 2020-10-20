@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202009280003
+v = 202010210010
 
 import os
 import sys
@@ -491,7 +491,7 @@ def from_json(s, encoding=None, cls=None, object_hook=None, parse_float=None,
               parse_int=None, parse_constant=None, object_pairs_hook=None, default=None):
   if s is None or s == '':
     return default
-  return json.loads(s, encoding=encoding, cls=cls, object_hook=object_hook,
+  return json.loads(s, cls=cls, object_hook=object_hook,
                     parse_float=parse_float, parse_int=parse_int,
                     parse_constant=parse_constant, object_pairs_hook=object_pairs_hook)
 
@@ -501,7 +501,7 @@ def load_dict(path, default=None, encoding=None, cls=None, object_hook=None,
   if path_exists(path):
     s = read_text_file(path)
     if s != '':
-      return json.loads(s, encoding=encoding, cls=cls, object_hook=object_hook,
+      return json.loads(s, cls=cls, object_hook=object_hook,
                         parse_float=parse_float, parse_int=parse_int,
                         parse_constant=parse_constant, object_pairs_hook=object_pairs_hook)
   return default
