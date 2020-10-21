@@ -19,6 +19,7 @@ public class ZipCompressor {
   private List<File> files;
   private String topLevelDirPath;
   private boolean junkPath;
+  private int level = 9; // 0-9
 
   public ZipCompressor() {
     files = new ArrayList<>();
@@ -65,12 +66,24 @@ public class ZipCompressor {
   public void compress(String destPath) {
     File destFile = new File(destPath);
     try (ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(destFile)));) {
+      if (level != -1) {
+        zos.setLevel(level);
+      }
       for (File file : files) {
         addZipEntry(zos, file);
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public void setLevel(int level) {
+    if (level < 0) {
+      level = -1;
+    } else if (level > 9) {
+      level = 9;
+    }
+    this.level = level;
   }
 
   private void addZipEntry(ZipOutputStream zos, File file) throws IOException {
