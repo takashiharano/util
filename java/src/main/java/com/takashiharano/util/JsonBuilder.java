@@ -1,12 +1,17 @@
 package com.takashiharano.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class JsonBuilder {
 
   StringBuilder buffer;
   int count;
+  List<Integer> listCounter;
 
   public JsonBuilder() {
     buffer = new StringBuilder();
+    listCounter = new ArrayList<>();
     buffer.append("{");
   }
 
@@ -128,6 +133,25 @@ public class JsonBuilder {
     _append(key, sb.toString());
   }
 
+  public void openList(String key) {
+    newListCounter();
+    _append(key, "[");
+  }
+
+  public void appendListItem(String value) {
+    int listCount = getListCount();
+    if (listCount > 0) {
+      buffer.append(",");
+    }
+    buffer.append(value);
+    incrementListCounter();
+  }
+
+  public void closeList(String key) {
+    buffer.append("]");
+    removeListCounter();
+  }
+
   private void _append(String key, String value) {
     if (count > 0) {
       buffer.append(",");
@@ -136,6 +160,36 @@ public class JsonBuilder {
     buffer.append(":");
     buffer.append(value);
     count++;
+  }
+
+  private void newListCounter() {
+    Integer counter = 0;
+    listCounter.add(counter);
+  }
+
+  private int getListCount() {
+    int listCount = 0;
+    int size = listCounter.size();
+    if (size > 0) {
+      listCount = listCounter.get(size - 1);
+    }
+    return listCount;
+  }
+
+  private void incrementListCounter() {
+    Integer counter = null;
+    int size = listCounter.size();
+    if (size > 0) {
+      counter = listCounter.get(size - 1);
+      counter++;
+    }
+  }
+
+  private void removeListCounter() {
+    int size = listCounter.size();
+    if (size > 0) {
+      listCounter.remove(size - 1);
+    }
   }
 
   public String toString() {
