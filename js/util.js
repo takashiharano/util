@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202010171702';
+util.v = '202010232357';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -4999,6 +4999,187 @@ util.isTargetKey = function(e, handler) {
       return true;
     }
   }
+  return false;
+};
+
+//-----------------------------------------------------------------------------
+/**
+ * cb = function(data, file)
+ * opt = {
+ *   mode: 'txt'|'b64'|'data'|'bin'|'blob'([object ArrayBuffer])
+ *   onloadstart: function(file),
+ *   onprogress: function(e, loaded, total, pct),
+ *   onload: function(data, file),
+ *   onabort: function(),
+ *   onerror: function(e) {
+ *     e.target.error.code:
+ *       e.target.error.NOT_FOUND_ERR
+ *       e.target.error.SECURITY_ERR
+ *       e.target.error.NOT_READABLE_ERR
+ *       e.target.error.ABORT_ERR
+ *   }
+ * };
+ */
+util.addDndHandler = function(el, cb, opt) {
+  el = util.getElement(el);
+  if (!el) return;
+  el.addEventListener('dragover', util.dnd.onDragOver, false);
+  el.addEventListener('drop', util.dnd.onDrop, false);
+  var o = new util.DndHandler(el, cb, opt);
+  util.dnd.handlers.push(o);
+  return o;
+};
+util.DndHandler = function(el, cb, opt) {
+  if (!opt) opt = {};
+  this.el = el;
+  this.cb = cb;
+  this.mode = opt.mode;
+  this.onloadstart = opt.onloadstart;
+  this.onprogress = opt.onprogress;
+  this.onload = opt.onload;
+  this.onabort = opt.onabort;
+  this.onerror = opt.onerror;
+};
+util.DndHandler.prototype = {
+  setMode: function(mode) {
+    this.mode = mode;
+  }
+};
+
+util.dnd = {};
+util.dnd.handlers = [];
+util.fileLoader = null;
+util.dnd.onDragOver = function(e) {
+  e.stopPropagation();
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+};
+util.dnd.onDrop = function(e) {
+  e.stopPropagation();
+  e.preventDefault();
+  var handlers = util.dnd.handlers;
+  var handler = null;
+  for (var i = 0; i < handlers.length; i++) {
+    handler = handlers[i];
+    if (util.isTargetEl(handler.el, e.target)) {
+      break;
+    }
+  }
+  if (i == handlers) return;
+  var cb = handler.cb;
+  var d = e.dataTransfer.getData('text');
+  if (d) {
+    if (cb) cb(d);
+  } else {
+    util.dnd.handleDroppedFile(e, handler);
+  }
+};
+
+util.dnd.handleDroppedFile = function(e, handler) {
+  try {
+    if (e.dataTransfer.files) {
+      if (e.dataTransfer.files.length > 0) {
+        var f = e.dataTransfer.files[0];
+        if (f) util.loadFile(f, handler);
+      } else {
+        if (handler.cb) handler.cb('');
+      }
+    }
+  } catch (e) {}
+};
+
+util.loadFile = function(file, handler) {
+  if (file.size == 0) return;
+  var fr = new FileReader();
+  fr.onload = util.onFileLoaded;
+  fr.onloadstart = util.onFileLoadStart;
+  fr.onprogress = util.onFileLoadProg;
+  fr.onabort = util.onFileLoadAbort;
+  fr.onerror = util.onFileLoadError;
+  util.fileLoader = {
+    file: file,
+    reader: fr,
+    handler: handler
+  };
+  var mode = handler.mode;
+  if ((mode == 'bin') || (mode == 'blob')) {
+    fr.readAsArrayBuffer(file);
+  } else if ((mode == 'b64') || (mode == 'data')) {
+    fr.readAsDataURL(file);
+  } else {
+    fr.readAsText(file);
+  }
+};
+
+util.onFileLoadStart = function() {
+  var loader = util.fileLoader;
+  var file = loader.file;
+  var cb = util.fileLoader.handler.onloadstart;
+  if (cb) cb(file);
+};
+
+util.onFileLoadProg = function(e) {
+  if (e.lengthComputable) {
+    var total = e.total;
+    var loaded = e.loaded;
+    var pct = (total == 0) ? 100 : Math.round((loaded / total) * 100);
+  }
+  var cb = util.fileLoader.handler.onprogress;
+  if (cb) cb(e, loaded, total, pct);
+};
+
+util.onFileLoaded = function() {
+  var loader = util.fileLoader;
+  var fr = loader.reader;
+  var file = loader.file;
+  var content = '';
+  try {
+    if (fr.result != null) content = fr.result;
+  } catch (e) {}
+  var handler = loader.handler;
+
+  var mode = handler.mode;
+  if (mode == 'b64') {
+    content = util.getDataUrlBody(content);
+  } else if (mode == 'bin') {
+    content = new Uint8Array(content);
+  }
+
+  var cb = util.fileLoader.handler.onload;
+  if (!cb) cb = handler.cb;
+  if (cb) cb(content, file);
+  util.finalizeFileLoad();
+};
+
+util.onFileLoadAbort = function() {
+  var cb = util.fileLoader.handler.onabort;
+  if (cb) cb();
+  util.finalizeFileLoad();
+};
+
+util.onFileLoadError = function(e) {
+  var cb = util.fileLoader.handler.onerror;
+  if (cb) cb(e);
+  util.finalizeFileLoad();
+};
+
+util.finalizeFileLoad = function() {
+  util.fileLoader = null;
+};
+
+util.getDataUrlBody = function(d) {
+  return d.split(',')[1];
+};
+
+util.decodeDataUrl = function(d) {
+  return util.decodeBase64(util.getDataUrlBody(d));
+};
+
+util.isTargetEl = function(el, tgt) {
+  do {
+    if (el == tgt) return true;
+    el = el.parentNode;
+  } while (el != null);
   return false;
 };
 
