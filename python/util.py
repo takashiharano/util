@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202010210010
+v = 202010251435
 
 import os
 import sys
@@ -858,16 +858,18 @@ def get_tz(ext=None):
 # Time calculation
 #------------------------------------------------
 # Addition
+# '01:00' + '02:00' -> 10800
+def add_time(t1, t2):
+  s1 = clock2sec(t1)
+  s2 = clock2sec(t2)
+  return s1 + s2
+
+# Addition
 # '12:00' + '01:30' -> '13:30'
 # '12:00' + '13:00' -> '01:00 (+1 Day)' / '25:00'
 # * Returns ClockTime object
 def time_add(t1, t2):
-  s1 = clock2sec(t1)
-  s2 = clock2sec(t2)
-  return _time_add(s1, s2)
-
-def _time_add(t1, t2):
-  total_secs = t1 + t2
+  total_secs = add_time(t1, t2)
   wk_secs = total_secs
   days = 0
   if wk_secs >= DAY:
@@ -876,16 +878,20 @@ def _time_add(t1, t2):
   return _calc_time(total_secs, wk_secs, days)
 
 # Subtraction
+# '01:30' + '00:30' -> 3600
+def sub_time(t1, t2):
+  s1 = clock2sec(t1)
+  s2 = clock2sec(t2)
+  return s1 - s2
+
+# Subtraction
 # '12:00' - '01:30' -> '10:30'
 # '12:00' - '13:00' -> '23:00 (-1 Day)' / '-01:00'
 # * Returns ClockTime object
 def time_sub(t1, t2):
   s1 = clock2sec(t1)
   s2 = clock2sec(t2)
-  return _time_sub(s1, s2)
-
-def _time_sub(t1, t2):
-  total_secs = t1 - t2
+  total_secs = s1 - s2
   wk_secs = total_secs
   days = 0
 
@@ -893,7 +899,7 @@ def _time_sub(t1, t2):
     wk_secs *= -1
     days = int(wk_secs / DAY)
     days = days + (0 if (wk_secs % DAY == 0) else 1)
-    if t1 != 0:
+    if s1 != 0:
       if wk_secs % DAY == 0 and wk_secs != DAY:
         days += 1
     wk_secs = DAY - (wk_secs - days * DAY)

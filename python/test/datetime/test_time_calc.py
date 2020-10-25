@@ -6,7 +6,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 import util
 
-def test_add_time():
+def test_time_add():
   s = ''
   s += '\n--------------------\n'
   s += _test_calc_time('add', '00:05:30.700', '00:01:20.123000', False, '00:06:50.823')
@@ -53,7 +53,7 @@ def test_add_time():
 
   return s
 
-def test_sub_time():
+def test_time_sub():
   s = ''
   s += _test_calc_time('sub', '00:05:30.700', '00:05:20.400000', False, '00:00:10.300')
 
@@ -122,9 +122,9 @@ def _test_calc_time(type, t1, t2, by_the_day, expected):
   s += 'by_the_day = ' + str(by_the_day) + '\n'
 
   if type == 'add':
-    ret = util.add_time(t1, t2)
+    ret = util.time_add(t1, t2)
   else:
-    ret = util.sub_time(t1, t2)
+    ret = util.time_sub(t1, t2)
 
   s += str(ret) + '\n'
   s += 'exp        = ' + expected + '\n'
@@ -138,9 +138,9 @@ def _test_calc_time(type, t1, t2, by_the_day, expected):
 
 def main():
   ret = ''
-  ret += test_add_time()
+  ret += test_time_add()
   ret += '\n============================================================\n'
-  ret += test_sub_time()
+  ret += test_time_sub()
 
   print('Content-Type: text/plain')
   print()
