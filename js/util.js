@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202010270031';
+util.v = '202010280005';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -568,15 +568,15 @@ util.Time.prototype = {
 /**
  * Millis to a string. (171959000 -> '1d 23h 45m 59s')
  *
- * f:
- *   to display millis
- *   true : 1ms
- *   false: 0s
+ * mode:
+ *   0: auto
+ *   1: s
+ *   2: ms
  */
 util.ms2str = function(ms, mode) {
   var t = new util.Time(ms);
-  if (mode == 1) return t.toString(false, true);
-  if ((mode == 2) || (ms >= 60000)) return t.toString(false, false);
+  if (mode == 2) return t.toString(false, true);
+  if ((mode == 1) || (ms >= 60000)) return t.toString(false, false);
   var ss = t.seconds;
   var sss = t.milliseconds;
   var r = '';
@@ -618,7 +618,7 @@ util.timecounter.objs = {};
  */
 util.timecounter.delta = function(t0, t1, f) {
   var ms = util.difftime(t0, t1);
-  var mode = (f ? 1 : 2);
+  var mode = (f ? 2 : 1);
   return util.ms2str(ms, mode);
 };
 
