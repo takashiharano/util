@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202010280005';
+util.v = '202010290000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1179,6 +1179,7 @@ util.str2arr = function(s) {
  * startsWith(string, pattern, position, case-insensitive)
  */
 util.startsWith = function(s, p, a3, a4) {
+  if (s == null) return false;
   var a = [a3, a4];
   var o = 0;
   var i = 0;
@@ -1201,6 +1202,7 @@ util.startsWith = function(s, p, a3, a4) {
  * endsWith(string, pattern, length, case-insensitive)
  */
 util.endsWith = function(s, p, a3, a4) {
+  if (s == null) return false;
   var a = [a3, a4];
   var l = 0;
   var i = 0;
