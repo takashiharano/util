@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202010300012';
+util.v = '202010310038';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2494,6 +2494,17 @@ util.STYLE = function() {/*
   40% {opacity: 1;}
   50% {opacity: 0.1;}
   80% {opacity: 1;}
+}
+.flicker-out {animation: flicker2 0.7s linear;animation-fill-mode:both;opacity:0 !important;}
+@keyframes flicker2 {
+  0% {opacity: 1;}
+  10% {opacity: 0.1;}
+  20% {opacity: 1;}
+  25% {opacity: 0.1;}
+  35% {opacity: 1;}
+  40% {opacity: 0.1;}
+  50% {opacity: 1;}
+  80% {opacity: 0;}
 }
 .progdot:after {content:"..."; animation: progdot1 1.2s linear infinite;}
 @keyframes progdot1 {
