@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202010310038';
+util.v = '202011010000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2163,6 +2163,14 @@ util.isTextInput = function(el) {
     if ((el.type == 'text') || (el.type == 'password')) return true;
   }
   return false;
+};
+
+util.addSelectOption = function(select, label, val, selected) {
+  var opt = document.createElement('option');
+  opt.value = val;
+  opt.innerText = label;
+  if (selected) opt.selected = true;
+  select.appendChild(opt);
 };
 
 util.getClientWidth = function() {
