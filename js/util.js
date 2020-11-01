@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011010000';
+util.v = '202011020002';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2171,6 +2171,7 @@ util.addSelectOption = function(select, label, val, selected) {
   opt.innerText = label;
   if (selected) opt.selected = true;
   select.appendChild(opt);
+  return opt;
 };
 
 util.getClientWidth = function() {
