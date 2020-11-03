@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011030049';
+util.v = '202011040006';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2395,13 +2395,14 @@ util._textseq = function(ctx) {
   if (ctx.isInp) {
     el.value = text;
   } else {
-    el.innerText = text;
+    el.innerHTML = text;
   }
   util.textseq.onprogress(ctx, prevPos, cutLen);
   if (ctx.pos < ctx.text.length) {
     speed = ctx.speed;
     ctx.tmrId = setTimeout(util._textseq, speed, ctx);
   } else {
+    el.innerHTML = ctx.orgTxt;
     util.textseq.oncomplete(ctx);
   }
 };
@@ -2438,14 +2439,18 @@ util.textseq.createCtx = function(el, text, speed, step, start, len) {
   if (len > 0) end = start + len;
   var pos = start - 1;
   if (pos < 0) pos = 0;
+  var isInp = util.isTextInput(el);
+  var orgTxt = text;
+  if (!isInp) text = util.html2text(text);
   var ctx = {
     el: el,
+    orgTxt: orgTxt,
     text: text,
     speed: speed,
     step: step,
     start: start,
     end: end,
-    isInp: util.isTextInput(el),
+    isInp: isInp,
     tmrId: 0,
     pos: 0,
     onprogress: null,
