@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011040006';
+util.v = '202011050000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1823,7 +1823,13 @@ util.http.onDone = function(xhr, req) {
   if (util.http.onReceive(xhr, res, req)) {
     if (st == 200) {
       if (util.http.isJSONable(xhr, req)) {
-        res = util.fromJSON(res);
+        try {
+          res = util.fromJSON(res);
+        } catch (e) {
+          if (util.http.logging) {
+            util._log.e('[' + req.trcid + '] JSON PARSE ERROR');
+          }
+        }
         if (util.debug) $dbg[req.trcid].res = res;
       }
     }
