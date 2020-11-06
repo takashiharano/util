@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011060000';
+util.v = '202011070012';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1816,7 +1816,7 @@ util.http.onDone = function(xhr, req) {
           m = m.substr(0, util.http.MAX_LOG_LEN) + '... (size=' + m.length + ')';
         }
       }
-      m = '<= [' + st + '] ' + util.escHTML(m);
+      m = '<= [' + st + '] ' + util.escHtml(m);
     }
     util._log.v('[' + req.trcid + '] ' + m);
   }
@@ -1951,7 +1951,7 @@ $el.fn = {
   },
   text: function(text, speed) {
     if (text == undefined) return this.innerText;
-    var html = util.escHTML(text);
+    var html = util.escHtml(text);
     if (speed == undefined) speed = 0;
     util.writeHTML(this, html, speed);
   },
@@ -2193,7 +2193,7 @@ util.getZoomRatio = function() {
   return Math.round(window.devicePixelRatio * 100);
 };
 
-util.escHTML = function(s) {
+util.escHtml = function(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 };
 
