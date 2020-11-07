@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011070012';
+util.v = '202011071725';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2173,6 +2173,7 @@ util.isTextInput = function(el) {
 };
 
 util.addSelectOption = function(select, label, val, selected) {
+  select = util.getElement(select);
   var opt = document.createElement('option');
   opt.value = val;
   opt.innerText = label;
