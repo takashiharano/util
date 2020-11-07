@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011080217';
+util.v = '202011080241';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1169,8 +1169,16 @@ util.clearObject = function(key) {
   }
 };
 
-util.text2list = function(s) {
+util.str2arr = function(s) {
   return s.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\s\S]/g) || [];
+};
+
+util.text2list = function(s) {
+  s = util.convertNewLine(s, '\n');
+  var a = s.split('\n');
+  var lastIdx = a.length - 1;
+  if (a[lastIdx] == '') a.splice(lastIdx, 1);
+  return a;
 };
 
 /**
@@ -1307,7 +1315,7 @@ util.shift2full = function(w) {
 
 util.getUnicodePoints = function(str) {
   var cd = '';
-  var chs = util.text2list(str);
+  var chs = util.str2arr(str);
   for (var i = 0; i < chs.length; i++) {
     var p = util.getCodePoint(chs[i], true);
     if (i > 0) cd += ' ';
@@ -2252,7 +2260,7 @@ util.updateTextAreaInfo = function(textarea) {
   var st = textarea.selectionStart;
   var ed = textarea.selectionEnd;
   var sl = ed - st;
-  var ch = util.text2list(txt)[st] || '';
+  var ch = util.str2arr(txt)[st] || '';
   var cd = util.getCodePoint(ch);
   var cd16 = util.getUnicodePoints(ch, true);
   var cp = '';
@@ -4539,7 +4547,7 @@ util.UTF8 = {};
 util.UTF8.toByteArray = function(s) {
   var a = [];
   if (!s) return a;
-  var chs = util.text2list(s);
+  var chs = util.str2arr(s);
   for (var i = 0; i < chs.length; i++) {
     var ch = chs[i];
     var c = ch.charCodeAt(0);
@@ -4672,6 +4680,113 @@ util.RingBuffer.prototype = {
   },
   size: function() {
     return this.len;
+  }
+};
+
+//-----------------------------------------------------------------------------
+// Console
+//-----------------------------------------------------------------------------
+/**
+ * opt = {
+ *   bufsize: 10,
+ *   width: '500px',
+ *   height: '100px',
+ *   color: '#fff',
+ *   background: '#000',
+ *   border: '1px solid #888',
+ *   fontFamily: 'Consolas',
+ *   fontSize: '12px',
+ *   class: 'console1'
+ * }
+ */
+util.Console = function(el, opt) {
+  el = util.getElement(el);
+  if (!opt) opt = {};
+  var bufsize = (opt.bufsize == undefined ? 1000 : opt.bufsize);
+  var fontFamily = (opt.fontFamily == undefined ? 'Consolas, Monaco, Menlo, monospace, sans-serif' : opt.fontFamily);
+
+  var pre = document.createElement('pre');
+  pre.width = '100%';
+  pre.height = '100%';
+  pre.style.margin = 0;
+  pre.style.padding = 0;
+  pre.style.fontFamily = fontFamily;
+  if (opt.color) pre.style.color = opt.color;
+  if (opt.fontSize) pre.style.fontSize = opt.fontSize;
+  if (opt.class) pre.className = opt.class;
+
+  el.appendChild(pre);
+  el.style.overflow = 'auto';
+  if (opt.width) el.style.width = opt.width;
+  if (opt.height) el.style.height = opt.height;
+  if (opt.background) el.style.background = opt.background;
+  if (opt.border) el.style.border = opt.border;
+  el.addEventListener('scroll', this.onScroll, true);
+  el.ctx = this;
+
+  this.wrapper = el;
+  this.buf = new util.RingBuffer(bufsize);
+  this.pre = pre;
+  this.autoScroll = true;
+};
+util.Console.prototype = {
+  print: function(m) {
+    var ctx = this;
+    ctx.buf.add(m);
+    ctx._print(ctx);
+  },
+  _print: function(ctx) {
+    var b = ctx.buf.getAll();
+    var s = '';
+    for (var i = 0; i < b.length; i++) {
+      s += b[i] + '\n';
+    }
+    ctx.pre.innerHTML = s;
+    if (ctx.autoScroll) ctx.scrollToBottom();
+  },
+  write: function(m, n) {
+    var ctx = this;
+    ctx.buf.clear();
+    if (n == undefined) {
+      ctx.buf.add(m);
+    } else {
+      var a = util.text2list(m);
+      if (n == 0) {
+        for (var i = 0; i < a.length; i++) {
+          ctx.buf.add(a[i]);
+        }
+      } else {
+        var s = '';
+        var st = a.length - n;
+        if (st < 0) st = 0;
+        var ed = st + n;
+        if (ed > a.length) ed = a.length;
+        for (i = st; i < ed; i++) {
+          s += a[i] + '\n';
+        }
+        ctx.buf.add(s);
+      }
+    }
+    ctx._print(ctx);
+  },
+  clear: function() {
+    var ctx = this;
+    ctx.buf.clear();
+    ctx._print(ctx);
+  },
+  scrollToBottom: function() {
+    this.wrapper.scrollTop = this.wrapper.scrollHeight;
+  },
+  onScroll: function(e) {
+    var ctx = e.target.ctx;
+    var rect = ctx.wrapper.getBoundingClientRect();
+    var h = rect.height;
+    var d = ctx.wrapper.scrollHeight - ctx.wrapper.scrollTop;
+    if ((d - 17 <= h) && (h <= d + 17)) {
+      ctx.autoScroll = true;
+    } else {
+      ctx.autoScroll = false;
+    }
   }
 };
 
