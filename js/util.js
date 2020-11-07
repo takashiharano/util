@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011071725';
+util.v = '202011080217';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1169,7 +1169,7 @@ util.clearObject = function(key) {
   }
 };
 
-util.str2arr = function(s) {
+util.text2list = function(s) {
   return s.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\s\S]/g) || [];
 };
 
@@ -1307,7 +1307,7 @@ util.shift2full = function(w) {
 
 util.getUnicodePoints = function(str) {
   var cd = '';
-  var chs = util.str2arr(str);
+  var chs = util.text2list(str);
   for (var i = 0; i < chs.length; i++) {
     var p = util.getCodePoint(chs[i], true);
     if (i > 0) cd += ' ';
@@ -2252,7 +2252,7 @@ util.updateTextAreaInfo = function(textarea) {
   var st = textarea.selectionStart;
   var ed = textarea.selectionEnd;
   var sl = ed - st;
-  var ch = util.str2arr(txt)[st] || '';
+  var ch = util.text2list(txt)[st] || '';
   var cd = util.getCodePoint(ch);
   var cd16 = util.getUnicodePoints(ch, true);
   var cp = '';
@@ -4539,7 +4539,7 @@ util.UTF8 = {};
 util.UTF8.toByteArray = function(s) {
   var a = [];
   if (!s) return a;
-  var chs = util.str2arr(s);
+  var chs = util.text2list(s);
   for (var i = 0; i < chs.length; i++) {
     var ch = chs[i];
     var c = ch.charCodeAt(0);
