@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011081454';
+util.v = '202011081750';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -294,9 +294,7 @@ util.getTimeStampOfDay = function(timeString, offset) {
   var d = util.getDateTime();
   var d1 = new Date(d.yyyy, (d.mm | 0) - 1, d.dd, hh, mi, ss, sss);
   var ts = d1.getTime();
-  if (offset != undefined) {
-    ts += (offset * util.DAY);
-  }
+  if (offset != undefined) ts += (offset * util.DAY);
   return ts;
 };
 
@@ -358,9 +356,7 @@ util.ms2sec = function(ms, toString) {
   } else {
     s = ms.substr(0, len - 3) + '.' + ms.substr(len - 3);
   }
-  if (!toString) {
-    s = parseFloat(s);
-  }
+  if (!toString) s = parseFloat(s);
   return s;
 };
 
@@ -4707,6 +4703,9 @@ util.RingBuffer.prototype = {
  *   class: 'console1'
  * }
  */
+util.initConsole = function(el, opt) {
+  return new util.Console(el, opt);
+};
 util.Console = function(el, opt) {
   var wrapper = util.getElement(el);
   if (!opt) opt = {};
