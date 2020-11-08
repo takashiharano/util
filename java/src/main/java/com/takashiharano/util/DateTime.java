@@ -411,4 +411,20 @@ public class DateTime {
     return ((((year % 4) == 0) && ((year % 100) != 0)) || (year % 400 == 0));
   }
 
+  /**
+   * Parses text from the beginning of the given string to produce a date.
+   *
+   * @param pattern
+   *          the pattern describing the date and time format like "yyyy-MM-dd"
+   * @param str
+   *          A String whose beginning should be parsed
+   * @return A Date parsed from the string
+   * @throws ParseException
+   */
+  public static Date parseDate(String pattern, String str) throws ParseException {
+    SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+    Date date = sdf.parse(str);
+    return date;
+  }
+
 }
