@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011081954';
+util.v = '202011082109';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -640,11 +640,23 @@ util.timecounter.start = function(el, t0, interval, f, cb) {
  * Stop to display the time delta
  */
 util.timecounter.stop = function(el) {
+  var s = '';
   var o = util.timecounter.getObj(el);
   if (o) {
+    s = o.update(o);
     o.stop();
     delete util.timecounter.objs[o.id];
   }
+  return s;
+};
+
+/**
+ * Returns the time delta string like '1m 23s'
+ */
+util.timecounter.getValue = function(el) {
+  var o = util.getElement(el);
+  if (!o) return '';
+  return o.innerText.trim();
 };
 
 util.timecounter.getObj = function(el) {
@@ -675,12 +687,14 @@ util.TimeCounter.prototype = {
   },
   update: function(ctx) {
     var now = new Date().getTime();
+    var s = '';
     var el = util.getElement(ctx.el);
     if (el) {
-      var s = util.timecounter.delta(ctx.t0, now, ctx.f);
+      s = util.timecounter.delta(ctx.t0, now, ctx.f);
       el.innerHTML = s.replace('-', '');
     }
     if (ctx.cb) ctx.cb(now - ctx.t0);
+    return s;
   },
   stop: function() {
     var ctx = this;
@@ -4778,6 +4792,7 @@ util.Console.prototype = {
   },
   copy: function() {
     var s = this.buf.getAllText();
+    s = util.html2text(s);
     util.copy2clpbd(s);
   },
   get: function() {
