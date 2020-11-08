@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011081750';
+util.v = '202011081954';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -660,7 +660,7 @@ util.timecounter.ids = function() {
  */
 util.TimeCounter = function(el, t0, interval, f, cb) {
   this.el = el;
-  this.t0 = t0;
+  this.t0 = (t0 == undefined ? util.now() : t0);
   this.interval = (interval == undefined ? 500 : interval);
   this.f = f;
   this.cb = cb;
