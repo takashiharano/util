@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011080241';
+util.v = '202011081454';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -4671,6 +4671,14 @@ util.RingBuffer.prototype = {
     }
     return buf;
   },
+  getAllText: function() {
+    var b = this.getAll();
+    var s = '';
+    for (var i = 0; i < b.length; i++) {
+      s += b[i] + '\n';
+    }
+    return s;
+  },
   clear: function() {
     this.buffer = new Array(this.len);
     this.cnt = 0;
@@ -4700,7 +4708,7 @@ util.RingBuffer.prototype = {
  * }
  */
 util.Console = function(el, opt) {
-  el = util.getElement(el);
+  var wrapper = util.getElement(el);
   if (!opt) opt = {};
   var bufsize = (opt.bufsize == undefined ? 1000 : opt.bufsize);
   var fontFamily = (opt.fontFamily == undefined ? 'Consolas, Monaco, Menlo, monospace, sans-serif' : opt.fontFamily);
@@ -4715,16 +4723,16 @@ util.Console = function(el, opt) {
   if (opt.fontSize) pre.style.fontSize = opt.fontSize;
   if (opt.class) pre.className = opt.class;
 
-  el.appendChild(pre);
-  el.style.overflow = 'auto';
-  if (opt.width) el.style.width = opt.width;
-  if (opt.height) el.style.height = opt.height;
-  if (opt.background) el.style.background = opt.background;
-  if (opt.border) el.style.border = opt.border;
-  el.addEventListener('scroll', this.onScroll, true);
-  el.ctx = this;
+  wrapper.appendChild(pre);
+  wrapper.style.overflow = 'auto';
+  if (opt.width) wrapper.style.width = opt.width;
+  if (opt.height) wrapper.style.height = opt.height;
+  if (opt.background) wrapper.style.background = opt.background;
+  if (opt.border) wrapper.style.border = opt.border;
+  wrapper.addEventListener('scroll', this.onScroll, true);
+  wrapper.ctx = this;
 
-  this.wrapper = el;
+  this.wrapper = wrapper;
   this.buf = new util.RingBuffer(bufsize);
   this.pre = pre;
   this.autoScroll = true;
@@ -4736,12 +4744,7 @@ util.Console.prototype = {
     ctx._print(ctx);
   },
   _print: function(ctx) {
-    var b = ctx.buf.getAll();
-    var s = '';
-    for (var i = 0; i < b.length; i++) {
-      s += b[i] + '\n';
-    }
-    ctx.pre.innerHTML = s;
+    ctx.pre.innerHTML = ctx.buf.getAllText();
     if (ctx.autoScroll) ctx.scrollToBottom();
   },
   write: function(m, n) {
@@ -4773,6 +4776,13 @@ util.Console.prototype = {
     var ctx = this;
     ctx.buf.clear();
     ctx._print(ctx);
+  },
+  copy: function() {
+    var s = this.buf.getAllText();
+    util.copy2clpbd(s);
+  },
+  get: function() {
+    return this.buf.getAllText();
   },
   scrollToBottom: function() {
     this.wrapper.scrollTop = this.wrapper.scrollHeight;
