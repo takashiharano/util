@@ -197,7 +197,7 @@ public class JsonBuilder {
     _appendListItem(Boolean.toString(value));
   }
 
-  public void _appendListItem(String value) {
+  private void _appendListItem(String value) {
     int listCount = _getListCount();
     if (listCount > 0) {
       buffer.append(",");
