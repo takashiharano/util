@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011082109';
+util.v = '202011120023';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1043,6 +1043,7 @@ util.ceil = function(number, precision) {
 };
 
 util._shift = function(number, precision, reverseShift) {
+  if (precision == undefined) precision = 0;
   if (reverseShift) {
     precision = -precision;
   }
@@ -4811,6 +4812,85 @@ util.Console.prototype = {
     } else {
       ctx.autoScroll = false;
     }
+  }
+};
+
+//-----------------------------------------------------------------------------
+// Counter
+//-----------------------------------------------------------------------------
+/**
+ * opt = {
+ *   duration: 250
+ * }
+ */
+util.initCounter = function(el, v, opt) {
+  return new util.Counter(el, v, opt);
+};
+util.Counter = function(el, v, opt) {
+  el = util.getElement(el);
+  if (v == undefined) v = 0;
+  if (!opt) opt = {};
+  var ctx = this;
+  ctx.D = (opt.duration == undefined ? 250 : opt.duration);
+  ctx.R = 20;
+  ctx.el = el;
+  ctx.v = v;
+  ctx.v0 = v;
+  ctx.s = 0;
+  ctx.tmrId = 0;
+  ctx.print(ctx, v);
+};
+util.Counter.prototype = {
+  getValue: function() {
+    return this.v;
+  },
+  setValue: function(v) {
+    var ctx = this;
+    if (ctx.tmrId > 0) {
+      clearTimeout(ctx.tmrId);
+      ctx.tmrId = 0;
+    }
+    ctx.v = v;
+    var d = v - ctx.v0;
+    var F = ctx.D / ctx.R;
+    var a = Math.abs(d);
+    if ((a >= ctx.D) || (a >= F)) {
+      ctx.s = Math.ceil(a / F);
+      if (ctx.s % 10 == 0) ctx.s++;
+      if (d < 0) ctx.s *= (-1);
+    } else {
+      ctx.s = (d < 0 ? -1 : 1);
+    }
+    ctx.print(ctx, ctx.v);
+    ctx.update(ctx);
+  },
+  setDuration: function(d) {
+    this.D = d;
+    this.setValue(this.v);
+  },
+  up: function() {
+    this.v++;
+    this.print(this, this.v);
+  },
+  down: function() {
+    this.v--;
+    this.print(this, this.v);
+  },
+  update: function(ctx) {
+    ctx.tmrId = 0;
+    var v = ctx.v0;
+    v += ctx.s;
+    var c = true;
+    if (((ctx.s >= 0) && (v > ctx.v)) || ((ctx.s < 0) && (v < ctx.v))) {
+      v = ctx.v;
+      c = false;
+    }
+    ctx.v0 = v;
+    ctx.print(ctx, v);
+    if (c) ctx.tmrId = setTimeout(ctx.update, ctx.R, ctx);
+  },
+  print: function(ctx, v) {
+    ctx.el.innerHTML = v;
   }
 };
 
