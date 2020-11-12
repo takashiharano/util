@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011120023';
+util.v = '202011130001';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -4837,6 +4837,7 @@ util.Counter = function(el, v, opt) {
   ctx.v = v;
   ctx.v0 = v;
   ctx.s = 0;
+  ctx.r = ctx.R;
   ctx.tmrId = 0;
   ctx.print(ctx, v);
 };
@@ -4853,6 +4854,7 @@ util.Counter.prototype = {
     ctx.v = v;
     var d = v - ctx.v0;
     var F = ctx.D / ctx.R;
+    ctx.r = ctx.R;
     var a = Math.abs(d);
     if ((a >= ctx.D) || (a >= F)) {
       ctx.s = Math.ceil(a / F);
@@ -4860,6 +4862,7 @@ util.Counter.prototype = {
       if (d < 0) ctx.s *= (-1);
     } else {
       ctx.s = (d < 0 ? -1 : 1);
+      if (a < 250) ctx.r = Math.ceil(250 / a);
     }
     ctx.print(ctx, ctx.v);
     ctx.update(ctx);
@@ -4870,11 +4873,11 @@ util.Counter.prototype = {
   },
   up: function() {
     this.v++;
-    this.print(this, this.v);
+    this.setValue(this.v);
   },
   down: function() {
     this.v--;
-    this.print(this, this.v);
+    this.setValue(this.v);
   },
   update: function(ctx) {
     ctx.tmrId = 0;
@@ -4887,7 +4890,7 @@ util.Counter.prototype = {
     }
     ctx.v0 = v;
     ctx.print(ctx, v);
-    if (c) ctx.tmrId = setTimeout(ctx.update, ctx.R, ctx);
+    if (c) ctx.tmrId = setTimeout(ctx.update, ctx.r, ctx);
   },
   print: function(ctx, v) {
     ctx.el.innerHTML = v;
