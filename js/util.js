@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011130001';
+util.v = '202011140000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -4820,17 +4820,19 @@ util.Console.prototype = {
 //-----------------------------------------------------------------------------
 /**
  * opt = {
- *   duration: 250
+ *   value: 0,
+ *   duration: 250,
+ *   format: true
  * }
  */
-util.initCounter = function(el, v, opt) {
-  return new util.Counter(el, v, opt);
+util.initCounter = function(el, opt) {
+  return new util.Counter(el, opt);
 };
-util.Counter = function(el, v, opt) {
-  el = util.getElement(el);
-  if (v == undefined) v = 0;
-  if (!opt) opt = {};
+util.Counter = function(el, opt) {
   var ctx = this;
+  el = util.getElement(el);
+  if (!opt) opt = {};
+  var v = (opt.value == undefined ? 0 : opt.value);
   ctx.D = (opt.duration == undefined ? 250 : opt.duration);
   ctx.R = 20;
   ctx.el = el;
@@ -4838,6 +4840,7 @@ util.Counter = function(el, v, opt) {
   ctx.v0 = v;
   ctx.s = 0;
   ctx.r = ctx.R;
+  ctx.fmt = (opt.format ? true : false);
   ctx.tmrId = 0;
   ctx.print(ctx, v);
 };
@@ -4847,6 +4850,7 @@ util.Counter.prototype = {
   },
   setValue: function(v) {
     var ctx = this;
+    v = parseInt(v);
     if (ctx.tmrId > 0) {
       clearTimeout(ctx.tmrId);
       ctx.tmrId = 0;
@@ -4893,6 +4897,7 @@ util.Counter.prototype = {
     if (c) ctx.tmrId = setTimeout(ctx.update, ctx.r, ctx);
   },
   print: function(ctx, v) {
+    if (ctx.fmt && ((v >= 1000) || (v <= 1000))) v = util.formatNumber(v);
     ctx.el.innerHTML = v;
   }
 };
