@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011140000';
+util.v = '202011150020';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -3833,6 +3833,7 @@ util.confirm = function(a1, a2, a3, a4, a5) {
  *  background
  *  border
  *  borderRadius
+ *  transition
  *  green
  *  yellow
  *  red,
@@ -3852,6 +3853,9 @@ util.confirm = function(a1, a2, a3, a4, a5) {
  * <div id="meter1"></div>
  * var m = new util.Meter('#meter1', opt);
  */
+util.initMeter = function(target, opt) {
+  return new util.Meter(target, opt);
+};
 util.Meter = function(target, opt) {
   target = $el(target);
   target.innerHTML = '';
@@ -3917,8 +3921,10 @@ util.Meter = function(target, opt) {
   style = {
     width: v + '%',
     height: '100%',
-    background: green
+    background: green,
+    transition: 'all 0.25s ease-out'
   };
+  if (opt && opt.transition) style.transition = opt.transition;
   util.setStyles(bar, style);
   base.appendChild(bar);
 
