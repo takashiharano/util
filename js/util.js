@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011150020';
+util.v = '202011152101';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1030,32 +1030,37 @@ util.calcNextTime = function(times) {
  * 12345, -1  -> 12350
  * 12345, -2-  > 12300
  */
-util.round = function(number, precision) {
-  return util._shift(Math.round(util._shift(number, precision, false)), precision, true);
+util.round = function(number, scale) {
+  return util._shift(Math.round(util._shift(number, scale, false)), scale, true);
 };
 
-util.floor = function(number, precision) {
-  return util._shift(Math.floor(util._shift(number, precision, false)), precision, true);
+util.floor = function(number, scale) {
+  return util._shift(Math.floor(util._shift(number, scale, false)), scale, true);
 };
 
-util.ceil = function(number, precision) {
-  return util._shift(Math.ceil(util._shift(number, precision, false)), precision, true);
+util.ceil = function(number, scale) {
+  return util._shift(Math.ceil(util._shift(number, scale, false)), scale, true);
 };
 
-util._shift = function(number, precision, reverseShift) {
-  if (precision == undefined) precision = 0;
+util._shift = function(number, scale, reverseShift) {
+  if (scale == undefined) scale = 0;
   if (reverseShift) {
-    precision = -precision;
+    scale = -scale;
   }
   var numArray = ('' + number).split('e');
-  return +(numArray[0] + 'e' + (numArray[1] ? (+numArray[1] + precision) : precision));
+  return +(numArray[0] + 'e' + (numArray[1] ? (+numArray[1] + scale) : scale));
 };
 
 // 123   , 1 -> '123.0'
 // 123.4 , 1 -> '123.4'
 // 123.45, 1 -> '123.5'
-util.decimalAlignment = function(v, scale, zero) {
-  v = util.round(v, scale);
+// type: 0=floor / 1=round / 2=ceil
+// zero: true=0 / false=0.0
+util.decimalAlignment = function(v, scale, type, zero) {
+  var F = [util.floor, util.round, util.ceil];
+  var f = F[type | 0];
+  if (!f) f = F[0];
+  v = f(v, scale);
   if (zero && v == 0) return 0;
   v = util.decimalPadding(v, scale);
   return v;
@@ -4828,7 +4833,11 @@ util.Console.prototype = {
  * opt = {
  *   value: 0,
  *   duration: 250,
- *   format: true
+ *   format: true,
+ *   scale: 0,
+ *   prefix: 'String',
+ *   suffix: 'String',
+ *   text: 'String'
  * }
  */
 util.initCounter = function(el, opt) {
@@ -4847,8 +4856,15 @@ util.Counter = function(el, opt) {
   ctx.s = 0;
   ctx.r = ctx.R;
   ctx.fmt = (opt.format ? true : false);
+  ctx.scale = (opt.scale == undefined ? 0 : opt.scale);
+  ctx.pfx = (opt.prefix == undefined ? '' : opt.prefix);
+  ctx.sfx = (opt.suffix == undefined ? '' : opt.suffix);
   ctx.tmrId = 0;
-  ctx.print(ctx, v);
+  if (opt.text == undefined) {
+    ctx.print(ctx, v);
+  } else {
+    ctx._print(ctx, opt.text);
+  }
 };
 util.Counter.prototype = {
   getValue: function() {
@@ -4856,7 +4872,7 @@ util.Counter.prototype = {
   },
   setValue: function(v) {
     var ctx = this;
-    v = parseInt(v);
+    v = util.floor(parseFloat(v), ctx.scale);
     if (ctx.tmrId > 0) {
       clearTimeout(ctx.tmrId);
       ctx.tmrId = 0;
@@ -4867,12 +4883,12 @@ util.Counter.prototype = {
     ctx.r = ctx.R;
     var a = Math.abs(d);
     if ((a >= ctx.D) || (a >= F)) {
-      ctx.s = Math.ceil(a / F);
+      ctx.s = util.ceil(a / F, ctx.scale);
       if (ctx.s % 10 == 0) ctx.s++;
       if (d < 0) ctx.s *= (-1);
     } else {
       ctx.s = (d < 0 ? -1 : 1);
-      if (a < 250) ctx.r = Math.ceil(250 / a);
+      if (a < 250) ctx.r = util.ceil(250 / a, ctx.scale);
     }
     ctx.print(ctx, ctx.v);
     ctx.update(ctx);
@@ -4882,17 +4898,50 @@ util.Counter.prototype = {
     this.setValue(this.v);
   },
   up: function() {
-    this.v++;
-    this.setValue(this.v);
+    var ctx = this;
+    var v = ctx.v;
+    if (ctx.scale == 0) {
+      v++;
+    } else {
+      v = util.decimalAlignment(v, ctx.scale).replace('.', '');
+      v = parseInt(v) + 1;
+      var s = v + '';
+      v = s.substr(0, s.length - ctx.scale) + '.' + s.slice(ctx.scale * (-1));
+    }
+    ctx.setValue(v);
   },
   down: function() {
-    this.v--;
-    this.setValue(this.v);
+    var ctx = this;
+    var v = ctx.v;
+    if (ctx.scale == 0) {
+      v--;
+    } else {
+      v = util.decimalAlignment(v, ctx.scale).replace('.', '');
+      v = parseInt(v);
+      if (v <= 0) {
+        v = v * (-1) + 1;
+        var s = '-' + util.lpad(v, '0', ctx.scale);
+      } else {
+        v--;
+        s = v + '';
+      }
+      v = s.substr(0, s.length - ctx.scale) + '.' + s.slice(ctx.scale * (-1));
+    }
+    ctx.setValue(v);
+  },
+  setText: function(s) {
+    var ctx = this;
+    if (ctx.tmrId > 0) {
+      clearTimeout(ctx.tmrId);
+      ctx.tmrId = 0;
+    }
+    ctx._print(ctx, s);
   },
   update: function(ctx) {
     ctx.tmrId = 0;
     var v = ctx.v0;
     v += ctx.s;
+    v = util.round(v, ctx.scale);
     var c = true;
     if (((ctx.s >= 0) && (v > ctx.v)) || ((ctx.s < 0) && (v < ctx.v))) {
       v = ctx.v;
@@ -4903,7 +4952,12 @@ util.Counter.prototype = {
     if (c) ctx.tmrId = setTimeout(ctx.update, ctx.r, ctx);
   },
   print: function(ctx, v) {
+    if (ctx.scale > 0) v = util.decimalPadding(v, ctx.scale);
     if (ctx.fmt && ((v >= 1000) || (v <= 1000))) v = util.formatNumber(v);
+    v = ctx.pfx + v + ctx.sfx;
+    ctx._print(ctx, v);
+  },
+  _print: function(ctx, v) {
     ctx.el.innerHTML = v;
   }
 };
