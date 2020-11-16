@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011152101';
+util.v = '202011170004';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2379,31 +2379,33 @@ util._clearHTML = function(el) {
 // Text Sequencer
 //-----------------------------------------------------------------------------
 /**
- * var ctx = util.textseq(el, text, speed, step, start, len);
+ * opt = {
+ *  speed: 20,
+ *  step: 1,
+ *  start: 0,
+ *  len: -1,
+ *  cursor: 100
+ * };
+ * var ctx = util.textseq(el, text, opt);
  * ctx.onprogress = <callback-function(ctx, chunk)>;
  * ctx.oncomplete = <callback-function(ctx)>;
  */
-util.textseq = function(el, text, speed, step, start, len) {
-  if (speed == undefined) speed = util.textseq.DFLT_SPEED;
-  if (step == undefined) step = 1;
-  if (start == undefined) start = 0;
-  if ((len == undefined) || (len < 0)) len = -1;
+util.textseq = function(el, text, opt) {
   var ctx = util.textseq.getCtx(el);
   if (ctx) util.textseq._stop(ctx);
-  ctx = util.textseq.createCtx(el, text, speed, step, start, len);
+  ctx = util.textseq.createCtx(el, text, opt);
   var i = util.textseq.idx(el);
   if (i < 0) {
     util.textseq.ctxs.push(ctx);
   } else {
     util.textseq.ctxs[i] = ctx;
   }
-  ctx.tmrId = setTimeout(util._textseq, 0, ctx);
+  var f = (ctx.cursor > 0 ? util.textseq.blinkCursor : util._textseq);
+  ctx.tmrId = setTimeout(f, 0, ctx);
   return ctx;
 };
 util._textseq = function(ctx) {
-  var el = ctx.el;
-  var speed = ctx.speed;
-  if (speed < 0) speed = util.textseq.DFLT_SPEED;
+  var speed = util.textseq.getSpeed(ctx);
   var step = ctx.step;
   var prevPos = ctx.pos;
   var cutLen = step;
@@ -2424,17 +2426,13 @@ util._textseq = function(ctx) {
   }
   ctx.tmrId = 0;
   var text = ctx.text.substr(0, ctx.pos);
-  if (ctx.isInp) {
-    el.value = text;
-  } else {
-    el.innerHTML = text;
-  }
+  util.textseq.print(ctx, text);
   util.textseq.onprogress(ctx, prevPos, cutLen);
   if (ctx.pos < ctx.text.length) {
-    speed = ctx.speed;
+    speed = util.textseq.getSpeed(ctx);
     ctx.tmrId = setTimeout(util._textseq, speed, ctx);
   } else {
-    el.innerHTML = ctx.orgTxt;
+    util.textseq.print(ctx, ctx.orgTxt);
     util.textseq.oncomplete(ctx);
   }
 };
@@ -2466,7 +2464,10 @@ util.textseq.oncomplete = function(ctx) {
   util.textseq.ctxs.splice(i, 1);
   if (ctx.oncomplete) ctx.oncomplete(ctx);
 };
-util.textseq.createCtx = function(el, text, speed, step, start, len) {
+util.textseq.createCtx = function(el, text, opt) {
+  if (!opt) opt = {};
+  var start = (opt.start == undefined ? 0 : opt.start);
+  var len = (((opt.len == undefined) || (opt.len < 0)) ? -1 : opt.len);
   var end = text.length;
   if (len > 0) end = start + len;
   var pos = start - 1;
@@ -2478,13 +2479,15 @@ util.textseq.createCtx = function(el, text, speed, step, start, len) {
     el: el,
     orgTxt: orgTxt,
     text: text,
-    speed: speed,
-    step: step,
+    speed: (opt.speed == undefined ? util.textseq.DFLT_SPEED : opt.speed),
+    step: (opt.step == undefined ? 1 : opt.step),
     start: start,
     end: end,
     isInp: isInp,
     tmrId: 0,
     pos: 0,
+    cursor: (opt.cursor == undefined ? 0 : opt.cursor),
+    cursorCnt: 0,
     onprogress: null,
     oncomplete: null
   };
@@ -2503,6 +2506,29 @@ util.textseq.getCtx = function(el) {
   var i = util.textseq.idx(el);
   if (i >= 0) ctx = util.textseq.ctxs[i];
   return ctx;
+};
+util.textseq.getSpeed = function(ctx) {
+  var speed = ctx.speed;
+  if (speed < 0) speed = util.textseq.DFLT_SPEED;
+  return speed;
+};
+util.textseq.blinkCursor = function(ctx) {
+  var speed = util.textseq.getSpeed(ctx);
+  if (ctx.cursorCnt < 8) {
+    ctx.cursorCnt++;
+    util.textseq.print(ctx, (ctx.cursorCnt % 2 == 0) ? ' ' : '_');
+    ctx.tmrId = setTimeout(util.textseq.blinkCursor, ctx.cursor, ctx);
+  } else {
+    ctx.cursorCnt = 0;
+    ctx.tmrId = setTimeout(util._textseq, speed, ctx);
+  }
+};
+util.textseq.print = function(ctx, s) {
+  if (ctx.isInp) {
+    ctx.el.value = s;
+  } else {
+    ctx.el.innerHTML = s;
+  }
 };
 util.textseq.DFLT_SPEED = 20;
 util.textseq.ctxs = [];
@@ -4848,7 +4874,8 @@ util.Counter = function(el, opt) {
   el = util.getElement(el);
   if (!opt) opt = {};
   var v = (opt.value == undefined ? 0 : opt.value);
-  ctx.D = (opt.duration == undefined ? 250 : opt.duration);
+  ctx.B = 250;
+  ctx.D = (opt.duration == undefined ? ctx.B : opt.duration);
   ctx.R = 20;
   ctx.el = el;
   ctx.v = v;
@@ -4873,29 +4900,54 @@ util.Counter.prototype = {
   setValue: function(v) {
     var ctx = this;
     v = util.floor(parseFloat(v), ctx.scale);
-    if (ctx.tmrId > 0) {
-      clearTimeout(ctx.tmrId);
-      ctx.tmrId = 0;
-    }
+    ctx._stopTmr(ctx);
     ctx.v = v;
+    var D = ctx.D;
+    var mf = 0;
+    if (D == 0) {
+      ctx.print(ctx, v);
+      return;
+    } else if (D < 0) {
+      mf = 1;
+      D *= (-1);
+    }
     var d = v - ctx.v0;
-    var F = ctx.D / ctx.R;
+    var F = D / ctx.R;
     ctx.r = ctx.R;
     var a = Math.abs(d);
-    if ((a >= ctx.D) || (a >= F)) {
+    if ((a >= D) || (a >= F)) {
       ctx.s = util.ceil(a / F, ctx.scale);
-      if (ctx.s % 10 == 0) ctx.s++;
-      if (d < 0) ctx.s *= (-1);
+      if (ctx.s % 10 == 0) {
+        if (ctx.scale > 0) {
+          ctx.s += parseFloat('0.' + util.repeatCh('0', ctx.scale - 1) + '1');
+        } else {
+          ctx.s++;
+        }
+      } else if (ctx.scale > 0) {
+        ctx.s += parseFloat('0.' + util.repeatCh('0', ctx.scale - 1) + '1');
+      }
     } else {
-      ctx.s = (d < 0 ? -1 : 1);
-      if (a < 250) ctx.r = util.ceil(250 / a, ctx.scale);
+      if (ctx.scale > 0) {
+        ctx.s = parseFloat('1.' + util.repeatCh('0', ctx.scale - 1) + '1');
+      } else {
+        ctx.s = 1;
+      }
+      if (a < ctx.B) ctx.r = util.ceil(ctx.B / a, ctx.scale);
     }
-    ctx.print(ctx, ctx.v);
-    ctx.update(ctx);
+    if (d < 0) ctx.s *= (-1);
+    if (mf) {
+      var t = (a < ctx.B ? ctx.B : D);
+      ctx.v0 = v;
+      ctx.tmrId = setTimeout(ctx.update, t, ctx);
+    } else {
+      ctx.update(ctx);
+    }
   },
   setDuration: function(d) {
     this.D = d;
-    this.setValue(this.v);
+    if (this.tmrId > 0) {
+      this.setValue(this.v);
+    }
   },
   up: function() {
     var ctx = this;
@@ -4931,10 +4983,7 @@ util.Counter.prototype = {
   },
   setText: function(s) {
     var ctx = this;
-    if (ctx.tmrId > 0) {
-      clearTimeout(ctx.tmrId);
-      ctx.tmrId = 0;
-    }
+    ctx._stopTmr(ctx);
     ctx._print(ctx, s);
   },
   update: function(ctx) {
@@ -4959,6 +5008,12 @@ util.Counter.prototype = {
   },
   _print: function(ctx, v) {
     ctx.el.innerHTML = v;
+  },
+  _stopTmr: function(ctx) {
+    if (ctx.tmrId > 0) {
+      clearTimeout(ctx.tmrId);
+      ctx.tmrId = 0;
+    }
   }
 };
 
