@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011170004';
+util.v = '202011180017';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1080,6 +1080,16 @@ util.decimalPadding = function(v, scale) {
   d = util.rpad(d, '0', scale);
   r = i + '.' + d;
   return r;
+};
+
+util.isInteger = function(v, strict) {
+  if (strict && (typeof v != 'number')) return false;
+  v += '';
+  var a = v.split('.');
+  if (isNaN(parseInt(a[0]))) return false;
+  var d = a[1];
+  if (!d) return true;
+  return (parseInt(d) == 0);
 };
 
 /**
@@ -4945,9 +4955,7 @@ util.Counter.prototype = {
   },
   setDuration: function(d) {
     this.D = d;
-    if (this.tmrId > 0) {
-      this.setValue(this.v);
-    }
+    if (this.tmrId > 0) this.setValue(this.v);
   },
   up: function() {
     var ctx = this;
