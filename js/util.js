@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011180017';
+util.v = '202011182033';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1998,8 +1998,8 @@ $el.fn = {
       util.clearHTML(el, speed);
     }
   },
-  textseq: function(text, speed, step) {
-    return util.textseq(this, text, speed, step);
+  textseq: function(text, opt) {
+    return util.textseq(this, text, opt);
   },
   startTextSeq: function() {
     util.textseq.start(this);
@@ -2394,7 +2394,10 @@ util._clearHTML = function(el) {
  *  step: 1,
  *  start: 0,
  *  len: -1,
- *  cursor: 100
+ *  cursor: {
+ *   speed: 100,
+ *   n: 3
+ *  }
  * };
  * var ctx = util.textseq(el, text, opt);
  * ctx.onprogress = <callback-function(ctx, chunk)>;
@@ -2410,7 +2413,7 @@ util.textseq = function(el, text, opt) {
   } else {
     util.textseq.ctxs[i] = ctx;
   }
-  var f = (ctx.cursor > 0 ? util.textseq.blinkCursor : util._textseq);
+  var f = (ctx.cursor ? util.textseq.blinkCursor : util._textseq);
   ctx.tmrId = setTimeout(f, 0, ctx);
   return ctx;
 };
@@ -2496,7 +2499,7 @@ util.textseq.createCtx = function(el, text, opt) {
     isInp: isInp,
     tmrId: 0,
     pos: 0,
-    cursor: (opt.cursor == undefined ? 0 : opt.cursor),
+    cursor: (opt.cursor ? opt.cursor : {}),
     cursorCnt: 0,
     onprogress: null,
     oncomplete: null
@@ -2524,10 +2527,11 @@ util.textseq.getSpeed = function(ctx) {
 };
 util.textseq.blinkCursor = function(ctx) {
   var speed = util.textseq.getSpeed(ctx);
-  if (ctx.cursorCnt < 8) {
+  var blnkNum = ctx.cursor.n * 2;
+  if (ctx.cursorCnt < blnkNum) {
     ctx.cursorCnt++;
     util.textseq.print(ctx, (ctx.cursorCnt % 2 == 0) ? ' ' : '_');
-    ctx.tmrId = setTimeout(util.textseq.blinkCursor, ctx.cursor, ctx);
+    ctx.tmrId = setTimeout(util.textseq.blinkCursor, ctx.cursor.speed, ctx);
   } else {
     ctx.cursorCnt = 0;
     ctx.tmrId = setTimeout(util._textseq, speed, ctx);
