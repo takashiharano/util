@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011182033';
+util.v = '202011190000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2488,6 +2488,16 @@ util.textseq.createCtx = function(el, text, opt) {
   var isInp = util.isTextInput(el);
   var orgTxt = text;
   if (!isInp) text = util.html2text(text);
+  var cursor = {};
+  if (opt.cursor != undefined) {
+    cursor = {speed: 100, n: 3};
+    if (typeof opt.cursor == 'number') {
+      cursor.speed = opt.cursor;
+    } else {
+      if (opt.cursor.speed != undefined) cursor.speed = opt.cursor.speed;
+      if (opt.cursor.n != undefined) cursor.n = opt.cursor.n;
+    }
+  }
   var ctx = {
     el: el,
     orgTxt: orgTxt,
@@ -2499,7 +2509,7 @@ util.textseq.createCtx = function(el, text, opt) {
     isInp: isInp,
     tmrId: 0,
     pos: 0,
-    cursor: (opt.cursor ? opt.cursor : {}),
+    cursor: cursor,
     cursorCnt: 0,
     onprogress: null,
     oncomplete: null
