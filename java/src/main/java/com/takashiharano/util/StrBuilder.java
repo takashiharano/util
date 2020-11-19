@@ -28,6 +28,20 @@ public class StrBuilder {
   }
 
   /**
+   * Constructs a string builder with no characters in it and an initial capacity
+   * specified by the capacity argument.
+   *
+   * @param capacity
+   *          the initial capacity
+   * @param lineseparator
+   *          line separator
+   */
+  public StrBuilder(int capacity, String lineseparator) {
+    this.buf = new StringBuilder(capacity);
+    this.lineseparator = lineseparator;
+  }
+
+  /**
    * Constructs a string builder initialized to the contents of the specified
    * string.
    *
@@ -36,6 +50,20 @@ public class StrBuilder {
    */
   public StrBuilder(String str) {
     this.buf = new StringBuilder(str);
+  }
+
+  /**
+   * Constructs a string builder initialized to the contents of the specified
+   * string.
+   *
+   * @param str
+   *          the initial contents of the buffer
+   * @param lineseparator
+   *          line separator
+   */
+  public StrBuilder(String str, String lineseparator) {
+    this.buf = new StringBuilder(str);
+    this.lineseparator = lineseparator;
   }
 
   /**
