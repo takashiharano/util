@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011190000';
+util.v = '202011230005';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1974,6 +1974,11 @@ var $el = function(target, idx) {
     for (var k in $el.fn) {
       if (el[k] == undefined) el[k] = $el.fn[k];
     }
+  } else {
+    el = {notFound: true};
+    for (k in $el.fn) {
+      el[k] = util.nop;
+    }
   }
   return el;
 };
@@ -2081,7 +2086,7 @@ util.getElement = function(target, idx) {
 };
 
 util.addClass = function(el, n) {
-  el = $el(el);
+  el = util.getElement(el);
   if (util.hasClass(el, n)) return;
   if (el.className == '') {
     el.className = n;
@@ -2091,7 +2096,7 @@ util.addClass = function(el, n) {
 };
 
 util.removeClass = function(el, n) {
-  el = $el(el);
+  el = util.getElement(el);
   var names = el.className.split(' ');
   var nm = '';
   for (var i = 0; i < names.length; i++) {
@@ -2104,7 +2109,7 @@ util.removeClass = function(el, n) {
 };
 
 util.hasClass = function(el, n) {
-  el = $el(el);
+  el = util.getElement(el);
   var names = el.className.split(' ');
   for (var i = 0; i < names.length; i++) {
     if (names[i] == n) return true;
@@ -2113,12 +2118,12 @@ util.hasClass = function(el, n) {
 };
 
 util.isActiveElement = function(el, idx) {
-  return $el(el, idx) == document.activeElement;
+  return util.getElement(el, idx) == document.activeElement;
 };
 
 util.hasParent = function(el, parent) {
-  el = $el(el);
-  parent = $el(parent);
+  el = util.getElement(el);
+  parent = util.getElement(parent);
   if (!el || !parent) return false;
   do {
     if (parent.toString() == '[object NodeList]') {
@@ -2265,9 +2270,9 @@ util.textarea = {};
  * addStatusInfo('#textarea-id', '#infoarea-id')
  */
 util.textarea.addStatusInfo = function(textarea, infoarea) {
-  textarea = $el(textarea);
+  textarea = util.getElement(textarea);
   if (!textarea) return;
-  infoarea = $el(infoarea);
+  infoarea = util.getElement(infoarea);
   if (!infoarea) return;
   textarea.infoarea = infoarea;
   util.textarea._adqdLIstener(textarea);
@@ -2276,7 +2281,7 @@ util.textarea.addStatusInfo = function(textarea, infoarea) {
  * updateTextAreaInfo('#textarea-id')
  */
 util.updateTextAreaInfo = function(textarea) {
-  textarea = $el(textarea);
+  textarea = util.getElement(textarea);
   if (!textarea) return;
   var txt = textarea.value;
   var len = txt.length;
@@ -2320,7 +2325,7 @@ util.textarea.onInput = function(e) {
   util.updateTextAreaInfo(e.target);
 };
 util.textarea.addListener = function(target, f) {
-  var el = $el(target);
+  var el = util.getElement(target);
   if (el) {
     el.listener = f;
     util.textarea._adqdLIstener(el);
@@ -2649,7 +2654,7 @@ util.setupStyle = function() {
 };
 
 util.setStyle = function(el, n, v) {
-  el = $el(el);
+  el = util.getElement(el);
   el.style.setProperty(n, v, 'important');
 };
 util.setStyles = function(el, s) {
@@ -2996,7 +3001,7 @@ util.registerFadeStyle = function() {
 };
 
 util.fadeIn = function(el, speed, cb, arg) {
-  el = $el(el);
+  el = util.getElement(el);
   if (!el) return;
   if ((speed == undefined) || (speed < 0)) {
     speed = util.DFLT_FADE_SPEED;
@@ -3024,7 +3029,7 @@ util.__fadeIn = function(dat) {
 };
 
 util.fadeOut = function(el, speed, cb, arg) {
-  el = $el(el);
+  el = util.getElement(el);
   if (!el) return;
   if ((speed == undefined) || (speed < 0)) {
     speed = util.DFLT_FADE_SPEED;
@@ -3064,7 +3069,7 @@ util.fadeScreenEl = null;
  */
 util.initScreenFader = function(a) {
   var el = util.fadeScreenEl;
-  if (!el) el = $el(a);
+  if (!el) el = util.getElement(a);
   if (!el) el = util.createFadeScreenEl();
   util.fadeScreenEl = el;
   document.body.appendChild(el);
@@ -3912,7 +3917,7 @@ util.initMeter = function(target, opt) {
   return new util.Meter(target, opt);
 };
 util.Meter = function(target, opt) {
-  target = $el(target);
+  target = util.getElement(target);
   target.innerHTML = '';
 
   var min = 0;
@@ -4204,7 +4209,7 @@ util.Meter.buildHTML = function(val, opt) {
  * };
  */
 util.Led = function(target, opt) {
-  var baseEl = $el(target);
+  var baseEl = util.getElement(target);
   if (!opt) opt = {};
   if (opt.size == undefined) opt.size = '16px';
   if (opt.color == undefined) opt.color = util.Led.DFLT_COLOR;
@@ -5738,6 +5743,8 @@ util.getElRelObj = function(objs, el) {
   }
   return null;
 };
+
+util.nop = function() {};
 
 //-----------------------------------------------------------------------------
 util.init = function() {
