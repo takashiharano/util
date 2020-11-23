@@ -145,6 +145,24 @@ public class JsonBuilder {
     _append(key, sb.toString());
   }
 
+  public void appendList(String key, List<String> list) {
+    if (list == null) {
+      _append(key, "null");
+      return;
+    }
+    StringBuilder sb = new StringBuilder();
+    sb.append("[");
+    int size = list.size();
+    for (int i = 0; i < size; i++) {
+      if (i > 0) {
+        sb.append(",");
+      }
+      sb.append(_quoteAndEscape(list.get(i)));
+    }
+    sb.append("]");
+    _append(key, sb.toString());
+  }
+
   public void appendComma() {
     buffer.append(",");
   }
