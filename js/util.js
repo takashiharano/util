@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011272030';
+util.v = '202011280023';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1485,6 +1485,12 @@ util.plural = function(s, n, f) {
   if (s.match(/fe$/)) return s.replace(/fe$/, 'ves');
   if (s.match(/FE$/)) return s.replace(/FE$/, 'VES');
   return s + 's';
+};
+
+util.haveBeen = function(subject, pred, n) {
+  if (n == null) return 'The ' + subject + ' has been ' + pred + '.';
+  var s = util.plural(subject, n) + ' ' + (n == 1 ? 'has' : 'have') + ' been ' + pred + '.';
+  return (n == 0 ? 'No' : n) + ' ' + s;
 };
 
 util.copy2clpbd = function(s) {
