@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011230005';
+util.v = '202011272030';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1474,8 +1474,17 @@ util.convByte = function(v, sep, sp) {
   return r;
 };
 
-util.plural = function(s, n) {
-  return (n >= 2 ? (s + 's') : s);
+util.plural = function(s, n, f) {
+  if (n == 1) return s;
+  if (f) return s + 's';
+  if (s.match(/s$/i) || s.match(/ch$/i) || s.match(/sh$/i) || s.match(/x$/i) || s.match(/o$/i)) return s + 'es';
+  if (s.match(/y$/)) return s.replace(/y$/, 'ies');
+  if (s.match(/Y$/)) return s.replace(/Y$/, 'IES');
+  if (s.match(/f$/)) return s.replace(/f$/, 'ves');
+  if (s.match(/F$/)) return s.replace(/F$/, 'VES');
+  if (s.match(/fe$/)) return s.replace(/fe$/, 'ves');
+  if (s.match(/FE$/)) return s.replace(/FE$/, 'VES');
+  return s + 's';
 };
 
 util.copy2clpbd = function(s) {
