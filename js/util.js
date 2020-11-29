@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011280023';
+util.v = '202011281440';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2414,6 +2414,7 @@ util._clearHTML = function(el) {
  *  step: 1,
  *  start: 0,
  *  len: -1,
+ *  reverse: false,
  *  cursor: {
  *   speed: 100,
  *   n: 3
@@ -2433,47 +2434,70 @@ util.textseq = function(el, text, opt) {
   } else {
     util.textseq.ctxs[i] = ctx;
   }
-  var f = (ctx.cursor ? util.textseq.blinkCursor : util._textseq);
+  var f = (ctx.cursor.speed ? util.textseq.blinkCursor : (ctx.reverse ? util.textseq._reverse : util.textseq._textseq));
   ctx.tmrId = setTimeout(f, 0, ctx);
   return ctx;
 };
-util._textseq = function(ctx) {
+util.textseq._textseq = function(ctx) {
   var speed = util.textseq.getSpeed(ctx);
   var step = ctx.step;
-  var prevPos = ctx.pos;
-  var cutLen = step;
-  if (ctx.pos < ctx.start) {
-    ctx.pos = ctx.start - 1;
-    if (ctx.pos < 0) ctx.pos = 0;
-    cutLen = ctx.start;
-  }
-  if ((speed == 0) || (step == 0)) {
-    ctx.pos = ctx.text.length;
-    cutLen = ctx.pos;
-  } else {
-    ctx.pos += step;
-  }
-  if (ctx.pos > ctx.end) {
-    ctx.pos = ctx.text.length;
-    cutLen = ctx.text.length - prevPos;
-  }
   ctx.tmrId = 0;
-  var text = ctx.text.substr(0, ctx.pos);
+  var text = util.textseq.getText(ctx);
   util.textseq.print(ctx, text);
-  util.textseq.onprogress(ctx, prevPos, cutLen);
+  util.textseq.onprogress(ctx, ctx.pos, ctx.prevPos, ctx.cutLen);
   if (ctx.pos < ctx.text.length) {
     speed = util.textseq.getSpeed(ctx);
-    ctx.tmrId = setTimeout(util._textseq, speed, ctx);
+    ctx.tmrId = setTimeout(util.textseq._textseq, speed, ctx);
   } else {
     util.textseq.print(ctx, ctx.orgTxt);
     util.textseq.oncomplete(ctx);
   }
+  if ((speed == 0) || (step == 0)) {
+    ctx.pos = ctx.text.length;
+    ctx.cutLen = ctx.pos;
+  } else {
+    ctx.prevPos = ctx.pos;
+    ctx.pos += step;
+    ctx.cutLen = step;
+    if (ctx.pos > ctx.end) ctx.pos = ctx.text.length;
+  }
+};
+util.textseq._reverse = function(ctx) {
+  var speed = util.textseq.getSpeed(ctx);
+  var step = ctx.step;
+  ctx.tmrId = 0;
+  var text = util.textseq.getText(ctx);
+  util.textseq.print(ctx, text);
+  util.textseq.onprogress(ctx, ctx.pos, ctx.prevPos, ctx.cutLen);
+  if (ctx.pos == ctx.end) {
+    util.textseq.oncomplete(ctx);
+  } else if (ctx.pos >= 0) {
+    speed = util.textseq.getSpeed(ctx);
+    ctx.tmrId = setTimeout(util.textseq._reverse, speed, ctx);
+  } else {
+    util.textseq.print(ctx, '');
+    util.textseq.oncomplete(ctx);
+  }
+  if ((speed == 0) || (step == 0)) {
+    ctx.pos = -1;
+    ctx.cutLen = ctx.text.length;
+  } else {
+    ctx.prevPos = ctx.pos;
+    ctx.pos -= step;
+    if (ctx.pos < ctx.end) ctx.pos = ctx.end;
+  }
+};
+util.textseq.getText = function(ctx) {
+  var len = ctx.pos;
+  if (ctx.reverse) len++;
+  return ctx.text.substr(0, len);
 };
 util.textseq.start = function(el) {
   var ctx = util.textseq.getCtx(el);
   if (!ctx) return;
   util.textseq._stop(ctx);
-  util._textseq(ctx);
+  var f = ctx.reverse ? util.textseq._reverse : util.textseq._textseq;
+  f(ctx);
 };
 util.textseq.stop = function(el) {
   var i = util.textseq.idx(el);
@@ -2487,9 +2511,22 @@ util.textseq._stop = function(ctx) {
     ctx.tmrId = 0;
   }
 };
-util.textseq.onprogress = function(ctx, prevPos, cutLen) {
+util.textseq.onprogress = function(ctx, pos, prevPos, cutLen) {
   if (!ctx.onprogress) return;
-  var chunk = ctx.text.substr(prevPos, cutLen);
+  var st;
+  if (ctx.reverse) {
+    if (prevPos < 0) return;
+    st = prevPos - cutLen + 1;
+    if (st < 0) {
+      cutLen = cutLen + st;
+      st = 0;
+    }
+  } else {
+    if (prevPos == pos) return;
+    st = prevPos;
+    if (st < 0) return;
+  }
+  var chunk = ctx.text.substr(st, cutLen);
   ctx.onprogress(ctx, chunk);
 };
 util.textseq.oncomplete = function(ctx) {
@@ -2499,15 +2536,40 @@ util.textseq.oncomplete = function(ctx) {
 };
 util.textseq.createCtx = function(el, text, opt) {
   if (!opt) opt = {};
-  var start = (opt.start == undefined ? 0 : opt.start);
-  var len = (((opt.len == undefined) || (opt.len < 0)) ? -1 : opt.len);
-  var end = text.length;
-  if (len > 0) end = start + len;
-  var pos = start - 1;
-  if (pos < 0) pos = 0;
   var isInp = util.isTextInput(el);
   var orgTxt = text;
   if (!isInp) text = util.html2text(text);
+  var txtLen = text.length;
+  var len = (((opt.len == undefined) || (opt.len < 0)) ? -1 : opt.len);
+  var step = (opt.step == undefined ? 1 : opt.step);
+  if (opt.start == undefined) opt.start = 0;
+  var cutLen = step;
+  if (opt.reverse) {
+    if (opt.start == 0) {
+      var start = txtLen - 1;
+    } else {
+      start = opt.start - 1;
+    }
+    var end = -1;
+    if (len > 0) end = start - len;
+    if (end < 0) end = -1;
+    var prevPos = start + cutLen;
+    if (prevPos >= txtLen) prevPos = txtLen - 1;
+    var pos = start;
+    if (pos < 0) pos = txtLen - 1;
+  } else {
+    if (opt.start == 0) {
+      start = 0;
+    } else {
+      start = opt.start;
+    }
+    end = txtLen;
+    if (len > 0) end = start + len;
+    prevPos = start;
+    if (prevPos < 0) prevPos = 0;
+    pos = start;
+    if (pos < 0) pos = 0;
+  }
   var cursor = {};
   if (opt.cursor != undefined) {
     cursor = {speed: 100, n: 3};
@@ -2523,12 +2585,15 @@ util.textseq.createCtx = function(el, text, opt) {
     orgTxt: orgTxt,
     text: text,
     speed: (opt.speed == undefined ? util.textseq.DFLT_SPEED : opt.speed),
-    step: (opt.step == undefined ? 1 : opt.step),
+    step: step,
     start: start,
     end: end,
     isInp: isInp,
     tmrId: 0,
-    pos: 0,
+    prevPos: prevPos,
+    pos: pos,
+    cutLen: cutLen,
+    reverse: (opt.reverse ? true : false),
     cursor: cursor,
     cursorCnt: 0,
     onprogress: null,
@@ -2560,11 +2625,13 @@ util.textseq.blinkCursor = function(ctx) {
   var blnkNum = ctx.cursor.n * 2;
   if (ctx.cursorCnt < blnkNum) {
     ctx.cursorCnt++;
-    util.textseq.print(ctx, (ctx.cursorCnt % 2 == 0) ? ' ' : '_');
+    var c = (ctx.cursorCnt % 2 == 0) ? ' ' : '_';
+    var s = util.textseq.getText(ctx) + c;
+    util.textseq.print(ctx, s);
     ctx.tmrId = setTimeout(util.textseq.blinkCursor, ctx.cursor.speed, ctx);
   } else {
     ctx.cursorCnt = 0;
-    ctx.tmrId = setTimeout(util._textseq, speed, ctx);
+    ctx.tmrId = setTimeout((ctx.reverse ? util.textseq._reverse : util.textseq._textseq), speed, ctx);
   }
 };
 util.textseq.print = function(ctx, s) {
