@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202011281440';
+util.v = '202012010039';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1990,7 +1990,7 @@ var $el = function(target, idx) {
       if (el[k] == undefined) el[k] = $el.fn[k];
     }
   } else {
-    el = {notFound: true};
+    el = {notFound: true, style: {}};
     for (k in $el.fn) {
       el[k] = util.nop;
     }
@@ -2737,7 +2737,7 @@ util.setupStyle = function() {
 
 util.setStyle = function(el, n, v) {
   el = util.getElement(el);
-  el.style.setProperty(n, v, 'important');
+  if (el) el.style.setProperty(n, v, 'important');
 };
 util.setStyles = function(el, s) {
   for (var k in s) {
