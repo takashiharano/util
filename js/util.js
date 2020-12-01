@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012010039';
+util.v = '202012020040';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1811,7 +1811,7 @@ util.http = function(req) {
   }
   var url = req.url;
   if (data && (req.method == 'GET')) {
-    url += '?' + data;
+    url += (url.match(/\?/) ? '&' : '?') + data;
     data = null;
   }
   if (req.async == undefined) req.async = true;
@@ -1837,7 +1837,7 @@ util.http = function(req) {
     xhr.withCredentials = true;
   }
   if (util.http.logging) {
-    var m = '[' + trcid + '] => ' + req.url;
+    var m = '[' + trcid + '] => ' + req.method + ' ' + util.escHtml(url);
     if (data) m += ' : ' + data.substr(0, util.http.MAX_LOG_LEN);
     util._log.v(m);
   }
@@ -1968,7 +1968,7 @@ util.http.TRC_ID_LEN = 4;
 util.http.LOG_LIMIT = 3145728;
 util.http.MAX_LOG_LEN = 4096;
 util.http.online = true;
-util.http.logging = false;
+util.http.logging = window.dbg ? true : false;
 util.http.trace = false;
 util.http.conn = 0;
 util.http.listeners = {
