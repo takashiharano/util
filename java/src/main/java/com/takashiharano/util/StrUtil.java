@@ -237,15 +237,15 @@ public class StrUtil {
    *
    * @param str
    *          the source string
-   * @param strict
-   *          set to true, whitespace only will not be treated as empty
+   * @param whitespace
+   *          set to true, whitespace only will be treated as empty
    * @return true if the string is empty.
    */
-  public static boolean isEmpty(String str, boolean strict) {
+  public static boolean isEmpty(String str, boolean whitespace) {
     if (str == null) {
       return true;
     }
-    if (!strict) {
+    if (whitespace) {
       str = str.trim();
     }
     return str.equals("");
