@@ -1,7 +1,5 @@
 package com.takashiharano.util;
 
-import java.math.BigDecimal;
-
 public class Log {
 
   private static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd' 'HH:mm:ss.SSS XX";
@@ -205,6 +203,34 @@ public class Log {
   }
 
   /**
+   * Log with time measurement.
+   *
+   * @param msg
+   * @return current time
+   */
+  public static long t(String msg) {
+    long t1 = System.currentTimeMillis();
+    String m = "[T+00:00:00.000] " + msg;
+    Log.out(m, LogLevel.DEBUG, 0, true);
+    return t1;
+  }
+
+  /**
+   * Log with time measurement.
+   *
+   * @param msg
+   * @param t0
+   * @return current time
+   */
+  public static long t(String msg, long t0) {
+    long t1 = System.currentTimeMillis();
+    long delta = t1 - t0;
+    String m = "[T+" + DateTime.formatTime(delta, "HH:mm:ss.SSS]") + " " + msg;
+    Log.out(m, LogLevel.DEBUG, 0, true);
+    return t1;
+  }
+
+  /**
    * Print stack trace.
    */
   public static void stack() {
@@ -227,33 +253,6 @@ public class Log {
       int lineNum = frame.getLineNumber();
       System.out.println("    at " + className + "#" + methodName + " (L:" + lineNum + ")");
     }
-  }
-
-  public static long timeStart() {
-    return System.nanoTime();
-  }
-
-  public static void timeEnd(long start) {
-    long delta = System.nanoTime() - start;
-    double delta_ = (double) delta / 1000000;
-    Log.d("delta = " + delta + " (" + delta_ + ")");
-    if (delta >= 1000) {
-      timeEndMilli(start);
-    } else {
-      timeEndNano(start);
-    }
-  }
-
-  public static void timeEndNano(long start) {
-    Log.d(System.nanoTime() - start + " ns");
-  }
-
-  public static void timeEndMilli(long start) {
-    long delta = System.nanoTime() - start;
-    double time = (double) delta / 1000000;
-    BigDecimal bd = new BigDecimal(time);
-    bd.setScale(3, BigDecimal.ROUND_HALF_UP);
-    Log.d(bd.doubleValue() + " ms");
   }
 
   /**
