@@ -328,6 +328,33 @@ public class Util {
   }
 
   /**
+   * Returns the sentence "N SUBJECT have/has been PRED."
+   *
+   * @param subject
+   * @param predicate
+   * @param n
+   * @return the sentence
+   */
+  public static String haveBeen(String subject, String predicate, int n) {
+    return haveBeen(subject, predicate, n, false);
+  }
+
+  /**
+   * Returns the sentence "N SUBJECT have/has been PRED."
+   *
+   * @param subject
+   * @param predicate
+   * @param n
+   * @param flag
+   *          if set to true, simply add "s" to the subject for plurals
+   * @return the sentence
+   */
+  public static String haveBeen(String subject, String predicate, int n, boolean flag) {
+    String s = plural(subject, n, flag) + ' ' + (n == 1 ? "has" : "have") + " been " + predicate + ".";
+    return (n == 0 ? "No" : n) + " " + s;
+  }
+
+  /**
    * Copy byte array.
    *
    * @param src
