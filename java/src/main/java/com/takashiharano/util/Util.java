@@ -7,6 +7,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Util {
 
@@ -215,6 +217,114 @@ public class Util {
     }
     String ret = new String(buf);
     return ret;
+  }
+
+  /**
+   * Returns the word in the singular or plural, depending on the number
+   * specified.
+   *
+   * @param word
+   *          the word
+   * @param n
+   *          number of the target
+   * @return the word in the singular or plural
+   */
+  public static String plural(String word, int n) {
+    return plural(word, n, false);
+  }
+
+  /**
+   * Returns the word in the singular or plural, depending on the number
+   * specified.
+   *
+   * @param word
+   *          the word
+   * @param n
+   *          number of the target
+   * @param flag
+   *          if set to true, adds "s" simply
+   * @return the word in the singular or plural
+   */
+  public static String plural(String word, int n, boolean flag) {
+    if (n == 1) {
+      return word;
+    }
+
+    if (flag) {
+      return word + "s";
+    }
+
+    String r = "s$";
+    Pattern p = Pattern.compile(r, Pattern.CASE_INSENSITIVE);
+    Matcher m = p.matcher(word);
+    if (m.find()) {
+      return word + "es";
+    }
+    r = "ch$";
+    p = Pattern.compile(r, Pattern.CASE_INSENSITIVE);
+    m = p.matcher(word);
+    if (m.find()) {
+      return word + "es";
+    }
+    r = "sh$";
+    p = Pattern.compile(r, Pattern.CASE_INSENSITIVE);
+    m = p.matcher(word);
+    if (m.find()) {
+      return word + "es";
+    }
+    r = "x$";
+    p = Pattern.compile(r, Pattern.CASE_INSENSITIVE);
+    m = p.matcher(word);
+    if (m.find()) {
+      return word + "es";
+    }
+    r = "o$";
+    p = Pattern.compile(r, Pattern.CASE_INSENSITIVE);
+    m = p.matcher(word);
+    if (m.find()) {
+      return word + "es";
+    }
+
+    r = "y$";
+    p = Pattern.compile(r);
+    m = p.matcher(word);
+    if (m.find()) {
+      return word.replaceAll(r, "ies");
+    }
+    r = "Y$";
+    p = Pattern.compile(r);
+    m = p.matcher(word);
+    if (m.find()) {
+      return word.replaceAll(r, "IES");
+    }
+
+    r = "f$";
+    p = Pattern.compile(r);
+    m = p.matcher(word);
+    if (m.find()) {
+      return word.replaceAll(r, "ves");
+    }
+    r = "F$";
+    p = Pattern.compile(r);
+    m = p.matcher(word);
+    if (m.find()) {
+      return word.replaceAll(r, "VES");
+    }
+
+    r = "fe$";
+    p = Pattern.compile(r);
+    m = p.matcher(word);
+    if (m.find()) {
+      return word.replaceAll(r, "ves");
+    }
+    r = "FE$";
+    p = Pattern.compile(r);
+    m = p.matcher(word);
+    if (m.find()) {
+      return word.replaceAll(r, "VES");
+    }
+
+    return word + "s";
   }
 
   /**
