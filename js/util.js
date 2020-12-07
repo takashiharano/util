@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012080000';
+util.v = '202012080039';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -574,12 +574,20 @@ util.ms2str = function(ms, mode, signed) {
   var r = '';
   if (mode == 2) {
     r = t.toString(false, true);
-    if (signed) r = ((ms < 0) ? '-' : '+') + r;
+    if (signed) {
+      if (ms >= 0) r = '+' + r;
+    } else {
+      r = r.replace('-', '');
+    }
     return r;
   }
   if ((mode == 1) || (ms >= 60000)) {
     r = t.toString(false, false);
-    if (signed) r = ((ms < 0) ? '-' : '+') + r;
+    if (signed) {
+      if (ms >= 0) r = '+' + r;
+    } else {
+      r = r.replace('-', '');
+    }
     return r;
   }
   var ss = t.seconds;
@@ -709,7 +717,7 @@ util.TimeCounter.prototype = {
     var el = util.getElement(ctx.el);
     if (el) {
       s = util.timecounter.delta(ctx.t0, now, ctx.mode, ctx.signed);
-      el.innerHTML = s.replace('-', '');
+      el.innerHTML = s;
     }
     if (ctx.cb) ctx.cb(now - ctx.t0);
     return s;
@@ -831,7 +839,7 @@ util.ClockTime.prototype = {
     var ss = this.toSecStr(byTheDay);
     var ms = this.toMilliSecStr(byTheDay);
 
-    if ((this.millis < 0) && !byTheDay) {
+    if (this.millis < 0) {
       hr = '-' + hr;
     }
 
