@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012020040';
+util.v = '202012080000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -569,13 +569,21 @@ util.Time.prototype = {
  *   1: s
  *   2: ms
  */
-util.ms2str = function(ms, mode) {
+util.ms2str = function(ms, mode, signed) {
   var t = new util.Time(ms);
-  if (mode == 2) return t.toString(false, true);
-  if ((mode == 1) || (ms >= 60000)) return t.toString(false, false);
+  var r = '';
+  if (mode == 2) {
+    r = t.toString(false, true);
+    if (signed) r = ((ms < 0) ? '-' : '+') + r;
+    return r;
+  }
+  if ((mode == 1) || (ms >= 60000)) {
+    r = t.toString(false, false);
+    if (signed) r = ((ms < 0) ? '-' : '+') + r;
+    return r;
+  }
   var ss = t.seconds;
   var sss = t.milliseconds;
-  var r = '';
   if (ms < 1000) {
     r += sss + 'ms';
   } else {
@@ -593,6 +601,7 @@ util.ms2str = function(ms, mode) {
       r += ss + '.' + msec + 's';
     }
   }
+  if (signed) r = ((ms < 0) ? '-' : '+') + r;
   return r;
 };
 
@@ -602,35 +611,26 @@ util.ms2str = function(ms, mode) {
 util.timecounter = {};
 util.timecounter.id = 0;
 util.timecounter.objs = {};
-
-/**
- * Returns time delta string
- *
- * t0: from in millis / Date-Time-String
- * t1: to in millis / Date-Time-String (default=current time)
- *
- * t1:1600000083000 - t0:1600000000000 = 83000 -> '1m 23s'
- * t1:'2020-09-20 20:01:23' - t0:'2020-09-20 20:00:00' = 83000 -> '1m 23s'
- */
-util.timecounter.delta = function(t0, t1, f) {
-  var ms = util.difftime(t0, t1);
-  var mode = (f ? 2 : 1);
-  return util.ms2str(ms, mode);
-};
-
 /**
  * Start to display the time delta
+ *
+ * opt = {
+ *  interval: 500,
+ *  mode: 1,
+ *  signed: true,
+ *  cb: null
+ * }
  */
-util.timecounter.start = function(el, t0, interval, f, cb) {
+util.timecounter.start = function(el, t0, opt) {
+  if (!opt) opt = {};
   var o = util.timecounter.getObj(el);
   if (o) {
     if (t0 !== undefined) o.t0 = t0;
-    if (interval != undefined) o.interval = interval;
-    if (f !== undefined) o.f = f;
-    if (cb !== undefined) o.cb = cb;
+    if (opt.interval != undefined) o.interval = opt.interval;
+    if (opt.mode !== undefined) o.mode = opt.mode;
+    if (opt.cb !== undefined) o.cb = opt.cb;
   } else {
-    f = f ? true : false;
-    o = new util.TimeCounter(el, t0, interval, f, cb);
+    o = new util.TimeCounter(el, t0, opt);
     util.timecounter.objs[o.id] = o;
   }
   o.start();
@@ -648,6 +648,22 @@ util.timecounter.stop = function(el) {
     delete util.timecounter.objs[o.id];
   }
   return s;
+};
+
+/**
+ * Returns time delta string
+ *
+ * t0: from in millis / Date-Time-String
+ * t1: to in millis / Date-Time-String (default=current time)
+ *
+ * t1:1600000083000 - t0:1600000000000 = 83000 -> '1m 23s'
+ * t1:'2020-09-20 20:01:23' - t0:'2020-09-20 20:00:00' = 83000 -> '1m 23s'
+
+ * signed: false='1m 23s' / true='+1m 23s' | '-1m 23s'
+ */
+util.timecounter.delta = function(t0, t1, mode, signed) {
+  var ms = util.difftime(t0, t1);
+  return util.ms2str(ms, mode, signed);
 };
 
 /**
@@ -670,12 +686,14 @@ util.timecounter.ids = function() {
 /**
  * TimeCounter Class
  */
-util.TimeCounter = function(el, t0, interval, f, cb) {
+util.TimeCounter = function(el, t0, opt) {
+  if (!opt) opt = {};
   this.el = el;
   this.t0 = (t0 == undefined ? util.now() : t0);
-  this.interval = (interval == undefined ? 500 : interval);
-  this.f = f;
-  this.cb = cb;
+  this.interval = (opt.interval == undefined ? 500 : opt.interval);
+  this.mode = (opt.mode == undefined ? 1 : opt.mode);
+  this.signed = opt.signed;
+  this.cb = opt.cb;
   this.id = '_timecounter-' + util.timecounter.id++;
 };
 util.TimeCounter.prototype = {
@@ -690,7 +708,7 @@ util.TimeCounter.prototype = {
     var s = '';
     var el = util.getElement(ctx.el);
     if (el) {
-      s = util.timecounter.delta(ctx.t0, now, ctx.f);
+      s = util.timecounter.delta(ctx.t0, now, ctx.mode, ctx.signed);
       el.innerHTML = s.replace('-', '');
     }
     if (ctx.cb) ctx.cb(now - ctx.t0);
