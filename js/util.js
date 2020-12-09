@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012080039';
+util.v = '202012100001';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -246,7 +246,7 @@ util.now = function() {
  * 2020/09/20 12:34:56.789
  * 2020/09/20 12:34:56.789 +09:00
  */
-util.datetime2ms = function(s) {
+util.unixmillis = function(s) {
   return new util.DateTime(s).timestamp;
 };
 
@@ -435,8 +435,8 @@ util.getTzLocalOffset = function(tz) {
  * return t1 - t0 in millis
  */
 util.difftime = function(t0, t1) {
-  t0 = util.datetime2ms(t0);
-  t1 = (t1 == undefined ? util.now() : util.datetime2ms(t1));
+  t0 = util.unixmillis(t0);
+  t1 = (t1 == undefined ? util.now() : util.unixmillis(t1));
   return t1 - t0;
 };
 
