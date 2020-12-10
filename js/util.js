@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012100001';
+util.v = '202012110000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -4933,7 +4933,7 @@ util.Console.prototype = {
   },
   _print: function(ctx) {
     ctx.pre.innerHTML = ctx.buf.getAllText();
-    if (ctx.autoScroll) ctx.scrollToBottom();
+    if (ctx.autoScroll) ctx.toBottom();
   },
   write: function(m, n) {
     var ctx = this;
@@ -4970,11 +4970,18 @@ util.Console.prototype = {
     s = util.html2text(s);
     util.copy2clpbd(s);
   },
-  get: function() {
+  getText: function() {
     return this.buf.getAllText();
   },
-  scrollToBottom: function() {
+  toTop: function() {
+    this.wrapper.scrollTop = 0;
+  },
+  toBottom: function() {
     this.wrapper.scrollTop = this.wrapper.scrollHeight;
+  },
+  scroll: function(v) {
+    if (v == undefined) return this.wrapper.scrollTop;
+    this.wrapper.scrollTop = v;
   },
   onScroll: function(e) {
     var ctx = e.target.ctx;
