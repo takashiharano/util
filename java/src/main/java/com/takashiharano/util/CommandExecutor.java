@@ -2,6 +2,7 @@ package com.takashiharano.util;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.concurrent.TimeUnit;
 
 public class CommandExecutor {
@@ -48,8 +49,8 @@ public class CommandExecutor {
    */
   public String exec(String[] command, long timeout, String charset, File dir) throws Exception {
     InputStream inpStream = null;
-    InputStream outStream = null;
     InputStream errStream = null;
+    OutputStream outStream = null;
 
     ProcessBuilder pb = new ProcessBuilder(command);
     pb.redirectErrorStream(true);
@@ -58,10 +59,10 @@ public class CommandExecutor {
     this.process = p;
     try {
       inpStream = p.getInputStream();
-      outStream = p.getInputStream();
       errStream = p.getErrorStream();
+      outStream = p.getOutputStream();
 
-      StreamGobbler outGobbler = new StreamGobbler(outStream);
+      StreamGobbler outGobbler = new StreamGobbler(inpStream);
       Thread t1 = new Thread(outGobbler);
       t1.start();
 
@@ -86,11 +87,11 @@ public class CommandExecutor {
       if (inpStream != null) {
         inpStream.close();
       }
-      if (outStream != null) {
-        outStream.close();
-      }
       if (errStream != null) {
         errStream.close();
+      }
+      if (outStream != null) {
+        outStream.close();
       }
     }
   }
