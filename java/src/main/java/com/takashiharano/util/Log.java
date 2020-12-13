@@ -225,7 +225,7 @@ public class Log {
   public static long t(String msg, long t0) {
     long t1 = System.currentTimeMillis();
     long delta = t1 - t0;
-    String m = "[T+" + DateTime.formatTime(delta, "HH:mm:ss.SSS]") + " " + msg;
+    String m = "[T+" + DateTime.formatTime(delta, "HH:mm:ss.SSS") + "] " + msg;
     Log.out(m, LogLevel.DEBUG, 0, true);
     return t1;
   }
