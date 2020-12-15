@@ -384,6 +384,17 @@ public class DateTime {
 
   /**
    * Convert milliseconds to a time string.<br>
+   *
+   * @param millis
+   *          milliseconds to format
+   * @return the formatted time string
+   */
+  public static String formatTime(long millis) {
+    return formatTime(millis, "HH:mm:ss.SSS");
+  }
+
+  /**
+   * Convert milliseconds to a time string.<br>
    * <br>
    * e.g., (1234, "HH:mm:ss.SSS") -> "00:00:01.234"
    *
