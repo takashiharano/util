@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012110000';
+util.v = '202012180017';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -4976,10 +4976,20 @@ util.Console.prototype = {
   toTop: function() {
     this.wrapper.scrollTop = 0;
   },
+  toRight: function() {
+    this.wrapper.scrollLeft = this.wrapper.scrollWidth;
+  },
   toBottom: function() {
     this.wrapper.scrollTop = this.wrapper.scrollHeight;
   },
-  scroll: function(v) {
+  toLeft: function() {
+    this.wrapper.scrollLeft = 0;
+  },
+  scrollX: function(v) {
+    if (v == undefined) return this.wrapper.scrollLeft;
+    this.wrapper.scrollLeft = v;
+  },
+  scrollY: function(v) {
     if (v == undefined) return this.wrapper.scrollTop;
     this.wrapper.scrollTop = v;
   },
@@ -4988,7 +4998,7 @@ util.Console.prototype = {
     var rect = ctx.wrapper.getBoundingClientRect();
     var h = rect.height;
     var d = ctx.wrapper.scrollHeight - ctx.wrapper.scrollTop;
-    if ((d - 17 <= h) && (h <= d + 17)) {
+    if ((d - 20 <= h) && (h <= d + 20)) {
       ctx.autoScroll = true;
     } else {
       ctx.autoScroll = false;
