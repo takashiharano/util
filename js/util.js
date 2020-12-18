@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012180017';
+util.v = '202012190000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1147,12 +1147,12 @@ util.random = function(min, max) {
 };
 
 /**
- * getRandomString(len)
- * getRandomString(tbl)
- * getRandomString(tbl, len)
- * getRandomString(tbl, minLen, maxLen)
+ * randomString(len)
+ * randomString(tbl)
+ * randomString(tbl, len)
+ * randomString(tbl, minLen, maxLen)
  */
-util.getRandomString = function(a1, a2, a3) {
+util.randomString = function(a1, a2, a3) {
   var DFLT_LEN = 8;
   var min = -1;
   var max = -1;
