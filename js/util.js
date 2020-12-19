@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012191220';
+util.v = '202012200001';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -4055,9 +4055,15 @@ util.Meter = function(target, opt) {
     if (opt.background != undefined) bg = opt.background;
     if (opt.border != undefined) bd = opt.border;
     if (opt.borderRadius != undefined) bdRd = opt.borderRadius;
-    if (opt.green != undefined) green = opt.green;
-    if (opt.yellow != undefined) yellow = opt.yellow;
-    if (opt.red != undefined) red = opt.red;
+    if (opt.color) {
+      green = opt.color;
+      yellow = opt.color;
+      red = opt.color;
+    } else {
+      if (opt.green != undefined) green = opt.green;
+      if (opt.yellow != undefined) yellow = opt.yellow;
+      if (opt.red != undefined) red = opt.red;
+    }
   }
 
   if (low == undefined) low = min;
