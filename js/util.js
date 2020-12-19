@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012200001';
+util.v = '202012200010';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -4002,6 +4002,7 @@ util.confirm = function(a1, a2, a3, a4, a5) {
  *  border
  *  borderRadius
  *  transition
+ *  color
  *  green
  *  yellow
  *  red,
