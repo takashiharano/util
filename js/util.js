@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012190000';
+util.v = '202012191220';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1806,7 +1806,7 @@ util.removeListener = function(listeners, fn) {
  */
 util.http = function(req) {
   var trc = util.http.trace;
-  var trcid = util.getRandomString(util.http.TRC_ID_CHARS, util.http.TRC_ID_LEN);
+  var trcid = util.randomString(util.http.TRC_ID_CHARS, util.http.TRC_ID_LEN);
   req.trcid = trcid;
   if (util.http.conn == 0) {
     util.http.onStart();
