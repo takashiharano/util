@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012200010';
+util.v = '202012201900';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1519,7 +1519,7 @@ util.haveBeen = function(subject, pred, n) {
   return (n == 0 ? 'No' : n) + ' ' + s;
 };
 
-util.copy2clpbd = function(s) {
+util.copy = function(s) {
   var b = document.body;
   var ta = document.createElement('textarea');
   ta.style.position = 'fixed';
@@ -4975,7 +4975,7 @@ util.Console.prototype = {
   copy: function() {
     var s = this.buf.getAllText();
     s = util.html2text(s);
-    util.copy2clpbd(s);
+    util.copy(s);
   },
   getText: function() {
     return this.buf.getAllText();
