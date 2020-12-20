@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012201900';
+util.v = '202012210000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -648,14 +648,14 @@ util.timecounter.start = function(el, t0, opt) {
  * Stop to display the time delta
  */
 util.timecounter.stop = function(el) {
-  var s = '';
+  var v = 0;
   var o = util.timecounter.getObj(el);
   if (o) {
-    s = o.update(o);
+    v = o.update(o);
     o.stop();
     delete util.timecounter.objs[o.id];
   }
-  return s;
+  return v;
 };
 
 /**
@@ -675,12 +675,27 @@ util.timecounter.delta = function(t0, t1, mode, signed) {
 };
 
 /**
+ * Returns the time delta value in millis
+ */
+util.timecounter.value = function(el) {
+  var v = 0;
+  var o = util.timecounter.getObj(el);
+  if (o) v = o.update(o);
+  return v;
+};
+
+/**
  * Returns the time delta string like '1m 23s'
  */
-util.timecounter.getValue = function(el) {
-  var o = util.getElement(el);
-  if (!o) return '';
-  return o.innerText.trim();
+util.timecounter.getText = function(el) {
+  var v = 0;
+  var s = '';
+  var o = util.timecounter.getObj(el);
+  if (o) {
+    v = o.update(o);
+    s = util.ms2str(v, o.mode, o.signed);
+  }
+  return s;
 };
 
 util.timecounter.getObj = function(el) {
@@ -713,14 +728,13 @@ util.TimeCounter.prototype = {
   },
   update: function(ctx) {
     var now = new Date().getTime();
-    var s = '';
+    var v = now - ctx.t0;
     var el = util.getElement(ctx.el);
     if (el) {
-      s = util.timecounter.delta(ctx.t0, now, ctx.mode, ctx.signed);
-      el.innerHTML = s;
+      el.innerHTML = util.ms2str(v, ctx.mode, ctx.signed);
     }
-    if (ctx.cb) ctx.cb(now - ctx.t0);
-    return s;
+    if (ctx.cb) ctx.cb(v);
+    return v;
   },
   stop: function() {
     var ctx = this;
