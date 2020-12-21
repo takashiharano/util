@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012210000';
+util.v = '202012220012';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -3951,6 +3951,7 @@ util.dialog.text = function(a1, a2, a3, a4, a5) {
       util.setStyle(txtBox, key, opt.style.textbox[key]);
     }
   }
+  txtBox.spellcheck = false;
   var body = document.createElement('div');
   var wrp1 = document.createElement('div');
   wrp1.style.display = 'inline-block';
@@ -4501,6 +4502,10 @@ util.submit = function(url, method, params, enc) {
   }
   document.body.appendChild(form);
   form.submit();
+};
+
+util.postSubmit = function(url, params, enc) {
+  util.submit(url, 'POST', params, enc);
 };
 
 //-----------------------------------------------------------------------------
