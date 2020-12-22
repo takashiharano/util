@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012220012';
+util.v = '202012221245';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -4992,11 +4992,14 @@ util.Console.prototype = {
     ctx._print(ctx);
   },
   copy: function() {
-    var s = this.buf.getAllText();
-    s = util.html2text(s);
+    var s = this.getText();
     util.copy(s);
   },
   getText: function() {
+    var s = this.buf.getAllText();
+    return util.html2text(s);
+  },
+  getHTML: function() {
     return this.buf.getAllText();
   },
   toTop: function() {
