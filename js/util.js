@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012221245';
+util.v = '202012240003';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2458,11 +2458,11 @@ util._clearHTML = function(el) {
  *  cursor: {
  *   speed: 100,
  *   n: 3
- *  }
+ *  },
+ *  onprogress: <callback-function(ctx, chunk)>,
+ *  oncomplete: <callback-function(ctx)>
  * };
  * var ctx = util.textseq(el, text, opt);
- * ctx.onprogress = <callback-function(ctx, chunk)>;
- * ctx.oncomplete = <callback-function(ctx)>;
  */
 util.textseq = function(el, text, opt) {
   var ctx = util.textseq.getCtx(el);
@@ -2636,8 +2636,8 @@ util.textseq.createCtx = function(el, text, opt) {
     reverse: (opt.reverse ? true : false),
     cursor: cursor,
     cursorCnt: 0,
-    onprogress: null,
-    oncomplete: null
+    onprogress: opt.onprogress,
+    oncomplete: opt.oncomplete
   };
   return ctx;
 };
