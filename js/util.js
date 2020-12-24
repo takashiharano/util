@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012240003';
+util.v = '202012250038';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -4848,12 +4848,29 @@ util.RingBuffer = function(len) {
 };
 util.RingBuffer.prototype = {
   add: function(data) {
-    var idx = this.cnt % this.len;
-    this.buffer[idx] = data;
+    var i = this.cnt % this.len;
+    this.buffer[i] = data;
     this.cnt++;
   },
   set: function(idx, data) {
-    this.buffer[idx] = data;
+    var ctx = this;
+    var p;
+    if (idx < 0) {
+      idx *= -1;
+      if (((ctx.cnt < ctx.len) && (idx > ctx.cnt)) || ((ctx.cnt >= ctx.len) && (idx > ctx.len))) {
+        return;
+      }
+      p = ctx.cnt - idx;
+    } else {
+      if (((ctx.cnt < ctx.len) && (idx >= ctx.cnt)) || ((ctx.cnt >= ctx.len) && (idx >= ctx.len))) {
+        return;
+      }
+      p = ctx.cnt - ctx.len;
+      if (p < 0) p = 0;
+      p += idx;
+    }
+    var i = p % ctx.len;
+    ctx.buffer[i] = data;
   },
   get: function(idx) {
     if (this.len < this.cnt) {
@@ -4881,14 +4898,6 @@ util.RingBuffer.prototype = {
       }
     }
     return buf;
-  },
-  getAllText: function() {
-    var b = this.getAll();
-    var s = '';
-    for (var i = 0; i < b.length; i++) {
-      s += b[i] + '\n';
-    }
-    return s;
   },
   clear: function() {
     this.buffer = new Array(this.len);
@@ -4952,37 +4961,45 @@ util.Console = function(el, opt) {
   this.autoScroll = true;
 };
 util.Console.prototype = {
-  print: function(m) {
+  print: function(m, idx) {
     var ctx = this;
-    ctx.buf.add(m);
+    idx |= 0;
+    if (idx == 0) {
+      ctx.buf.add(m);
+    } else {
+      if (idx > 0) idx--;
+      ctx.buf.set(idx, m);
+    }
     ctx._print(ctx);
   },
   _print: function(ctx) {
-    ctx.pre.innerHTML = ctx.buf.getAllText();
+    var b = ctx.buf.getAll();
+    var s = '';
+    for (var i = 0; i < b.length; i++) {
+      s += b[i] + '\n';
+    }
+    ctx.pre.innerHTML = s;
     if (ctx.autoScroll) ctx.toBottom();
   },
   write: function(m, n) {
     var ctx = this;
     ctx.buf.clear();
-    if (n == undefined) {
-      ctx.buf.add(m);
-    } else {
-      var a = util.text2list(m);
-      if (n == 0) {
-        for (var i = 0; i < a.length; i++) {
-          ctx.buf.add(a[i]);
-        }
-      } else {
-        var s = '';
-        var st = a.length - n;
-        if (st < 0) st = 0;
-        var ed = st + n;
-        if (ed > a.length) ed = a.length;
-        for (i = st; i < ed; i++) {
-          s += a[i] + '\n';
-        }
-        ctx.buf.add(s);
+    n |= 0;
+    var a = util.text2list(m);
+    if (n == 0) {
+      for (var i = 0; i < a.length; i++) {
+        ctx.buf.add(a[i]);
       }
+    } else {
+      var s = '';
+      var st = a.length - n;
+      if (st < 0) st = 0;
+      var ed = st + n;
+      if (ed > a.length) ed = a.length;
+      for (i = st; i < ed; i++) {
+        s += a[i] + '\n';
+      }
+      ctx.buf.add(s);
     }
     ctx._print(ctx);
   },
@@ -4995,12 +5012,21 @@ util.Console.prototype = {
     var s = this.getText();
     util.copy(s);
   },
-  getText: function() {
-    var s = this.buf.getAllText();
+  getText: function(idx) {
+    var s = this.getHTML(idx);
     return util.html2text(s);
   },
-  getHTML: function() {
-    return this.buf.getAllText();
+  getHTML: function(idx) {
+    idx |= 0;
+    var c = this.pre.innerHTML;
+    if (idx == 0) return c;
+    var a = util.text2list(c);
+    if (idx < 0) {
+      var i = a.length + idx;
+      return (i < 0 ? '' : a[i]);
+    }
+    idx--;
+    return (idx < a.length ? a[idx] : '');
   },
   toTop: function() {
     this.wrapper.scrollTop = 0;
