@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012250038';
+util.v = '202012270036';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -454,6 +454,28 @@ util.diffDays = function(ms1, ms2, abs) {
     if (!abs) sign = -1;
   }
   return Math.floor(d / 86400000) * sign;
+};
+
+/**
+ * Calc Estimated Time to Complete
+ * t0: origin unix millis
+ * val: current value
+ * total: total value
+ */
+util.calcETC = function(t0, val, total, now) {
+  if (now == undefined) now = util.now();
+  var dt = now - t0;
+  var avg = dt / val;
+  var tt = Math.ceil(avg * total);
+  var rt = Math.ceil(avg * (total - val));
+  var r = {
+    completion: now + rt,
+    remaining: rt,
+    total: tt,
+    elapsed: dt,
+    average: Math.ceil(dt / val)
+  };
+  return r;
 };
 
 //-----------------------------------------------------------------------------
