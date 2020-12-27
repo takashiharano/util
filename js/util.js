@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012270036';
+util.v = '202012280028';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2339,6 +2339,180 @@ util.fn2text = function(f, s, e) {
     t += a[i] + '\n';
   }
   return t;
+};
+
+/**
+ * R, G, B -> #RGB
+ */
+util.rgb = function(r, g, b) {
+  var r16 = ('0' + r.toString(16)).slice(-2);
+  var g16 = ('0' + g.toString(16)).slice(-2);
+  var b16 = ('0' + b.toString(16)).slice(-2);
+  var r0 = r16.charAt(0);
+  var r1 = r16.charAt(1);
+  var g0 = g16.charAt(0);
+  var g1 = g16.charAt(1);
+  var b0 = b16.charAt(0);
+  var b1 = b16.charAt(1);
+  if ((r0 == r1) && (g0 == g1) && (b0 == b1)) {
+    r16 = r0;
+    g16 = g0;
+    b16 = b0;
+  }
+  return '#' + r16 + g16 + b16;
+};
+
+/**
+ * R, G, B -> {h, s, v}
+ * r: R or #RGB
+ */
+util.rgb2hsv = function(r, g, b) {
+  if (typeof r == 'string') {
+    var rgb = util.color.rgb16to10(r);
+    r = rgb.r;
+    g = rgb.g;
+    b = rgb.b;
+  }
+  var hsv = {
+    h: util.color.getH(r, g, b),
+    s: util.color.getS(r, g, b),
+    v: util.color.getV(r, g, b)
+  };
+  return hsv;
+};
+
+/**
+ * H, S, V -> {r, g, b}
+ */
+util.hsv2rgb = function(h, s, v) {
+  var r, g, b;
+  var max = v;
+  var min = max - ((s / 255) * max);
+  if ((h >= 0) && (h < 60)) {
+    r = max;
+    g = (h / 60) * (max - min) + min;
+    b = min;
+  } else if ((h >= 60) && (h < 120)) {
+    r = ((120 - h) / 60) * (max - min) + min;
+    g = max;
+    b = min;
+  } else if ((h >= 120) && (h < 180)) {
+    r = min;
+    g = max;
+    b = ((h - 120) / 60) * (max - min) + min;
+  } else if ((h >= 180) && (h < 240)) {
+    r = min;
+    g = ((240 - h) / 60) * (max - min) + min;
+    b = max;
+  } else if ((h >= 240) && (h < 300)) {
+    r = ((h - 240) / 60) * (max - min) + min;
+    g = min;
+    b = max;
+  } else {
+    r = max;
+    g = min;
+    b = ((360 - h) / 60) * (max - min) + min;
+  }
+  var rgb = {
+    r: Math.round(r),
+    g: Math.round(g),
+    b: Math.round(b)
+  };
+  return rgb;
+};
+
+/**
+ * rgb16: #rgb
+ * brightness: -100-0-100
+ * hue: -100-0-100
+ */
+util.color = function(rgb16, brightness, hue) {
+  hue |= 0;
+  var hsv = util.rgb2hsv(rgb16);
+  var h = hsv.h + ((hue / 100) * 255);
+  var s = hsv.s;
+  var v = hsv.v;
+  if (brightness > 0) {
+    s = hsv.s + (((brightness * -1) / 100) * 255);
+  } else {
+    v = hsv.v + ((brightness / 100) * 255);
+  }
+  if (h < 0) {
+    h += 360;
+  } else if (h >= 360) {
+    h -= 360;
+  }
+  if (s < 0) {
+    s = 0;
+  } else if (s > 255) {
+    s = 255;
+  }
+  if (v < 0) {
+    v = 0;
+  } else if (v > 255) {
+    v = 255;
+  }
+  var rgb = util.hsv2rgb(h, s, v);
+  return util.rgb(rgb.r, rgb.g, rgb.b);
+};
+
+util.color.rgb16to10 = function(rgb16) {
+  var r16, g16, b16, r10, g10, b10;
+  rgb16 = rgb16.replace(/#/, '').replace(/\s/g, '');
+  if (rgb16.length == 6) {
+    r16 = rgb16.substr(0, 2);
+    g16 = rgb16.substr(2, 2);
+    b16 = rgb16.substr(4, 2);
+  } else if (rgb16.length == 3) {
+    r16 = rgb16.substr(0, 1);
+    g16 = rgb16.substr(1, 1);
+    b16 = rgb16.substr(2, 1);
+    r16 += r16;
+    g16 += g16;
+    b16 += b16;
+  }
+  r10 = parseInt(r16, 16);
+  g10 = parseInt(g16, 16);
+  b10 = parseInt(b16, 16);
+  var rgb = {r: r10, g: g10, b: b10};
+  return rgb;
+};
+
+// Hue 0-360
+util.color.getH = function(r, g, b) {
+  if ((r == g) && (g == b)) return 0;
+  var a = util.color.sortRGB(r, g, b);
+  var max = a[0];
+  var min = a[2];
+  var h;
+  if (max == r) {
+    h = 60 * ((g - b) / (max - min));
+  } else if (max == g) {
+    h = 60 * ((b - r) / (max - min)) + 120;
+  } else {
+    h = 60 * ((r - g) / (max - min)) + 240;
+  }
+  if (h < 0) h += 360;
+  return Math.round(h);
+};
+
+// Saturation/Chroma 0-255
+util.color.getS = function(r, g, b) {
+  var a = util.color.sortRGB(r, g, b);
+  var max = a[0];
+  var min = a[2];
+  var s = (max - min) / max;
+  return Math.round(s * 255);
+};
+
+// Value/Brightness 0-255
+util.color.getV = function(r, g, b) {
+  return util.color.sortRGB(r, g, b)[0];
+};
+
+util.color.sortRGB = function(r, g, b) {
+  var a = [r, g, b];
+  return a.sort(function(_a, _b) {return _b - _a});
 };
 
 //-----------------------------------------------------------------------------
