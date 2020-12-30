@@ -487,6 +487,19 @@ public class FileUtil {
   }
 
   /**
+   * Returns the length of the file denoted by this abstract pathname.
+   *
+   * @param path
+   *          file path
+   * @return The length, in bytes, of the file denoted by this abstract pathname,
+   *         or 0L if the file does not exist.
+   */
+  public static long getFileLen(String path) {
+    File file = new File(path);
+    return file.length();
+  }
+
+  /**
    * Detects charset and returns its name.
    *
    * @param src
