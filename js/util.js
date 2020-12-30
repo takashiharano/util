@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012280028';
+util.v = '202012310115';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2345,21 +2345,8 @@ util.fn2text = function(f, s, e) {
  * R, G, B -> #RGB
  */
 util.rgb = function(r, g, b) {
-  var r16 = ('0' + r.toString(16)).slice(-2);
-  var g16 = ('0' + g.toString(16)).slice(-2);
-  var b16 = ('0' + b.toString(16)).slice(-2);
-  var r0 = r16.charAt(0);
-  var r1 = r16.charAt(1);
-  var g0 = g16.charAt(0);
-  var g1 = g16.charAt(1);
-  var b0 = b16.charAt(0);
-  var b1 = b16.charAt(1);
-  if ((r0 == r1) && (g0 == g1) && (b0 == b1)) {
-    r16 = r0;
-    g16 = g0;
-    b16 = b0;
-  }
-  return '#' + r16 + g16 + b16;
+  var rgb = util.color.rgb10to16(r, g, b);
+  return '#' + rgb.r + rgb.g + rgb.b;
 };
 
 /**
@@ -2454,6 +2441,25 @@ util.color = function(rgb16, brightness, hue) {
   }
   var rgb = util.hsv2rgb(h, s, v);
   return util.rgb(rgb.r, rgb.g, rgb.b);
+};
+
+util.color.rgb10to16 = function(r, g, b) {
+  var r16 = ('0' + parseInt(r).toString(16)).slice(-2);
+  var g16 = ('0' + parseInt(g).toString(16)).slice(-2);
+  var b16 = ('0' + parseInt(b).toString(16)).slice(-2);
+  var r0 = r16.charAt(0);
+  var r1 = r16.charAt(1);
+  var g0 = g16.charAt(0);
+  var g1 = g16.charAt(1);
+  var b0 = b16.charAt(0);
+  var b1 = b16.charAt(1);
+  if ((r0 == r1) && (g0 == g1) && (b0 == b1)) {
+    r16 = r0;
+    g16 = g0;
+    b16 = b0;
+  }
+  var rgb = {r: r16, g: g16, b: b16};
+  return rgb;
 };
 
 util.color.rgb16to10 = function(rgb16) {
