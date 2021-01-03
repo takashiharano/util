@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202012310115';
+util.v = '202101032353';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2420,9 +2420,9 @@ util.color = function(rgb16, brightness, hue) {
   var s = hsv.s;
   var v = hsv.v;
   if (brightness > 0) {
-    s = hsv.s + (((brightness * -1) / 100) * 255);
+    s = s + (((brightness * -1) / 100) * 255);
   } else {
-    v = hsv.v + ((brightness / 100) * 255);
+    v = v + ((brightness / 100) * 255);
   }
   if (h < 0) {
     h += 360;
@@ -2488,8 +2488,8 @@ util.color.rgb16to10 = function(rgb16) {
 util.color.getH = function(r, g, b) {
   if ((r == g) && (g == b)) return 0;
   var a = util.color.sortRGB(r, g, b);
-  var max = a[0];
-  var min = a[2];
+  var min = a[0];
+  var max = a[2];
   var h;
   if (max == r) {
     h = 60 * ((g - b) / (max - min));
@@ -2505,20 +2505,20 @@ util.color.getH = function(r, g, b) {
 // Saturation/Chroma 0-255
 util.color.getS = function(r, g, b) {
   var a = util.color.sortRGB(r, g, b);
-  var max = a[0];
-  var min = a[2];
+  var min = a[0];
+  var max = a[2];
   var s = (max - min) / max;
   return Math.round(s * 255);
 };
 
 // Value/Brightness 0-255
 util.color.getV = function(r, g, b) {
-  return util.color.sortRGB(r, g, b)[0];
+  return util.color.sortRGB(r, g, b)[2];
 };
 
 util.color.sortRGB = function(r, g, b) {
   var a = [r, g, b];
-  return a.sort(function(_a, _b) {return _b - _a});
+  return a.sort(function(_a, _b) {return _a - _b});
 };
 
 //-----------------------------------------------------------------------------
