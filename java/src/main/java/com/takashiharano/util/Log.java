@@ -338,6 +338,16 @@ public class Log {
       if ("byte[]".equals(typeName)) {
         byte[] b = (byte[]) o;
         sb.append("byte[" + b.length + "] = " + HexDumper.toHex(b, 1024));
+      } else if ("int[]".equals(typeName)) {
+        int[] wk = (int[]) o;
+        sb.append("[");
+        for (int i = 0; i < wk.length; i++) {
+          if (i > 0) {
+            sb.append(", ");
+          }
+          sb.append(wk[i]);
+        }
+        sb.append("]");
       } else if ("java.lang.String[]".equals(typeName)) {
         String[] wk = (String[]) o;
         sb.append("[");
