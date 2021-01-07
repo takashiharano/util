@@ -12,9 +12,9 @@ public class Main {
 
   private static void test() {
     Log.d("test start");
-    long start = Log.timeStart();
+    long start = Log.t("Start");
 
-    Log.timeEndMilli(start);
+    Log.t("End", start);
     Log.d("test end");
   }
 
