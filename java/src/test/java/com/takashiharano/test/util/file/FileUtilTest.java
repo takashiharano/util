@@ -1,4 +1,4 @@
-package com.takashiharano.test.util;
+package com.takashiharano.test.util.file;
 
 import java.io.IOException;
 

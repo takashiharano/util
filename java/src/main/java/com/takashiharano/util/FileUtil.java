@@ -73,6 +73,16 @@ public class FileUtil {
   /**
    * Read a text file.
    *
+   * @param file
+   * @return text content
+   */
+  public static String readTextFile(File file) {
+    return readTextFile(file, DEFAULT_CHARSET);
+  }
+
+  /**
+   * Read a text file.
+   *
    * @param path
    *          file path to read
    * @param charsetName
@@ -81,6 +91,19 @@ public class FileUtil {
    */
   public static String readTextFile(String path, String charsetName) {
     File file = new File(path);
+    return readTextFile(file, charsetName);
+  }
+
+  /**
+   * Read a text file.
+   *
+   * @param file
+   *          file object to read
+   * @param charsetName
+   *          charset name. set null to auto detection
+   * @return text content
+   */
+  public static String readTextFile(File file, String charsetName) {
     byte[] content = readFile(file);
     if (content == null) {
       return "";
@@ -121,10 +144,10 @@ public class FileUtil {
     if (charsetName == null) {
       charsetName = DEFAULT_CHARSET;
     }
-    Path file = Paths.get(path);
+    Path filePath = Paths.get(path);
     List<String> lines;
     try {
-      lines = Files.readAllLines(file, Charset.forName(charsetName));
+      lines = Files.readAllLines(filePath, Charset.forName(charsetName));
     } catch (IOException e) {
       return new String[0];
     }
@@ -140,8 +163,19 @@ public class FileUtil {
    * @return file content in Base64 encoded string
    */
   public static String readFileAsBase64(String path) {
+    File file = new File(path);
+    return readFileAsBase64(file);
+  }
+
+  /**
+   * Read a file as Base64 encoded string.
+   *
+   * @param file
+   * @return file content in Base64 encoded string
+   */
+  public static String readFileAsBase64(File file) {
     String encoded = null;
-    byte[] bytes = readFile(path);
+    byte[] bytes = readFile(file);
     if ((bytes != null) && (bytes.length != 0)) {
       encoded = Base64.getEncoder().encodeToString(bytes);
     }
@@ -203,6 +237,30 @@ public class FileUtil {
     } catch (IOException e) {
       throw e;
     }
+  }
+
+  /**
+   * Decodes a Base64 encoded String and writes it to a file.
+   *
+   * @param path
+   * @param base64
+   * @throws IOException
+   */
+  public static void writeFileFromBase64(String path, String base64) throws IOException {
+    File file = new File(path);
+    writeFileFromBase64(file, base64);
+  }
+
+  /**
+   * Decodes a Base64 encoded String and writes it to a file.
+   *
+   * @param file
+   * @param base64
+   * @throws IOException
+   */
+  public static void writeFileFromBase64(File file, String base64) throws IOException {
+    byte[] content = Base64.getDecoder().decode(base64);
+    writeFile(file, content);
   }
 
   /**
