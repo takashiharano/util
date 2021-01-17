@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -13,7 +15,7 @@ import java.util.regex.Pattern;
 public class Util {
 
   public static final String DEFAULT_CHARSET = "UTF-8";
-  public static final String LINE_SEPARATOR = System.lineSeparator();
+  public static final String LINE_SEPARATOR = "\n";
 
   /**
    * Returns the current time in milliseconds.
@@ -643,6 +645,128 @@ public class Util {
     String details = info1.getPercent() + "% -> " + info2.getPercent() + "% (" + elapsed + ")";
     Log.i("GC: " + details);
     return details;
+  }
+
+  /**
+   * Splits the given string by space character.
+   *
+   * @param src
+   *          the source string
+   * @return the array of the split strings. if the src is null, returns [].
+   */
+  public static String[] splitKeywords(String src) {
+    return splitKeywords(src, 0);
+  }
+
+  /**
+   * Splits the given string by space character.<br>
+   * The limit parameter controls the number of times the pattern is applied and
+   * therefore affects the length of the resulting array.<br>
+   * <br>
+   * e.g.,<br>
+   * 1 2 3 "abc" "d ef" "g\"hi" ("jkl" + m) 'xyz' 'a"b b"a'<br>
+   * -> [1, 2, 3, "abc", "d ef", "g\"hi", ("jkl" + m), 'xyz', 'a"b b"a']<br>
+   * 
+   * @param src
+   *          the source string
+   * @param limit
+   *          the result threshold, as described above
+   * @return the array of the split strings. if the src is null, returns [].
+   */
+  public static String[] splitKeywords(String src, int limit) {
+    if (src == null) {
+      return new String[0];
+    }
+    List<String> keywords = new ArrayList<>();
+    int start = 0;
+    int len = 0;
+    boolean srch = true;
+    char quot = 0;
+    int paren = 0;
+    char ch;
+    String str = "";
+    for (int i = 0; i < src.length(); i++) {
+      len++;
+      ch = src.charAt(i);
+      switch (ch) {
+        case ' ':
+          if (srch || (quot != 0) || (paren > 0)) {
+            continue;
+          } else {
+            srch = true;
+            str = src.substring(start, start + len);
+            keywords.add(str);
+            if (keywords.size() + 1 == limit) {
+              if (i < src.length() - 1) {
+                start = i + 1;
+                len = src.length() - start;
+                str = src.substring(start, start + len);
+                keywords.add(str);
+                i = src.length();
+              }
+            }
+          }
+          break;
+        case '(':
+          if (srch) {
+            start = i;
+            len = 0;
+            srch = false;
+          }
+          if (quot == 0) {
+            paren++;
+          }
+          break;
+        case ')':
+          if (srch) {
+            start = i;
+            len = 0;
+            srch = false;
+          } else if (paren > 0) {
+            if ((i > 0) && (src.charAt(i - 1) == '\\')) {
+              continue;
+            }
+            paren--;
+          }
+          break;
+        case '"':
+        case '\'':
+          if (paren > 0) {
+            continue;
+          } else if (srch) {
+            start = i;
+            len = 0;
+            srch = false;
+            quot = ch;
+          } else if (ch == quot) {
+            if ((i > 0) && (src.charAt(i - 1) == '\\')) {
+              continue;
+            }
+            quot = 0;
+          }
+          break;
+        default:
+          if (srch) {
+            start = i;
+            len = 0;
+            srch = false;
+          }
+      }
+    }
+    len++;
+    if (!srch) {
+      str = src.substring(start, start + len);
+      keywords.add(str);
+    }
+
+    String[] ret;
+    if (keywords.size() == 0) {
+      ret = new String[0];
+    } else {
+      ret = new String[keywords.size()];
+      keywords.toArray(ret);
+    }
+    return ret;
   }
 
 }
