@@ -81,6 +81,83 @@ public class StrUtil {
   }
 
   /**
+   * Counts the number of matches for a regex.
+   *
+   * @param target
+   * @param regex
+   * @return count
+   */
+  public static int countMatcher(String target, String regex) {
+    return countMatcher(target, regex, 0);
+  }
+
+  /**
+   * Counts the number of matches for a regex.
+   *
+   * @param target
+   * @param regex
+   * @param flags
+   * @return count
+   */
+  public static int countMatcher(String target, String regex, int flags) {
+    return countMatcher(target, regex, flags, false);
+  }
+
+  /**
+   * Counts the number of matches for a regex.
+   *
+   * @param target
+   * @param regex
+   * @param complex
+   * @return count
+   */
+  public static int countMatcher(String target, String regex, boolean complex) {
+    return countMatcher(target, regex, 0, complex);
+  }
+
+  /**
+   * Counts the number of matches for a regex.
+   *
+   * @param target
+   * @param regex
+   * @param flags
+   * @param complex
+   *          matcher pattern
+   *
+   *          <pre>
+   *          aaaa
+  
+   *          false:
+   *          aa
+   *            aa
+   *
+   *          true:
+   *          aa
+   *           aa
+   *            aa
+   *          </pre>
+   * 
+   * @return count
+   */
+  public static int countMatcher(String target, String regex, int flags, boolean complex) {
+    Pattern p = Pattern.compile(regex, flags);
+    Matcher m = p.matcher(target);
+    int count = 0;
+    if (complex) {
+      int i = 0;
+      while (m.find(i)) {
+        count++;
+        i = m.start() + 1;
+      }
+    } else {
+      while (m.find()) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  /**
    * Returns the input subsequence captured by the given group during the previous
    * match operation.<br>
    * For a matcher m, input sequence s, and group index g, the expressions
