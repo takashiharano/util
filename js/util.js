@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202101032353';
+util.v = '202101212115';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1261,11 +1261,26 @@ util.str2arr = function(s) {
   return s.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\s\S]/g) || [];
 };
 
-util.text2list = function(s) {
+/**
+ * flg: 0 = ALL
+ *      1 = Omit empty lines
+ *      2 = Omit comments (starts with "#")
+ */
+util.text2list = function(s, flg) {
   s = util.convertNewLine(s, '\n');
   var a = s.split('\n');
   var lastIdx = a.length - 1;
   if (a[lastIdx] == '') a.splice(lastIdx, 1);
+  if (flg) {
+    var w = [];
+    for (var i = 0; i < a.length; i++) {
+      var v = a[i];
+      var t = v.trim();
+      if ((t == '') || ((flg == 2) && (t.match(/^#/)))) continue;
+      w.push(v);
+    }
+    a = w;
+  }
   return a;
 };
 
