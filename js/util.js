@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202101212115';
+util.v = '202101230000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2362,6 +2362,17 @@ util.fn2text = function(f, s, e) {
 util.rgb = function(r, g, b) {
   var rgb = util.color.rgb10to16(r, g, b);
   return '#' + rgb.r + rgb.g + rgb.b;
+};
+
+/**
+ * http://xxx/ -> <a href="http://xxx/">http://xxx/</a>
+ */
+util.linkUrls = function(s, attr) {
+  if (attr == undefined) attr = 'target="_blank" rel="noopener"';
+  var t = '<a href="$1"';
+  if (attr) t += ' ' + attr;
+  t += '>$1</a>';
+  return s.replace(/(https?:\/\/[!#$&'()*+,/:;=?@[\]0-9A-Za-z\-._~]+)/g, t);
 };
 
 /**
