@@ -20,7 +20,7 @@ import java.util.List;
 public class FileUtil {
 
   public static final String DEFAULT_CHARSET = "UTF-8";
-  public static String LINE_SEPARATOR = System.lineSeparator();
+  public static String LINE_SEPARATOR = "\n";
 
   /**
    * Sets line separator.
@@ -36,7 +36,8 @@ public class FileUtil {
    * Read a binary file.
    *
    * @param path
-   * @return binary content
+   * @return byte array of the file content. If the file does not exist, this
+   *         method returns null.
    */
   public static byte[] readFile(String path) {
     File file = new File(path);
@@ -47,9 +48,13 @@ public class FileUtil {
    * Read a binary file.
    *
    * @param file
-   * @return
+   * @return byte array of the file content. If the file does not exist, this
+   *         method returns null.
    */
   public static byte[] readFile(File file) {
+    if (!file.exists()) {
+      return null;
+    }
     byte[] content = new byte[(int) file.length()];
     try (FileInputStream fis = new FileInputStream(file)) {
       @SuppressWarnings("unused")
@@ -64,7 +69,7 @@ public class FileUtil {
    * Read a text file.
    *
    * @param path
-   * @return text content
+   * @return text content. If the file does not exist, this method returns null.
    */
   public static String readTextFile(String path) {
     return readTextFile(path, DEFAULT_CHARSET);
@@ -74,7 +79,7 @@ public class FileUtil {
    * Read a text file.
    *
    * @param file
-   * @return text content
+   * @return text content. If the file does not exist, this method returns null.
    */
   public static String readTextFile(File file) {
     return readTextFile(file, DEFAULT_CHARSET);
@@ -87,7 +92,7 @@ public class FileUtil {
    *          file path to read
    * @param charsetName
    *          charset name. set null to auto detection
-   * @return text content
+   * @return text content. If the file does not exist, this method returns null.
    */
   public static String readTextFile(String path, String charsetName) {
     File file = new File(path);
@@ -101,12 +106,12 @@ public class FileUtil {
    *          file object to read
    * @param charsetName
    *          charset name. set null to auto detection
-   * @return text content
+   * @return text content. If the file does not exist, this method returns null.
    */
   public static String readTextFile(File file, String charsetName) {
     byte[] content = readFile(file);
     if (content == null) {
-      return "";
+      return null;
     }
     if (charsetName == null) {
       charsetName = getCharsetName(content);
@@ -149,7 +154,7 @@ public class FileUtil {
     try {
       lines = Files.readAllLines(filePath, Charset.forName(charsetName));
     } catch (IOException e) {
-      return new String[0];
+      return null;
     }
     String[] text = new String[lines.size()];
     lines.toArray(text);
@@ -160,7 +165,8 @@ public class FileUtil {
    * Read a file as Base64 encoded string.
    *
    * @param path
-   * @return file content in Base64 encoded string
+   * @return file content in Base64 encoded string. If the file does not exist,
+   *         this method returns null.
    */
   public static String readFileAsBase64(String path) {
     File file = new File(path);
@@ -171,7 +177,8 @@ public class FileUtil {
    * Read a file as Base64 encoded string.
    *
    * @param file
-   * @return file content in Base64 encoded string
+   * @return file content in Base64 encoded string. If the file does not exist,
+   *         this method returns null.
    */
   public static String readFileAsBase64(File file) {
     String encoded = null;
