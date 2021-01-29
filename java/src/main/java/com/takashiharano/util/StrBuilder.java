@@ -6,7 +6,7 @@ package com.takashiharano.util;
 public class StrBuilder {
 
   private StringBuilder buf;
-  private String lineseparator = System.lineSeparator();
+  private String lineseparator = "\n";
 
   /**
    * Constructs a string builder with no characters in it and an initial capacity
