@@ -33,6 +33,61 @@ public class FileUtil {
   }
 
   /**
+   * Creates a new empty file.
+   *
+   * @param path
+   * @return true if the named file does not exist and was successfully created;
+   *         false if the named file already exists or failed to create
+   */
+  public static boolean create(String path) {
+    File file = new File(path);
+    return create(file);
+  }
+
+  /**
+   * Creates a new empty file.
+   *
+   * @param path
+   * @param createParent
+   * @return true if the named file does not exist and was successfully created;
+   *         false if the named file already exists or failed to create
+   */
+  public static boolean create(String path, boolean createParent) {
+    File file = new File(path);
+    return create(file, createParent);
+  }
+
+  /**
+   * Creates a new empty file.
+   *
+   * @param file
+   * @return true if the named file does not exist and was successfully created;
+   *         false if the named file already exists or failed to create
+   */
+  public static boolean create(File file) {
+    return create(file, false);
+  }
+
+  /**
+   * Creates a new empty file.
+   *
+   * @param file
+   * @param createParent
+   * @return true if the named file does not exist and was successfully created;
+   *         false if the named file already exists or failed to create
+   */
+  public static boolean create(File file, boolean createParent) {
+    if (createParent) {
+      mkParentDir(file);
+    }
+    try {
+      return file.createNewFile();
+    } catch (IOException e) {
+      return false;
+    }
+  }
+
+  /**
    * Read a binary file.
    *
    * @param path
@@ -313,11 +368,11 @@ public class FileUtil {
   /**
    * Returns the pathname string of this abstract pathname's parent, or null if
    * this pathname does not name a parent directory. The parent of an abstract
-   * pathname consists of thepathname's prefix, if any, and each name in the
+   * pathname consists of the pathname's prefix, if any, and each name in the
    * pathname's name sequence except for the last. If the name sequence is empty
    * then the pathname does not name a parent directory.
    *
-   * a/b/c.txt->/a/b
+   * e.g., "a/b/c.txt" -> "/a/b"
    *
    * @param path
    * @return parent path
@@ -329,7 +384,7 @@ public class FileUtil {
 
   /**
    * Returns parent path of the file.<br>
-   * e.g., a/b/c.txt->/a/b
+   * e.g., "a/b/c.txt" -> "/a/b"
    *
    * @param file
    * @return parent path
@@ -512,7 +567,7 @@ public class FileUtil {
   /**
    * Returns the name of the file or directory denoted by the given pathname.<br>
    * <br>
-   * "C:/test/abc.txt" -> "abc.txt"
+   * e.g., "C:/test/abc.txt" -> "abc.txt"
    *
    * @param path
    * @return file name
@@ -526,7 +581,7 @@ public class FileUtil {
   /**
    * Returns the name of extension.<br>
    * <br>
-   * "C:/test/abc.txt" -> "txt"
+   * e.g., "C:/test/abc.txt" -> "txt"
    *
    * @param path
    *          file path (absolute or related)
