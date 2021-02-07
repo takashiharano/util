@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202101230000';
+util.v = '202102080025';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -57,9 +57,7 @@ util.DateTime = function(src, tzOffset) {
     tzOffset = util.getTZ();
   } else {
     var os = tzOffset;
-    if (typeof os == 'string') {
-      os = util.getTzLocalOffset(os);
-    }
+    if (typeof os == 'string') os = util.getTzLocalOffset(os);
     dt = new Date(timestamp + os);
     timestamp = dt.getTime();
   }
@@ -73,9 +71,7 @@ util.DateTime = function(src, tzOffset) {
   }
 
   var tzOffsetMin = tzOffset;
-  if (typeof tzOffset == 'string') {
-    tzOffsetMin = util.tz2ms(tzOffset) / 60000;
-  }
+  if (typeof tzOffset == 'string') tzOffsetMin = util.tz2ms(tzOffset) / 60000;
   var year = dt.getFullYear();
   var month = dt.getMonth() + 1;
   var day = dt.getDate();
@@ -109,7 +105,7 @@ util.DateTime.prototype = {
   setWdays: function(wdays) {
     this.WDAYS = wdays;
   },
-  // -> '+0900' : ext=true -> '+09:00'
+  // -> '+0900' / ext=true: '+09:00'
   getTZ: function(ext) {
     return util.formatTZ(this.tzOffsetMin, ext);
   },
@@ -174,7 +170,7 @@ util._getTzPos = function(s) {
 };
 
 /**
- * Format the date and time string in YYYYMMDDHHMISSsss format.
+ * Format the date and time string in YYYYMMDDHHMISSsss format
  * 20200920                -> 20200920000000000
  * 20200920T1234           -> 20200920123400000
  * 20200920T123456.789     -> 20200920123456789
@@ -245,6 +241,7 @@ util.now = function() {
  * 2020/09/20 12:34:56
  * 2020/09/20 12:34:56.789
  * 2020/09/20 12:34:56.789 +09:00
+ * -> millis from 19700101T0000Z
  */
 util.unixmillis = function(s) {
   return new util.DateTime(s).timestamp;
@@ -264,8 +261,7 @@ util.getDateTime = function(dt, ofst) {
  * fmt: '%Y-%M-%D %H:%m:%S.%s'
  */
 util.getDateTimeString = function(t, fmt) {
-  var dt = new util.DateTime(t);
-  return dt.toString(fmt);
+  return (new util.DateTime(t)).toString(fmt);
 };
 
 /**
@@ -304,9 +300,7 @@ util.getTimeStampOfDay = function(timeString, offset) {
  */
 util.ms2struct = function(millis) {
   var wk = millis;
-  if (millis < 0) {
-    wk *= (-1);
-  }
+  if (millis < 0) wk *= (-1);
   var d = (wk / 86400000) | 0;
   var hh = 0;
   if (wk >= 3600000) {
@@ -584,7 +578,7 @@ util.Time.prototype = {
 };
 
 /**
- * Millis to a string. (171959000 -> '1d 23h 45m 59s')
+ * Millis to a string (171959000 -> '1d 23h 45m 59s')
  *
  * mode:
  *   0: auto
@@ -752,9 +746,7 @@ util.TimeCounter.prototype = {
     var now = new Date().getTime();
     var v = now - ctx.t0;
     var el = util.getElement(ctx.el);
-    if (el) {
-      el.innerHTML = util.ms2str(v, ctx.mode, ctx.signed);
-    }
+    if (el) el.innerHTML = util.ms2str(v, ctx.mode, ctx.signed);
     if (ctx.cb) ctx.cb(v);
     return v;
   },
@@ -869,16 +861,11 @@ util.ClockTime.prototype = {
   toString: function(fmt) {
     if (!fmt) fmt = '%H:%m:%S.%s';
     var byTheDay = fmt.match(/%d/) != null;
-
     var hr = this.toHrStr(byTheDay);
     var mi = this.toMinStr(byTheDay);
     var ss = this.toSecStr(byTheDay);
     var ms = this.toMilliSecStr(byTheDay);
-
-    if (this.millis < 0) {
-      hr = '-' + hr;
-    }
-
+    if ((this.millis < 0) && !byTheDay) hr = '-' + hr;
     var r = fmt;
     r = r.replace(/%H/, hr);
     r = r.replace(/%m/, mi);
@@ -897,7 +884,7 @@ util.ClockTime.prototype = {
     } else {
       days = '+';
     }
-    days += this.days + ' ' + util.plural('Day', this.days);
+    days += this.days + ' ' + util.plural('Day', this.days, true);
     return days;
   },
   toHrStr: function(byTheDay) {
@@ -1065,10 +1052,7 @@ util.clock2ms = function(str) {
 util.calcNextTime = function(times) {
   var now = util.getDateTime();
   times.sort();
-  var ret = {
-    time: null,
-    datetime: null
-  };
+  var ret = {time: null, datetime: null};
   for (var i = 0; i < times.length; i++) {
     var t = times[i];
     t = t.replace(/T/, '').replace(/:/g, '');
@@ -1106,9 +1090,7 @@ util.ceil = function(number, scale) {
 
 util._shift = function(number, scale, reverseShift) {
   if (scale == undefined) scale = 0;
-  if (reverseShift) {
-    scale = -scale;
-  }
+  if (reverseShift) scale = -scale;
   var numArray = ('' + number).split('e');
   return +(numArray[0] + 'e' + (numArray[1] ? (+numArray[1] + scale) : scale));
 };
@@ -1144,6 +1126,14 @@ util.decimalPadding = function(v, scale) {
   return r;
 };
 
+/**
+ * true:
+ *  '1'
+ *  '1.0'
+ * false:
+ *  '1.2'
+ *  'a'
+ */
 util.isInteger = function(v, strict) {
   if (strict && (typeof v != 'number')) return false;
   v += '';
@@ -1473,16 +1463,13 @@ util.formatNumber = function(v) {
   var d = v.replace(/.*?(\d+).*/, '$1');
   var f = util.separateDigits(d);
   var re = new RegExp(d);
-  var r = v.replace(re, f);
-  return r;
+  return v.replace(re, f);
 };
 util.separateDigits = function(v) {
   var len = v.length;
   var r = '';
   for (var i = 0; i < len; i++) {
-    if ((i != 0) && ((len - i) % 3 == 0)) {
-      r += ',';
-    }
+    if ((i != 0) && ((len - i) % 3 == 0)) r += ',';
     r += v.charAt(i);
   }
   return r;
@@ -1600,20 +1587,18 @@ util.xlsCol = function(c) {
   return f(c);
 };
 util.xlsColA2N = function(c) {
-  var t = util.A2Z;
-  return util.strpIndex(t, c.trim().toUpperCase());
+  return util.strpIndex(util.A2Z, c.trim().toUpperCase());
 };
 util.xlsColN2A = function(n) {
-  var t = util.A2Z;
-  var a = util.strp(t, n);
+  var a = util.strp(util.A2Z, n);
   if (n <= 0) a = '';
   return a;
 };
 
 /**
  * String permutation.
- * strp('ABC', 1)  -> 'A'
- * strp('ABC', 2)  -> 'B'
+ * strp('ABC', 1) -> 'A'
+ * strp('ABC', 2) -> 'B'
  * strp('ABC', 4) -> 'AA'
  */
 util.strp = function(tbl, idx) {
@@ -1743,9 +1728,7 @@ util.arr.countByValue = function(arr) {
  */
 util.arr.del = function(arr, v) {
   for (var i = 0; i < arr.length; i++) {
-    if (arr[i] == v) {
-      arr.splice(i--, 1);
-    }
+    if (arr[i] == v) arr.splice(i--, 1);
   }
 };
 
@@ -1799,13 +1782,9 @@ util.arr.toUniqueValues = function(arr, srt) {
     v.push({key: k, cnt: o[k]});
   }
   if (srt == 'asc|count') {
-    v.sort(function(a, b) {
-      return a.cnt - b.cnt;
-    });
+    v.sort(function(a, b) {return a.cnt - b.cnt;});
   } else if (srt == 'desc|count') {
-    v.sort(function(a, b) {
-      return b.cnt - a.cnt;
-    });
+    v.sort(function(a, b) {return b.cnt - a.cnt;});
   }
   var r = [];
   for (var i = 0; i < v.length; i++) {
@@ -1820,12 +1799,12 @@ util.arr.toUniqueValues = function(arr, srt) {
 };
 
 //-----------------------------------------------------------------------------
-util.addListener = function(listeners, fn) {
-  if (listeners && !util.arr.hasValue(listeners, fn)) listeners.push(fn);
+util.addListItem = function(list, item) {
+  if (list && !util.arr.hasValue(list, item)) list.push(item);
 };
 
-util.removeListener = function(listeners, fn) {
-  if (listeners) util.arr.del(listeners, fn);
+util.removeListItem = function(list, item) {
+  if (list) util.arr.del(list, item);
 };
 
 //-----------------------------------------------------------------------------
@@ -1981,9 +1960,7 @@ util.http.buildQueryString = function(p) {
   var s = '';
   var cnt = 0;
   for (var k in p) {
-    if (cnt > 0) {
-      s += '&';
-    }
+    if (cnt > 0) s += '&';
     s += k + '=' + encodeURIComponent(p[k]);
     cnt++;
   }
@@ -2009,7 +1986,7 @@ util.http.isJSONable = function(xhr, req) {
  *   error: (xhr, res, req)
  */
 util.http.addListener = function(type, fn) {
-  util.addListener(util.http.listeners[type], fn);
+  util.addListItem(util.http.listeners[type], fn);
 };
 util.http.onStart = function() {
   util.http.callListeners('start');
@@ -2221,14 +2198,10 @@ util.hasParent = function(el, parent) {
     if (parent.toString() == '[object NodeList]') {
       for (var i = 0; i < parent.length; i++) {
         var p = parent[i];
-        if (el == p) {
-          return true;
-        }
+        if (el == p) return true;
       }
     } else {
-      if (el == parent) {
-        return true;
-      }
+      if (el == parent) return true;
     }
     el = el.parentNode;
   } while (el);
@@ -2278,20 +2251,13 @@ util.center = function(el) {
   var h = rect.height;
   var x = cliW / 2 - w / 2;
   var y = cliH / 2 - h / 2;
-  if (x < 0) {
-    x = 0;
-  }
-  if (y < 0) {
-    y = 0;
-  }
+  if (x < 0) x = 0;
+  if (y < 0) y = 0;
   util.setPosition(el, x, y);
 };
 
 util.setPosition = function(el, x, y) {
-  var style = {
-    left: x + 'px',
-    top: y + 'px'
-  };
+  var style = {left: x + 'px', top: y + 'px'};
   util.setStyles(el, style);
 };
 
@@ -2629,9 +2595,7 @@ util.textarea.addListener = function(target, f) {
  */
 util.writeHTML = function(target, html, speed) {
   var el = target;
-  if (typeof target == 'string') {
-    el = document.querySelector(target);
-  }
+  if (typeof target == 'string') el = document.querySelector(target);
   if (!el) return;
   if (speed == 0) {
     el.innerHTML = html;
@@ -2648,9 +2612,7 @@ util.writeHTML = function(target, html, speed) {
 util._writeHTML = function(target, cbData) {
   var DFLT_SPEED = 250;
   var speed = cbData.speed;
-  if ((speed == undefined) || (speed < 0)) {
-    speed = DFLT_SPEED;
-  }
+  if ((speed == undefined) || (speed < 0)) speed = DFLT_SPEED;
   target.innerHTML = cbData.html;
   setTimeout(util.__writeHTML, 10, target, speed);
 };
@@ -2663,9 +2625,7 @@ util.__writeHTML = function(target, speed) {
  */
 util.clearHTML = function(target, speed) {
   var DFLT_SPEED = 200;
-  if ((speed == undefined) || (speed < 0)) {
-    speed = DFLT_SPEED;
-  }
+  if ((speed == undefined) || (speed < 0)) speed = DFLT_SPEED;
   util.fadeOut(target, speed, util._clearHTML);
 };
 util._clearHTML = function(el) {
@@ -2986,7 +2946,6 @@ util.setupStyle = function() {
   util.infotip.registerStyle();
   util.registerFadeStyle();
   util.loader.registerStyle();
-
   var head = document.head || document.getElementsByTagName('head').item(0);
   var style = document.createElement('style');
   var firstStyle = document.getElementsByTagName('style').item(0);
@@ -3027,10 +2986,7 @@ util.infotip.FADE_SPEED = 250;
 util.infotip.obj = {
   type: 'infotip',
   st: util.infotip.ST_HIDE,
-  el: {
-    body: null,
-    pre: null
-  },
+  el: {body: null, pre: null},
   duration: 0,
   timerId: 0
 };
@@ -3045,22 +3001,13 @@ util.infotip.opt = null;
  * show("message", 0, {style: {'font-size': '18px'}});
  */
 util.infotip.show = function(msg, duration, opt) {
-  var x;
-  var y;
-  var style;
-  var offset;
-
+  var x, y, style, offset;
   if (opt) {
     if (opt.pos) {
       if (opt.pos == 'pointer') {
         x = util.mouseX;
         y = util.mouseY;
-        if (!opt.offset) {
-          opt.offset = {
-            x: 5,
-            y: -8
-          };
-        }
+        if (!opt.offset) opt.offset = {x: 5, y: -8};
         offset = opt.offset;
       } else if (opt.pos == 'active') {
         var el = document.activeElement;
@@ -3070,13 +3017,9 @@ util.infotip.show = function(msg, duration, opt) {
       } else if (opt.pos.x != undefined) {
         x = opt.pos.x;
       }
-      if (opt.pos.y != undefined) {
-        y = opt.pos.y;
-      }
+      if (opt.pos.y != undefined) y = opt.pos.y;
     }
-    if (opt.style) {
-      style = opt.style;
-    }
+    if (opt.style) style = opt.style;
   }
 
   var obj = util.infotip.obj;
@@ -3130,9 +3073,7 @@ util.infotip.onFadeInCompleted = function(el, obj) {
 
 util.infotip.setHideTimer = function(obj) {
   if (obj.duration > 0) {
-    if (obj.timerId) {
-      clearTimeout(obj.timerId);
-    }
+    if (obj.timerId) clearTimeout(obj.timerId);
     obj.timerId = setTimeout(util.infotip._hide, obj.duration, obj);
   }
 };
@@ -3151,13 +3092,9 @@ util.infotip._move = function(obj, x, y, offset) {
   if (offset) {
     x += offset.x;
     y += offset.y;
-    if (offset.y < 0) {
-      y -= rect.height;
-    }
+    if (offset.y < 0) y -= rect.height;
   }
-  if (y < 0) {
-    y = 0;
-  }
+  if (y < 0) y = 0;
   ttBody.style.left = x + 'px';
   ttBody.style.top = y + 'px';
 };
@@ -3193,14 +3130,10 @@ util.infotip.onFadeOutCompleted = function(el, obj) {
 };
 util.infotip.__hide = function(obj) {
   var div = obj.el.body;
-  if ((div != null) && (div.parentNode)) {
-    document.body.removeChild(div);
-  }
+  if ((div != null) && (div.parentNode)) document.body.removeChild(div);
   obj.el.pre = null;
   obj.el.body = null;
-  if (obj.id == 'infotip') {
-    util.infotip.opt = null;
-  }
+  if (obj.id == 'infotip') util.infotip.opt = null;
   obj.st = util.infotip.ST_HIDE;
 };
 
@@ -3209,9 +3142,7 @@ util.infotip.isVisible = function() {
 };
 
 util.infotip.adjust = function() {
-  if (util.infotip.isVisible()) {
-    util.infotip.center();
-  }
+  if (util.infotip.isVisible()) util.infotip.center();
 };
 
 util.infotip.onMouseMove = function(x, y) {
@@ -3253,40 +3184,28 @@ util.infotip.registerStyle = function() {
 // Tooltip
 //-----------------------------------------------------------------------------
 util.tooltip = {};
-util.tooltip.DELAY = 500;
-util.tooltip.offset = {
-  x: 5,
-  y: -8
-};
+util.tooltip.DELAY = 350;
+util.tooltip.offset = {x: 5, y: -8};
 util.tooltip.targetEl = null;
 util.tooltip.obj = {
   type: 'tooltip',
   st: util.infotip.ST_HIDE,
-  el: {
-    body: null,
-    pre: null
-  },
+  el: {body: null, pre: null},
   timerId: 0
 };
 util.tooltip.disabled = false;
 util.tooltip.show = function(el, msg, x, y) {
   var obj = util.tooltip.obj;
-  if (obj.st == util.infotip.ST_FADEOUT) {
-    util.tooltip.cancel(obj);
-  }
+  if (obj.st == util.infotip.ST_FADEOUT) util.tooltip.cancel(obj);
   if ((el == util.tooltip.targetEl) && (obj.st >= util.infotip.ST_OPEN)) {
     util.infotip._move(obj, x, y, util.tooltip.offset);
   } else {
-    if (obj.st != util.infotip.ST_SHOW) {
-      obj.st = util.infotip.ST_OPEN;
-    }
+    if (obj.st != util.infotip.ST_SHOW) obj.st = util.infotip.ST_OPEN;
     util.tooltip.targetEl = el;
     if (obj.el.body) {
       util.tooltip._show(msg);
     } else {
-      if (obj.timerId) {
-        clearTimeout(obj.timerId);
-      }
+      if (obj.timerId) clearTimeout(obj.timerId);
       obj.timerId = setTimeout(util.tooltip._show, util.tooltip.DELAY, msg);
     }
   }
@@ -3301,9 +3220,7 @@ util.tooltip._show = function(msg) {
   var x = util.mouseX;
   var y = util.mouseY;
   var el = document.elementFromPoint(x, y);
-  if (!el || (el != util.tooltip.targetEl)) {
-    return;
-  }
+  if (!el || (el != util.tooltip.targetEl)) return;
   util.infotip._show(obj, msg);
   util.infotip._move(obj, x, y, util.tooltip.offset);
 };
@@ -3341,21 +3258,15 @@ util.tooltip.setDelay = function(ms) {
 // Fade in / out
 //-----------------------------------------------------------------------------
 util.registerFadeStyle = function() {
-  var style = '.fadein {';
-  style += '  opacity: 1 !important;';
-  style += '}';
-  style += '.fadeout {';
-  style += '  opacity: 0 !important;';
-  style += '}';
+  var style = '.fadein {opacity: 1 !important;}';
+  style += '.fadeout {opacity: 0 !important;}';
   util.registerStyle(style);
 };
 
 util.fadeIn = function(el, speed, cb, arg) {
   el = util.getElement(el);
   if (!el) return;
-  if ((speed == undefined) || (speed < 0)) {
-    speed = util.DFLT_FADE_SPEED;
-  }
+  if ((speed == undefined) || (speed < 0)) speed = util.DFLT_FADE_SPEED;
   if (el.fadeTimerId > 0) {
     clearTimeout(el.fadeTimerId);
     el.fadeTimerId = 0;
@@ -3373,17 +3284,13 @@ util._fadeIn = function(el, speed, cb, arg) {
 };
 util.__fadeIn = function(dat) {
   dat.el.fadeTimerId = 0;
-  if (dat.cb) {
-    dat.cb(dat.el, dat.arg);
-  }
+  if (dat.cb) dat.cb(dat.el, dat.arg);
 };
 
 util.fadeOut = function(el, speed, cb, arg) {
   el = util.getElement(el);
   if (!el) return;
-  if ((speed == undefined) || (speed < 0)) {
-    speed = util.DFLT_FADE_SPEED;
-  }
+  if ((speed == undefined) || (speed < 0)) speed = util.DFLT_FADE_SPEED;
   if (el.fadeTimerId > 0) {
     clearTimeout(el.fadeTimerId);
     el.fadeTimerId = 0;
@@ -3401,9 +3308,7 @@ util._fadeOut = function(el, speed, cb, arg) {
 };
 util.__fadeOut = function(dat) {
   dat.el.fadeTimerId = 0;
-  if (dat.cb) {
-    dat.cb(dat.el, dat.arg);
-  }
+  if (dat.cb) dat.cb(dat.el, dat.arg);
 };
 
 //-----------------------------------------------------------------------------
@@ -3417,20 +3322,18 @@ util.fadeScreenEl = null;
  * onLoad()
  *   fadeScreenIn()
  */
-util.initScreenFader = function(a) {
+util.initScreenFader = function(a, bg) {
   var el = util.fadeScreenEl;
   if (!el) el = util.getElement(a);
-  if (!el) el = util.createFadeScreenEl();
+  if (!el) el = util.createFadeScreenEl(bg);
   util.fadeScreenEl = el;
   document.body.appendChild(el);
   return el;
 };
 
-util.fadeScreenIn = function(speed, cb) {
-  if (speed == undefined) {
-    speed = util.DFLT_FADE_SPEED;
-  }
-  var el = util.initScreenFader();
+util.fadeScreenIn = function(speed, cb, bg) {
+  if (speed == undefined) speed = util.DFLT_FADE_SPEED;
+  var el = util.initScreenFader(null, bg);
   util.fadeScreenIn.cb = cb;
   util.fadeOut(el, speed, util._fadeScreenIn);
 };
@@ -3442,23 +3345,22 @@ util._fadeScreenIn = function() {
   if (cb) cb();
 };
 
-util.fadeScreenOut = function(speed, cb) {
-  if (speed == undefined) {
-    speed = util.DFLT_FADE_SPEED;
-  }
-  var el = util.initScreenFader();
+util.fadeScreenOut = function(speed, cb, bg) {
+  if (speed == undefined) speed = util.DFLT_FADE_SPEED;
+  var el = util.initScreenFader(null, bg);
   util.fadeIn(el, speed, cb);
 };
 
-util.createFadeScreenEl = function() {
+util.createFadeScreenEl = function(bg) {
   var el = document.createElement('div');
+  if (!bg) bg = '#fff';
   var style = {
     'position': 'fixed',
     'width': '100vw',
     'height': '100vh',
     'top': '0',
     'left': '0',
-    'background': '#fff',
+    'background': bg,
     'z-index': util.SCREEN_FADER_ZINDEX
   };
   util.setStyles(el, style);
@@ -3504,13 +3406,9 @@ util.loader.registerStyle = function() {
 };
 
 util.loader.show = function(delay) {
-  if (delay == undefined) {
-    delay = 500;
-  }
   util.loader.count++;
-  if (util.loader.count > 1) {
-    return;
-  }
+  if (util.loader.count > 1) return;
+  if (delay == undefined) delay = 500;
   util.loader.timerId = setTimeout(util.loader._show, delay);
 };
 util.loader._show = function() {
@@ -3563,17 +3461,11 @@ util.modal = function(child, addCloseHandler) {
   var el = document.createElement('div');
   var style = {};
   util.copyProps(util.modal.DFLT_STYLE, style);
-  if (util.modal.style) {
-    util.copyProps(util.modal.style, style);
-  }
+  if (util.modal.style) util.copyProps(util.modal.style, style);
   util.setStyles(el, style);
   el.style.opacity = '0';
-  if (addCloseHandler) {
-    el.addEventListener('click', this.onClick);
-  }
-  if (child) {
-    el.appendChild(child);
-  }
+  if (addCloseHandler) el.addEventListener('click', this.onClick);
+  if (child) el.appendChild(child);
   el.ctx = this;
   this.el = el;
 };
@@ -3611,9 +3503,7 @@ util.modal.prototype = {
 
   onClick: function(e) {
     var el = e.target;
-    if (el.ctx && (el.ctx.sig == 'modal')) {
-      el.ctx.hide();
-    }
+    if (el.ctx && (el.ctx.sig == 'modal')) el.ctx.hide();
   }
 };
 util.modal.show = function(el, closeAnywhere) {
@@ -3645,14 +3535,8 @@ util.modal.style = null;
  * opt = {
  *   title: 'Title',
  *   buttons = [
- *     {
- *       label: 'Yes',
- *       cb: function1
- *     },
- *     {
- *       label: 'No',
- *       cb: function2
- *     }
+ *     {label: 'Yes', cb: function1},
+ *     {label: 'No', cb: function2}
  *   ],
  *   style: {
  *     body: {
@@ -3688,9 +3572,7 @@ util.dialog = function(content, opt) {
 
   var closeAnywhere = false;
   if (opt) {
-    if (opt.closeAnywhere) {
-      closeAnywhere = true;
-    }
+    if (opt.closeAnywhere) closeAnywhere = true;
   }
 
   ctx.modal = util.modal.show(ctx.el, closeAnywhere);
@@ -3783,9 +3665,7 @@ util.dialog.prototype = {
           'margin-top': '1em',
           'margin-bottom': '0',
         };
-        if (i > 0) {
-          style['margin-left'] = '0.5em';
-        }
+        if (i > 0) style['margin-left'] = '0.5em';
         util.setStyles(btnEl, style);
         if (opt && opt.style && opt.style.button) {
           for (key in opt.style.button) {
@@ -3803,11 +3683,7 @@ util.dialog.prototype = {
       }
     }
     if (opt.focusEl) util.dialog.initFocusEl = opt.focusEl;
-    var ret = {
-      boby: body,
-      btnEls: btnEls
-    };
-    return ret;
+    return {boby: body, btnEls: btnEls};
   },
 
   close: function(ctx) {
@@ -3831,9 +3707,7 @@ util.dialog.focusBtn = function() {
 util.dialog.getTopDialog = function() {
   var dialog = null;
   var instances = util.dialog.instances;
-  if (instances.length > 0) {
-    dialog = instances[instances.length - 1];
-  }
+  if (instances.length > 0) dialog = instances[instances.length - 1];
   return dialog;
 };
 util.dialog.adjust = function() {
@@ -3849,11 +3723,7 @@ util.dialog.show = function() {
 // opt = {
 //   title: 'Title',
 //   buttons = [
-//     {
-//       label: 'Yes',
-//       focus: true,
-//       cb: cbYes
-//     },
+//     {label: 'Yes', focus: true, cb: cbYes},
 //     ...
 //   ],
 //   style: {
@@ -3875,11 +3745,7 @@ util.dialog.open = function(content, opt) {
     'text-align': 'center'
   };
   if (!opt) opt = {};
-  if (!opt.style) {
-    opt.style = {
-      body: DEFAULT_STYLE
-    };
-  }
+  if (!opt.style) opt.style = {body: DEFAULT_STYLE};
   var dialog = new util.dialog(content, opt);
   util.dialog.instances.push(dialog);
   return dialog;
@@ -3901,16 +3767,15 @@ util.dialog.btnHandler = function(el) {
 
 util.dialog.close = function(btnIdx) {
   var dialog = util.dialog.instances.pop();
-  if (dialog) {
-    if (btnIdx == undefined) {
-      dialog.close(dialog);
+  if (!dialog) return;
+  if (btnIdx == undefined) {
+    dialog.close(dialog);
+  } else {
+    var b = dialog.btnEls[btnIdx];
+    if (b) {
+      util.dialog.btnHandler(b);
     } else {
-      var b = dialog.btnEls[btnIdx];
-      if (b) {
-        util.dialog.btnHandler(b);
-      } else {
-        dialog.close(dialog);
-      }
+      dialog.close(dialog);
     }
   }
 };
@@ -3966,18 +3831,10 @@ util.dialog.info = function(a1, a2, a3, a4) {
       cb = null;
     }
   }
-  if (a[i]) {
-    opt = a[i];
-  }
+  if (a[i]) opt = a[i];
   var dialogOpt = {
     title: title,
-    buttons: [
-      {
-        label: 'OK',
-        focus: true,
-        cb: cb
-      }
-    ],
+    buttons: [{label: 'OK', focus: true, cb: cb}],
     style: opt.style
   };
   msg = util.null2empty(msg);
@@ -4047,9 +3904,7 @@ util.dialog.confirm = function(a1, a2, a3, a4, a5) {
   } else {
     k--;
   }
-  if (a[k]) {
-    opt = a[k];
-  }
+  if (a[k]) opt = a[k];
   var definition = {
     labelY: 'Yes',
     labelN: 'No',
@@ -4066,7 +3921,6 @@ util.dialog.confirm = function(a1, a2, a3, a4, a5) {
     }
   }
   content.innerHTML = msg;
-
   var dialog = new util.dialog.confirmDialog(title, content, definition, opt);
   dialog.cbY = cbY;
   dialog.cbN = cbN;
@@ -4076,19 +3930,11 @@ util.dialog.confirmDialog = function(title, content, definition, opt) {
   var ctx = this;
   ctx.data = opt.data;
   var buttons = [
-    {
-      label: definition.labelY,
-      cb: definition.cbY
-    },
-    {
-      label: definition.labelN,
-      cb: definition.cbN
-    }
+    {label: definition.labelY, cb: definition.cbY},
+    {label: definition.labelN, cb: definition.cbN}
   ];
   var focusIdx = 0;
-  if (opt.focus == 'no') {
-    focusIdx = 1;
-  }
+  if (opt.focus == 'no') focusIdx = 1;
   buttons[focusIdx].focus = true;
   var dialogOpt = {
     title: title,
@@ -4164,15 +4010,9 @@ util.dialog.text = function(a1, a2, a3, a4, a5) {
   } else {
     k--;
   }
-  if (a[k]) {
-    opt = a[k];
-  }
+  if (a[k]) opt = a[k];
   var txtBox = document.createElement('input');
-  if (opt.secure) {
-    txtBox.type = 'password';
-  } else {
-    txtBox.type = 'text';
-  }
+  txtBox.type = (opt.secure ? 'password' : 'text');
   txtBox.className = 'dialog-textbox';
   if (opt && opt.style && opt.style.textbox) {
     for (var key in opt.style.textbox) {
@@ -4392,9 +4232,7 @@ util.Meter = function(target, opt) {
       'vertical-align': 'middle'
     };
     util.setStyles(lblEl, s);
-    if (label.style) {
-      util.setStyles(lblEl, label.style);
-    }
+    if (label.style) util.setStyles(lblEl, label.style);
     lblEl.innerHTML = label.text;
     base.appendChild(lblEl);
   }
@@ -4428,12 +4266,8 @@ util.Meter.prototype = {
     return this.value;
   },
   setValue: function(v, txt) {
-    if (v != null) {
-      this._setValue(v);
-    }
-    if (txt != undefined) {
-      this.setText(txt);
-    }
+    if (v != null) this._setValue(v);
+    if (txt != undefined) this.setText(txt);
     this.redraw();
   },
   _setValue: function(v) {
@@ -4715,14 +4549,14 @@ util.Led.prototype = {
 //-----------------------------------------------------------------------------
 // Form
 //-----------------------------------------------------------------------------
-util.submit = function(url, method, params, enc) {
+util.submit = function(url, method, params, uriEnc) {
   var form = document.createElement('form');
   form.action = url;
   form.method = method;
   for (var key in params) {
     var input = document.createElement('input');
     var val = params[key];
-    if (enc) val = encodeURIComponent(val);
+    if (uriEnc) val = encodeURIComponent(val);
     input.type = 'hidden';
     input.name = key;
     input.value = val;
@@ -4732,8 +4566,8 @@ util.submit = function(url, method, params, enc) {
   form.submit();
 };
 
-util.postSubmit = function(url, params, enc) {
-  util.submit(url, 'POST', params, enc);
+util.postSubmit = function(url, params, uriEnc) {
+  util.submit(url, 'POST', params, uriEnc);
 };
 
 //-----------------------------------------------------------------------------
@@ -5101,9 +4935,7 @@ util.RingBuffer.prototype = {
     ctx.buffer[i] = data;
   },
   get: function(idx) {
-    if (this.len < this.cnt) {
-      idx += this.cnt;
-    }
+    if (this.len < this.cnt) idx += this.cnt;
     idx %= this.len;
     return this.buffer[idx];
   },
@@ -5111,13 +4943,9 @@ util.RingBuffer.prototype = {
     var buf = [];
     var len = this.len;
     var pos = 0;
-    if (this.cnt > len) {
-      pos = (this.cnt % len);
-    }
+    if (this.cnt > len) pos = (this.cnt % len);
     for (var i = 0; i < len; i++) {
-      if (pos >= len) {
-        pos = 0;
-      }
+      if (pos >= len) pos = 0;
       if (this.buffer[pos] == undefined) {
         break;
       } else {
@@ -5565,9 +5393,7 @@ util.IntervalProc.ids = function() {
 //
 // util.event.addListener('EVENT_NAME', NAMESPACE.cb);
 //
-// var data = {
-//   msg: 'abc'
-// };
+// var data = {msg: 'abc'};
 // util.event.send('EVENT_NAME', data);
 //-----------------------------------------------------------------------------
 util.event = {};
@@ -5575,45 +5401,28 @@ util.event.listeners = {};
 util.event.events = [];
 
 util.event.addListener = function(name, fn) {
-  if (!util.event.listeners[name]) {
-    util.event.listeners[name] = [];
-  }
-  util.addListener(util.event.listeners[name], fn);
+  if (!util.event.listeners[name]) util.event.listeners[name] = [];
+  util.addListItem(util.event.listeners[name], fn);
 };
 
 util.event.removeListener = function(name, fn) {
-  util.removeListener(util.event.listeners[name], fn);
+  util.removeListItem(util.event.listeners[name], fn);
 };
 
 util.event.send = function(name, data) {
-  var e = {
-    name: name,
-    data: data
-  };
+  var e = {name: name, data: data};
   util.event.events.push(e);
   setTimeout(util.event._send, 0);
 };
 
 util.event._send = function() {
   var ev = util.event.events.shift();
-  if (!ev) {
-    return;
-  }
-
-  var e = {
-    name: ev.name,
-    data: ev.data
-  };
-
+  if (!ev) return;
+  var e = {name: ev.name, data: ev.data};
   var listeners = util.event.listeners[ev.name];
-  if (listeners) {
-    util.event.callListeners(listeners, e);
-  }
-
+  if (listeners) util.event.callListeners(listeners, e);
   listeners = util.event.listeners['*'];
-  if (listeners) {
-    util.event.callListeners(listeners, e);
-  }
+  if (listeners) util.event.callListeners(listeners, e);
 };
 
 util.event.callListeners = function(listeners, e) {
@@ -5638,9 +5447,7 @@ util.geo.cbOK = null;
 util.geo.cbERR = null;
 
 util.geo.getPosition = function(cbOK, cbERR, opt) {
-  if (!opt) {
-    opt = util.geo.DFLT_OPT;
-  }
+  if (!opt) opt = util.geo.DFLT_OPT;
   util.geo.cbOK = cbOK;
   util.geo.cbERR = cbERR;
   navigator.geolocation.getCurrentPosition(util.geo.onGetPosOK, util.geo.onGetPosERR, opt);
@@ -5667,22 +5474,16 @@ util.geo.onGetPosOK = function(pos) {
     'speed_kmh': kmh
   };
 
-  if (util.geo.cbOK) {
-    util.geo.cbOK(data);
-  }
+  if (util.geo.cbOK) util.geo.cbOK(data);
 };
 
 util.geo.onGetPosERR = function(err) {
-  if (util.geo.cbERR) {
-    util.geo.cbERR(err);
-  }
+  if (util.geo.cbERR) util.geo.cbERR(err);
 };
 
 util.geo.startWatchPosition = function(cbOK, cbERR, opt) {
   if (util.geo.watchId != null) return;
-  if (!opt) {
-    opt = util.geo.DFLT_OPT;
-  }
+  if (!opt) opt = util.geo.DFLT_OPT;
   util.geo.cbOK = cbOK;
   util.geo.cbERR = cbERR;
   util.geo.watchId = navigator.geolocation.watchPosition(util.geo.onGetPosOK, util.geo.onGetPosERR, opt);
@@ -5698,20 +5499,13 @@ util.geo.stopWatchPosition = function() {
 };
 
 // '35.681237, 139.766985'
-// ->
-// {
-//   'latitude': 35.681237,
-//   'longitude': 139.766985
-// }
+// -> {'latitude': 35.681237, 'longitude': 139.766985}
 util.parseCoordinate = function(location) {
   location = location.replace(/ /g, '');
   var loc = location.split(',');
   var lat = parseFloat(loc[0]);
   var lon = parseFloat(loc[1]);
-  var coordinate = {
-    'latitude': lat,
-    'longitude': lon
-  };
+  var coordinate = {'latitude': lat, 'longitude': lon};
   return coordinate;
 };
 
@@ -5748,22 +5542,13 @@ util.isForwardMovement = function(azimuth, heading, range) {
   heading = util.roundAngle(heading);
   range = util.roundAngle(range);
   var rangeL = heading - (range / 2);
-  if (rangeL < 0) {
-    rangeL += 360;
-  }
+  if (rangeL < 0) rangeL += 360;
   var rangeR = heading + (range / 2);
-  if (rangeR >= 360) {
-    rangeR -= 360;
-  }
-
+  if (rangeR >= 360) rangeR -= 360;
   if (rangeR < rangeL) {
-    if ((azimuth >= rangeL) || (azimuth <= rangeR)) {
-      return true;
-    }
+    if ((azimuth >= rangeL) || (azimuth <= rangeR)) return true;
   } else {
-    if ((azimuth >= rangeL) && (azimuth <= rangeR)) {
-      return true;
-    }
+    if ((azimuth >= rangeL) && (azimuth <= rangeR)) return true;
   }
   return false;
 };
@@ -5779,26 +5564,16 @@ util.onMouseMove = function(e) {
 };
 
 //-----------------------------------------------------------------------------
-util.keyHandlers = {
-  down: [],
-  press: [],
-  up: []
-};
+util.keyHandlers = {down: [], press: [], up: []};
 
-// combination = {
-//   ctrl: true
-// }
-// 'down', 83, fn, combination
-// fn(e)
+/**
+ * fn = function(e) {};
+ * combination = {ctrl: true, shift: false, alt: false, meta: false};
+ * addKeyHandler('down', 83, fn, combination);
+ */
 util.addKeyHandler = function(type, keyCode, fn, combination) {
-  if ((type != 'down') && (type != 'press') && (type != 'up')) {
-    return;
-  }
-  var handler = {
-    keyCode: keyCode,
-    combination: combination,
-    fn: fn
-  };
+  if ((type != 'down') && (type != 'press') && (type != 'up')) return;
+  var handler = {keyCode: keyCode, combination: combination, fn: fn};
   util.keyHandlers[type].push(handler);
 };
 
@@ -5897,9 +5672,7 @@ util.dnd.onDrop = function(e) {
   var handler = null;
   for (var i = 0; i < handlers.length; i++) {
     handler = handlers[i];
-    if (util.isTargetEl(handler.el, e.target)) {
-      break;
-    }
+    if (util.isTargetEl(handler.el, e.target)) break;
   }
   if (i == handlers) return;
   var cb = handler.cb;
@@ -5913,13 +5686,12 @@ util.dnd.onDrop = function(e) {
 
 util.dnd.handleDroppedFile = function(e, handler) {
   try {
-    if (e.dataTransfer.files) {
-      if (e.dataTransfer.files.length > 0) {
-        var f = e.dataTransfer.files[0];
-        if (f) util.loadFile(f, handler);
-      } else {
-        if (handler.cb) handler.cb('');
-      }
+    if (!e.dataTransfer.files) return;
+    if (e.dataTransfer.files.length > 0) {
+      var f = e.dataTransfer.files[0];
+      if (f) util.loadFile(f, handler);
+    } else {
+      if (handler.cb) handler.cb('');
     }
   } catch (e) {}
 };
@@ -5932,11 +5704,7 @@ util.loadFile = function(file, handler) {
   fr.onprogress = util.onFileLoadProg;
   fr.onabort = util.onFileLoadAbort;
   fr.onerror = util.onFileLoadError;
-  util.fileLoader = {
-    file: file,
-    reader: fr,
-    handler: handler
-  };
+  util.fileLoader = {file: file, reader: fr, handler: handler};
   var mode = handler.mode;
   if ((mode == 'bin') || (mode == 'blob')) {
     fr.readAsArrayBuffer(file);
@@ -6158,9 +5926,7 @@ util.nop = function() {};
 util.init = function() {
   util.setupLogs();
   try {
-    if (typeof window.localStorage != 'undefined') {
-      util.LS_AVAILABLE = true;
-    }
+    if (typeof window.localStorage != 'undefined') util.LS_AVAILABLE = true;
   } catch (e) {}
   window.addEventListener('DOMContentLoaded', util.onReady, true);
   window.addEventListener('mousemove', util.onMouseMove, true);
