@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202102080025';
+util.v = '202102080220';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -3034,7 +3034,6 @@ util.infotip.show = function(msg, duration, opt) {
   }
   util.infotip.opt = opt;
 };
-
 util.infotip._show = function(obj, msg, style) {
   if (!obj.el.body) {
     var div = document.createElement('div');
@@ -3213,14 +3212,17 @@ util.tooltip.show = function(el, msg, x, y) {
 util.tooltip._show = function(msg) {
   var obj = util.tooltip.obj;
   var st = obj.st;
-  if ((st == util.infotip.ST_FADEOUT) || (st == util.infotip.ST_HIDE)) {
-    util.tooltip.cancel(obj);
-    return;
+  if (st == util.infotip.ST_FADEOUT) {
+    clearTimeout(obj.timerId);
+    obj.timerId = 0;
   }
   var x = util.mouseX;
   var y = util.mouseY;
   var el = document.elementFromPoint(x, y);
-  if (!el || (el != util.tooltip.targetEl)) return;
+  if (!el || (el != util.tooltip.targetEl)) {
+    util.tooltip.cancel(obj);
+    return;
+  }
   util.infotip._show(obj, msg);
   util.infotip._move(obj, x, y, util.tooltip.offset);
 };
@@ -3242,9 +3244,9 @@ util.tooltip.cancel = function(obj) {
 util.tooltip.onMouseMove = function(x, y) {
   if (util.tooltip.disabled) return;
   var el = document.elementFromPoint(x, y);
-  var tooltip = ((el && el.dataset) ? el.dataset.tooltip : null);
-  if (tooltip) {
-    util.tooltip.show(el, tooltip, x, y);
+  var tpData = ((el && el.dataset) ? el.dataset.tooltip : null);
+  if (tpData) {
+    util.tooltip.show(el, tpData, x, y);
   } else if (util.tooltip.obj.el.body) {
     util.tooltip.hide();
   }
