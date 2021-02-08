@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202102080220';
+util.v = '202102090000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -3094,6 +3094,9 @@ util.infotip._move = function(obj, x, y, offset) {
     if (offset.y < 0) y -= rect.height;
   }
   if (y < 0) y = 0;
+  var cliW = util.getClientWidth();
+  if (x + rect.width > cliW) x = cliW - rect.width;
+  if (x < 0) x = 0;
   ttBody.style.left = x + 'px';
   ttBody.style.top = y + 'px';
 };
@@ -3101,7 +3104,6 @@ util.infotip._move = function(obj, x, y, offset) {
 util.infotip.center = function() {
   util.infotip._center(util.infotip.obj);
 };
-
 util.infotip._center = function(obj) {
   var infotip = obj.el.body;
   util.center(infotip);
