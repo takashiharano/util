@@ -23,13 +23,61 @@ public class FileUtil {
   public static String LINE_SEPARATOR = "\n";
 
   /**
-   * Sets line separator.
+   * Append a line to text file.
    *
-   * @param sep
-   *          line separator
+   * @param path
+   *          file path
+   * @param newLine
+   *          new line
+   * @throws IOException
    */
-  public static void setLineSeparator(String sep) {
-    LINE_SEPARATOR = sep;
+  public static void appendLine(String path, String newLine) throws IOException {
+    appendLine(path, newLine, 0);
+  }
+
+  /**
+   * Append a line to text file.
+   *
+   * @param path
+   *          file path
+   * @param newLine
+   *          new line
+   * @param maxLines
+   *          number of lines to limit
+   * @throws IOException
+   */
+  public static void appendLine(String path, String newLine, int maxLines) throws IOException {
+    String[] lines = readTextAsArray(path);
+    int start = 0;
+    if ((maxLines > 0) && (lines.length >= maxLines)) {
+      start = lines.length - (maxLines - 1);
+    }
+
+    StringBuilder newContent = new StringBuilder();
+    for (int i = start; i < lines.length; i++) {
+      newContent.append(lines[i] + LINE_SEPARATOR);
+    }
+
+    newContent.append(newLine + LINE_SEPARATOR);
+    write(path, newContent.toString());
+  }
+
+  /**
+   * Check if the given bytes corresponding to the given charset.
+   *
+   * @param src
+   *          string byte array
+   * @param charsetName
+   *          charset name
+   * @return true if the byte array matches the charset
+   */
+  public static boolean checkCharset(byte[] src, String charsetName) {
+    try {
+      byte[] tmp = new String(src, charsetName).getBytes(charsetName);
+      return Arrays.equals(tmp, src);
+    } catch (UnsupportedEncodingException e) {
+      return false;
+    }
   }
 
   /**
@@ -88,281 +136,116 @@ public class FileUtil {
   }
 
   /**
-   * Read a binary file.
+   * Deletes the file or directory denoted by this abstract pathname. If this
+   * pathname denotes a directory, then the directory must be empty in order to be
+   * deleted.
    *
    * @param path
-   * @return byte array of the file content. If the file does not exist, this
-   *         method returns null.
+   *          the path of file or directory
+   * @return true if and only if the file or directory is successfully deleted;
+   *         false otherwise
    */
-  public static byte[] readFile(String path) {
+  public static boolean delete(String path) {
     File file = new File(path);
-    return readFile(file);
+    boolean deleted = file.delete();
+    return deleted;
   }
 
   /**
-   * Read a binary file.
-   *
-   * @param file
-   * @return byte array of the file content. If the file does not exist, this
-   *         method returns null.
-   */
-  public static byte[] readFile(File file) {
-    if (!file.exists()) {
-      return null;
-    }
-    byte[] content = new byte[(int) file.length()];
-    try (FileInputStream fis = new FileInputStream(file)) {
-      @SuppressWarnings("unused")
-      int readSize = fis.read(content, 0, content.length);
-    } catch (IOException ioe) {
-      content = new byte[0];
-    }
-    return content;
-  }
-
-  /**
-   * Read a text file.
+   * Tests whether the file or directory denoted by this abstract path name
+   * exists.
    *
    * @param path
-   * @return text content. If the file does not exist, this method returns null.
+   *          the path of file or directory
+   * @return true if and only if the file or directory denoted by this abstract
+   *         pathname exists; false otherwise
    */
-  public static String readTextFile(String path) {
-    return readTextFile(path, DEFAULT_CHARSET);
-  }
-
-  /**
-   * Read a text file.
-   *
-   * @param file
-   * @return text content. If the file does not exist, this method returns null.
-   */
-  public static String readTextFile(File file) {
-    return readTextFile(file, DEFAULT_CHARSET);
-  }
-
-  /**
-   * Read a text file.
-   *
-   * @param path
-   *          file path to read
-   * @param charsetName
-   *          charset name. set null to auto detection
-   * @return text content. If the file does not exist, this method returns null.
-   */
-  public static String readTextFile(String path, String charsetName) {
+  public static boolean exists(String path) {
     File file = new File(path);
-    return readTextFile(file, charsetName);
+    return file.exists();
   }
 
   /**
-   * Read a text file.
+   * Returns the name of the file or directory denoted by the given pathname.<br>
+   * <br>
+   * e.g., "C:/test/abc.txt" -> "abc.txt"
    *
-   * @param file
-   *          file object to read
-   * @param charsetName
-   *          charset name. set null to auto detection
-   * @return text content. If the file does not exist, this method returns null.
+   * @param path
+   * @return file name
    */
-  public static String readTextFile(File file, String charsetName) {
-    byte[] content = readFile(file);
-    if (content == null) {
-      return null;
+  public static String getFileName(String path) {
+    File file = new File(path);
+    String name = file.getName();
+    return name;
+  }
+
+  /**
+   * Returns the name of extension.<br>
+   * <br>
+   * e.g., "C:/test/abc.txt" -> "txt"
+   *
+   * @param path
+   *          file path (absolute or related)
+   * @return file extension
+   */
+  public static String getExtension(String path) {
+    String extension = "";
+    int i = path.lastIndexOf('.');
+    if (i > 0) {
+      extension = path.substring(i + 1);
     }
-    if (charsetName == null) {
-      charsetName = getCharsetName(content);
-      if (charsetName == null) {
-        charsetName = DEFAULT_CHARSET;
+    return extension;
+  }
+
+  /**
+   * Returns the current path.
+   *
+   * @return
+   */
+  public static String getCurrentPath() {
+    String path = new File(".").getAbsoluteFile().getParent();
+    return path;
+  }
+
+  /**
+   * Returns the length of the file denoted by this abstract pathname.
+   *
+   * @param path
+   *          file path
+   * @return The length, in bytes, of the file denoted by this abstract pathname,
+   *         or 0L if the file does not exist.
+   */
+  public static long getFileLen(String path) {
+    File file = new File(path);
+    return file.length();
+  }
+
+  /**
+   * Detects charset and returns its name.
+   *
+   * @param src
+   *          string byte array
+   * @return charset name
+   */
+  public static String getCharsetName(byte[] src) {
+    if (src.length >= 3) {
+      if ((src[0] == (byte) 0xFE) && (src[1] == (byte) 0xFF)) {
+        // big-endian
+        return "UTF-16BE";
+      } else if ((src[0] == (byte) 0xFF) && (src[1] == (byte) 0xFE)) {
+        // little-endian
+        return "UTF-16LE";
       }
     }
-    String text;
-    try {
-      text = new String(content, charsetName);
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
+
+    String[] CHARSET_NAMES = { "UTF-16", "UTF-8", "EUC_JP", "SJIS" };
+    for (int i = 0; i < CHARSET_NAMES.length; i++) {
+      String charsetName = CHARSET_NAMES[i];
+      if (checkCharset(src, charsetName)) {
+        return charsetName;
+      }
     }
-    return text;
-  }
-
-  /**
-   * Read a text file as an array.
-   *
-   * @param path
-   * @return text content
-   */
-  public static String[] readTextFileAsArray(String path) {
-    return readTextFileAsArray(path, DEFAULT_CHARSET);
-  }
-
-  /**
-   * Read a text file as an array.
-   *
-   * @param path
-   * @param charsetName
-   * @return text content
-   */
-  public static String[] readTextFileAsArray(String path, String charsetName) {
-    if (charsetName == null) {
-      charsetName = DEFAULT_CHARSET;
-    }
-    Path filePath = Paths.get(path);
-    List<String> lines;
-    try {
-      lines = Files.readAllLines(filePath, Charset.forName(charsetName));
-    } catch (IOException e) {
-      return null;
-    }
-    String[] text = new String[lines.size()];
-    lines.toArray(text);
-    return text;
-  }
-
-  /**
-   * Read a file as Base64 encoded string.
-   *
-   * @param path
-   * @return file content in Base64 encoded string. If the file does not exist,
-   *         this method returns null.
-   */
-  public static String readFileAsBase64(String path) {
-    File file = new File(path);
-    return readFileAsBase64(file);
-  }
-
-  /**
-   * Read a file as Base64 encoded string.
-   *
-   * @param file
-   * @return file content in Base64 encoded string. If the file does not exist,
-   *         this method returns null.
-   */
-  public static String readFileAsBase64(File file) {
-    String encoded = null;
-    byte[] bytes = readFile(file);
-    if ((bytes != null) && (bytes.length != 0)) {
-      encoded = Base64.getEncoder().encodeToString(bytes);
-    }
-    return encoded;
-  }
-
-  /**
-   * Write a content using a byte array into a file.
-   *
-   * @param path
-   * @param content
-   * @throws IOException
-   */
-  public static void writeFile(String path, byte[] content) throws IOException {
-    File file = new File(path);
-    writeFile(file, content);
-  }
-
-  /**
-   * Write a content using a byte array into a file.
-   *
-   * @param file
-   * @param content
-   * @throws IOException
-   */
-  public static void writeFile(File file, byte[] content) throws IOException {
-    mkParentDir(file);
-    try (FileOutputStream fos = new FileOutputStream(file); BufferedOutputStream bos = new BufferedOutputStream(fos)) {
-      bos.write(content, 0, content.length);
-      bos.flush();
-    } catch (IOException e) {
-      throw e;
-    }
-  }
-
-  /**
-   * Write a text into a file.
-   *
-   * @param path
-   * @param content
-   * @throws IOException
-   */
-  public static void writeFile(String path, String content) throws IOException {
-    File file = new File(path);
-    writeFile(file, content);
-  }
-
-  /**
-   * Write a text into a file.
-   *
-   * @param file
-   * @param content
-   * @throws IOException
-   */
-  public static void writeFile(File file, String content) throws IOException {
-    mkParentDir(file);
-    try (FileWriter fw = new FileWriter(file); BufferedWriter bw = new BufferedWriter(fw);) {
-      bw.write(content);
-    } catch (IOException e) {
-      throw e;
-    }
-  }
-
-  /**
-   * Decodes a Base64 encoded String and writes it to a file.
-   *
-   * @param path
-   * @param base64
-   * @throws IOException
-   */
-  public static void writeFileFromBase64(String path, String base64) throws IOException {
-    File file = new File(path);
-    writeFileFromBase64(file, base64);
-  }
-
-  /**
-   * Decodes a Base64 encoded String and writes it to a file.
-   *
-   * @param file
-   * @param base64
-   * @throws IOException
-   */
-  public static void writeFileFromBase64(File file, String base64) throws IOException {
-    byte[] content = Base64.getDecoder().decode(base64);
-    writeFile(file, content);
-  }
-
-  /**
-   * Append a line to text file.
-   *
-   * @param path
-   *          file path
-   * @param newLine
-   *          new line
-   * @throws IOException
-   */
-  public static void appendLine(String path, String newLine) throws IOException {
-    appendLine(path, newLine, 0);
-  }
-
-  /**
-   * Append a line to text file.
-   *
-   * @param path
-   *          file path
-   * @param newLine
-   *          new line
-   * @param maxLines
-   *          number of lines to limit
-   * @throws IOException
-   */
-  public static void appendLine(String path, String newLine, int maxLines) throws IOException {
-    String[] lines = readTextFileAsArray(path);
-    int start = 0;
-    if ((maxLines > 0) && (lines.length >= maxLines)) {
-      start = lines.length - (maxLines - 1);
-    }
-
-    StringBuilder newContent = new StringBuilder();
-    for (int i = start; i < lines.length; i++) {
-      newContent.append(lines[i] + LINE_SEPARATOR);
-    }
-
-    newContent.append(newLine + LINE_SEPARATOR);
-    writeFile(path, newContent.toString());
+    return null;
   }
 
   /**
@@ -392,81 +275,6 @@ public class FileUtil {
   public static String getParentPath(File file) {
     String parent = file.getParent();
     return parent;
-  }
-
-  /**
-   * Tests whether the file or directory denoted by this abstract path name
-   * exists.
-   *
-   * @param path
-   *          the path of file or directory
-   * @return true if and only if the file or directory denoted by this abstract
-   *         pathname exists; false otherwise
-   */
-  public static boolean exists(String path) {
-    File file = new File(path);
-    return file.exists();
-  }
-
-  /**
-   * Deletes the file or directory denoted by this abstract pathname. If this
-   * pathname denotes a directory, then the directory must be empty in order to be
-   * deleted.
-   *
-   * @param path
-   *          the path of file or directory
-   * @return true if and only if the file or directory is successfully deleted;
-   *         false otherwise
-   */
-  public static boolean delete(String path) {
-    File file = new File(path);
-    boolean deleted = file.delete();
-    return deleted;
-  }
-
-  /**
-   * Creates the directory named by this abstract pathname, including any
-   * necessary but nonexistent parent directories. Note that if this operation
-   * fails it may have succeeded in creating some of the necessary parent
-   * directories.
-   *
-   * @param path
-   *          the path of directory
-   * @return true if and only if the directory was created,along with all
-   *         necessary parent directories; false otherwise
-   */
-  public static boolean mkdir(String path) {
-    File file = new File(path);
-    boolean created = file.mkdirs();
-    return created;
-  }
-
-  /**
-   * Creates the parent directories.
-   *
-   * @param path
-   *          the path of directory
-   * @return true if and only if the directory was created
-   */
-  public static boolean mkParentDir(String path) {
-    File file = new File(path);
-    return mkParentDir(file);
-  }
-
-  /**
-   * Creates the parent directories.
-   *
-   * @param file
-   *          the target file
-   * @return true if and only if the directory was created
-   */
-  public static boolean mkParentDir(File file) {
-    boolean created = false;
-    String parent = getParentPath(file);
-    if (!exists(parent)) {
-      created = mkdir(parent);
-    }
-    return created;
   }
 
   /**
@@ -565,104 +373,296 @@ public class FileUtil {
   }
 
   /**
-   * Returns the name of the file or directory denoted by the given pathname.<br>
-   * <br>
-   * e.g., "C:/test/abc.txt" -> "abc.txt"
+   * Creates the directory named by this abstract pathname, including any
+   * necessary but nonexistent parent directories. Note that if this operation
+   * fails it may have succeeded in creating some of the necessary parent
+   * directories.
    *
    * @param path
-   * @return file name
+   *          the path of directory
+   * @return true if and only if the directory was created,along with all
+   *         necessary parent directories; false otherwise
    */
-  public static String getFileName(String path) {
+  public static boolean mkdir(String path) {
     File file = new File(path);
-    String name = file.getName();
-    return name;
+    boolean created = file.mkdirs();
+    return created;
   }
 
   /**
-   * Returns the name of extension.<br>
-   * <br>
-   * e.g., "C:/test/abc.txt" -> "txt"
+   * Creates the parent directories.
    *
    * @param path
-   *          file path (absolute or related)
-   * @return file extension
+   *          the path of directory
+   * @return true if and only if the directory was created
    */
-  public static String getExtension(String path) {
-    String extension = "";
-    int i = path.lastIndexOf('.');
-    if (i > 0) {
-      extension = path.substring(i + 1);
-    }
-    return extension;
-  }
-
-  /**
-   * Returns the current path.
-   *
-   * @return
-   */
-  public static String getCurrentPath() {
-    String path = new File(".").getAbsoluteFile().getParent();
-    return path;
-  }
-
-  /**
-   * Returns the length of the file denoted by this abstract pathname.
-   *
-   * @param path
-   *          file path
-   * @return The length, in bytes, of the file denoted by this abstract pathname,
-   *         or 0L if the file does not exist.
-   */
-  public static long getFileLen(String path) {
+  public static boolean mkParentDir(String path) {
     File file = new File(path);
-    return file.length();
+    return mkParentDir(file);
   }
 
   /**
-   * Detects charset and returns its name.
+   * Creates the parent directories.
    *
-   * @param src
-   *          string byte array
-   * @return charset name
+   * @param file
+   *          the target file
+   * @return true if and only if the directory was created
    */
-  public static String getCharsetName(byte[] src) {
-    if (src.length >= 3) {
-      if ((src[0] == (byte) 0xFE) && (src[1] == (byte) 0xFF)) {
-        // big-endian
-        return "UTF-16BE";
-      } else if ((src[0] == (byte) 0xFF) && (src[1] == (byte) 0xFE)) {
-        // little-endian
-        return "UTF-16LE";
-      }
+  public static boolean mkParentDir(File file) {
+    boolean created = false;
+    String parent = getParentPath(file);
+    if (!exists(parent)) {
+      created = mkdir(parent);
     }
-
-    String[] CHARSET_NAMES = { "UTF-16", "UTF-8", "EUC_JP", "SJIS" };
-    for (int i = 0; i < CHARSET_NAMES.length; i++) {
-      String charsetName = CHARSET_NAMES[i];
-      if (checkCharset(src, charsetName)) {
-        return charsetName;
-      }
-    }
-    return null;
+    return created;
   }
 
   /**
-   * Check if the given bytes corresponding to the given charset.
+   * Read a binary file.
    *
-   * @param src
-   *          string byte array
+   * @param path
+   * @return byte array of the file content. If the file does not exist, this
+   *         method returns null.
+   */
+  public static byte[] read(String path) {
+    File file = new File(path);
+    return read(file);
+  }
+
+  /**
+   * Read a binary file.
+   *
+   * @param file
+   * @return byte array of the file content. If the file does not exist, this
+   *         method returns null.
+   */
+  public static byte[] read(File file) {
+    if (!file.exists()) {
+      return null;
+    }
+    byte[] content = new byte[(int) file.length()];
+    try (FileInputStream fis = new FileInputStream(file)) {
+      @SuppressWarnings("unused")
+      int readSize = fis.read(content, 0, content.length);
+    } catch (IOException ioe) {
+      content = new byte[0];
+    }
+    return content;
+  }
+
+  /**
+   * Read a text file.
+   *
+   * @param path
+   * @return text content. If the file does not exist, this method returns null.
+   */
+  public static String readText(String path) {
+    return readText(path, DEFAULT_CHARSET);
+  }
+
+  /**
+   * Read a text file.
+   *
+   * @param file
+   * @return text content. If the file does not exist, this method returns null.
+   */
+  public static String readText(File file) {
+    return readText(file, DEFAULT_CHARSET);
+  }
+
+  /**
+   * Read a text file.
+   *
+   * @param path
+   *          file path to read
    * @param charsetName
-   *          charset name
-   * @return true if the byte array matches the charset
+   *          charset name. set null to auto detection
+   * @return text content. If the file does not exist, this method returns null.
    */
-  public static boolean checkCharset(byte[] src, String charsetName) {
-    try {
-      byte[] tmp = new String(src, charsetName).getBytes(charsetName);
-      return Arrays.equals(tmp, src);
-    } catch (UnsupportedEncodingException e) {
-      return false;
+  public static String readText(String path, String charsetName) {
+    File file = new File(path);
+    return readText(file, charsetName);
+  }
+
+  /**
+   * Read a text file.
+   *
+   * @param file
+   *          file object to read
+   * @param charsetName
+   *          charset name. set null to auto detection
+   * @return text content. If the file does not exist, this method returns null.
+   */
+  public static String readText(File file, String charsetName) {
+    byte[] content = read(file);
+    if (content == null) {
+      return null;
     }
+    if (charsetName == null) {
+      charsetName = getCharsetName(content);
+      if (charsetName == null) {
+        charsetName = DEFAULT_CHARSET;
+      }
+    }
+    String text;
+    try {
+      text = new String(content, charsetName);
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+    return text;
+  }
+
+  /**
+   * Read a text file as an array.
+   *
+   * @param path
+   * @return text content
+   */
+  public static String[] readTextAsArray(String path) {
+    return readTextAsArray(path, DEFAULT_CHARSET);
+  }
+
+  /**
+   * Read a text file as an array.
+   *
+   * @param path
+   * @param charsetName
+   * @return text content
+   */
+  public static String[] readTextAsArray(String path, String charsetName) {
+    if (charsetName == null) {
+      charsetName = DEFAULT_CHARSET;
+    }
+    Path filePath = Paths.get(path);
+    List<String> lines;
+    try {
+      lines = Files.readAllLines(filePath, Charset.forName(charsetName));
+    } catch (IOException e) {
+      return null;
+    }
+    String[] text = new String[lines.size()];
+    lines.toArray(text);
+    return text;
+  }
+
+  /**
+   * Read a file as Base64 encoded string.
+   *
+   * @param path
+   * @return file content in Base64 encoded string. If the file does not exist,
+   *         this method returns null.
+   */
+  public static String readAsBase64(String path) {
+    File file = new File(path);
+    return readAsBase64(file);
+  }
+
+  /**
+   * Read a file as Base64 encoded string.
+   *
+   * @param file
+   * @return file content in Base64 encoded string. If the file does not exist,
+   *         this method returns null.
+   */
+  public static String readAsBase64(File file) {
+    String encoded = null;
+    byte[] bytes = read(file);
+    if ((bytes != null) && (bytes.length != 0)) {
+      encoded = Base64.getEncoder().encodeToString(bytes);
+    }
+    return encoded;
+  }
+
+  /**
+   * Sets line separator.
+   *
+   * @param sep
+   *          line separator
+   */
+  public static void setLineSeparator(String sep) {
+    LINE_SEPARATOR = sep;
+  }
+
+  /**
+   * Write a content using a byte array into a file.
+   *
+   * @param path
+   * @param content
+   * @throws IOException
+   */
+  public static void write(String path, byte[] content) throws IOException {
+    File file = new File(path);
+    write(file, content);
+  }
+
+  /**
+   * Write a content using a byte array into a file.
+   *
+   * @param file
+   * @param content
+   * @throws IOException
+   */
+  public static void write(File file, byte[] content) throws IOException {
+    mkParentDir(file);
+    try (FileOutputStream fos = new FileOutputStream(file); BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+      bos.write(content, 0, content.length);
+      bos.flush();
+    } catch (IOException e) {
+      throw e;
+    }
+  }
+
+  /**
+   * Write a text into a file.
+   *
+   * @param path
+   * @param content
+   * @throws IOException
+   */
+  public static void write(String path, String content) throws IOException {
+    File file = new File(path);
+    write(file, content);
+  }
+
+  /**
+   * Write a text into a file.
+   *
+   * @param file
+   * @param content
+   * @throws IOException
+   */
+  public static void write(File file, String content) throws IOException {
+    mkParentDir(file);
+    try (FileWriter fw = new FileWriter(file); BufferedWriter bw = new BufferedWriter(fw);) {
+      bw.write(content);
+    } catch (IOException e) {
+      throw e;
+    }
+  }
+
+  /**
+   * Decodes a Base64 encoded String and writes it to a file.
+   *
+   * @param path
+   * @param base64
+   * @throws IOException
+   */
+  public static void writeFromBase64(String path, String base64) throws IOException {
+    File file = new File(path);
+    writeFromBase64(file, base64);
+  }
+
+  /**
+   * Decodes a Base64 encoded String and writes it to a file.
+   *
+   * @param file
+   * @param base64
+   * @throws IOException
+   */
+  public static void writeFromBase64(File file, String base64) throws IOException {
+    byte[] content = Base64.getDecoder().decode(base64);
+    write(file, content);
   }
 
 }

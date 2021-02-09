@@ -586,7 +586,7 @@ public class Util {
    * @return hash value
    */
   public static String getFileHash(String path, String algorithm) {
-    byte[] b = FileUtil.readFile(path);
+    byte[] b = FileUtil.read(path);
     String hash = Hash.getHash(b, algorithm);
     return hash;
   }
@@ -601,7 +601,7 @@ public class Util {
    * @return hash value
    */
   public static String getFileHash(File file, String algorithm) {
-    byte[] b = FileUtil.readFile(file);
+    byte[] b = FileUtil.read(file);
     String hash = Hash.getHash(b, algorithm);
     return hash;
   }
