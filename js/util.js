@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202102140016';
+util.v = '202102140023';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -216,13 +216,6 @@ util._serializeDateTimeString = function(s) {
   s = s.replace(/\./g, '');
   s = (s + '000000000').substr(0, 17);
   return s;
-};
-
-/**
- * Returns current timestamp
- */
-util.now = function() {
-  return Date.now();
 };
 
 /**
