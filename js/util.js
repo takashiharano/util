@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202102090000';
+util.v = '202102140016';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -222,7 +222,7 @@ util._serializeDateTimeString = function(s) {
  * Returns current timestamp
  */
 util.now = function() {
-  return new Date().getTime();
+  return Date.now();
 };
 
 /**
@@ -430,7 +430,7 @@ util.getTzLocalOffset = function(tz) {
  */
 util.difftime = function(t0, t1) {
   t0 = util.unixmillis(t0);
-  t1 = (t1 == undefined ? util.now() : util.unixmillis(t1));
+  t1 = (t1 == undefined ? Date.now() : util.unixmillis(t1));
   return t1 - t0;
 };
 
@@ -457,7 +457,7 @@ util.diffDays = function(ms1, ms2, abs) {
  * total: total value
  */
 util.calcETC = function(t0, val, total, now) {
-  if (now == undefined) now = util.now();
+  if (now == undefined) now = Date.now();
   var dt = now - t0;
   var avg = dt / val;
   var tt = Math.ceil(avg * total);
@@ -728,7 +728,7 @@ util.timecounter.ids = function() {
 util.TimeCounter = function(el, t0, opt) {
   if (!opt) opt = {};
   this.el = el;
-  this.t0 = (t0 == undefined ? util.now() : t0);
+  this.t0 = (t0 == undefined ? Date.now() : t0);
   this.interval = (opt.interval == undefined ? 500 : opt.interval);
   this.mode = (opt.mode == undefined ? 1 : opt.mode);
   this.signed = opt.signed;
@@ -743,8 +743,7 @@ util.TimeCounter.prototype = {
     util.IntervalProc.start(ctx.id, ctx.update, ctx.interval, ctx);
   },
   update: function(ctx) {
-    var now = new Date().getTime();
-    var v = now - ctx.t0;
+    var v = Date.now() - ctx.t0;
     var el = util.getElement(ctx.el);
     if (el) el.innerHTML = util.ms2str(v, ctx.mode, ctx.signed);
     if (ctx.cb) ctx.cb(v);
@@ -814,7 +813,7 @@ util.Clock.prototype = {
   update: function(ctx) {
     var el = util.getElement(ctx.el);
     if (el) {
-      var t = new Date().getTime();
+      var t = Date.now();
       t += ctx.offset;
       el.innerHTML = new util.DateTime(t, ctx.tz).toString(ctx.fmt);
     }
@@ -1044,28 +1043,35 @@ util.clock2ms = function(str) {
 };
 
 //-----------------------------------------------------------------------------
-// ['0000', '12:00', '1530'] ->
-// {
-//   time: '12:00',
-//   datetime: DateTime object
-// }
-util.calcNextTime = function(times) {
-  var now = util.getDateTime();
-  times.sort();
-  var ret = {time: null, datetime: null};
+// ['0000', '1200', '1530']
+// ['T0000', 'T1200', 'T1530']
+// ['00:00', '12:00', '15:30']
+// -> {time: '1200', datetime: DateTime object}
+util.calcNextTime = function(times, dfltS) {
+  var now = Date.now();
+  var tList = [];
   for (var i = 0; i < times.length; i++) {
-    var t = times[i];
-    t = t.replace(/T/, '').replace(/:/g, '');
-    var tmstr = t.substr(0, 2) + t.substr(2, 2) + '5959.999';
+    var t = times[i].replace(/T/, '').replace(/:/g, '');
+    tList.push(t);
+  }
+  tList.sort();
+  var ret = {time: null, datetime: null};
+  for (i = 0; i < tList.length; i++) {
+    t = tList[i];
+    var h = t.substr(0, 2);
+    var m = t.substr(2, 2);
+    var s = t.substr(4, 2);
+    if (s == '') s = ((dfltS == undefined) ? '59' : dfltS);
+    var tmstr = h + m + s + '.999';
     var tgt = util.getDateTimeFromTime(tmstr);
-    if (now.timestamp <= tgt.timestamp) {
-      ret.time = times[i];
+    if (now <= tgt.timestamp) {
+      ret.time = tList[i];
       ret.datetime = tgt;
       return ret;
     }
   }
-  ret.time = times[0];
-  ret.datetime = util.getDateTimeFromTime(times[0], 1);
+  ret.time = tList[0];
+  ret.datetime = util.getDateTimeFromTime(tList[0], 1);
   return ret;
 };
 
@@ -1106,8 +1112,7 @@ util.decimalAlignment = function(v, scale, type, zero) {
   if (!f) f = F[0];
   v = f(v, scale);
   if (zero && v == 0) return 0;
-  v = util.decimalPadding(v, scale);
-  return v;
+  return util.decimalPadding(v, scale);
 };
 
 // 123  , 1 -> '123.0'
@@ -1122,8 +1127,7 @@ util.decimalPadding = function(v, scale) {
   var i = w[0];
   var d = (w[1] == undefined ? '' : w[1]);
   d = util.rpad(d, '0', scale);
-  r = i + '.' + d;
-  return r;
+  return (i + '.' + d);
 };
 
 /**
@@ -1195,9 +1199,7 @@ util.randomString = function(a1, a2, a3) {
       max = a2;
     }
   }
-  if (typeof a3 == 'number') {
-    max = a3;
-  }
+  if (typeof a3 == 'number') max = a3;
   if (!tbl) tbl = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   if (typeof tbl == 'string') tbl = tbl.split('');
   if (min == -1) min = DFLT_LEN;
@@ -1236,15 +1238,11 @@ util.loadObject = function(key) {
 };
 
 util.saveObject = function(key, obj) {
-  if (util.LS_AVAILABLE) {
-    localStorage.setItem(key, JSON.stringify(obj));
-  }
+  if (util.LS_AVAILABLE) localStorage.setItem(key, JSON.stringify(obj));
 };
 
 util.clearObject = function(key) {
-  if (util.LS_AVAILABLE) {
-    localStorage.removeItem(key);
-  }
+  if (util.LS_AVAILABLE) localStorage.removeItem(key);
 };
 
 util.str2arr = function(s) {
@@ -1850,10 +1848,7 @@ util.http = function(req) {
   util.http.conn++;
   if (!req.method) req.method = 'GET';
   req.method = req.method.toUpperCase();
-  var data = null;
-  if ((req.data != undefined) && (req.data != '')) {
-    data = req.data;
-  }
+  var data = (((req.data != undefined) && (req.data != '')) ? req.data : null);
   if (trc) {
     if (!data) data = {};
     if (typeof data == 'string') {
@@ -1862,9 +1857,7 @@ util.http = function(req) {
       data._trcid = trcid;
     }
   }
-  if (data instanceof Object) {
-    data = util.http.buildQueryString(data);
-  }
+  if (data instanceof Object) data = util.http.buildQueryString(data);
   var url = req.url;
   if (data && (req.method == 'GET')) {
     url += (url.match(/\?/) ? '&' : '?') + data;
