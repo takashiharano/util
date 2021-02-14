@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202102140023';
+util.v = '202102150000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -853,10 +853,10 @@ util.ClockTime.prototype = {
   toString: function(fmt) {
     if (!fmt) fmt = '%H:%m:%S.%s';
     var byTheDay = fmt.match(/%d/) != null;
-    var hr = this.toHrStr(byTheDay);
-    var mi = this.toMinStr(byTheDay);
-    var ss = this.toSecStr(byTheDay);
-    var ms = this.toMilliSecStr(byTheDay);
+    var hr = this.toHrString(byTheDay);
+    var mi = this.toMinString(byTheDay);
+    var ss = this.toSecString(byTheDay);
+    var ms = this.toMilliSecString(byTheDay);
     if ((this.millis < 0) && !byTheDay) hr = '-' + hr;
     var r = fmt;
     r = r.replace(/%H/, hr);
@@ -864,48 +864,33 @@ util.ClockTime.prototype = {
     r = r.replace(/%S/, ss);
     r = r.replace(/%s/, ms);
     if (byTheDay) {
-      var d = this.toDaysStr();
+      var d = this.toDaysString();
       r = r.replace(/%d/, d);
     }
     return r;
   },
-  toDaysStr: function() {
-    var days;
-    if (this.millis < 0) {
-      days = '-';
-    } else {
-      days = '+';
-    }
+  toDaysString: function() {
+    var days = ((this.millis < 0) ? '-' : '+');
     days += this.days + ' ' + util.plural('Day', this.days, true);
     return days;
   },
-  toHrStr: function(byTheDay) {
-    var h;
-    var hh;
+  toHrString: function(byTheDay) {
     if (byTheDay === undefined) {
       byTheDay = false;
     }
-    if (byTheDay) {
-      h = this.clockTm['hrs'];
-    } else {
-      h = this.tm['hours'];
-    }
-    if (h < 10) {
-      hh = ('0' + h).slice(-2);
-    } else {
-      hh = h + '';
-    }
+    var h = (byTheDay ? this.clockTm['hrs'] : this.tm['hours']);
+    var hh = ((h < 10) ? ('0' + h).slice(-2) : h + '');
     return hh;
   },
-  toMinStr: function(byTheDay) {
+  toMinString: function(byTheDay) {
     var st = (byTheDay ? this.clockTm : this.tm);
     return ('0' + st['minutes']).slice(-2);
   },
-  toSecStr: function(byTheDay) {
+  toSecString: function(byTheDay) {
     var st = (byTheDay ? this.clockTm : this.tm);
     return ('0' + st['seconds']).slice(-2);
   },
-  toMilliSecStr: function(byTheDay) {
+  toMilliSecString: function(byTheDay) {
     var st = (byTheDay ? this.clockTm : this.tm);
     return ('00' + (st['milliseconds'] | 0)).slice(-3);
   }
@@ -1075,23 +1060,23 @@ util.calcNextTime = function(times, dfltS) {
  * 12345, -1  -> 12350
  * 12345, -2-  > 12300
  */
-util.round = function(number, scale) {
-  return util._shift(Math.round(util._shift(number, scale, false)), scale, true);
+util.round = function(num, scale) {
+  return util._shift(Math.round(util._shift(num, scale, false)), scale, true);
 };
 
-util.floor = function(number, scale) {
-  return util._shift(Math.floor(util._shift(number, scale, false)), scale, true);
+util.floor = function(num, scale) {
+  return util._shift(Math.floor(util._shift(num, scale, false)), scale, true);
 };
 
-util.ceil = function(number, scale) {
-  return util._shift(Math.ceil(util._shift(number, scale, false)), scale, true);
+util.ceil = function(num, scale) {
+  return util._shift(Math.ceil(util._shift(num, scale, false)), scale, true);
 };
 
-util._shift = function(number, scale, reverseShift) {
+util._shift = function(num, scale, reverseShift) {
   if (scale == undefined) scale = 0;
   if (reverseShift) scale = -scale;
-  var numArray = ('' + number).split('e');
-  return +(numArray[0] + 'e' + (numArray[1] ? (+numArray[1] + scale) : scale));
+  var a = ('' + num).split('e');
+  return +(a[0] + 'e' + (a[1] ? (+a[1] + scale) : scale));
 };
 
 // 123   , 1 -> '123.0'
@@ -1124,12 +1109,12 @@ util.decimalPadding = function(v, scale) {
 };
 
 /**
- * true:
- *  '1'
- *  '1.0'
- * false:
- *  '1.2'
- *  'a'
+ * '1'
+ * '1.0'
+ * -> true
+ * '1.2'
+ * 'a'
+ * -> false
  */
 util.isInteger = function(v, strict) {
   if (strict && (typeof v != 'number')) return false;
@@ -4104,10 +4089,7 @@ util.Meter = function(target, opt) {
 
   var min = 0;
   var max = 100;
-  var low;
-  var high;
-  var optimum;
-  var value;
+  var low, high, optimum, value;
   var w = '100px';
   var h = '14px';
   var bg = '#888';
