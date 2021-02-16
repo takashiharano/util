@@ -160,7 +160,7 @@ public class ColorUtil {
    */
   public static int[] rgb16to10(String rgb16) {
     String r16, g16, b16;
-    rgb16 = rgb16.replace("#", "").replaceAll("\s", "");
+    rgb16 = rgb16.replace("#", "").replaceAll("\\s", "");
     if (rgb16.length() == 6) {
       r16 = rgb16.substring(0, 2);
       g16 = rgb16.substring(2, 4);
