@@ -278,6 +278,33 @@ public class FileUtil {
   }
 
   /**
+   * Returns the file size.
+   *
+   * @param path
+   * @return file size. directory:0, not found:-1
+   */
+  public static long getSize(String path) {
+    File file = new File(path);
+    return getSize(file);
+  }
+
+  /**
+   * Returns the file size.
+   *
+   * @param file
+   * @return file size. directory:0, not found:-1
+   */
+  public static long getSize(File file) {
+    if (!file.exists()) {
+      return -1;
+    } else if (file.isFile()) {
+      return file.length();
+    } else {
+      return 0;
+    }
+  }
+
+  /**
    * Returns an array of abstract pathnames denoting the files in the directory
    * denoted by this abstract pathname. If this abstract pathname does not denote
    * a directory, then this method returns null. Otherwise an array of File
