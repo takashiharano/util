@@ -3,10 +3,11 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202010251435
+v = 202102270010
 
 import os
 import sys
+import math
 import codecs
 import subprocess
 import re
@@ -672,6 +673,9 @@ class DateTime:
 
 def now():
   return get_timestamp()
+
+def timestamp_in_millis():
+  return int(math.floor(time.time() * 1000))
 
 # 1546400096.123456 (float)    -> datetime
 # '2019-01-02 12:34:56.123456' -> datetime
