@@ -5,7 +5,7 @@ import java.io.IOException;
 import com.takashiharano.util.FileUtil;
 import com.takashiharano.util.Log;
 
-public class WriteFileFromBase64Test {
+public class WriteFromBase64Test {
 
   public static void main(String args[]) {
     test1();
@@ -15,7 +15,7 @@ public class WriteFileFromBase64Test {
     String base64 = "YWJj";
     String path = "C:/test/a.txt";
     try {
-      FileUtil.writeFileFromBase64(path, base64);
+      FileUtil.writeFromBase64(path, base64);
       Log.d("OK");
     } catch (IOException e) {
       Log.d("ERROR: " + e);
