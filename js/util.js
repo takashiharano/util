@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202102150000';
+util.v = '202103030103';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -251,7 +251,7 @@ util.getDateTime = function(dt, ofst) {
 /**
  * Returns Date-Time string
  * t: timestamp / Date object
- * fmt: '%Y-%M-%D %H:%m:%S.%s'
+ * fmt: '%Y-%M-%D %H:%m:%S.%s %Z'
  */
 util.getDateTimeString = function(t, fmt) {
   return (new util.DateTime(t)).toString(fmt);
@@ -5644,7 +5644,7 @@ util.dnd.onDrop = function(e) {
   var handler = null;
   for (var i = 0; i < handlers.length; i++) {
     handler = handlers[i];
-    if (util.isTargetEl(handler.el, e.target)) break;
+    if (util.isTargetEl(e.target, handler.el)) break;
   }
   if (i == handlers) return;
   var cb = handler.cb;
