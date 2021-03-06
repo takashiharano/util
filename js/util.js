@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202103030103';
+util.v = '202103070000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2088,7 +2088,9 @@ $el.fn = {
   },
   hide: function() {
     var el = this;
-    el.displayBak = el.style.display;
+    var v = el.style.display;
+    if (v == 'none') return;
+    el.displayBak = v;
     el.style.display = 'none';
   },
   show: function() {
@@ -5583,6 +5585,20 @@ util.isTargetKey = function(e, handler) {
     }
   }
   return false;
+};
+
+util.addEnterKeyHandler = function(fn) {
+  util.addKeyHandler('down', 13, fn);
+};
+
+util.addEscKeyHandler = function(fn) {
+  util.addKeyHandler('down', 27, fn);
+};
+
+// k: keyCode or 'A-Za-z0-9'
+util.addCtrlKeyHandler = function(k, fn) {
+  if (typeof k == 'string') k = k.toUpperCase().charCodeAt(0);
+  util.addKeyHandler('down', k, fn, {ctrl: true, shift: false, alt: false, meta: false});
 };
 
 //-----------------------------------------------------------------------------
