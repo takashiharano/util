@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202102270010
+v = 202103071440
 
 import os
 import sys
@@ -1186,7 +1186,7 @@ def sleep(seconds):
 #------------------------------------------------------------------------------
 # Base64
 #------------------------------------------------------------------------------
-def base64_decode(s, encoding=DEFAULT_ENCODING, tostring=True, altchars=None, validate=False):
+def decode_base64(s, encoding=DEFAULT_ENCODING, tostring=True, altchars=None, validate=False):
   b = base64.b64decode(s, altchars=altchars, validate=validate)
   if tostring:
     decoded = b.decode(encoding)
@@ -1194,7 +1194,7 @@ def base64_decode(s, encoding=DEFAULT_ENCODING, tostring=True, altchars=None, va
     decoded = b
   return decoded
 
-def base64_encode(s, encoding=DEFAULT_ENCODING, tostring=True, altchars=None):
+def encode_base64(s, encoding=DEFAULT_ENCODING, tostring=True, altchars=None):
   b = s
   if typename(s) == 'str':
     b = s.encode(encoding)
@@ -1863,7 +1863,7 @@ def http_request(url, method='GET', params=None, user=None, password=None,
     headers = {}
 
   if (not user is None) and (not password is None):
-    auth = base64_encode(user + ':' + password)
+    auth = encode_base64(user + ':' + password)
     headers['Authorization'] = 'Basic ' + auth
 
   req = urllib.request.Request(url, headers=headers, method=method)

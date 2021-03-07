@@ -85,30 +85,30 @@ def test_str_find():
 
   return s
 
-def test_base64_decode():
+def test_decode_base64():
   s = '\n'
-  s += util.base64_decode('YWJj')
+  s += util.decode_base64('YWJj')
   s += '\n'
-  s += util.base64_decode('YWJj', 'utf-8')
+  s += util.decode_base64('YWJj', 'utf-8')
   s += '\n'
-  s += util.base64_decode('YWJj', 'shift-jis')
+  s += util.decode_base64('YWJj', 'shift-jis')
   s += '\n'
-  s += util.base64_decode('YWJj44GC44GE44GG', 'utf-8')
+  s += util.decode_base64('YWJj44GC44GE44GG', 'utf-8')
   s += '\n'
-  s += util.base64_decode('YWJjgqCCooKk', 'shift-jis')
+  s += util.decode_base64('YWJjgqCCooKk', 'shift-jis')
   return s
 
-def test_base64_encode():
+def test_encode_base64():
   s = '\n'
-  s += util.base64_encode('abc')
+  s += util.encode_base64('abc')
   s += '\n'
-  s += util.base64_encode('abc', 'utf-8')
+  s += util.encode_base64('abc', 'utf-8')
   s += '\n'
-  s += util.base64_encode('abc', 'shift-jis')
+  s += util.encode_base64('abc', 'shift-jis')
   s += '\n'
-  s += util.base64_encode('abcあいう', 'utf-8')
+  s += util.encode_base64('abcあいう', 'utf-8')
   s += '\n'
-  s += util.base64_encode('abcあいう', 'shift-jis')
+  s += util.encode_base64('abcあいう', 'shift-jis')
   return s
 
 def test_to_json():
@@ -195,9 +195,9 @@ def test():
   ret += '\n'
   ret += 'test_str_find() = ' + test_str_find() + '\n'
   ret += '\n'
-  ret += 'test_base64_decode() = ' + test_base64_decode() + '\n'
+  ret += 'test_decode_base64() = ' + test_decode_base64() + '\n'
   ret += '\n'
-  ret += 'test_base64_encode() = ' + test_base64_encode() + '\n'
+  ret += 'test_encode_base64() = ' + test_encode_base64() + '\n'
   ret += '\n'
   ret += 'test_to_json() = ' + test_to_json() + '\n'
   ret += '\n'
