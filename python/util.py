@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202103071440
+v = 202103080050
 
 import os
 import sys
@@ -1294,10 +1294,12 @@ def get_datetime_filename(suffix='', fmt='%Y%m%dT%H%M%S', prefix=''):
 # mode:
 #  't' = text
 #  'b' = bin
-def read_file(path, mode='t', encoding=DEFAULT_ENCODING):
+def read_file(path, mode='t', default=None, encoding=DEFAULT_ENCODING):
+  if not path_exists(path):
+    return default
   if mode == 't':
     return read_text_file(path, encoding)
-  elif mode == 'b':
+  else:
     return read_binary_file(path)
 
 # Read file as text
