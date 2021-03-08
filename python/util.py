@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202103080050
+v = 202103090028
 
 import os
 import sys
@@ -2139,19 +2139,16 @@ def send_response(type, content, status=200, headers=None, encoding=DEFAULT_ENCO
 def send_result_json(status, body=None, headers=None, encoding=None):
   result = build_result_object(status, body)
   content = to_json(result)
-  send_response('json', content, headers, encoding)
+  send_response('json', content, headers=headers, encoding=encoding)
 
 def build_result_object(status, body=None, headers=None):
   result = {
     'status': status
   }
-
   if headers is not None:
     for key in headers:
       result[key] = headers[key]
-
   result['body'] = body
-
   return result
 
 def send_response_debug(enable=True):
