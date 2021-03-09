@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202103070000';
+util.v = '202103100000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1758,9 +1758,9 @@ util.arr.toUniqueValues = function(arr, srt) {
     v.push({key: k, cnt: o[k]});
   }
   if (srt == 'asc|count') {
-    v.sort(function(a, b) {return a.cnt - b.cnt;});
+    v = util.sortObjList(v, 'cnt');
   } else if (srt == 'desc|count') {
-    v.sort(function(a, b) {return b.cnt - a.cnt;});
+    v = util.sortObjList(v, 'cnt', true);
   }
   var r = [];
   for (var i = 0; i < v.length; i++) {
@@ -1781,6 +1781,19 @@ util.addListItem = function(list, item) {
 
 util.removeListItem = function(list, item) {
   if (list) util.arr.del(list, item);
+};
+
+/**
+ * [{id: 'A', cnt: 2}, {id: 'B', cnt: 1}, {id: 'C', cnt: 3}]
+ * -> [{id: 'B', cnt: 1}, {id: 'A', cnt: 2}, {id: 'C', cnt: 3}]
+ */
+util.sortObjList = function(list, key, desc) {
+  if (desc) {
+    list.sort(function(a, b) {return b[key] - a[key];});
+  } else {
+    list.sort(function(a, b) {return a[key] - b[key];});
+  }
+  return list;
 };
 
 //-----------------------------------------------------------------------------
