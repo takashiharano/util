@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202103100000';
+util.v = '202103140023';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1223,7 +1223,22 @@ util.clearObject = function(key) {
   if (util.LS_AVAILABLE) localStorage.removeItem(key);
 };
 
-util.str2arr = function(s) {
+/**
+ * s='ABCDEF'
+ * n=2: ['AB', 'CD', 'EF']
+ * n=3: ['ABC', 'DEF']
+ */
+util.divideString = function(s, n) {
+  if ((s == undefined) || (s == null)) return s;
+  if ((n <= 0) || (s == '')) return [s];
+  var a = [];
+  for (var i = 0; i < s.length / n; i++) {
+    a.push(s.substr(i * n, n));
+  }
+  return a;
+};
+
+util.divideChars = function(s) {
   return s.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\s\S]/g) || [];
 };
 
@@ -1384,7 +1399,7 @@ util.shift2full = function(w) {
 
 util.getUnicodePoints = function(str) {
   var cd = '';
-  var chs = util.str2arr(str);
+  var chs = util.divideChars(str);
   for (var i = 0; i < chs.length; i++) {
     var p = util.getCodePoint(chs[i], true);
     if (i > 0) cd += ' ';
@@ -2526,7 +2541,7 @@ util.updateTextAreaInfo = function(textarea) {
   var st = textarea.selectionStart;
   var ed = textarea.selectionEnd;
   var sl = ed - st;
-  var ch = util.str2arr(txt)[st] || '';
+  var ch = util.divideChars(txt)[st] || '';
   var cd = util.getCodePoint(ch);
   var cd16 = util.getUnicodePoints(ch, true);
   var cp = '';
@@ -4807,7 +4822,7 @@ util.UTF8 = {};
 util.UTF8.toByteArray = function(s) {
   var a = [];
   if (!s) return a;
-  var chs = util.str2arr(s);
+  var chs = util.divideChars(s);
   for (var i = 0; i < chs.length; i++) {
     var ch = chs[i];
     var c = ch.charCodeAt(0);
