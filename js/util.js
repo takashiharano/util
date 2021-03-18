@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202103140023';
+util.v = '202103190006';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2043,7 +2043,7 @@ var $el = function(target, idx) {
       if (el[k] == undefined) el[k] = $el.fn[k];
     }
   } else {
-    el = {notFound: true, style: {}};
+    el = {notExists: true, style: {}};
     for (k in $el.fn) {
       el[k] = util.nop;
     }
