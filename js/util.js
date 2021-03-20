@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202103190006';
+util.v = '202103201234';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1208,6 +1208,12 @@ util.copyProps = function(src, dst) {
   }
 };
 
+util.copyDefaultProps = function(tgt, dflt) {
+  for (var k in dflt) {
+    if (!(k in tgt)) tgt[k] = dflt[k];
+  }
+};
+
 util.loadObject = function(key) {
   if (util.LS_AVAILABLE) {
     return JSON.parse(localStorage.getItem(key));
@@ -2303,6 +2309,102 @@ util.html2text = function(s) {
   return p.innerText;
 };
 
+//-----------------------------------------------------------------------------
+util.overlay = {};
+util.overlay.DFLT_FADE_SPEED = 250;
+util.overlay.DFLT_SHOW_OPT = {pos: 'nw', adjX: 0, adjY: 0, fade: 0};
+util.overlay.DFLT_HIDE_OPT = {fade: 0};
+/**
+ * tgt: must be style.position != 'static'
+ * opt: {pos: 'nw|n|ne|e|se|s|sw|w', adjX: 0, adjY: 0, fade: 0}
+ */
+util.overlay.show = function(tgt, el, opt) {
+  tgt = util.getElement(tgt);
+  el = util.getElement(el);
+  if (!tgt || !el || tgt.contains(el)) return;
+  if (!opt) opt = {};
+  util.copyDefaultProps(opt, util.overlay.DFLT_SHOW_OPT);
+  el.style.opacity = 0;
+  el.style.position = 'absolute';
+  if (opt.fade > 0) util.addClass(el, 'fadeout');
+  tgt.appendChild(el);
+  setTimeout(util.overlay._show, 0, tgt, el, opt);
+};
+util.overlay._show = function(tgt, el, opt) {
+  el.style.opacity = 1;
+  var tgtSP = util.getElSizePos(tgt);
+  var elSP = util.getElSizePos(el);
+  var x = 0;
+  var y = 0;
+  switch (opt.pos) {
+    case 'n':
+      x = tgtSP.wC - elSP.wC;
+      break;
+    case 'ne':
+      x = tgtSP.w - elSP.w;
+      break;
+    case 'e':
+      y = tgtSP.hC - elSP.hC;
+      x = tgtSP.w - elSP.w;
+      break;
+    case 'se':
+      y = tgtSP.h - elSP.h;
+      x = tgtSP.w - elSP.w;
+      break;
+    case 's':
+      y = tgtSP.h - elSP.h;
+      x = tgtSP.wC - elSP.wC;
+      break;
+    case 'sw':
+      y = tgtSP.h - elSP.h;
+      break;
+    case 'w':
+      y = tgtSP.hC - elSP.hC;
+      break;
+    case 'c':
+      y = tgtSP.hC - elSP.hC;
+      x = tgtSP.wC - elSP.wC;
+  }
+  el.style.top = (y + opt.adjY) + 'px';
+  el.style.left = (x + opt.adjX) + 'px';
+  if (opt.fade > 0) {
+    setTimeout(util.overlay.__show, 0, el, opt.fade);
+  } else {
+    util.clearFade(el);
+  }
+};
+util.overlay.__show = function(el, speed) {
+ util.fadeIn(el, speed);
+};
+util.overlay.hide = function(tgt, el, opt) {
+  tgt = util.getElement(tgt);
+  el = util.getElement(el);
+  if (!tgt || !el || !tgt.contains(el)) return;
+  if (!opt) opt = {};
+  util.copyDefaultProps(opt, util.overlay.DFLT_HIDE_OPT);
+  if (opt.fade > 0) {
+    util.fadeOut(el, opt.fade, util.overlay._hide, tgt);
+  } else {
+    util.overlay._hide(el, tgt);
+  }
+};
+util.overlay._hide = function(el, tgt) {
+  tgt.removeChild(el);
+};
+util.getElSizePos = function(el) {
+  var r = el.getBoundingClientRect();
+  var rT = Math.round(r.top);
+  var rL = Math.round(r.left);
+  var rR = Math.round(r.right);
+  var rB = Math.round(r.bottom);
+  var o = {x1: rL, y1: rT, x2: rR, y2: rB, w: ((rR - rL) + 1), h: ((rB - rT) + 1)};
+  o.wC = o.w / 2;
+  o.hC = o.h / 2;
+  o.xC = o.x1 + o.wC;
+  o.yC = o.y1 + o.hC;
+  return o;
+};
+
 // f = function() {/*
 // ABC
 // 123
@@ -3314,6 +3416,11 @@ util._fadeOut = function(el, speed, cb, arg) {
 util.__fadeOut = function(dat) {
   dat.el.fadeTimerId = 0;
   if (dat.cb) dat.cb(dat.el, dat.arg);
+};
+util.clearFade = function(el) {
+  util.setStyle(el, 'transition', '');
+  util.removeClass(el, 'fadein');
+  util.removeClass(el, 'fadeout');
 };
 
 //-----------------------------------------------------------------------------
