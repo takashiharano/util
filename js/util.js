@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202103201234';
+util.v = '202103210139';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1210,7 +1210,11 @@ util.copyProps = function(src, dst) {
 
 util.copyDefaultProps = function(tgt, dflt) {
   for (var k in dflt) {
-    if (!(k in tgt)) tgt[k] = dflt[k];
+    if (!(k in tgt)) {
+      tgt[k] = dflt[k];
+    } else if (tgt[k] instanceof Object) {
+      util.copyDefaultProps(tgt[k], dflt[k]);
+    }
   }
 };
 
@@ -2740,22 +2744,34 @@ util._clearHTML = function(el) {
 // Text Sequencer
 //-----------------------------------------------------------------------------
 /**
- * opt = {
- *  speed: 20,
- *  step: 1,
- *  start: 0,
- *  len: -1,
- *  reverse: false,
- *  cursor: {
- *   speed: 100,
- *   n: 3
- *  },
- *  onprogress: <callback-function(ctx, chunk)>,
- *  oncomplete: <callback-function(ctx)>
- * };
  * var ctx = util.textseq(el, text, opt);
+ * opt: see DFLT_OPT
  */
 util.textseq = function(el, text, opt) {
+  el = util.getElement(el);
+  if (!opt) opt = {};
+  var cursor = opt.cursor;
+  if (typeof opt.cursor == 'number') delete opt.cursor;
+  util.copyDefaultProps(opt, util.textseq.DFLT_OPT);
+  if (typeof cursor == 'number') opt.cursor.n = cursor;
+  if (text instanceof Array) {
+    el.$$textseqCtx = {textList: text, idx: 0, opt: opt};
+    text = text[0];
+  }
+  return util.textseq1(el, text, opt);
+};
+util.textseq.DFLT_OPT = {
+  speed: 20,
+  step: 1,
+  start: 0,
+  len: -1,
+  reverse: false,
+  cursor: {n: 0, speed: 100, repeat: false},
+  pause: 700, // for text array
+  onprogress: null, // <callback-function(ctx, chunk)>
+  oncomplete: null // <callback-function(ctx)>
+};
+util.textseq1 = function(el, text, opt) {
   var ctx = util.textseq.getCtx(el);
   if (ctx) util.textseq._stop(ctx);
   ctx = util.textseq.createCtx(el, text, opt);
@@ -2765,7 +2781,7 @@ util.textseq = function(el, text, opt) {
   } else {
     util.textseq.ctxs[i] = ctx;
   }
-  var f = (ctx.cursor.speed ? util.textseq.blinkCursor : (ctx.reverse ? util.textseq._reverse : util.textseq._textseq));
+  var f = (ctx.cursor.n && ctx.cursor.speed ? util.textseq.blinkCursor : (ctx.reverse ? util.textseq._reverse : util.textseq._textseq));
   ctx.tmrId = setTimeout(f, 0, ctx);
   return ctx;
 };
@@ -2861,9 +2877,20 @@ util.textseq.onprogress = function(ctx, pos, prevPos, cutLen) {
   ctx.onprogress(ctx, chunk);
 };
 util.textseq.oncomplete = function(ctx) {
-  var i = util.textseq.idx(ctx.el);
+  var el = ctx.el;
+  var i = util.textseq.idx(el);
   util.textseq.ctxs.splice(i, 1);
-  if (ctx.oncomplete) ctx.oncomplete(ctx);
+  var textseqCtx = el.$$textseqCtx;
+  var idx;
+  if (textseqCtx) idx = textseqCtx.idx;
+  if (ctx.oncomplete) ctx.oncomplete(ctx, idx);
+  if (textseqCtx) {
+    textseqCtx.idx++;
+    if (textseqCtx.idx < textseqCtx.textList.length) {
+      if (!textseqCtx.opt.cursor.repeat) textseqCtx.opt.cursor.n = 0;
+      setTimeout(util.textseq1, textseqCtx.opt.pause, el, textseqCtx.textList[textseqCtx.idx], textseqCtx.opt);
+    }
+  }
 };
 util.textseq.createCtx = function(el, text, opt) {
   if (!opt) opt = {};
@@ -2871,9 +2898,8 @@ util.textseq.createCtx = function(el, text, opt) {
   var orgTxt = text;
   if (!isInp) text = util.html2text(text);
   var txtLen = text.length;
-  var len = (((opt.len == undefined) || (opt.len < 0)) ? -1 : opt.len);
-  var step = (opt.step == undefined ? 1 : opt.step);
-  if (opt.start == undefined) opt.start = 0;
+  var len = ((opt.len < 0) ? -1 : opt.len);
+  var step = opt.step;
   var cutLen = step;
   if (opt.reverse) {
     if (opt.start == 0) {
@@ -2901,21 +2927,11 @@ util.textseq.createCtx = function(el, text, opt) {
     pos = start;
     if (pos < 0) pos = 0;
   }
-  var cursor = {};
-  if (opt.cursor != undefined) {
-    cursor = {speed: 100, n: 3};
-    if (typeof opt.cursor == 'number') {
-      cursor.speed = opt.cursor;
-    } else {
-      if (opt.cursor.speed != undefined) cursor.speed = opt.cursor.speed;
-      if (opt.cursor.n != undefined) cursor.n = opt.cursor.n;
-    }
-  }
   var ctx = {
     el: el,
     orgTxt: orgTxt,
     text: text,
-    speed: (opt.speed == undefined ? util.textseq.DFLT_SPEED : opt.speed),
+    speed: opt.speed,
     step: step,
     start: start,
     end: end,
@@ -2924,8 +2940,8 @@ util.textseq.createCtx = function(el, text, opt) {
     prevPos: prevPos,
     pos: pos,
     cutLen: cutLen,
-    reverse: (opt.reverse ? true : false),
-    cursor: cursor,
+    reverse: opt.reverse,
+    cursor: opt.cursor,
     cursorCnt: 0,
     onprogress: opt.onprogress,
     oncomplete: opt.oncomplete
@@ -2947,9 +2963,7 @@ util.textseq.getCtx = function(el) {
   return ctx;
 };
 util.textseq.getSpeed = function(ctx) {
-  var speed = ctx.speed;
-  if (speed < 0) speed = util.textseq.DFLT_SPEED;
-  return speed;
+  return ctx.speed;
 };
 util.textseq.blinkCursor = function(ctx) {
   var speed = util.textseq.getSpeed(ctx);
@@ -2972,7 +2986,6 @@ util.textseq.print = function(ctx, s) {
     ctx.el.innerHTML = s;
   }
 };
-util.textseq.DFLT_SPEED = 20;
 util.textseq.ctxs = [];
 
 //-----------------------------------------------------------------------------
