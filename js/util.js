@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202103210139';
+util.v = '202103220007';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2767,7 +2767,7 @@ util.textseq.DFLT_OPT = {
   len: -1,
   reverse: false,
   cursor: {n: 0, speed: 100, repeat: false},
-  pause: 700, // for text array
+  pause: 1000, // for text array
   onprogress: null, // <callback-function(ctx, chunk)>
   oncomplete: null // <callback-function(ctx)>
 };
@@ -2927,6 +2927,14 @@ util.textseq.createCtx = function(el, text, opt) {
     pos = start;
     if (pos < 0) pos = 0;
   }
+  el.innerHTML = '';
+  delete el.$$textseqSpan;
+  if (opt.style && !isInp) {
+    var span = document.createElement('span');
+    util.setStyles(span, opt.style);
+    el.$$textseqSpan = span;
+    el.appendChild(span);
+  }
   var ctx = {
     el: el,
     orgTxt: orgTxt,
@@ -2983,7 +2991,11 @@ util.textseq.print = function(ctx, s) {
   if (ctx.isInp) {
     ctx.el.value = s;
   } else {
-    ctx.el.innerHTML = s;
+    if (ctx.el.$$textseqSpan) {
+      ctx.el.$$textseqSpan.innerHTML = s;
+    } else {
+      ctx.el.innerHTML = s;
+    }
   }
 };
 util.textseq.ctxs = [];
