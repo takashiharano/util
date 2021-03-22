@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202103220007';
+util.v = '202103230112';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -3510,59 +3510,62 @@ util.createFadeScreenEl = function(bg) {
 util.loader = {};
 util.loader.timerId = 0;
 util.loader.count = 0;
-util.loader.el = null;
-
+util.loader.ctx = null;
+util.loader.DFLTOPT = {
+  delay: 500,
+  size: '46px',
+  color1: '#ccc',
+  color2: 'rgba(204, 204, 204, 0.25)',
+  weight: '4px',
+  speed: '1s',
+};
 util.loader.registerStyle = function() {
   var style = '@keyframes loader-rotate {';
-  style += '  0% {';
-  style += '    transform: rotate(0);';
-  style += '  }';
-  style += '  100% {';
-  style += '    transform: rotate(360deg);';
-  style += '  }';
+  style += '0% {transform: rotate(0);}';
+  style += '100% {transform: rotate(360deg);}';
   style += '}';
-  style += '.loader {';
-  style += '  display: block;';
-  style += '  width: 46px;';
-  style += '  height: 46px;';
-  style += '  border: 4px solid rgba(204, 204, 204, 0.25);';
-  style += '  border-top-color: #ccc;';
-  style += '  border-radius: 50%;';
-  style += '  position: fixed;';
-  style += '  top: 0;';
-  style += '  left: 0;';
-  style += '  right: 0;';
-  style += '  bottom: 0;';
-  style += '  margin: auto;';
-  style += '  animation: loader-rotate 1s linear infinite;';
-  style += '}';
-  style += '.loading {';
-  style += '  cursor: progress !important;';
-  style += '}';
+  style += '.loading {cursor: progress !important;}';
   util.registerStyle(style);
 };
 
-util.loader.show = function(delay) {
+util.loader.show = function(opt) {
+  if (!opt) opt = {};
+  util.copyDefaultProps(opt, util.loader.DFLTOPT);
+  if (!opt.el) opt.el = document.body;
   util.loader.count++;
   if (util.loader.count > 1) return;
-  if (delay == undefined) delay = 500;
-  util.loader.timerId = setTimeout(util.loader._show, delay);
+  util.loader.timerId = setTimeout(util.loader._show, opt.delay, opt);
 };
-util.loader._show = function() {
+util.loader._show = function(opt) {
   util.loader.timerId = 0;
-  var el = util.loader.el;
-  if (!el) {
-    el = util.loader.create();
-    util.loader.el = el;
+  var ctx = util.loader.ctx;
+  if (!ctx) {
+    var el = util.loader.create(opt);
+    util.loader.ctx = {opt: opt, el: el};
+    util.addClass(el, 'fadeout');
   }
   util.addClass(document.body, 'loading');
-  document.body.appendChild(el);
-  util.fadeIn(el);
+  util.overlay.show(opt.el, el);
+  util.fadeIn(el, 500);
 };
-
-util.loader.create = function() {
+util.loader.create = function(opt) {
   var el = document.createElement('div');
-  el.className = 'loader';
+  var s = {
+    display: 'inline-block',
+    position: 'fixed',
+    width: opt.size,
+    height: opt.size,
+    border: opt.weight + ' solid ' + opt.color2,
+    'border-top-color': opt.color1,
+    'border-radius': '50%',
+    top: '0',
+    left: '0',
+    right: '0',
+    bottom: '0',
+    margin: 'auto',
+    animation: 'loader-rotate ' + opt.speed + ' linear infinite'
+  };
+  util.setStyles(el, s);
   return el;
 };
 
@@ -3572,21 +3575,20 @@ util.loader.hide = function(force) {
   } else if (util.loader.count > 0) {
     util.loader.count--;
   }
-  if (util.loader.count == 0) {
-    if (util.loader.timerId > 0) {
-      clearTimeout(util.loader.timerId);
-      util.loader.timerId = 0;
-    }
-    util.removeClass(document.body, 'loading');
-    util.fadeOut(util.loader.el, 0, util.loader._hide);
+  if (util.loader.count > 0) return;
+  if (util.loader.timerId > 0) {
+    clearTimeout(util.loader.timerId);
+    util.loader.timerId = 0;
   }
+  var ctx = util.loader.ctx;
+  if (!ctx) return;
+  util.removeClass(document.body, 'loading');
+  util.fadeOut(ctx.el, 200, util.loader._hide);
 };
-
 util.loader._hide = function() {
-  if (util.loader.el) {
-    document.body.removeChild(util.loader.el);
-    util.loader.el = null;
-  }
+  var ctx = util.loader.ctx;
+  util.overlay.hide(ctx.opt.el, ctx.el);
+  util.loader.ctx = null;
 };
 
 //-----------------------------------------------------------------------------
