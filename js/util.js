@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202103230112';
+util.v = '202103240031';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2313,6 +2313,20 @@ util.html2text = function(s) {
   return p.innerText;
 };
 
+util.getCtxIdx4El = function(ctxs, el) {
+  for (var i = 0; i < ctxs.length; i++) {
+    var ctx = ctxs[i];
+    if (ctx.el == el) return i;
+  }
+  return -1;
+};
+util.getCtx4El = function(ctxs, el) {
+  var ctx = null;
+  var i = util.getCtxIdx4El(ctxs, el);
+  if (i >= 0) ctx = ctxs[i];
+  return ctx;
+};
+
 //-----------------------------------------------------------------------------
 util.overlay = {};
 util.overlay.DFLT_FADE_SPEED = 250;
@@ -2772,10 +2786,10 @@ util.textseq.DFLT_OPT = {
   oncomplete: null // <callback-function(ctx)>
 };
 util.textseq1 = function(el, text, opt) {
-  var ctx = util.textseq.getCtx(el);
+  var ctx = util.getCtx4El(util.textseq.ctxs, el);
   if (ctx) util.textseq._stop(ctx);
   ctx = util.textseq.createCtx(el, text, opt);
-  var i = util.textseq.idx(el);
+  var i = util.getCtxIdx4El(util.textseq.ctxs, el);
   if (i < 0) {
     util.textseq.ctxs.push(ctx);
   } else {
@@ -2840,14 +2854,14 @@ util.textseq.getText = function(ctx) {
   return ctx.text.substr(0, len);
 };
 util.textseq.start = function(el) {
-  var ctx = util.textseq.getCtx(el);
+  var ctx = util.getCtx4El(util.textseq.ctxs, el);
   if (!ctx) return;
   util.textseq._stop(ctx);
   var f = ctx.reverse ? util.textseq._reverse : util.textseq._textseq;
   f(ctx);
 };
 util.textseq.stop = function(el) {
-  var i = util.textseq.idx(el);
+  var i = util.getCtxIdx4El(util.textseq.ctxs, el);
   if (i < 0) return;
   var ctx = util.textseq.ctxs[i];
   util.textseq._stop(ctx);
@@ -2878,7 +2892,7 @@ util.textseq.onprogress = function(ctx, pos, prevPos, cutLen) {
 };
 util.textseq.oncomplete = function(ctx) {
   var el = ctx.el;
-  var i = util.textseq.idx(el);
+  var i = util.getCtxIdx4El(util.textseq.ctxs, el);
   util.textseq.ctxs.splice(i, 1);
   var textseqCtx = el.$$textseqCtx;
   var idx;
@@ -2954,20 +2968,6 @@ util.textseq.createCtx = function(el, text, opt) {
     onprogress: opt.onprogress,
     oncomplete: opt.oncomplete
   };
-  return ctx;
-};
-util.textseq.idx = function(el) {
-  var ctxs = util.textseq.ctxs;
-  for (var i = 0; i < ctxs.length; i++) {
-    var ctx = ctxs[i];
-    if (ctx.el == el) return i;
-  }
-  return -1;
-};
-util.textseq.getCtx = function(el) {
-  var ctx = null;
-  var i = util.textseq.idx(el);
-  if (i >= 0) ctx = util.textseq.ctxs[i];
   return ctx;
 };
 util.textseq.getSpeed = function(ctx) {
@@ -3508,9 +3508,6 @@ util.createFadeScreenEl = function(bg) {
 // Loader Indication
 //-----------------------------------------------------------------------------
 util.loader = {};
-util.loader.timerId = 0;
-util.loader.count = 0;
-util.loader.ctx = null;
 util.loader.DFLTOPT = {
   delay: 500,
   size: '46px',
@@ -3519,6 +3516,8 @@ util.loader.DFLTOPT = {
   weight: '4px',
   speed: '1s',
 };
+util.loader.cnt = 0;
+util.loader.ctxs = [];
 util.loader.registerStyle = function() {
   var style = '@keyframes loader-rotate {';
   style += '0% {transform: rotate(0);}';
@@ -3531,22 +3530,25 @@ util.loader.registerStyle = function() {
 util.loader.show = function(opt) {
   if (!opt) opt = {};
   util.copyDefaultProps(opt, util.loader.DFLTOPT);
+  opt.el = util.getElement(opt.el);
   if (!opt.el) opt.el = document.body;
-  util.loader.count++;
-  if (util.loader.count > 1) return;
-  util.loader.timerId = setTimeout(util.loader._show, opt.delay, opt);
-};
-util.loader._show = function(opt) {
-  util.loader.timerId = 0;
-  var ctx = util.loader.ctx;
+  var ctx = util.getCtx(util.loader.ctxs, opt.el);
   if (!ctx) {
-    var el = util.loader.create(opt);
-    util.loader.ctx = {opt: opt, el: el};
-    util.addClass(el, 'fadeout');
+    var ldrEl = util.loader.create(opt);
+    ctx = {el: opt.el, opt: opt, ldrEl: ldrEl, cnt: 0, timerId: 0};
+    util.loader.ctxs.push(ctx);
+    util.addClass(ldrEl, 'fadeout');
   }
+  ctx.cnt++;
+  util.loader.cnt++;
+  if (ctx.cnt > 1) return;
+  ctx.timerId = setTimeout(util.loader._show, opt.delay, ctx);
+};
+util.loader._show = function(ctx) {
+  ctx.timerId = 0;
   util.addClass(document.body, 'loading');
-  util.overlay.show(opt.el, el);
-  util.fadeIn(el, 500);
+  util.overlay.show(ctx.opt.el, ctx.ldrEl);
+  util.fadeIn(ctx.ldrEl, 500);
 };
 util.loader.create = function(opt) {
   var el = document.createElement('div');
@@ -3569,26 +3571,33 @@ util.loader.create = function(opt) {
   return el;
 };
 
-util.loader.hide = function(force) {
-  if (force) {
-    util.loader.count = 0;
-  } else if (util.loader.count > 0) {
-    util.loader.count--;
-  }
-  if (util.loader.count > 0) return;
-  if (util.loader.timerId > 0) {
-    clearTimeout(util.loader.timerId);
-    util.loader.timerId = 0;
-  }
-  var ctx = util.loader.ctx;
+util.loader.hide = function(el, force) {
+  el = util.getElement(el);
+  if (!el) el = document.body;
+  var ctx = util.getCtx4El(util.loader.ctxs, el);
   if (!ctx) return;
-  util.removeClass(document.body, 'loading');
-  util.fadeOut(ctx.el, 200, util.loader._hide);
+  if (force) {
+    util.loader.cnt -= ctx.cnt;
+    ctx.cnt = 0;
+  } else if (ctx.cnt > 0) {
+    ctx.cnt--;
+    util.loader.cnt--;
+  }
+  if (ctx.cnt > 0) return;
+  if (ctx.timerId > 0) {
+    clearTimeout(ctx.timerId);
+    ctx.timerId = 0;
+  }
+  if (util.loader.cnt <= 0) {
+    util.loader.cnt = 0;
+    util.removeClass(document.body, 'loading');
+  }
+  util.fadeOut(ctx.ldrEl, 200, util.loader._hide, ctx);
 };
-util.loader._hide = function() {
-  var ctx = util.loader.ctx;
-  util.overlay.hide(ctx.opt.el, ctx.el);
-  util.loader.ctx = null;
+util.loader._hide = function(ctx) {
+  util.overlay.hide(ctx.el, ctx.ldrEl);
+  var i = util.getCtxIdx4El(util.loader.ctxs, ctx.el);
+  util.loader.ctxs.splice(i, 1);
 };
 
 //-----------------------------------------------------------------------------
