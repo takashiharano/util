@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202103240935';
+util.v = '202103250000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1233,6 +1233,10 @@ util.clearObject = function(key) {
   if (util.LS_AVAILABLE) localStorage.removeItem(key);
 };
 
+util.objtype = function(o) {
+  return Object.prototype.toString.call(o);
+};
+
 /**
  * s='ABCDEF'
  * n=2: ['AB', 'CD', 'EF']
@@ -1367,8 +1371,7 @@ util.null2empty = function(s) {
 
 util.countStr = function(s, p) {
   var i = 0;
-  var t = Object.prototype.toString.call(p);
-  if (t == '[object RegExp]') {
+  if (util.objtype(p) == '[object RegExp]') {
     var m = s.match(p);
     if (m) i = m.length;
   } else {
@@ -3527,15 +3530,19 @@ util.loader.registerStyle = function() {
   util.registerStyle(style);
 };
 
-util.loader.show = function(opt) {
+util.loader.show = function(el, opt) {
+  if (util.objtype(el) == '[object Object]') {
+    opt = el;
+    el = null;
+  }
   if (!opt) opt = {};
   util.copyDefaultProps(opt, util.loader.DFLTOPT);
-  opt.el = util.getElement(opt.el);
-  if (!opt.el) opt.el = document.body;
-  var ctx = util.getCtx4El(util.loader.ctxs, opt.el);
+  el = util.getElement(el);
+  if (!el) el = document.body;
+  var ctx = util.getCtx4El(util.loader.ctxs, el);
   if (!ctx) {
     var ldrEl = util.loader.create(opt);
-    ctx = {el: opt.el, opt: opt, ldrEl: ldrEl, cnt: 0, timerId: 0};
+    ctx = {el: el, opt: opt, ldrEl: ldrEl, cnt: 0, timerId: 0};
     util.loader.ctxs.push(ctx);
     util.addClass(ldrEl, 'fadeout');
   }
@@ -3547,7 +3554,7 @@ util.loader.show = function(opt) {
 util.loader._show = function(ctx) {
   ctx.timerId = 0;
   util.addClass(document.body, 'loading');
-  util.overlay.show(ctx.opt.el, ctx.ldrEl);
+  util.overlay.show(ctx.el, ctx.ldrEl);
   util.fadeIn(ctx.ldrEl, 500);
 };
 util.loader.create = function(opt) {
@@ -3594,7 +3601,7 @@ util.loader.hide = function(el, force) {
   }
   util.fadeOut(ctx.ldrEl, 200, util.loader._hide, ctx);
 };
-util.loader._hide = function(ctx) {
+util.loader._hide = function(el, ctx) {
   util.overlay.hide(ctx.el, ctx.ldrEl);
   var i = util.getCtxIdx4El(util.loader.ctxs, ctx.el);
   util.loader.ctxs.splice(i, 1);
