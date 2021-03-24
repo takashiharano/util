@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202103240031';
+util.v = '202103240935';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -3532,7 +3532,7 @@ util.loader.show = function(opt) {
   util.copyDefaultProps(opt, util.loader.DFLTOPT);
   opt.el = util.getElement(opt.el);
   if (!opt.el) opt.el = document.body;
-  var ctx = util.getCtx(util.loader.ctxs, opt.el);
+  var ctx = util.getCtx4El(util.loader.ctxs, opt.el);
   if (!ctx) {
     var ldrEl = util.loader.create(opt);
     ctx = {el: opt.el, opt: opt, ldrEl: ldrEl, cnt: 0, timerId: 0};
