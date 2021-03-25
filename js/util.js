@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202103250000';
+util.v = '202103260033';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2403,14 +2403,15 @@ util.overlay.hide = function(tgt, el, opt) {
   if (!tgt || !el || !tgt.contains(el)) return;
   if (!opt) opt = {};
   util.copyDefaultProps(opt, util.overlay.DFLT_HIDE_OPT);
+  var o = {el: el, tgt: tgt};
   if (opt.fade > 0) {
-    util.fadeOut(el, opt.fade, util.overlay._hide, tgt);
+    util.fadeOut(el, opt.fade, util.overlay._hide, o);
   } else {
-    util.overlay._hide(el, tgt);
+    util.overlay._hide(o);
   }
 };
-util.overlay._hide = function(el, tgt) {
-  tgt.removeChild(el);
+util.overlay._hide = function(o) {
+  o.tgt.removeChild(o.el);
 };
 util.getElSizePos = function(el) {
   var r = el.getBoundingClientRect();
@@ -2729,19 +2730,19 @@ util.writeHTML = function(target, html, speed) {
     util.clearHTML(el, speed);
   } else {
     el.innerHTML = '';
-    var cbData = {html: html, speed: speed};
+    var cbData = {el: el, html: html, speed: speed};
     util.fadeOut(el, 0, util._writeHTML, cbData);
   }
 };
-util._writeHTML = function(target, cbData) {
+util._writeHTML = function(cbData) {
   var DFLT_SPEED = 250;
   var speed = cbData.speed;
   if ((speed == undefined) || (speed < 0)) speed = DFLT_SPEED;
-  target.innerHTML = cbData.html;
-  setTimeout(util.__writeHTML, 10, target, speed);
+  cbData.el.innerHTML = cbData.html;
+  setTimeout(util.__writeHTML, 10, cbData);
 };
-util.__writeHTML = function(target, speed) {
-  util.fadeIn(target, speed);
+util.__writeHTML = function(cbData) {
+  util.fadeIn(cbData.el, cbData.speed);
 };
 
 /**
@@ -2750,7 +2751,7 @@ util.__writeHTML = function(target, speed) {
 util.clearHTML = function(target, speed) {
   var DFLT_SPEED = 200;
   if ((speed == undefined) || (speed < 0)) speed = DFLT_SPEED;
-  util.fadeOut(target, speed, util._clearHTML);
+  util.fadeOut(target, speed, util._clearHTML, target);
 };
 util._clearHTML = function(el) {
   el.innerHTML = '';
@@ -3443,7 +3444,7 @@ util._fadeOut = function(el, speed, cb, arg) {
 };
 util.__fadeOut = function(dat) {
   dat.el.fadeTimerId = 0;
-  if (dat.cb) dat.cb(dat.el, dat.arg);
+  if (dat.cb) dat.cb(dat.arg);
 };
 util.clearFade = function(el) {
   util.setStyle(el, 'transition', '');
@@ -3601,7 +3602,7 @@ util.loader.hide = function(el, force) {
   }
   util.fadeOut(ctx.ldrEl, 200, util.loader._hide, ctx);
 };
-util.loader._hide = function(el, ctx) {
+util.loader._hide = function(ctx) {
   util.overlay.hide(ctx.el, ctx.ldrEl);
   var i = util.getCtxIdx4El(util.loader.ctxs, ctx.el);
   util.loader.ctxs.splice(i, 1);
