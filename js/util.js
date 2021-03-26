@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202103260033';
+util.v = '202103270000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1786,9 +1786,9 @@ util.arr.toUniqueValues = function(arr, srt) {
     v.push({key: k, cnt: o[k]});
   }
   if (srt == 'asc|count') {
-    v = util.sortObjList(v, 'cnt');
+    v = util.sortObj(v, 'cnt');
   } else if (srt == 'desc|count') {
-    v = util.sortObjList(v, 'cnt', true);
+    v = util.sortObj(v, 'cnt', true);
   }
   var r = [];
   for (var i = 0; i < v.length; i++) {
@@ -1815,7 +1815,7 @@ util.removeListItem = function(list, item) {
  * [{id: 'A', cnt: 2}, {id: 'B', cnt: 1}, {id: 'C', cnt: 3}]
  * -> [{id: 'B', cnt: 1}, {id: 'A', cnt: 2}, {id: 'C', cnt: 3}]
  */
-util.sortObjList = function(list, key, desc) {
+util.sortObj = function(list, key, desc) {
   if (desc) {
     list.sort(function(a, b) {return b[key] - a[key];});
   } else {
@@ -3638,7 +3638,7 @@ util.modal.prototype = {
     var ctx = el.ctx;
     if (!ctx.closing) {
       ctx.closing = true;
-      util.fadeOut(el, 200, ctx._hide);
+      util.fadeOut(el, 200, ctx._hide, el);
     }
   },
   _hide: function(el) {
