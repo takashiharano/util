@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202103270000';
+util.v = '202103290000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -875,9 +875,7 @@ util.ClockTime.prototype = {
     return days;
   },
   toHrString: function(byTheDay) {
-    if (byTheDay === undefined) {
-      byTheDay = false;
-    }
+    if (byTheDay === undefined) byTheDay = false;
     var h = (byTheDay ? this.clockTm['hrs'] : this.tm['hours']);
     var hh = ((h < 10) ? ('0' + h).slice(-2) : h + '');
     return hh;
@@ -1617,9 +1615,7 @@ util.strp = function(tbl, idx) {
         a[j]++;
         if (a[j] > len - 1) {
           a[j] = 0;
-          if (a.length <= j + 1) {
-            a[j + 1] = -1;
-          }
+          if (a.length <= j + 1) a[j + 1] = -1;
         } else {
           cb = 0;
         }
@@ -2995,11 +2991,8 @@ util.textseq.print = function(ctx, s) {
   if (ctx.isInp) {
     ctx.el.value = s;
   } else {
-    if (ctx.el.$$textseqSpan) {
-      ctx.el.$$textseqSpan.innerHTML = s;
-    } else {
-      ctx.el.innerHTML = s;
-    }
+    var tgt = (ctx.el.$$textseqSpan ? ctx.el.$$textseqSpan : ctx.el);
+    tgt.innerHTML = s;
   }
 };
 util.textseq.ctxs = [];
@@ -3127,7 +3120,7 @@ util.infotip.opt = null;
 /**
  * show("message");
  * show("message", 3000);
- * show("message", 0, {pos: {x: 100, y: 200});
+ * show("message", 0, {pos: {x: 100, y: 200}});
  * show("message", 0, {pos: 'pointer', offset: {x: 5, y: -8}});
  * show("message", 0, {pos: 'active'});
  * show("message", 0, {style: {'font-size': '18px'}});
