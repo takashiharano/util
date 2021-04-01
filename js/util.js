@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202103290000';
+util.v = '202104011243';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -5945,13 +5945,6 @@ util.isTargetEl = function(el, tgt) {
     el = el.parentNode;
   } while (el != null);
   return false;
-};
-
-//-----------------------------------------------------------------------------
-util.loadScript = function(path) {
-  var s = document.createElement('script');
-  s.src = path;
-  document.body.appendChild(s);
 };
 
 //-----------------------------------------------------------------------------
