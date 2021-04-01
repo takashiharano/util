@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202104011243';
+util.v = '202104020000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -5948,45 +5948,23 @@ util.isTargetEl = function(el, tgt) {
 };
 
 //-----------------------------------------------------------------------------
-util.setupLogs = function() {
-  if (!window.log) {
-    window.log = function(o) {
-      console.log(o);
-    };
-    window.log.v = function(o) {
-      console.log(o);
-    };
-    window.log.d = function(o) {
-      console.log(o);
-    };
-    window.log.i = function(o) {
-      console.info(o);
-    };
-    window.log.w = function(o) {
-      console.warn(o);
-    };
-    window.log.e = function(o) {
-      console.error(o);
-    };
-  }
-  util._log = function(o) {
-    window.log(o);
-  };
-  util._log.v = function(o) {
-    window.log.v(o);
-  };
-  util._log.d = function(o) {
-    window.log.d(o);
-  };
-  util._log.i = function(o) {
-    window.log.i(o);
-  };
-  util._log.w = function(o) {
-    window.log.w(o);
-  };
-  util._log.e = function(o) {
-    window.log.e(o);
-  };
+util._log = function(o) {
+  if (window.log) window.log(o);
+};
+util._log.v = function(o) {
+  if (window.log) window.log.v(o);
+};
+util._log.d = function(o) {
+  if (window.log) window.log.d(o);
+};
+util._log.i = function(o) {
+  if (window.log) window.log.i(o);
+};
+util._log.w = function(o) {
+  if (window.log) window.log.w(o);
+};
+util._log.e = function(o) {
+  if (window.log) window.log.e(o);
 };
 
 //-----------------------------------------------------------------------------
@@ -6077,7 +6055,6 @@ util.nop = function() {};
 
 //-----------------------------------------------------------------------------
 util.init = function() {
-  util.setupLogs();
   try {
     if (typeof window.localStorage != 'undefined') util.LS_AVAILABLE = true;
   } catch (e) {}
