@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202104020000';
+util.v = '202104030000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -5267,15 +5267,7 @@ util.Console.prototype = {
 // Counter
 //-----------------------------------------------------------------------------
 /**
- * opt = {
- *   value: 0,
- *   duration: 250,
- *   format: true,
- *   scale: 0,
- *   prefix: 'String',
- *   suffix: 'String',
- *   text: 'String'
- * }
+ * opt: see util.Counter.DFLTOPT
  */
 util.initCounter = function(el, opt) {
   return new util.Counter(el, opt);
@@ -5284,25 +5276,38 @@ util.Counter = function(el, opt) {
   var ctx = this;
   el = util.getElement(el);
   if (!opt) opt = {};
-  var v = (opt.value == undefined ? 0 : opt.value);
-  ctx.B = 250;
-  ctx.D = (opt.duration == undefined ? ctx.B : opt.duration);
+  util.copyDefaultProps(opt, util.Counter.DFLTOPT);
+  if (typeof opt.duration == 'number') {
+    opt.duration = {min: opt.duration, max: opt.duration};
+  }
+  var v = opt.value;
+  ctx.dMin = opt.duration.min;
+  ctx.dMax = opt.duration.max;
   ctx.R = 20;
   ctx.el = el;
   ctx.v = v;
   ctx.v0 = v;
-  ctx.s = 0;
+  ctx.step = 0;
   ctx.r = ctx.R;
   ctx.fmt = (opt.format ? true : false);
-  ctx.scale = (opt.scale == undefined ? 0 : opt.scale);
-  ctx.pfx = (opt.prefix == undefined ? '' : opt.prefix);
-  ctx.sfx = (opt.suffix == undefined ? '' : opt.suffix);
+  ctx.scale = opt.scale;
+  ctx.pfx = opt.prefix;
+  ctx.sfx = opt.suffix;
   ctx.tmrId = 0;
   if (opt.text == undefined) {
     ctx.print(ctx, v);
   } else {
     ctx._print(ctx, opt.text);
   }
+};
+util.Counter.DFLTOPT = {
+  value: 0,
+  duration: {min: 250, max: 250},
+  format: true,
+  scale: 0,
+  prefix: '',
+  suffix: '',
+  text: undefined
 };
 util.Counter.prototype = {
   getValue: function() {
@@ -5313,49 +5318,59 @@ util.Counter.prototype = {
     v = util.floor(parseFloat(v), ctx.scale);
     ctx._stopTmr(ctx);
     ctx.v = v;
-    var D = ctx.D;
-    var mf = 0;
-    if (D == 0) {
+    var dMax = ctx.dMax;
+    var ngtvD = 0;
+    if (dMax == 0) {
       ctx.print(ctx, v);
       return;
-    } else if (D < 0) {
-      mf = 1;
-      D *= (-1);
+    } else if (dMax < 0) {
+      ngtvD = 1;
+      dMax *= (-1);
     }
     var d = v - ctx.v0;
-    var F = D / ctx.R;
+    var F = dMax / ctx.R;
     ctx.r = ctx.R;
     var a = Math.abs(d);
-    if ((a >= D) || (a >= F)) {
-      ctx.s = util.ceil(a / F, ctx.scale);
-      if (ctx.s % 10 == 0) {
+    if ((a >= dMax) || (a >= F)) {
+      ctx.step = util.ceil(a / F, ctx.scale);
+      if (ctx.step % 10 == 0) {
         if (ctx.scale > 0) {
-          ctx.s += parseFloat('0.' + util.repeatCh('0', ctx.scale - 1) + '1');
+          ctx.step += parseFloat('0.' + util.repeatCh('0', ctx.scale - 1) + '1');
         } else {
-          ctx.s++;
+          ctx.step++;
         }
       } else if (ctx.scale > 0) {
-        ctx.s += parseFloat('0.' + util.repeatCh('0', ctx.scale - 1) + '1');
+        ctx.step += parseFloat('0.' + util.repeatCh('0', ctx.scale - 1) + '1');
       }
     } else {
       if (ctx.scale > 0) {
-        ctx.s = parseFloat('1.' + util.repeatCh('0', ctx.scale - 1) + '1');
+        ctx.step = parseFloat('1.' + util.repeatCh('0', ctx.scale - 1) + '1');
       } else {
-        ctx.s = 1;
+        ctx.step = 1;
       }
-      if (a < ctx.B) ctx.r = util.ceil(ctx.B / a, ctx.scale);
+      if (a < ctx.dMin) ctx.r = util.ceil(ctx.dMin / a, ctx.scale);
     }
-    if (d < 0) ctx.s *= (-1);
-    if (mf) {
-      var t = (a < ctx.B ? ctx.B : D);
+    if (Math.floor(ctx.step) % 10 == 0) ctx.step += 1;
+    if (d < 0) ctx.step *= (-1);
+    if (ngtvD) {
+      var t = (a < ctx.dMin ? ctx.dMin : dMax);
       ctx.v0 = v;
       ctx.tmrId = setTimeout(ctx.update, t, ctx);
     } else {
       ctx.update(ctx);
     }
   },
+  setDurationMin: function(d) {
+    this.dMin = d;
+    if (this.tmrId > 0) this.setValue(this.v);
+  },
+  setDurationMax: function(d) {
+    this.dMax = d;
+    if (this.tmrId > 0) this.setValue(this.v);
+  },
   setDuration: function(d) {
-    this.D = d;
+    this.dMin = d;
+    this.dMax = d;
     if (this.tmrId > 0) this.setValue(this.v);
   },
   up: function() {
@@ -5398,10 +5413,10 @@ util.Counter.prototype = {
   update: function(ctx) {
     ctx.tmrId = 0;
     var v = ctx.v0;
-    v += ctx.s;
+    v += ctx.step;
     v = util.round(v, ctx.scale);
     var c = true;
-    if (((ctx.s >= 0) && (v > ctx.v)) || ((ctx.s < 0) && (v < ctx.v))) {
+    if (((ctx.step >= 0) && (v > ctx.v)) || ((ctx.step < 0) && (v < ctx.v))) {
       v = ctx.v;
       c = false;
     }
