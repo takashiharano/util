@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202104030000';
+util.v = '202104040018';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -5294,6 +5294,7 @@ util.Counter = function(el, opt) {
   ctx.pfx = opt.prefix;
   ctx.sfx = opt.suffix;
   ctx.tmrId = 0;
+  ctx.cb = opt.cb;
   if (opt.text == undefined) {
     ctx.print(ctx, v);
   } else {
@@ -5307,7 +5308,8 @@ util.Counter.DFLTOPT = {
   scale: 0,
   prefix: '',
   suffix: '',
-  text: undefined
+  text: undefined,
+  cb: null
 };
 util.Counter.prototype = {
   getValue: function() {
@@ -5427,8 +5429,9 @@ util.Counter.prototype = {
   print: function(ctx, v) {
     if (ctx.scale > 0) v = util.decimalPadding(v, ctx.scale);
     if (ctx.fmt && ((v >= 1000) || (v <= 1000))) v = util.formatNumber(v);
-    v = ctx.pfx + v + ctx.sfx;
-    ctx._print(ctx, v);
+    var s = ctx.pfx + v + ctx.sfx;
+    ctx._print(ctx, s);
+    if (ctx.cb) ctx.cb(v);
   },
   _print: function(ctx, v) {
     ctx.el.innerHTML = v;
