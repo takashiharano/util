@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202103090028
+v = 202104031810
 
 import os
 import sys
@@ -27,6 +27,7 @@ import urllib.request
 import urllib.parse
 import ssl
 import logging
+import zipfile
 
 DEFAULT_ENCODING = 'utf-8'
 DEFAULT_HTTP_TIMEOUT = 15
@@ -2461,6 +2462,25 @@ def print_elapsed_time(prefix='', suffix=''):
   t = elapsed_time()
   m = prefix + t + suffix
   printlog(m)
+
+#------------------------------------------------------------------------------
+# ZIP
+#------------------------------------------------------------------------------
+def zip(zip_path, filepath, arcarcname=None):
+  if is_dir(filepath):
+    zip_path = re.sub('\.zip$', '', zip_path)
+    shutil.make_archive(zip_path, 'zip', root_dir=filepath)
+  else:
+    if arcarcname is None:
+      arcarcname = get_filename(filepath)
+    with zipfile.ZipFile(zip_path, 'w', compression=zipfile.ZIP_DEFLATED) as zipf:
+      zipf.write(filepath, arcname=arcarcname)
+
+def unzip(zip_path, out_path, pwd=None):
+  if pwd is not None:
+    pwd = pwd.encode(encoding='utf-8')
+  with zipfile.ZipFile(zip_path) as zipf:
+    zipf.extractall(out_path, pwd=pwd)
 
 #------------------------------------------------------------------------------
 # Debugging
