@@ -1,4 +1,3 @@
-Attribute VB_Name = "Util"
 '==============================================================================
 ' Util.bas
 ' Copyright 2020 Takashi Harano
@@ -1826,10 +1825,9 @@ End Sub
 ''
 ' Unix timeを返します。
 '
-' offset
-'  ローカルタイムゾーンのUTCからのオフセット(分)
-'
-Public Function GetUnixTime(Optional offset As Long = 0)
+Public Function GetUnixTime() As Long
+    Dim offset As Long
+    offset = GetLocalTimeZoneOffset()
     GetUnixTime = DateDiff("s", #1/1/1970#, Now()) - offset * 60
 End Function
 
