@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202104031810
+v = 202104132100
 
 import os
 import sys
@@ -178,14 +178,23 @@ def str_find(s, pattern, flags=0):
 def str_findall(s, pattern, flags=0):
   return re.findall(pattern, s, flags)
 
-# ('abc', '0', 5)
-# -> '00abc'
-# ('abc', '0', 2)
-# -> 'abc'
-# (1, '0', 2)
-# -> '01'
-def str_padding(s, ch, len):
+# ('ABC', '0', 5)
+# -> '00ABC'
+# ('ABCDE', '0', 5)
+# -> 'ABCDE'
+# (1, '0', 5)
+# -> '00001'
+def lpad(s, ch, len):
   return str(s).rjust(len, ch)
+
+# ('ABC', '0', 5)
+# -> 'ABC00'
+# ('ABCDE', '0', 5)
+# -> 'ABCDE'
+# (1, '0', 5)
+# -> '10000'
+def rpad(s, ch, len):
+  return str(s).ljust(len, ch)
 
 # Convert newline
 def convert_newline(s, nl):
