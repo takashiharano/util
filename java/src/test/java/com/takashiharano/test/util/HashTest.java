@@ -24,7 +24,7 @@ public class HashTest {
 
   private static void fromFile() {
     String path = "C:/test/a.txt";
-    byte[] b = FileUtil.readFile(path);
+    byte[] b = FileUtil.read(path);
     Log.d("hash=" + Hash.md5(b));
     Log.d("hash=" + Hash.sha1(b));
     Log.d("hash=" + Hash.sha256(b));
