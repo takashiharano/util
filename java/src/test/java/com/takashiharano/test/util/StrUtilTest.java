@@ -22,7 +22,7 @@ public class StrUtilTest {
   }
 
   private static void text2arrayTest() {
-    String str = FileUtil.readTextFile("C:/test/a.txt");
+    String str = FileUtil.readText("C:/test/a.txt");
     String[] arr = StrUtil.text2array(str);
     for (int i = 0; i < arr.length; i++) {
       Log.d("str=" + arr[i]);
