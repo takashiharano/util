@@ -8,12 +8,12 @@ import com.takashiharano.util.Log;
 public class FileUtilTest {
 
   public static void main(String args[]) {
-    // readBinaryFileTest();
-    // readTextFileTest();
+    readBinaryFileTest();
+    readTextFileTest();
     // readTextFileTest10000();
     // readTextFileTest10000AsArray();
     // readFileArrayTest();
-    // readFileAsBase64Test();
+    readFileAsBase64Test();
     // writeFileTest();
     // getParentPathTest();
     listFileNamesTest();
@@ -25,20 +25,20 @@ public class FileUtilTest {
 
   private static void readBinaryFileTest() {
     String path = "C:/test/a.txt";
-    byte[] b = FileUtil.readFile(path);
+    byte[] b = FileUtil.read(path);
     Log.d(b);
   }
 
   private static void readTextFileTest() {
     String path = "C:/test/a.txt";
-    String str = FileUtil.readTextFile(path);
+    String str = FileUtil.readText(path);
     Log.d(str);
   }
 
   private static void readTextFileTest10000() {
     String path = "C:/test/100000lines.txt";
     long t1 = System.currentTimeMillis();
-    String str = FileUtil.readTextFile(path); // 160-170ms
+    String str = FileUtil.readText(path); // 160-170ms
     // String str = FileUtil.readTextFile(path, "UTF-8"); // 30ms
     long t2 = System.currentTimeMillis();
     Log.d("t=" + (t2 - t1));
@@ -47,7 +47,7 @@ public class FileUtilTest {
   private static void readTextFileTest10000AsArray() {
     String path = "C:/test/100000lines.txt";
     long t1 = System.currentTimeMillis();
-    String[] str = FileUtil.readTextFileAsArray(path); // 65ms
+    String[] str = FileUtil.readTextAsArray(path); // 65ms
     long t2 = System.currentTimeMillis();
     Log.d("t=" + (t2 - t1));
   }
@@ -96,10 +96,10 @@ public class FileUtilTest {
   }
 
   private static void _readFileArrayTest(String path) {
-    byte[] bytes = FileUtil.readFile(path);
+    byte[] bytes = FileUtil.read(path);
     String charsetName = FileUtil.getCharsetName(bytes);
     Log.d("charset=" + charsetName);
-    String[] text = FileUtil.readTextFileAsArray(path, charsetName);
+    String[] text = FileUtil.readTextAsArray(path, charsetName);
     if (text == null) {
       Log.e("READ_ERROOR");
       return;
@@ -111,7 +111,7 @@ public class FileUtilTest {
 
   private static void readFileAsBase64Test() {
     String path = "C:/test/a.txt";
-    String str = FileUtil.readFileAsBase64(path);
+    String str = FileUtil.readAsBase64(path);
     Log.d(str);
   }
 
@@ -130,7 +130,7 @@ public class FileUtilTest {
     String path1 = parent + "file1.txt";
     String content1 = "abc\nあいうえお\n华语";
     try {
-      FileUtil.writeFile(path1, content1);
+      FileUtil.write(path1, content1);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -138,7 +138,7 @@ public class FileUtilTest {
     String path2 = parent + "file2.txt";
     byte[] content2 = { 97, 98, 99 };
     try {
-      FileUtil.writeFile(path2, content2);
+      FileUtil.write(path2, content2);
     } catch (IOException e) {
       e.printStackTrace();
     }
