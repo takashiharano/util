@@ -10,27 +10,6 @@ import java.util.regex.Pattern;
 public class StrUtil {
 
   /**
-   * Split the string by line separator.<br>
-   * "aaa\nbbb\nccc" -> ["aaa", "bbb", "ccc"]
-   * 
-   * @param src
-   *          the string to split
-   * @return the split array of strings
-   */
-  public static String[] text2array(String src) {
-    String text = convertNewLine(src, "\n");
-    String[] arr = text.split("\n", -1);
-    if ((arr.length >= 2) && (arr[arr.length - 1].equals(""))) {
-      String[] tmp = new String[arr.length - 1];
-      for (int i = 0; i < arr.length - 1; i++) {
-        tmp[i] = arr[i];
-      }
-      arr = tmp;
-    }
-    return arr;
-  }
-
-  /**
    * String array to string.
    *
    * @param arr
@@ -59,25 +38,14 @@ public class StrUtil {
   }
 
   /**
-   * Attempts to find the next subsequence of the input sequence that matches the
-   * pattern.<br>
-   * This method starts at the beginning of this matcher's region, or, if a
-   * previous invocation of the method was successful and the matcher has not
-   * since been reset, at the first character not matched by the previous
-   * match.<br>
-   * If the match succeeds then more information can be obtained via the start,
-   * end, and group methods.
+   * Convert newline control character.
    *
-   * @param target
-   * @param regex
-   * @param flags
-   * @return true if, and only if, a subsequence of the input sequence matches
-   *         this matcher's pattern
+   * @param src
+   * @param newLine
+   * @return converted string
    */
-  public static boolean match(String target, String regex, int flags) {
-    Pattern p = Pattern.compile(regex, flags);
-    Matcher m = p.matcher(target);
-    return m.find();
+  public static String convertNewLine(String src, String newLine) {
+    return src.replaceAll("\r\n", "\n").replaceAll("\r", "\n").replaceAll("\n", newLine);
   }
 
   /**
@@ -158,6 +126,135 @@ public class StrUtil {
   }
 
   /**
+   * Count the specified pattern in the given string.
+   *
+   * @param str
+   *          the string to check
+   * @param pattern
+   *          the pattern to count
+   * @return count
+   */
+  public static int countStrPattern(String str, String pattern) {
+    Pattern p = Pattern.compile(pattern);
+    Matcher m = p.matcher(str);
+    int count = 0;
+    while (m.find()) {
+      count++;
+    }
+    return count;
+  }
+
+  /**
+   * Decodes a application/x-www-form-urlencoded string using a specific encoding
+   * scheme.
+   *
+   * @param src
+   *          the String to decode
+   * @return the newly decoded String
+   */
+  public static String decodeUri(String src) {
+    return decodeUri(src, null);
+  }
+
+  /**
+   * Decodes a application/x-www-form-urlencoded string using a specific encoding
+   * scheme.
+   *
+   * @param src
+   *          the String to decode
+   * @param encoding
+   *          The name of a supported character encoding
+   * @return the newly decoded String
+   */
+  public static String decodeUri(String src, String encoding) {
+    if (encoding == null) {
+      encoding = "UTF-8";
+    }
+    String decoded;
+    try {
+      decoded = URLDecoder.decode(src, encoding);
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+    return decoded;
+  }
+
+  /**
+   * Translates a string into application/x-www-form-urlencoded format using a
+   * specific encoding scheme.
+   *
+   * @param src
+   *          the String to encode
+   * @return the newly encoded String
+   */
+  public static String encodeUri(String src) {
+    return encodeUri(src, null);
+  }
+
+  /**
+   * Translates a string into application/x-www-form-urlencoded format using a
+   * specific encoding scheme.
+   *
+   * @param src
+   *          the String to encode
+   * @param encoding
+   *          The name of a supported character encoding
+   * @return the newly encoded String
+   */
+  public static String encodeUri(String src, String encoding) {
+    if (encoding == null) {
+      encoding = "UTF-8";
+    }
+    String encoded;
+    try {
+      encoded = URLEncoder.encode(src, encoding);
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+    return encoded;
+  }
+
+  /**
+   * Escaping a string for HTML.
+   *
+   * @param src
+   *          a string to escape
+   * @return escaped string
+   */
+  public static String escapeHtml(String src) {
+    String escaped = src.replace("&", "&amp;");
+    escaped = escaped.replace("<", "&lt;");
+    escaped = escaped.replace(">", "&gt;");
+    escaped = escaped.replace("\"", "&quot;");
+    escaped = escaped.replace("'", "&#39;");
+    return escaped;
+  }
+
+  /**
+   * Specialization of format.
+   *
+   * @param number
+   *          the long number to format
+   * @return the formatted String
+   */
+  public static String formatNumber(long number) {
+    NumberFormat nf = NumberFormat.getNumberInstance();
+    return nf.format(number);
+  }
+
+  /**
+   * Specialization of format.
+   *
+   * @param number
+   *          the double number to format
+   * @return the formatted String
+   */
+  public static String formatNumber(double number) {
+    NumberFormat nf = NumberFormat.getNumberInstance();
+    return nf.format(number);
+  }
+
+  /**
    * Returns the input subsequence captured by the given group during the previous
    * match operation.<br>
    * For a matcher m, input sequence s, and group index g, the expressions
@@ -188,22 +285,142 @@ public class StrUtil {
   }
 
   /**
-   * Count the specified pattern in the given string.
+   * Integer to Decimal formated string.<br>
+   * 1000, 3 -> 1.000<br>
+   * 1, 3 -> 0.001
+   *
+   * @param number
+   * @param scale
+   * @return
+   */
+  public static String intnum2decimal(long number, int scale) {
+    if (number == 0) {
+      return "0";
+    }
+
+    String src = Long.toString(number);
+    if (number < 0) {
+      src = src.substring(1);
+    }
+
+    int len = src.length();
+    String formatted;
+    if (len <= scale) {
+      String zeros = repeat("0", scale - len);
+      formatted = "0." + zeros + src;
+    } else {
+      String i = src.substring(0, len - scale);
+      String d = src.substring(len - scale, len);
+      formatted = i + "." + d;
+    }
+
+    if (number < 0) {
+      formatted = "-" + formatted;
+    }
+
+    return formatted;
+  }
+
+  /**
+   * Returns if the specified string is empty or not.
+   *
+   * @param str
+   *          the source string
+   * @return true if the string is empty.
+   */
+  public static boolean isEmpty(String str) {
+    return isEmpty(str, false);
+  }
+
+  /**
+   * Returns if the specified string is empty or not.
+   *
+   * @param str
+   *          the source string
+   * @param whitespace
+   *          set to true, whitespace only will be treated as empty
+   * @return true if the string is empty.
+   */
+  public static boolean isEmpty(String str, boolean whitespace) {
+    if (str == null) {
+      return true;
+    }
+    if (whitespace) {
+      str = str.trim();
+    }
+    return str.equals("");
+  }
+
+  /**
+   * Returns if the given string is a float.
    *
    * @param str
    *          the string to check
-   * @param pattern
-   *          the pattern to count
-   * @return count
+   * @return true if the string is a float
    */
-  public static int countStrPattern(String str, String pattern) {
-    Pattern p = Pattern.compile(pattern);
-    Matcher m = p.matcher(str);
-    int count = 0;
-    while (m.find()) {
-      count++;
+  public static boolean isFloat(String str) {
+    if (str == null) {
+      return false;
     }
-    return count;
+    return match(str, "^-?\\d+\\.\\d+$", 0);
+  }
+
+  /**
+   * Returns if the given string is an integer.
+   *
+   * @param str
+   *          the string to check
+   * @return true if the string is an integer
+   */
+  public static boolean isInteger(String str) {
+    if (str == null) {
+      return false;
+    }
+    return match(str, "^-?\\d+$", 0);
+  }
+
+  /**
+   * Returns if the given string is not a number.
+   *
+   * @param str
+   *          the string to check
+   * @return true if not a number
+   */
+  public static boolean isNaN(String str) {
+    return !isNumber(str);
+  }
+
+  /**
+   * Returns if the given string is a number.
+   *
+   * @param str
+   *          the string to check
+   * @return true if the string is a number
+   */
+  public static boolean isNumber(String str) {
+    return (isInteger(str) || isFloat(str));
+  }
+
+  /**
+   * Attempts to find the next subsequence of the input sequence that matches the
+   * pattern.<br>
+   * This method starts at the beginning of this matcher's region, or, if a
+   * previous invocation of the method was successful and the matcher has not
+   * since been reset, at the first character not matched by the previous
+   * match.<br>
+   * If the match succeeds then more information can be obtained via the start,
+   * end, and group methods.
+   *
+   * @param target
+   * @param regex
+   * @param flags
+   * @return true if, and only if, a subsequence of the input sequence matches
+   *         this matcher's pattern
+   */
+  public static boolean match(String target, String regex, int flags) {
+    Pattern p = Pattern.compile(regex, flags);
+    Matcher m = p.matcher(target);
+    return m.find();
   }
 
   /**
@@ -215,23 +432,6 @@ public class StrUtil {
    */
   public static String quote(String src) {
     return quote(src, null, null);
-  }
-
-  /**
-   * Build a repeated string.
-   *
-   * @param str
-   *          source string
-   * @param n
-   *          number of repeat
-   * @return repeated string
-   */
-  public static String repeat(String str, int n) {
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < n; i++) {
-      sb.append(str);
-    }
-    return sb.toString();
   }
 
   /**
@@ -274,14 +474,20 @@ public class StrUtil {
   }
 
   /**
-   * Convert newline control character.
+   * Build a repeated string.
    *
-   * @param src
-   * @param newLine
-   * @return converted string
+   * @param str
+   *          source string
+   * @param n
+   *          number of repeat
+   * @return repeated string
    */
-  public static String convertNewLine(String src, String newLine) {
-    return src.replaceAll("\r\n", "\n").replaceAll("\r", "\n").replaceAll("\n", newLine);
+  public static String repeat(String str, int n) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < n; i++) {
+      sb.append(str);
+    }
+    return sb.toString();
   }
 
   /**
@@ -299,144 +505,24 @@ public class StrUtil {
   }
 
   /**
-   * Returns if the specified string is empty or not.
-   *
-   * @param str
-   *          the source string
-   * @return true if the string is empty.
+   * Split the string by line separator.<br>
+   * "aaa\nbbb\nccc" -> ["aaa", "bbb", "ccc"]
+   * 
+   * @param src
+   *          the string to split
+   * @return the split array of strings
    */
-  public static boolean isEmpty(String str) {
-    return isEmpty(str, false);
-  }
-
-  /**
-   * Returns if the specified string is empty or not.
-   *
-   * @param str
-   *          the source string
-   * @param whitespace
-   *          set to true, whitespace only will be treated as empty
-   * @return true if the string is empty.
-   */
-  public static boolean isEmpty(String str, boolean whitespace) {
-    if (str == null) {
-      return true;
+  public static String[] text2array(String src) {
+    String text = convertNewLine(src, "\n");
+    String[] arr = text.split("\n", -1);
+    if ((arr.length >= 2) && (arr[arr.length - 1].equals(""))) {
+      String[] tmp = new String[arr.length - 1];
+      for (int i = 0; i < arr.length - 1; i++) {
+        tmp[i] = arr[i];
+      }
+      arr = tmp;
     }
-    if (whitespace) {
-      str = str.trim();
-    }
-    return str.equals("");
-  }
-
-  /**
-   * Returns if the given string is an integer.
-   *
-   * @param str
-   *          the string to check
-   * @return true if the string is an integer
-   */
-  public static boolean isInteger(String str) {
-    if (str == null) {
-      return false;
-    }
-    return match(str, "^-?\\d+$", 0);
-  }
-
-  /**
-   * Returns if the given string is a float.
-   *
-   * @param str
-   *          the string to check
-   * @return true if the string is a float
-   */
-  public static boolean isFloat(String str) {
-    if (str == null) {
-      return false;
-    }
-    return match(str, "^-?\\d+\\.\\d+$", 0);
-  }
-
-  /**
-   * Returns if the given string is a number.
-   *
-   * @param str
-   *          the string to check
-   * @return true if the string is a number
-   */
-  public static boolean isNumber(String str) {
-    return (isInteger(str) || isFloat(str));
-  }
-
-  /**
-   * Returns if the given string is not a number.
-   *
-   * @param str
-   *          the string to check
-   * @return true if not a number
-   */
-  public static boolean isNaN(String str) {
-    return !isNumber(str);
-  }
-
-  /**
-   * Specialization of format.
-   *
-   * @param number
-   *          the long number to format
-   * @return the formatted String
-   */
-  public static String formatNumber(long number) {
-    NumberFormat nf = NumberFormat.getNumberInstance();
-    return nf.format(number);
-  }
-
-  /**
-   * Specialization of format.
-   *
-   * @param number
-   *          the double number to format
-   * @return the formatted String
-   */
-  public static String formatNumber(double number) {
-    NumberFormat nf = NumberFormat.getNumberInstance();
-    return nf.format(number);
-  }
-
-  /**
-   * Integer to Decimal formated string.<br>
-   * 1000, 3 -> 1.000<br>
-   * 1, 3 -> 0.001
-   *
-   * @param number
-   * @param scale
-   * @return
-   */
-  public static String intnum2decimal(long number, int scale) {
-    if (number == 0) {
-      return "0";
-    }
-
-    String src = Long.toString(number);
-    if (number < 0) {
-      src = src.substring(1);
-    }
-
-    int len = src.length();
-    String formatted;
-    if (len <= scale) {
-      String zeros = repeat("0", scale - len);
-      formatted = "0." + zeros + src;
-    } else {
-      String i = src.substring(0, len - scale);
-      String d = src.substring(len - scale, len);
-      formatted = i + "." + d;
-    }
-
-    if (number < 0) {
-      formatted = "-" + formatted;
-    }
-
-    return formatted;
+    return arr;
   }
 
   /**
@@ -480,92 +566,6 @@ public class StrUtil {
     }
 
     return r;
-  }
-
-  /**
-   * Translates a string into application/x-www-form-urlencoded format using a
-   * specific encoding scheme.
-   *
-   * @param src
-   *          the String to encode
-   * @return the newly encoded String
-   */
-  public static String encodeUri(String src) {
-    return encodeUri(src, null);
-  }
-
-  /**
-   * Translates a string into application/x-www-form-urlencoded format using a
-   * specific encoding scheme.
-   *
-   * @param src
-   *          the String to encode
-   * @param encoding
-   *          The name of a supported character encoding
-   * @return the newly encoded String
-   */
-  public static String encodeUri(String src, String encoding) {
-    if (encoding == null) {
-      encoding = "UTF-8";
-    }
-    String encoded;
-    try {
-      encoded = URLEncoder.encode(src, encoding);
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
-    }
-    return encoded;
-  }
-
-  /**
-   * Decodes a application/x-www-form-urlencoded string using a specific encoding
-   * scheme.
-   *
-   * @param src
-   *          the String to decode
-   * @return the newly decoded String
-   */
-  public static String decodeUri(String src) {
-    return decodeUri(src, null);
-  }
-
-  /**
-   * Decodes a application/x-www-form-urlencoded string using a specific encoding
-   * scheme.
-   *
-   * @param src
-   *          the String to decode
-   * @param encoding
-   *          The name of a supported character encoding
-   * @return the newly decoded String
-   */
-  public static String decodeUri(String src, String encoding) {
-    if (encoding == null) {
-      encoding = "UTF-8";
-    }
-    String decoded;
-    try {
-      decoded = URLDecoder.decode(src, encoding);
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
-    }
-    return decoded;
-  }
-
-  /**
-   * Escaping a string for HTML.
-   *
-   * @param src
-   *          a string to escape
-   * @return escaped string
-   */
-  public static String escapeHtml(String src) {
-    String escaped = src.replace("&", "&amp;");
-    escaped = escaped.replace("<", "&lt;");
-    escaped = escaped.replace(">", "&gt;");
-    escaped = escaped.replace("\"", "&quot;");
-    escaped = escaped.replace("'", "&#39;");
-    return escaped;
   }
 
 }
