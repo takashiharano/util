@@ -2,11 +2,11 @@ package com.takashiharano.util;
 
 public class Log {
 
-  private static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd' 'HH:mm:ss.SSS XX";
+  private static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXX";
   private static String dateTimeFormat = DEFAULT_DATE_TIME_FORMAT;
 
   public enum LogLevel {
-    X("X", 0), FATAL("F", 1), ERROR("E", 2), WARN("W", 3), INFO("I", 4), DEBUG("D", 5);
+    FATAL("F", 1), ERROR("E", 2), WARN("W", 3), INFO("I", 4), DEBUG("D", 5);
 
     private String typeSymbol;
     private int level;
@@ -133,10 +133,6 @@ public class Log {
     moduleName = name;
   }
 
-  public static void x(Object o) {
-    Log.out(o, LogLevel.X, 0, true);
-  }
-
   /**
    * Debug log.
    *
@@ -245,13 +241,13 @@ public class Log {
    */
   public static void stack(int offset) {
     StackTraceElement stack[] = (new Throwable()).getStackTrace();
-    System.out.println("Stack:");
+    printLog("Stack:");
     for (int i = offset; i < stack.length; i++) {
       StackTraceElement frame = stack[i];
       String className = frame.getClassName();
       String methodName = frame.getMethodName();
       int lineNum = frame.getLineNumber();
-      System.out.println("    at " + className + "#" + methodName + " (L:" + lineNum + ")");
+      printLog("    at " + className + "#" + methodName + " (L:" + lineNum + ")");
     }
   }
 
@@ -267,9 +263,15 @@ public class Log {
    *          set true to output method():file:line
    */
   private static void out(Object o, LogLevel lv, int stackFrameOffset, boolean printLine) {
-    if (lv.getLevel() <= outputLevel) {
-      String message = buildMessage(o, lv, stackFrameOffset, printLine);
-      System.out.println(message);
+    int logLevel = lv.getLevel();
+    if (logLevel > outputLevel) {
+      return;
+    }
+    String message = buildMessage(o, lv, stackFrameOffset, printLine);
+    if (logLevel <= LogLevel.ERROR.getLevel()) {
+      printErrorLog(message);
+    } else {
+      printLog(message);
     }
   }
 
@@ -385,6 +387,14 @@ public class Log {
       String m = "    at " + clazz + "#" + method + " (L:" + line + ")";
       out(m, lv, 3, printLine);
     }
+  }
+
+  private static void printLog(Object o) {
+    System.out.println(o);
+  }
+
+  private static void printErrorLog(Object o) {
+    System.out.println(o);
   }
 
 }
