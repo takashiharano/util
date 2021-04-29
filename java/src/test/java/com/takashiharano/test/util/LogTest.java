@@ -7,7 +7,6 @@ import com.takashiharano.util.Log;
 public class LogTest {
 
   public static void main(String args[]) {
-    Log.x("X-Debug");
     Log.d("Debug");
     Log.i("Information");
     Log.w("Warning");
