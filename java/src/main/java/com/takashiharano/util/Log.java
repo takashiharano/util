@@ -251,49 +251,24 @@ public class Log {
     }
   }
 
-  /**
-   * Output log message.
-   *
-   * @param o
-   *          message string or object
-   * @param lv
-   *          log level
-   * @param stackFrameOffset
-   * @param printLine
-   *          set true to output method():file:line
-   */
-  private static void out(Object o, LogLevel lv, int stackFrameOffset, boolean printLine) {
-    int logLevel = lv.getLevel();
-    if (logLevel > outputLevel) {
-      return;
-    }
-    String message = buildMessage(o, lv, stackFrameOffset, printLine);
-    if (logLevel <= LogLevel.ERROR.getLevel()) {
-      printErrorLog(message);
-    } else {
-      printLog(message);
+  private static void printStackTraceString(Throwable t, LogLevel lv, boolean printLine) {
+    out(t.toString(), lv, 2, printLine);
+    _printStackTraceString(t, lv, printLine);
+    while ((t = t.getCause()) != null) {
+      out("Caused by: " + t.toString(), lv, 2, printLine);
+      _printStackTraceString(t, lv, printLine);
     }
   }
 
-  /**
-   * Output error message.
-   *
-   * @param o
-   * @param lv
-   * @param t
-   */
-  private static void error(Object o, LogLevel lv, Throwable t) {
-    if (lv.getLevel() > outputLevel) {
-      return;
-    }
-    boolean printLine = true;
-    if (o instanceof Throwable) {
-      printStackTraceString((Throwable) o, lv, printLine);
-    } else {
-      out(o, lv, 1, printLine);
-    }
-    if (t != null) {
-      printStackTraceString(t, lv, printLine);
+  private static void _printStackTraceString(Throwable t, LogLevel lv, boolean printLine) {
+    StackTraceElement[] stack = t.getStackTrace();
+    for (int i = 0; i < stack.length; i++) {
+      StackTraceElement frame = stack[i];
+      String clazz = frame.getClassName();
+      String method = frame.getMethodName();
+      int line = frame.getLineNumber();
+      String m = "    at " + clazz + "#" + method + " (L:" + line + ")";
+      out(m, lv, 3, printLine);
     }
   }
 
@@ -368,24 +343,57 @@ public class Log {
     return sb.toString();
   }
 
-  private static void printStackTraceString(Throwable t, LogLevel lv, boolean printLine) {
-    out(t.toString(), lv, 2, printLine);
-    _printStackTraceString(t, lv, printLine);
-    while ((t = t.getCause()) != null) {
-      out("Caused by: " + t.toString(), lv, 2, printLine);
-      _printStackTraceString(t, lv, printLine);
+  /**
+   * Output log message.
+   *
+   * @param o
+   *          message string or object
+   * @param lv
+   *          log level
+   * @param stackFrameOffset
+   * @param printLine
+   *          set true to output method():file:line
+   */
+  private static void out(Object o, LogLevel lv, int stackFrameOffset, boolean printLine) {
+    int logLevel = lv.getLevel();
+    if (logLevel > outputLevel) {
+      return;
+    }
+    String message = buildMessage(o, lv, stackFrameOffset, printLine);
+    if (logLevel <= LogLevel.FATAL.getLevel()) {
+      printLogF(message);
+    } else if (logLevel <= LogLevel.ERROR.getLevel()) {
+      printLogE(message);
+    } else if (logLevel <= LogLevel.WARN.getLevel()) {
+      printLogW(message);
+    } else if (logLevel <= LogLevel.INFO.getLevel()) {
+      printLogI(message);
+    } else if (logLevel <= LogLevel.DEBUG.getLevel()) {
+      printLogD(message);
+    } else {
+      printLog(message);
     }
   }
 
-  private static void _printStackTraceString(Throwable t, LogLevel lv, boolean printLine) {
-    StackTraceElement[] stack = t.getStackTrace();
-    for (int i = 0; i < stack.length; i++) {
-      StackTraceElement frame = stack[i];
-      String clazz = frame.getClassName();
-      String method = frame.getMethodName();
-      int line = frame.getLineNumber();
-      String m = "    at " + clazz + "#" + method + " (L:" + line + ")";
-      out(m, lv, 3, printLine);
+  /**
+   * Output error message.
+   *
+   * @param o
+   * @param lv
+   * @param t
+   */
+  private static void error(Object o, LogLevel lv, Throwable t) {
+    if (lv.getLevel() > outputLevel) {
+      return;
+    }
+    boolean printLine = true;
+    if (o instanceof Throwable) {
+      printStackTraceString((Throwable) o, lv, printLine);
+    } else {
+      out(o, lv, 1, printLine);
+    }
+    if (t != null) {
+      printStackTraceString(t, lv, printLine);
     }
   }
 
@@ -393,7 +401,23 @@ public class Log {
     System.out.println(o);
   }
 
-  private static void printErrorLog(Object o) {
+  private static void printLogD(Object o) {
+    System.out.println(o);
+  }
+
+  private static void printLogI(Object o) {
+    System.out.println(o);
+  }
+
+  private static void printLogW(Object o) {
+    System.out.println(o);
+  }
+
+  private static void printLogE(Object o) {
+    System.out.println(o);
+  }
+
+  private static void printLogF(Object o) {
     System.out.println(o);
   }
 
