@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202104080000';
+util.v = '202105020059';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2079,6 +2079,12 @@ $el.fn = {
       if (speed == undefined) speed = 0;
       util.clearHTML(el, speed);
     }
+  },
+  disable: function() {
+    this.disabled = true;
+  },
+  enable: function() {
+    this.disabled = false;
   },
   textseq: function(text, opt) {
     return util.textseq(this, text, opt);
