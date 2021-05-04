@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202105020059';
+util.v = '202105050000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -3016,6 +3016,9 @@ util.STYLE = function() {/*
 }
 .pseudo-link:hover {
   text-decoration: underline;
+}
+.glow {
+  text-shadow: 0 0 5px;
 }
 .blink {animation: blinker 1.5s step-end infinite;}
 @keyframes blinker {
