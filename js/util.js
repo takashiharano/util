@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202105070000';
+util.v = '202105120020';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1360,6 +1360,13 @@ util.rpad = function(str, pad, len, adj) {
   r += pd;
   if (adj) r = r.substr(0, len);
   return r;
+};
+
+/**
+ * abc -> Abc
+ */
+util.capitalize = function(s) {
+  return ((s && (typeof s == 'string')) ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s);
 };
 
 util.null2empty = function(s) {
