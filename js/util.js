@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202105120020';
+util.v = '202105130019';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -524,7 +524,7 @@ util.Time.prototype = {
   },
 
   /**
-   * To string the time.
+   * Returns a string representation of the object.
    *
    * 1d 23h 45m 59s
    * h:
@@ -629,7 +629,7 @@ util.timecounter = {};
 util.timecounter.id = 0;
 util.timecounter.objs = {};
 /**
- * Start to display the time delta
+ * Start displaying the time delta
  *
  * opt = {
  *  interval: 500,
@@ -654,7 +654,7 @@ util.timecounter.start = function(el, t0, opt) {
 };
 
 /**
- * Stop to display the time delta
+ * Stop displaying the time difference
  */
 util.timecounter.stop = function(el) {
   var v = 0;
@@ -668,7 +668,7 @@ util.timecounter.stop = function(el) {
 };
 
 /**
- * Returns time delta string
+ * Returns a string of time difference
  *
  * t0: from in millis / Date-Time-String
  * t1: to in millis / Date-Time-String (default=current time)
@@ -684,7 +684,7 @@ util.timecounter.delta = function(t0, t1, mode, signed) {
 };
 
 /**
- * Returns the time delta value in millis
+ * Returns the time difference value in millis
  */
 util.timecounter.value = function(el) {
   var v = 0;
@@ -694,7 +694,7 @@ util.timecounter.value = function(el) {
 };
 
 /**
- * Returns the time delta string like '1m 23s'
+ * Returns a string of the time difference like '1m 23s'
  */
 util.timecounter.getText = function(el) {
   var v = 0;
@@ -5537,7 +5537,7 @@ util.IntervalProc._stop = function(p) {
 };
 
 /**
- * Sets a timer which executes an intefval proc function.
+ * Sets a timer which executes an interval proc function.
  */
 util.IntervalProc.next = function(id, interval) {
   var p = util.IntervalProc.procs[id];
