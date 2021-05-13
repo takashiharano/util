@@ -1039,6 +1039,20 @@ Private Function SingleValueToArray(value As Variant)
     SingleValueToArray = arr
 End Function
 
+''
+' シート全体をクリアします。
+'
+Public Function ClearSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
+    If ws Is Nothing Then
+        If sheetName = "" Then
+            Set ws = ActiveSheet
+        Else
+            Set ws = Sheets(sheetName)
+        End If
+    End If
+    ws.Cells.clear
+End Function
+
 '------------------------------------------------------------------------------
 '# 文字列操作
 '------------------------------------------------------------------------------
