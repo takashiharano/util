@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202104132100
+v = 202105150000
 
 import os
 import sys
@@ -1160,7 +1160,6 @@ def float2clock(v):
     sign = '-'
   i = int(v)
   f = v - int(v)
-  h = i
   m = int(60 * f)
   hh = str(i)
   if i < 10:
@@ -1609,7 +1608,7 @@ def copy_file(src, dst):
 # FileExistsError will be thrown if dst exists and overwrite=False
 def copy_dir(src, dst, overwrite=False):
   if overwrite:
-    distutils.dir_util.copy_tree(src, dst)
+    dir_util.copy_tree(src, dst)
   else:
     shutil.copytree(src, dst)
 
@@ -1632,7 +1631,7 @@ def rename(src, dst, force=False):
   if path_exists(dst):
     if force:
       if is_file(src) == is_file(dst):
-        delete_path(dst)
+        delete_file(dst)
       else:
         return False
     else:
@@ -1978,7 +1977,7 @@ def get_host_name(default=''):
 def get_host_by_addr(addr, default=''):
   try:
     host_name = socket.gethostbyaddr(addr)[0]
-  except Exception as e:
+  except Exception:
     host_name = default
   return host_name
 
