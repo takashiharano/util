@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202105150000
+v = 202105150008
 
 import os
 import sys
@@ -14,7 +14,6 @@ import re
 import datetime
 import time
 import shutil
-import distutils
 from distutils import dir_util
 import base64
 import json
