@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202105130019';
+util.v = '202105150007';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1202,7 +1202,12 @@ util.toJSON = function(o, r, s) {
 
 util.copyProps = function(src, dst) {
   for (var k in src) {
-    dst[k] = src[k];
+    if (src[k] instanceof Object) {
+      dst[k] = {};
+      util.copyProps(src[k], dst[k]);
+    } else {
+      dst[k] = src[k];
+    }
   }
 };
 
