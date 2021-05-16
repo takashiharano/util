@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202105150007';
+util.v = '202105170013';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2161,6 +2161,13 @@ $el.fn = {
   },
   fadeOut: function(speed, cb, arg) {
     util.fadeOut(this, speed, cb, arg);
+  },
+  loading: function(opt, force) {
+    if (opt === false) {
+      util.loader.hide(this, force);
+    } else {
+      util.loader.show(this, opt);
+    }
   },
   getRect: function() {
     return this.getBoundingClientRect();
