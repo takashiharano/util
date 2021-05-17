@@ -3,6 +3,7 @@
 ' Copyright 2020 Takashi Harano
 ' Released under the MIT license
 ' https://github.com/takashiharano/util
+' v202105180039
 '==============================================================================
 Option Explicit
 
@@ -105,7 +106,7 @@ End Function
 ''
 ' フォルダを選択します。
 ' 選択ダイアログを表示、選択するとそのパスを返します。
-' outCell:="A1" A1セルにパス文字列を設定します。
+' SelectFolderPath("A1")  'A1セルにパス文字列を設定します。
 '
 Public Function SelectFolderPath(Optional outCell As String = "", Optional ws As Worksheet = Nothing)
     If ws Is Nothing Then
@@ -222,6 +223,9 @@ End Function
 ''
 ' ExcelのBookを開きます。
 '
+' Dim wb As Workbook
+' Set wb = Util.OpenBook("C:\Book1.xlsx")
+'
 Public Function OpenBook(path) As Workbook
     Set OpenBook = Nothing
     On Error GoTo ErrHandler
@@ -255,7 +259,7 @@ End Function
 ''
 ' 配列に要素をpushします。
 '
-Public Sub ArrPush(ByRef arr As Variant, val As Variant)
+Public Sub ArrayPush(ByRef arr As Variant, val As Variant)
     On Error GoTo ArrInit
     ReDim Preserve arr(UBound(arr) + 1)
     arr(UBound(arr)) = val
@@ -402,8 +406,8 @@ Public Function GetSheetValues(Optional sheetName As String = "", Optional ws As
     Dim lastColN As Long
     Dim lastColA As String
 
-    lastRowN = GetLastRowOfSheet(sheetName, ws)
-    lastColN = GetLastColOfSheet(sheetName, ws)
+    lastRowN = GetLastRow(sheetName, ws)
+    lastColN = GetLastCol(sheetName, ws)
     lastColA = XlsColN2A(lastColN)
 
     Dim addr As String
@@ -790,14 +794,18 @@ Public Function ColToArray(refs As String, Optional ws As Worksheet = Nothing) A
 End Function
 
 ''
-' 1次元配列の値を行に展開します。
+' 1次元配列の値を行→に展開します。
 '
 ' ArrayToRow(arr, "A1")
+' ArrayToRow(arr, "Sheet1!A1")
 '   A      B      C
 ' 1 arr(0) arr(1) arr(2) ...
 ' 2
 '
 Public Sub ArrayToRow(arr As Variant, targetStartCell As String, Optional ws As Worksheet = Nothing)
+    If IsEmptyArray(arr) Then
+        Exit Sub
+    End If
     If ws Is Nothing Then
         Dim refPrts As Variant
         refPrts = Split(targetStartCell, "!")
@@ -831,9 +839,10 @@ Public Sub ArrayToRow(arr As Variant, targetStartCell As String, Optional ws As 
 End Sub
 
 ''
-' 1次元配列の値を列に展開します。
+' 1次元配列の値を列↓に展開します。
 '
 ' ArrayToCol(arr, "A1")
+' ArrayToCol(arr, "Sheet1!A1")
 '   A      B      C
 ' 1 arr(0)
 ' 2 arr(1)
@@ -841,6 +850,9 @@ End Sub
 '   :
 '
 Public Sub ArrayToCol(arr As Variant, targetStartCell As String, Optional ws As Worksheet = Nothing)
+    If IsEmptyArray(arr) Then
+        Exit Sub
+    End If
     If ws Is Nothing Then
         Dim refPrts As Variant
         refPrts = Split(targetStartCell, "!")
@@ -904,8 +916,8 @@ Public Sub ColToRow(fmAddr As String, toAddr As String)
 
         Dim firstRow As Long
         Dim lastRow As Long
-        firstRow = GetFirstRow(fmCol, ws)
-        lastRow = GetLastRow(fmCol, ws)
+        firstRow = GetFirstRowOfCol(fmCol, ws)
+        lastRow = GetLastRowOfCol(fmCol, ws)
 
         fmAddr = fmCol & firstRow & ":" & fmCol & lastRow
     End If
@@ -946,8 +958,8 @@ Public Sub RowToCol(fmAddr As String, toAddr As String)
 
         Dim firstCol As String
         Dim lastCol As String
-        firstCol = GetFirstCol(fmRow, ws)
-        lastCol = GetLastCol(fmRow, ws)
+        firstCol = GetFirstColOfRow(fmRow, ws)
+        lastCol = GetLastColOfRow(fmRow, ws)
 
         fmAddr = firstCol & fmRow & ":" & lastCol & fmRow
     End If
@@ -1296,7 +1308,7 @@ Public Function StrP(strTbl As String, idx As Long) As String
     tbllen = Len(strTbl)
 
     Dim a() As Long
-    Call ArrPush(a, -1)
+    Call ArrayPush(a, -1)
 
     Dim i As Long
     For i = 0 To idx - 1
@@ -1314,7 +1326,7 @@ Public Function StrP(strTbl As String, idx As Long) As String
                 If a(j) > (tbllen - 1) Then
                     a(j) = 0
                     If (aLen <= j + 1) Then
-                        Call ArrPush(a, -1)
+                        Call ArrayPush(a, -1)
                         aLen = UBound(a) + 1
                     End If
                 Else
@@ -1644,7 +1656,7 @@ End Function
 ''
 ' 指定されたシートの先頭行を返します。
 '
-Public Function GetFirstRowOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
+Public Function GetFirstRow(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
     If ws Is Nothing Then
         If sheetName = "" Then
             Set ws = ActiveSheet
@@ -1656,13 +1668,13 @@ Public Function GetFirstRowOfSheet(Optional sheetName As String = "", Optional w
     Dim firstRow As Range
     Set usedRng = ws.UsedRange
     Set firstRow = usedRng.rows(1).EntireRow
-    GetFirstRowOfSheet = firstRow.row
+    GetFirstRow = firstRow.row
 End Function
 
 ''
 ' 指定されたシートの最終行を返します。
 '
-Public Function GetLastRowOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
+Public Function GetLastRow(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
     If ws Is Nothing Then
         If sheetName = "" Then
             Set ws = ActiveSheet
@@ -1674,13 +1686,13 @@ Public Function GetLastRowOfSheet(Optional sheetName As String = "", Optional ws
     Dim lastRow As Range
     Set usedRng = ws.UsedRange
     Set lastRow = usedRng.rows(usedRng.rows.count).EntireRow
-    GetLastRowOfSheet = lastRow.row
+    GetLastRow = lastRow.row
 End Function
 
 ''
 ' 指定されたシートの先頭列を返します。(A=1, B=2, ...)
 '
-Public Function GetFirstColOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
+Public Function GetFirstCol(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
     If ws Is Nothing Then
         If sheetName = "" Then
             Set ws = ActiveSheet
@@ -1692,13 +1704,13 @@ Public Function GetFirstColOfSheet(Optional sheetName As String = "", Optional w
     Dim firstCol As Range
     Set usedRng = ws.UsedRange
     Set firstCol = usedRng.Columns(1).EntireColumn
-    GetFirstColOfSheet = firstCol.Column
+    GetFirstCol = firstCol.Column
 End Function
 
 ''
 ' 指定されたシートの最終列を返します。(A=1, B=2, ...)
 '
-Public Function GetLastColOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
+Public Function GetLastCol(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
     If ws Is Nothing Then
         If sheetName = "" Then
             Set ws = ActiveSheet
@@ -1710,13 +1722,13 @@ Public Function GetLastColOfSheet(Optional sheetName As String = "", Optional ws
     Dim lastCol As Range
     Set usedRng = ws.UsedRange
     Set lastCol = usedRng.Columns(usedRng.Columns.count).EntireColumn
-    GetLastColOfSheet = lastCol.Column
+    GetLastCol = lastCol.Column
 End Function
 
 ''
 ' 指定された列の先頭行を返します。
 '
-Public Function GetFirstRow(col As String, Optional ws As Worksheet = Nothing) As Long
+Public Function GetFirstRowOfCol(col As String, Optional ws As Worksheet = Nothing) As Long
     If ws Is Nothing Then
         Set ws = ActiveSheet
     End If
@@ -1724,20 +1736,20 @@ Public Function GetFirstRow(col As String, Optional ws As Worksheet = Nothing) A
     Dim row As Long
     n = XlsColA2N(col)
     If ws.Cells(1, n).value <> "" Then
-        GetFirstRow = 1
+        GetFirstRowOfCol = 1
         Exit Function
     End If
     row = ws.Cells(1, n).End(xlDown).row
     If row = ws.rows.count And ws.Cells(ws.rows.count, n).value = "" Then
         row = -1
     End If
-    GetFirstRow = row
+    GetFirstRowOfCol = row
 End Function
 
 ''
 ' 指定された列の最終行を返します。
 '
-Public Function GetLastRow(col As String, Optional ws As Worksheet = Nothing) As Long
+Public Function GetLastRowOfCol(col As String, Optional ws As Worksheet = Nothing) As Long
     If ws Is Nothing Then
         Set ws = ActiveSheet
     End If
@@ -1745,18 +1757,18 @@ Public Function GetLastRow(col As String, Optional ws As Worksheet = Nothing) As
     Dim row As Long
     n = XlsColA2N(col)
     row = ws.Cells(ws.rows.count, n).End(xlUp).row
-    GetLastRow = row
+    GetLastRowOfCol = row
 End Function
 
 ''
 ' 指定された行の先頭列を返します。("A", "B", ...)
 '
-Public Function GetFirstCol(row As Long, Optional ws As Worksheet = Nothing) As String
+Public Function GetFirstColOfRow(row As Long, Optional ws As Worksheet = Nothing) As String
     If ws Is Nothing Then
         Set ws = ActiveSheet
     End If
     If ws.Cells(row, 1).value <> "" Then
-        GetFirstCol = "A"
+        GetFirstColOfRow = "A"
         Exit Function
     End If
     Dim n As Long
@@ -1767,13 +1779,13 @@ Public Function GetFirstCol(row As Long, Optional ws As Worksheet = Nothing) As 
     Else
         col = XlsColN2A(n)
     End If
-    GetFirstCol = col
+    GetFirstColOfRow = col
 End Function
 
 ''
 ' 指定された行の最終列を返します。("A", "B", ...)
 '
-Public Function GetLastCol(row As Long, Optional ws As Worksheet = Nothing) As String
+Public Function GetLastColOfRow(row As Long, Optional ws As Worksheet = Nothing) As String
     If ws Is Nothing Then
         Set ws = ActiveSheet
     End If
@@ -1781,7 +1793,7 @@ Public Function GetLastCol(row As Long, Optional ws As Worksheet = Nothing) As S
     Dim col As String
     n = ws.Cells(row, ws.Columns.count).End(xlToLeft).Column
     col = XlsColN2A(n)
-    GetLastCol = col
+    GetLastColOfRow = col
 End Function
 
 ''
@@ -1837,7 +1849,7 @@ End Sub
 '# Date Time
 '------------------------------------------------------------------------------
 ''
-' Unix timeを返します。
+' Unix time (秒) を返します。
 '
 Public Function GetUnixTime() As Long
     Dim offset As Long
