@@ -96,7 +96,7 @@ public class BinUtil {
    * @return the byte array
    */
   public static byte[] hex2bytes(String src) {
-    src = src.trim().replaceAll("\r\n|\r|\n", "").replaceAll("\s{2,}", " ");
+    src = src.trim().replaceAll("\r\n|\r|\n", "").replaceAll("\\s{2,}", " ");
     String[] arr = src.split(" ");
     byte[] bytes = new byte[arr.length];
     for (int i = 0; i < arr.length; i++) {
