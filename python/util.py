@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202105242032
+v = 202105250001
 
 import os
 import sys
@@ -198,6 +198,10 @@ def rpad(s, ch, len):
 # Convert newline
 def convert_newline(s, nl):
   return s.replace('\r\n', '\n').replace('\r', '\n').replace('\n', nl)
+
+# ' abc\n123 456 ' -> 'abc123456'
+def remove_space_newline(s):
+  return re.sub('\s', '', s).replace('\r\n', '\n').replace('\r', '\n').replace('\n', '')
 
 # ('abc123aabb', ['^a', '\d'])
 # -> bcaabb
