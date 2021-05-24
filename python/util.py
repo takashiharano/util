@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202105150008
+v = 202105242032
 
 import os
 import sys
@@ -1392,6 +1392,11 @@ def _read_chunk(file_object, chunk_size=102400):
 def write_file_from_base64(path, data):
   b = base64.b64decode(data)
   write_binary_file(path, b)
+
+# Base64 decoder (file to file)
+def file_to_file_base64_decoder(src_path, dest_path):
+  d = read_text_file(src_path)
+  write_file_from_base64(dest_path, d)
 
 # Append a line to text file
 def append_line_to_text_file(path, text, encoding=DEFAULT_ENCODING, max=0):
