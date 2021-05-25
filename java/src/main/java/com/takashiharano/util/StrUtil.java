@@ -474,6 +474,17 @@ public class StrUtil {
   }
 
   /**
+   * Remove white space characters and newlines from the given string.
+   *
+   * @param str
+   *          a string to replace
+   * @return replaced string
+   */
+  public static String removeSpaceNewline(String str) {
+    return str.replaceAll("\s", "").replaceAll("\r\n", "\n").replaceAll("\r", "\n").replaceAll("\n", "");
+  }
+
+  /**
    * Build a repeated string.
    *
    * @param str
