@@ -133,6 +133,20 @@ public class Util {
   }
 
   /**
+   * Base64 decoder. (file to file)
+   *
+   * @param srcPath
+   *          Base64 text file path
+   * @param destPath
+   *          path to save the decoded file
+   * @throws IOException
+   */
+  public static void fileToFileBase64Decoder(String srcPath, String destPath) throws IOException {
+    String b64 = FileUtil.readText(srcPath);
+    FileUtil.writeFromBase64(destPath, b64);
+  }
+
+  /**
    * Returns current path
    *
    * @return
