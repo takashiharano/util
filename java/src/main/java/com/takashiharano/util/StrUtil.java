@@ -481,7 +481,7 @@ public class StrUtil {
    * @return replaced string
    */
   public static String removeSpaceNewline(String str) {
-    return str.replaceAll("\s", "").replaceAll("\r\n", "\n").replaceAll("\r", "\n").replaceAll("\n", "");
+    return str.replaceAll("\\s", "").replaceAll("\\r\\n", "\\n").replaceAll("\\r", "\\n").replaceAll("\\n", "");
   }
 
   /**
