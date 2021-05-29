@@ -2,6 +2,7 @@ package com.takashiharano.util.zip;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -63,7 +64,7 @@ public class ZipCompressor {
     }
   }
 
-  public void compress(String destPath) {
+  public void compressToFile(String destPath) {
     File destFile = new File(destPath);
     try (ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(destFile)));) {
       if (level != -1) {
@@ -72,6 +73,23 @@ public class ZipCompressor {
       for (File file : files) {
         addZipEntry(zos, file);
       }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public byte[] compressOnMemory() {
+    try (ByteArrayOutputStream out = new ByteArrayOutputStream(); ZipOutputStream zos = new ZipOutputStream(out);) {
+      if (level != -1) {
+        zos.setLevel(level);
+      }
+      for (File file : files) {
+        addZipEntry(zos, file);
+      }
+      zos.close();
+      out.close();
+      byte[] b = out.toByteArray();
+      return b;
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -87,6 +105,7 @@ public class ZipCompressor {
   }
 
   private void addZipEntry(ZipOutputStream zos, File file) throws IOException {
+    String sepChar = File.separator;
     String itemPath;
     if (topLevelDirPath == null) {
       itemPath = file.getName();
@@ -94,29 +113,32 @@ public class ZipCompressor {
       itemPath = file.getAbsolutePath().replace(topLevelDirPath, "");
     }
 
-    ZipEntry entry;
+    String entryName;
     if (file.isDirectory()) {
-      entry = new ZipEntry(itemPath + File.separator);
+      entryName = itemPath + sepChar;
     } else {
-      entry = new ZipEntry(itemPath);
+      entryName = itemPath;
     }
+    if (entryName.startsWith(sepChar)) {
+      entryName = entryName.substring(1);
+    }
+    ZipEntry entry = new ZipEntry(entryName);
 
     long lastModified = file.lastModified();
     entry.setTime(lastModified);
     zos.putNextEntry(entry);
 
-    if (file.isDirectory()) {
-      return;
-    }
-
-    try (InputStream is = new BufferedInputStream(new FileInputStream(file));) {
-      byte[] buf = new byte[BUF_SIZE];
-      int len = 0;
-      while ((len = is.read(buf)) != -1) {
-        zos.write(buf, 0, len);
+    if (!file.isDirectory()) {
+      try (InputStream is = new BufferedInputStream(new FileInputStream(file));) {
+        byte[] buf = new byte[BUF_SIZE];
+        int len = 0;
+        while ((len = is.read(buf)) != -1) {
+          zos.write(buf, 0, len);
+        }
+        is.close();
       }
-      is.close();
     }
+    zos.closeEntry();
   }
 
   private void getAllFilesInDir(List<File> files, File parentDir) {
