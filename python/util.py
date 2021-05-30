@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202105301656
+v = 202105301741
 
 import sys
 import os
@@ -2184,7 +2184,7 @@ def send_response_debug(enable=True):
 #   ...
 # }
 # status: HTTP status code for response
-def send_binary(content, content_type='application/octet-stream', filename='', etag='', headers=None, status=200):
+def send_binary(content, filename='', content_type='application/octet-stream', etag='', headers=None, status=200):
   # Prevent the following error:
   #  ap_content_length_filter: apr_bucket_read() failed
   #  Failed to flush CGI output to client
@@ -2518,7 +2518,7 @@ def zip(zip_path, filepath, excl_root_path=False, arcname=None, slink=True):
         root_path = _get_root_path(filepath, excl_root_path)
         _zip(zipf, filepath, root_path, arcname=arcname, slink=slink)
 
-  if typename(zip_out) == 'bytes':
+  if zip_path == None:
     return zip_out.getvalue()
 
 def _zip(zipf, target_path, root_path, arcname=None, slink=True):
