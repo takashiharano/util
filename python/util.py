@@ -3,10 +3,11 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202105250001
+v = 202105301656
 
-import os
 import sys
+import os
+import io
 import math
 import codecs
 import subprocess
@@ -2482,21 +2483,87 @@ def print_elapsed_time(prefix='', suffix=''):
 #------------------------------------------------------------------------------
 # ZIP
 #------------------------------------------------------------------------------
-def zip(zip_path, filepath, arcarcname=None):
-  if is_dir(filepath):
-    zip_path = re.sub('\.zip$', '', zip_path)
-    shutil.make_archive(zip_path, 'zip', root_dir=filepath)
+# to file
+# zip('C:/tmp/zip1.zip', 'C:/path/a.txt')
+# -> a.txt
+#
+# zip('C:/tmp/zip1.zip', 'C:/path/dir1')
+# -> dir1/*
+#
+# zip('C:/tmp/zip1.zip', 'C:/path/dir1', excl_root_path=True)
+# -> *
+#
+# zip('C:/tmp/zip1.zip', ['C:/path/a.txt', 'C:/path/b.txt'])
+# -> a.txt, b.txt
+#
+# on memory
+# zip(None, 'C:/path/dir1')
+# -> returns bytes
+#
+# * filepath must be absolute path
+def zip(zip_path, filepath, excl_root_path=False, arcname=None, slink=True):
+  if zip_path is None:
+    zip_out = io.BytesIO()
   else:
-    if arcarcname is None:
-      arcarcname = get_filename(filepath)
-    with zipfile.ZipFile(zip_path, 'w', compression=zipfile.ZIP_DEFLATED) as zipf:
-      zipf.write(filepath, arcname=arcarcname)
+    zip_out = zip_path
 
+  with zipfile.ZipFile(zip_out, 'w', compression=zipfile.ZIP_DEFLATED) as zipf:
+    if typename(filepath) == 'list':
+      for path in filepath:
+        if os.path.exists(path):
+          root_path = _get_root_path(path, excl_root_path)
+          _zip(zipf, path, root_path, slink=slink)
+    else:
+      if os.path.exists(filepath):
+        root_path = _get_root_path(filepath, excl_root_path)
+        _zip(zipf, filepath, root_path, arcname=arcname, slink=slink)
+
+  if typename(zip_out) == 'bytes':
+    return zip_out.getvalue()
+
+def _zip(zipf, target_path, root_path, arcname=None, slink=True):
+  islink = os.path.islink(target_path)
+  if islink and not slink:
+    return
+  # DIR
+  if os.path.isdir(target_path):
+    for path in os.listdir(target_path):
+      full_path = os.path.join(target_path, path)
+      full_path = re.sub('\\\\', '/', full_path)
+      islink = os.path.islink(full_path)
+      if not islink or slink:
+        if os.path.isdir(full_path):
+          _zip(zipf, full_path, root_path, slink=slink)
+        else:
+          arcname = full_path
+          arcname = re.sub('\\\\', '/', arcname)
+          arcname = re.sub(root_path, '', arcname)
+          arcname = re.sub('^/', '', arcname)
+          zipf.write(full_path, arcname=arcname)
+  # File
+  else:
+    if arcname is None:
+      parent_path = get_parent_path(target_path)
+      arcname = re.sub(parent_path, '', target_path)
+    zipf.write(target_path, arcname=arcname)
+
+# unzip('C:/tmp/zip1.zip', 'C:/path/dir1')
+# unzip('C:/tmp/zip1.zip', 'C:/path/dir1', 'pwd='pass123')
 def unzip(zip_path, out_path, pwd=None):
   if pwd is not None:
     pwd = pwd.encode(encoding='utf-8')
   with zipfile.ZipFile(zip_path) as zipf:
     zipf.extractall(out_path, pwd=pwd)
+
+# 'C:/path/dir1', excl_root_path=True  -> C:/path/dir1
+# 'C:/path/dir1', excl_root_path=False -> C:/path
+def _get_root_path(path, excl_root_path):
+  if excl_root_path:
+    root_path = path
+  else:
+    root_path = get_parent_path(path)
+  root_path = re.sub('\\\\', '/', root_path)
+  return root_path
 
 #------------------------------------------------------------------------------
 # Debugging
