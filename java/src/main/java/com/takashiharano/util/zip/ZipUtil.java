@@ -3,7 +3,7 @@ package com.takashiharano.util.zip;
 public class ZipUtil {
 
   /**
-   * Compresses the files or directories into a ZIP file.
+   * Archives the files or directories into a ZIP file.
    *
    * @param inPath
    *          Target files/directories to compress
@@ -15,7 +15,7 @@ public class ZipUtil {
   }
 
   /**
-   * Compresses the files or directories into a ZIP file.
+   * Archives the files or directories into a ZIP file.
    *
    * @param inPath
    *          Target files/directories to compress
@@ -25,12 +25,28 @@ public class ZipUtil {
    *          Set true not to store the top directory name
    */
   public static void zip(String inPath, String zipPath, boolean junkPath) {
-    ZipCompressor zip = new ZipCompressor(inPath, junkPath);
+    ZipArchiver zip = new ZipArchiver(inPath, junkPath);
     zip.compressToFile(zipPath);
   }
 
   /**
-   * Compresses the files or directories and returns the byte array.
+   * Archives the files or directories into a ZIP file.
+   *
+   * @param inPaths
+   *          The path list of the target files/directories to compress
+   * @param zipPath
+   *          ZIP file path
+   */
+  public static void zip(String[] inPaths, String zipPath) {
+    ZipArchiver zip = new ZipArchiver(false);
+    for (int i = 0; i < inPaths.length; i++) {
+      zip.add(inPaths[i]);
+    }
+    zip.compressToFile(zipPath);
+  }
+
+  /**
+   * Archives the files or directories, and returns the byte array.
    *
    * @param inPath
    *          Target files/directories to compress
@@ -41,7 +57,7 @@ public class ZipUtil {
   }
 
   /**
-   * Compresses the files or directories and returns the byte array.
+   * Archives the files or directories, and returns the byte array.
    *
    * @param inPath
    *          Target files/directories to compress
@@ -50,7 +66,22 @@ public class ZipUtil {
    * @return byte array
    */
   public static byte[] zip(String inPath, boolean junkPath) {
-    ZipCompressor zip = new ZipCompressor(inPath, junkPath);
+    ZipArchiver zip = new ZipArchiver(inPath, junkPath);
+    return zip.compressOnMemory();
+  }
+
+  /**
+   * Archives the files or directories, and returns the byte array.
+   *
+   * @param inPaths
+   *          The list of the target files/directories to compress
+   * @return byte array
+   */
+  public static byte[] zip(String[] inPaths) {
+    ZipArchiver zip = new ZipArchiver(false);
+    for (int i = 0; i < inPaths.length; i++) {
+      zip.add(inPaths[i]);
+    }
     return zip.compressOnMemory();
   }
 

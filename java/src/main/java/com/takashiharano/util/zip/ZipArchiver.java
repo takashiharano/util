@@ -13,31 +13,31 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class ZipCompressor {
+public class ZipArchiver {
 
   private static final int BUF_SIZE = 1048576;
 
   private List<File> files;
   private String topLevelDirPath;
-  private boolean junkPath;
+  private boolean junkPath; // don't record directory names
   private int level = 9; // 0-9
 
-  public ZipCompressor() {
+  public ZipArchiver() {
     files = new ArrayList<>();
   }
 
-  public ZipCompressor(String inPath) {
+  public ZipArchiver(String inPath) {
     this();
     add(inPath);
   }
 
-  public ZipCompressor(String inPath, boolean junkPath) {
+  public ZipArchiver(String inPath, boolean junkPath) {
     this();
     this.junkPath = junkPath;
     add(inPath);
   }
 
-  public ZipCompressor(boolean junkPath) {
+  public ZipArchiver(boolean junkPath) {
     this();
     this.junkPath = junkPath;
   }
