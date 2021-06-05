@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202105170013';
+util.v = '202106060048';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2009,6 +2009,8 @@ util.http.addListener = function(type, fn) {
   util.addListItem(util.http.listeners[type], fn);
 };
 util.http.onStart = function() {
+  util.http.t0 = Date.now();
+  util.http.sartInd();
   util.http.callListeners('start');
 };
 util.http.onSend = function(req) {
@@ -2022,6 +2024,8 @@ util.http.onReceive = function(xhr, res, req) {
 };
 util.http.onStop = function() {
   util.http.callListeners('stop');
+  util.http.stopInd();
+  util.http.t0 = 0;
 };
 util.http.onError = function(xhr, res, req) {
   util.http.callListeners('error', xhr, res, req);
@@ -2034,6 +2038,22 @@ util.http.callListeners = function(type, a1, a2, a3) {
   }
   return true;
 };
+util.http.sartInd = function() {
+  if (window.dbg) window.dbg.led.on(0);
+};
+util.http.stopInd = function() {
+  var t = 100;
+  var t1 = Date.now();
+  var d = t1 - util.http.t0;
+  if (d < t) {
+    setTimeout(util.http._stopInd, (t - d));
+  } else {
+    util.http._stopInd();
+  }
+};
+util.http._stopInd = function() {
+  if (window.dbg && (util.http.conn == 0)) window.dbg.led.off(0);
+};
 util.http.countConnections = function() {
   return util.http.conn;
 };
@@ -2045,6 +2065,7 @@ util.http.online = true;
 util.http.logging = window.dbg ? true : false;
 util.http.trace = false;
 util.http.conn = 0;
+util.http.t0 = 0;
 util.http.listeners = {
   start: [],
   send: [],
