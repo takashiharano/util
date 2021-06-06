@@ -5,7 +5,7 @@
  * https://github.com/takashiharano/util
  */
 var util = util || {};
-util.v = '202106060048';
+util.v = '202106061504';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1846,6 +1846,7 @@ util.sortObj = function(list, key, desc) {
  *    method: 'POST',
  *    data: param,
  *    responseType: 'json',
+ *    timeout: 0,
  *    cb: callback,
  *    onsuccess: callback,
  *    onerror: callback
@@ -1898,6 +1899,7 @@ util.http = function(req) {
     }
   };
   xhr.open(req.method, url, req.async, req.user, req.pass);
+  if (req.timeout != undefined) xhr.timeout = req.timeout;
   var contentType = 'application/x-www-form-urlencoded';
   if (req.contentType) {
     contentType = req.contentType;
