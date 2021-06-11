@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://github.com/takashiharano/util
 # Python >= 3.4
-v = 202105301741
+v = 202106112307
 
 import sys
 import os
@@ -1426,6 +1426,15 @@ def is_file(path):
 
 def is_dir(path):
   return os.path.isdir(path)
+
+def file_lock(lock_file_path):
+  if os.path.exists(lock_file_path):
+    return False
+  mkdir(lock_file_path)
+  return True
+
+def file_unlock(lock_file_path):
+  rmdir(lock_file_path)
 
 #------------------------------------------------------------------------------
 # ['aaa.txt', 'bbb.txt', 'dir1', ...]
