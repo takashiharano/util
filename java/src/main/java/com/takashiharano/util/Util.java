@@ -147,7 +147,7 @@ public class Util {
   }
 
   /**
-   * Returns current path
+   * Returns the current path.
    *
    * @return
    */
@@ -157,7 +157,7 @@ public class Util {
   }
 
   /**
-   * Returns random integer value.
+   * Returns a random integer value.
    *
    * @return random integer value
    */
@@ -168,7 +168,7 @@ public class Util {
   }
 
   /**
-   * Returns random integer value.
+   * Returns a random integer value.
    *
    * @param max
    * @return 0-max
@@ -180,7 +180,7 @@ public class Util {
   }
 
   /**
-   * Returns random integer value.
+   * Returns a random integer value.
    *
    * @param min
    * @param max
@@ -197,7 +197,7 @@ public class Util {
   }
 
   /**
-   * Returns random double value.<br>
+   * Returns a random double value.<br>
    * e.g.,) 0.8697886198087033
    *
    * @return 0.0 - 1.0
@@ -215,6 +215,8 @@ public class Util {
   }
 
   /**
+   * Returns a random string.<br>
+   * <br>
    * randomString("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
    * 8);<br>
    * -> "TWEQWhq2"

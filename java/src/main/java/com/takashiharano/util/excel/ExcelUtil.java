@@ -175,7 +175,7 @@ public class ExcelUtil {
   }
 
   /**
-   * Return a formula for the cell, for example, SUM(A1:C1)
+   * Return a formula for the cell, for example, SUM(A1:C1).
    *
    * @param sheet
    * @param address

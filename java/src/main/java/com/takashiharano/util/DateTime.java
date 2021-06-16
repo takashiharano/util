@@ -162,7 +162,7 @@ public class DateTime {
   }
 
   /**
-   * Returns year
+   * Returns the year of this date.
    *
    * @return year
    */
@@ -171,7 +171,7 @@ public class DateTime {
   }
 
   /**
-   * Returns month
+   * Returns the month of this date.
    *
    * @return month (1-12)
    */
@@ -180,7 +180,7 @@ public class DateTime {
   }
 
   /**
-   * Returns day of month.
+   * Returns the day of the month.
    *
    * @return day of month (1-31)
    */
@@ -189,9 +189,9 @@ public class DateTime {
   }
 
   /**
-   * Returns day of week.<br>
+   * Returns the day of the week.<br>
    *
-   * @return day of week<br>
+   * @return the day of week<br>
    *         0 SUNDAY<br>
    *         1 MONDAY<br>
    *         2 TUESDAY<br>
@@ -326,7 +326,7 @@ public class DateTime {
 
   // --------------------------------------------------------------------------
   /**
-   * Returns current time stamp.
+   * Returns the current time stamp.
    *
    * @return the difference, measured in milliseconds, between the current time
    *         and midnight, January 1, 1970 UTC.
@@ -336,7 +336,7 @@ public class DateTime {
   }
 
   /**
-   * Returns current Date Time String in the specified format.
+   * Returns the current Date Time String in the specified format.
    *
    * @param format
    *          the pattern describing the date and time format
@@ -351,7 +351,7 @@ public class DateTime {
   }
 
   /**
-   * Returns Date Time String from Date object.
+   * Returns the Date Time String from Date object.
    *
    * @param date
    * @param format
@@ -366,7 +366,7 @@ public class DateTime {
   }
 
   /**
-   * Returns current Date Time String in the specified format. * @param millis
+   * Returns the current Date Time String in the specified format. * @param millis
    *
    * @param timestamp
    *          the milliseconds since January 1, 1970, 00:00:00 GMT.

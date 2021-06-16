@@ -97,7 +97,7 @@ public class HttpResponse {
   }
 
   /**
-   * Sets content-length
+   * Sets the content-length.
    *
    * @param contentLength
    *          content-length
@@ -107,7 +107,7 @@ public class HttpResponse {
   }
 
   /**
-   * Returns response body as string.
+   * Returns the response body as string.
    *
    * @return response text
    */
@@ -116,7 +116,7 @@ public class HttpResponse {
   }
 
   /**
-   * Returns response body as string.
+   * Returns the response body as string.
    *
    * @param charsetName
    *          charset name

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class StringPermutation {
   /**
-   * Count the number of total patterns of the table
+   * Count the number of total patterns of the table.
    *
    * @param chars
    * @param digit
@@ -21,7 +21,7 @@ public class StringPermutation {
   }
 
   /**
-   * Given pattern's index
+   * Returns the index of the given pattern.
    *
    * @param chars
    * @param pattern
@@ -42,7 +42,7 @@ public class StringPermutation {
   }
 
   /**
-   * Returns a String pattern at the specified position
+   * Returns a String pattern at the specified position.
    *
    * @param chars
    * @param idx
