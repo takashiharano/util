@@ -1,9 +1,9 @@
 # util.py
 # Copyright 2018 Takashi Harano
 # Released under the MIT license
-# https://github.com/takashiharano/util
+# https://libutil.com/
 # Python >= 3.4
-v = 202106112307
+v = 202106200900
 
 import sys
 import os

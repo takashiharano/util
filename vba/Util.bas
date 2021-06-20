@@ -2,8 +2,8 @@
 ' Util.bas
 ' Copyright 2020 Takashi Harano
 ' Released under the MIT license
-' https://github.com/takashiharano/util
-' v202105180039
+' https://libutil.com/
+' v202106200900
 '==============================================================================
 Option Explicit
 

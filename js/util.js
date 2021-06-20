@@ -2,10 +2,10 @@
  * util.js
  * Copyright 2019 Takashi Harano
  * Released under the MIT license
- * https://github.com/takashiharano/util
+ * https://libutil.com/
  */
 var util = util || {};
-util.v = '202106061504';
+util.v = '202106200900';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
