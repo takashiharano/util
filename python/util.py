@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202106200900
+v = 202106250058
 
 import sys
 import os
@@ -760,6 +760,62 @@ def is_leap_year(year):
   if (year % 4 == 0) and (year % 100 != 0 or year %400 == 0):
     return True
   return False
+
+# Format the date-time string in YYYYMMDDHHMISSffffff format
+# 20200920                   -> 20200920000000000000
+# 20200920T1234              -> 20200920123400000000
+# 20200920T123456.789        -> 20200920123456789000
+# 20200920T123456.789123     -> 20200920123456789123
+# 2020-09-20 12:34:56.789    -> 20200920123456789000
+# 2020-09-20 12:34:56.789123 -> 20200920123456789123
+# 2020/9/3 12:34:56.789      -> 20200903123456789000
+# 2020/9/3 12:34:56.789123   -> 20200903123456789123
+def serialize_datetime(s):
+  w = s
+  w = w.strip()
+  w = re.sub('\s{2,}', ' ', w)
+  w = re.sub('T', ' ', w)
+
+  if re.search('[-/:]', w) is None:
+    return _serialize_datetime(w)
+
+  prt = w.split(' ')
+  date = prt[0]
+  time = prt[1] if len(prt) >= 2 else ''
+  date = re.sub('/', '-', date)
+
+  prt = date.split('-')
+  yyyy = prt[0];
+  mm = ('0' + prt[1])[-2:]
+  dd = ('0' + prt[2])[-2:]
+  date = yyyy + mm + dd
+
+  prt = time.split('.')
+  f = ''
+  if len(prt) >= 2 and prt[1]:
+    f = prt[1]
+    time = prt[0]
+
+  hh = '00'
+  mi = '00'
+  ss = '00'
+
+  prt = time.split(':')
+  hh = ('0' + prt[0])[-2:]
+  if (len(prt) >= 2):
+    mi = ('0' + prt[1])[-2:]
+  if (len(prt) >= 3):
+    ss = ('0' + prt[2])[-2:]
+  time = hh + mi + ss + f
+  return _serialize_datetime(date + time);
+
+def _serialize_datetime(s):
+  s = re.sub('-', '', s)
+  s = re.sub('\s', '', s)
+  s = re.sub(':', '', s)
+  s = re.sub('\.', '', s)
+  s = (s + '000000000000')[0:20]
+  return s
 
 # ['0300', '0900', '1200', '1800']
 # moment='2020-07-01 00:00:00.0000' -> '2020-07-01 03:00:00.0000'
