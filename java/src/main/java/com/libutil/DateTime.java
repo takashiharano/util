@@ -53,6 +53,10 @@ public class DateTime {
     _init(date);
   }
 
+  public DateTime(Date date, String timeZoneId) {
+    _init(date, timeZoneId);
+  }
+
   public DateTime(String source) throws ParseException {
     this(source, DEFAULT_FORMAT);
   }
@@ -151,6 +155,21 @@ public class DateTime {
   }
 
   // --------------------------------------------------------------------------
+
+  /**
+   * Returns calendrical calculation result.
+   *
+   * @param days
+   *          offset
+   * @return the calculated DateTime object
+   */
+  public DateTime addDays(int days) {
+    long ts = timestamp + (86400000 * days);
+    Date date = new Date(ts);
+    TimeZone tz = timeZone;
+    String timeZoneId = tz.getID();
+    return new DateTime(date, timeZoneId);
+  }
 
   /**
    * Returns the number of milliseconds since January 1, 1970, 00:00:00 GMT
@@ -327,14 +346,28 @@ public class DateTime {
   }
 
   // --------------------------------------------------------------------------
+
   /**
-   * Returns the current time stamp.
+   * Returns calendrical calculation result.
    *
-   * @return the difference, measured in milliseconds, between the current time
-   *         and midnight, January 1, 1970 UTC.
+   * @param date
+   *          a string of the origin date
+   * @param days
+   *          offset
+   * @param format
+   *          date time format for result
+   * @return the calculated date time string
    */
-  public static long now() {
-    return System.currentTimeMillis();
+  public static String addDate(String date, int days, String format) {
+    String s = serializeDateTime(date);
+    DateTime dt0;
+    try {
+      dt0 = new DateTime(s, "yyyyMMddHHmmssSSS");
+    } catch (ParseException e) {
+      return null;
+    }
+    DateTime dt1 = dt0.addDays(days);
+    return dt1.toString(format);
   }
 
   /**
@@ -422,6 +455,16 @@ public class DateTime {
    */
   public static boolean isLeapYear(int year) {
     return ((((year % 4) == 0) && ((year % 100) != 0)) || (year % 400 == 0));
+  }
+
+  /**
+   * Returns the current time stamp.
+   *
+   * @return the difference, measured in milliseconds, between the current time
+   *         and midnight, January 1, 1970 UTC.
+   */
+  public static long now() {
+    return System.currentTimeMillis();
   }
 
   /**
