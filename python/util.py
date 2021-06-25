@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202106250058
+v = 202106251919
 
 import sys
 import os
@@ -785,7 +785,7 @@ def serialize_datetime(s):
   date = re.sub('/', '-', date)
 
   prt = date.split('-')
-  yyyy = prt[0];
+  yyyy = prt[0]
   mm = ('0' + prt[1])[-2:]
   dd = ('0' + prt[2])[-2:]
   date = yyyy + mm + dd
@@ -807,7 +807,7 @@ def serialize_datetime(s):
   if (len(prt) >= 3):
     ss = ('0' + prt[2])[-2:]
   time = hh + mi + ss + f
-  return _serialize_datetime(date + time);
+  return _serialize_datetime(date + time)
 
 def _serialize_datetime(s):
   s = re.sub('-', '', s)
@@ -815,6 +815,47 @@ def _serialize_datetime(s):
   s = re.sub(':', '', s)
   s = re.sub('\.', '', s)
   s = (s + '000000000000')[0:20]
+  return s
+
+# '20210102123456789123' -> datetime
+def number_to_datetime(v):
+  yyyy = v[0:4]
+  mm = v[4:6]
+  dd = v[6:8]
+  hh = v[8:10]
+  mi = v[10:12]
+  ss = v[12:14]
+  f6 = v[14:20]
+  y = int(yyyy)
+  m = int(mm)
+  d = int(dd)
+  h = int(hh)
+  mn = int(mi)
+  s = int(ss)
+  f = int(f6)
+  return datetime.datetime(y, m, d, h, mn, s, f)
+
+# fmt = '%Y-%m-%d %H:%M:%S.%f'
+def format_datetime(dt, fmt):
+  if typename(dt) == 'str':
+    dt = number_to_datetime(dt)
+
+  yyyy = str(dt.year)
+  mm = ('0' + str(dt.month))[-2:]
+  dd = ('0' + str(dt.day))[-2:]
+  hh = ('0' + str(dt.hour))[-2:]
+  mi = ('0' + str(dt.minute))[-2:]
+  ss = ('0' + str(dt.second))[-2:]
+  f6 = ('00000' + str(dt.microsecond))[-6:]
+
+  s = fmt
+  s = re.sub('%Y', yyyy, s)
+  s = re.sub('%m', mm, s)
+  s = re.sub('%d', dd, s)
+  s = re.sub('%H', hh, s)
+  s = re.sub('%M', mi, s)
+  s = re.sub('%S', ss, s)
+  s = re.sub('%f', f6, s)
   return s
 
 # ['0300', '0900', '1200', '1800']
