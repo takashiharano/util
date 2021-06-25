@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202106251919
+v = 202106252234
 
 import sys
 import os
@@ -796,26 +796,35 @@ def serialize_datetime(s):
     f = prt[1]
     time = prt[0]
 
-  hh = '00'
-  mi = '00'
-  ss = '00'
-
   prt = time.split(':')
   hh = ('0' + prt[0])[-2:]
+
+  mi = '00'
   if (len(prt) >= 2):
     mi = ('0' + prt[1])[-2:]
+
+  ss = '00'
   if (len(prt) >= 3):
     ss = ('0' + prt[2])[-2:]
+
   time = hh + mi + ss + f
   return _serialize_datetime(date + time)
 
 def _serialize_datetime(s):
-  s = re.sub('-', '', s)
-  s = re.sub('\s', '', s)
-  s = re.sub(':', '', s)
-  s = re.sub('\.', '', s)
+  s = re.sub('[-\s:\.]', '', s)
   s = (s + '000000000000')[0:20]
   return s
+
+# ('2021-01-01', 1, '%Y-%m-%d') -> '2021-01-02'
+# (datetime, 1, '%Y-%m-%d') -> '2021-01-02'
+def add_date(dt, offset, fmt='%Y-%m-%d'):
+  if typename(dt) == 'str':
+    v = serialize_datetime(dt)
+    dt0 = number_to_datetime(v)
+  else:
+    dt0 = dt
+  dt1 = dt0 + datetime.timedelta(days=offset)
+  return format_datetime(dt1, fmt)
 
 # '20210102123456789123' -> datetime
 def number_to_datetime(v):
