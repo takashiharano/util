@@ -563,14 +563,15 @@ public class Util {
   }
 
   /**
-   * Print the system environment.
+   * Returns all system environment.
    */
-  public static void printSystemEnv() {
-    Log.i("[env]");
+  public static String getAllSystemEnv() {
+    StringBuilder sb = new StringBuilder();
     Map<String, String> envMap = System.getenv();
     for (Map.Entry<String, String> entry : envMap.entrySet()) {
-      Log.i(entry);
+      sb.append(entry + "\n");
     }
+    return sb.toString();
   }
 
   /**
@@ -598,8 +599,7 @@ public class Util {
     long t2 = System.currentTimeMillis();
     HeapInfo info2 = new HeapInfo();
     String elapsed = Time.ms2str(t2 - t1);
-    String details = info1.getPercent() + "% -> " + info2.getPercent() + "% (" + elapsed + ")";
-    Log.i("GC: " + details);
+    String details = "GC: " + info1.getPercent() + "% -> " + info2.getPercent() + "% (" + elapsed + ")";
     return details;
   }
 
