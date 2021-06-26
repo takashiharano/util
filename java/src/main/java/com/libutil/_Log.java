@@ -23,10 +23,10 @@
  */
 package com.libutil;
 
-public class Log {
+public class _Log {
 
-  private static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXX";
-  private static String dateTimeFormat = DEFAULT_DATE_TIME_FORMAT;
+  protected static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXX";
+  protected static _Log instance;
 
   public enum LogLevel {
     FATAL("F", 1), ERROR("E", 2), WARN("W", 3), INFO("I", 4), DEBUG("D", 5);
@@ -48,33 +48,53 @@ public class Log {
     }
   }
 
-  private static int outputLevel = LogLevel.DEBUG.level;
-  private static String moduleName = null;
+  protected String dateTimeFormat = DEFAULT_DATE_TIME_FORMAT;
+  protected int outputLevel = LogLevel.DEBUG.level;
+  protected String moduleName = null;
 
   /**
-   * Initialize the Log module.
+   * Returns the instance.
+   *
+   * @return instance
+   */
+  public static _Log getInstance() {
+    if (instance == null) {
+      instance = new _Log();
+    }
+    return instance;
+  }
+
+  /**
+   * Initialize the module.
+   */
+  public _Log() {
+    this(5);
+  }
+
+  /**
+   * Initialize the module.
    *
    * @param level
    *          log level
    */
-  public static void init(int level) {
-    init(level, null);
+  public _Log(int level) {
+    this(level, null);
   }
 
   /**
-   * Initialize the Log module.
+   * Initialize the module.
    *
    * @param level
    *          log level
    * @param module
    *          module name
    */
-  public static void init(int level, String module) {
-    init(level, module, DEFAULT_DATE_TIME_FORMAT);
+  public _Log(int level, String module) {
+    this(level, module, DEFAULT_DATE_TIME_FORMAT);
   }
 
   /**
-   * Initialize the Log module.
+   * Initialize the module.
    *
    * @param level
    *          log level
@@ -83,7 +103,7 @@ public class Log {
    * @param format
    *          date time format like "yyyy-MM-dd' 'HH:mm:ss.SSS XX"
    */
-  public static void init(int level, String module, String format) {
+  public _Log(int level, String module, String format) {
     outputLevel = level;
     moduleName = module;
     dateTimeFormat = format;
@@ -94,8 +114,27 @@ public class Log {
    *
    * @return output level
    */
-  public static int getOutputLevel() {
+  public static int getLevel() {
+    return getInstance().getOutputLevel();
+  }
+
+  /**
+   * Returns current output level.
+   *
+   * @return output level
+   */
+  public int getOutputLevel() {
     return outputLevel;
+  }
+
+  /**
+   * Sets log output level.
+   *
+   * @param level
+   *          log level
+   */
+  public static void setLevel(int level) {
+    getInstance().setOutputLevel(level);
   }
 
   /**
@@ -104,9 +143,8 @@ public class Log {
    * @param level
    *          output level
    */
-  public static void setOutputLevel(LogLevel level) {
-    int lv = level.getLevel();
-    setOutputLevel(lv);
+  public static void setLevel(LogLevel level) {
+    getInstance().setOutputLevel(level);
   }
 
   /**
@@ -114,17 +152,19 @@ public class Log {
    *
    * @param level
    */
-  public static void setOutputLevel(int level) {
+  public void setOutputLevel(int level) {
     outputLevel = level;
   }
 
   /**
-   * Returns current date-time format.
+   * Sets output level.
    *
-   * @return date-time format
+   * @param level
+   *          output level
    */
-  public static String getDateTimeFormat() {
-    return dateTimeFormat;
+  public void setOutputLevel(LogLevel level) {
+    int lv = level.getLevel();
+    setOutputLevel(lv);
   }
 
   /**
@@ -134,16 +174,17 @@ public class Log {
    *          date-time format like "yyyy-MM-dd' 'HH:mm:ss.SSS XX"
    */
   public static void setDateTimeFormat(String format) {
-    dateTimeFormat = format;
+    getInstance().setLogDateTimeFormat(format);
   }
 
   /**
-   * Returns current module name.
+   * Sets date-time format.
    *
-   * @return module name
+   * @param format
+   *          date-time format like "yyyy-MM-dd' 'HH:mm:ss.SSS XX"
    */
-  public static String getModuleName() {
-    return moduleName;
+  public void setLogDateTimeFormat(String format) {
+    dateTimeFormat = format;
   }
 
   /**
@@ -153,6 +194,16 @@ public class Log {
    *          module name
    */
   public static void setModuleName(String name) {
+    getInstance().setLoggingModuleName(name);
+  }
+
+  /**
+   * Sets module name.
+   *
+   * @param name
+   *          module name
+   */
+  public void setLoggingModuleName(String name) {
     moduleName = name;
   }
 
@@ -162,7 +213,7 @@ public class Log {
    * @param o
    */
   public static void d(Object o) {
-    Log.out(o, LogLevel.DEBUG, 0, true);
+    getInstance().out(o, LogLevel.DEBUG, 0, true);
   }
 
   /**
@@ -171,7 +222,7 @@ public class Log {
    * @param o
    */
   public static void i(Object o) {
-    Log.out(o, LogLevel.INFO, 0, false);
+    getInstance().out(o, LogLevel.INFO, 0, false);
   }
 
   /**
@@ -180,7 +231,7 @@ public class Log {
    * @param o
    */
   public static void w(Object o) {
-    Log.out(o, LogLevel.WARN, 0, false);
+    getInstance().out(o, LogLevel.WARN, 0, false);
   }
 
   /**
@@ -189,7 +240,7 @@ public class Log {
    * @param o
    */
   public static void e(Object o) {
-    Log.error(o, LogLevel.ERROR, null);
+    getInstance().error(o, LogLevel.ERROR, null);
   }
 
   /**
@@ -199,7 +250,7 @@ public class Log {
    * @param t
    */
   public static void e(Object o, Throwable t) {
-    Log.error(o, LogLevel.ERROR, t);
+    getInstance().error(o, LogLevel.ERROR, t);
   }
 
   /**
@@ -208,7 +259,7 @@ public class Log {
    * @param o
    */
   public static void f(Object o) {
-    Log.error(o, LogLevel.FATAL, null);
+    getInstance().error(o, LogLevel.FATAL, null);
   }
 
   /**
@@ -218,11 +269,11 @@ public class Log {
    * @param t
    */
   public static void f(Object o, Throwable t) {
-    Log.error(o, LogLevel.FATAL, t);
+    getInstance().error(o, LogLevel.FATAL, t);
   }
 
   /**
-   * Log with time measurement.
+   * _Log with time measurement.
    *
    * @param msg
    * @return current time
@@ -230,12 +281,12 @@ public class Log {
   public static long t(String msg) {
     long t1 = System.currentTimeMillis();
     String m = "[T+00:00:00.000] " + msg;
-    Log.out(m, LogLevel.DEBUG, 0, true);
+    getInstance().out(m, LogLevel.DEBUG, 0, true);
     return t1;
   }
 
   /**
-   * Log with time measurement.
+   * _Log with time measurement.
    *
    * @param msg
    * @param t0
@@ -245,7 +296,7 @@ public class Log {
     long t1 = System.currentTimeMillis();
     long delta = t1 - t0;
     String m = "[T+" + DateTime.formatTime(delta, "HH:mm:ss.SSS") + "] " + msg;
-    Log.out(m, LogLevel.DEBUG, 0, true);
+    getInstance().out(m, LogLevel.DEBUG, 0, true);
     return t1;
   }
 
@@ -263,27 +314,29 @@ public class Log {
    *          frame offset to output
    */
   public static void stack(int offset) {
+    _Log log = getInstance();
     StackTraceElement stack[] = (new Throwable()).getStackTrace();
-    printLog("Stack:");
+    log.printLog("Stack:");
     for (int i = offset; i < stack.length; i++) {
       StackTraceElement frame = stack[i];
       String className = frame.getClassName();
       String methodName = frame.getMethodName();
       int lineNum = frame.getLineNumber();
-      printLog("    at " + className + "#" + methodName + " (L:" + lineNum + ")");
+      log.printLog("    at " + className + "#" + methodName + " (L:" + lineNum + ")");
     }
   }
 
-  private static void printStackTraceString(Throwable t, LogLevel lv, boolean printLine) {
-    out(t.toString(), lv, 2, printLine);
-    _printStackTraceString(t, lv, printLine);
+  protected static void printStackTraceString(Throwable t, LogLevel lv, boolean printLine) {
+    _Log log = getInstance();
+    log.out(t.toString(), lv, 2, printLine);
+    log._printStackTraceString(t, lv, printLine);
     while ((t = t.getCause()) != null) {
-      out("Caused by: " + t.toString(), lv, 2, printLine);
-      _printStackTraceString(t, lv, printLine);
+      log.out("Caused by: " + t.toString(), lv, 2, printLine);
+      log._printStackTraceString(t, lv, printLine);
     }
   }
 
-  private static void _printStackTraceString(Throwable t, LogLevel lv, boolean printLine) {
+  protected void _printStackTraceString(Throwable t, LogLevel lv, boolean printLine) {
     StackTraceElement[] stack = t.getStackTrace();
     for (int i = 0; i < stack.length; i++) {
       StackTraceElement frame = stack[i];
@@ -295,7 +348,61 @@ public class Log {
     }
   }
 
-  private static String buildMessage(Object o, LogLevel lv, int stackFrameOffset, boolean printLine) {
+  /**
+   * Output log message.
+   *
+   * @param o
+   *          message string or object
+   * @param lv
+   *          log level
+   * @param stackFrameOffset
+   * @param printLine
+   *          set true to output method():file:line
+   */
+  protected void out(Object o, LogLevel lv, int stackFrameOffset, boolean printLine) {
+    int logLevel = lv.getLevel();
+    if (logLevel > outputLevel) {
+      return;
+    }
+    String message = buildMessage(o, lv, stackFrameOffset, printLine);
+    if (logLevel <= LogLevel.FATAL.getLevel()) {
+      printLogF(message);
+    } else if (logLevel <= LogLevel.ERROR.getLevel()) {
+      printLogE(message);
+    } else if (logLevel <= LogLevel.WARN.getLevel()) {
+      printLogW(message);
+    } else if (logLevel <= LogLevel.INFO.getLevel()) {
+      printLogI(message);
+    } else if (logLevel <= LogLevel.DEBUG.getLevel()) {
+      printLogD(message);
+    } else {
+      printLog(message);
+    }
+  }
+
+  /**
+   * Output error message.
+   *
+   * @param o
+   * @param lv
+   * @param t
+   */
+  protected void error(Object o, LogLevel lv, Throwable t) {
+    if (lv.getLevel() > outputLevel) {
+      return;
+    }
+    boolean printLine = true;
+    if (o instanceof Throwable) {
+      printStackTraceString((Throwable) o, lv, printLine);
+    } else {
+      out(o, lv, 1, printLine);
+    }
+    if (t != null) {
+      printStackTraceString(t, lv, printLine);
+    }
+  }
+
+  protected String buildMessage(Object o, LogLevel lv, int stackFrameOffset, boolean printLine) {
     String time = DateTime.formatDateTime(dateTimeFormat);
     Thread th = Thread.currentThread();
     long tid = th.getId();
@@ -366,81 +473,27 @@ public class Log {
     return sb.toString();
   }
 
-  /**
-   * Output log message.
-   *
-   * @param o
-   *          message string or object
-   * @param lv
-   *          log level
-   * @param stackFrameOffset
-   * @param printLine
-   *          set true to output method():file:line
-   */
-  private static void out(Object o, LogLevel lv, int stackFrameOffset, boolean printLine) {
-    int logLevel = lv.getLevel();
-    if (logLevel > outputLevel) {
-      return;
-    }
-    String message = buildMessage(o, lv, stackFrameOffset, printLine);
-    if (logLevel <= LogLevel.FATAL.getLevel()) {
-      printLogF(message);
-    } else if (logLevel <= LogLevel.ERROR.getLevel()) {
-      printLogE(message);
-    } else if (logLevel <= LogLevel.WARN.getLevel()) {
-      printLogW(message);
-    } else if (logLevel <= LogLevel.INFO.getLevel()) {
-      printLogI(message);
-    } else if (logLevel <= LogLevel.DEBUG.getLevel()) {
-      printLogD(message);
-    } else {
-      printLog(message);
-    }
-  }
-
-  /**
-   * Output error message.
-   *
-   * @param o
-   * @param lv
-   * @param t
-   */
-  private static void error(Object o, LogLevel lv, Throwable t) {
-    if (lv.getLevel() > outputLevel) {
-      return;
-    }
-    boolean printLine = true;
-    if (o instanceof Throwable) {
-      printStackTraceString((Throwable) o, lv, printLine);
-    } else {
-      out(o, lv, 1, printLine);
-    }
-    if (t != null) {
-      printStackTraceString(t, lv, printLine);
-    }
-  }
-
-  private static void printLog(Object o) {
+  protected void printLog(Object o) {
     System.out.println(o);
   }
 
-  private static void printLogD(Object o) {
+  protected void printLogD(Object o) {
     System.out.println(o);
   }
 
-  private static void printLogI(Object o) {
+  protected void printLogI(Object o) {
     System.out.println(o);
   }
 
-  private static void printLogW(Object o) {
+  protected void printLogW(Object o) {
     System.out.println(o);
   }
 
-  private static void printLogE(Object o) {
+  protected void printLogE(Object o) {
     System.out.println(o);
   }
 
-  private static void printLogF(Object o) {
+  protected void printLogF(Object o) {
     System.out.println(o);
   }
 
