@@ -24,7 +24,7 @@
 ' SOFTWARE.
 '
 ' https://libutil.com/
-' v202106270124
+' v202106270132
 '==============================================================================
 Option Explicit
 
@@ -286,96 +286,216 @@ Public Function CloseBook(path)
 End Function
 
 '------------------------------------------------------------------------------
-'# 配列操作
+'# Sheet
 '------------------------------------------------------------------------------
 ''
-' 配列に要素をpushします。
+' 指定された名前のシートが存在するかを返します。
 '
-Public Sub ArrayPush(ByRef arr As Variant, val As Variant)
-    On Error GoTo ArrInit
-    ReDim Preserve arr(UBound(arr) + 1)
-    arr(UBound(arr)) = val
-    Exit Sub
-ArrInit:
-    ReDim arr(0)
-    arr(0) = val
+Function SheetExists(name As String, Optional wb As Workbook = Nothing)
+    If wb Is Nothing Then
+        Set wb = ActiveWorkbook
+    End If
+    Dim ws As Worksheet
+    For Each ws In wb.Worksheets
+        If ws.name = name Then
+            SheetExists = True
+            Exit Function
+        End If
+    Next ws
+    SheetExists = False
+End Function
+
+''
+' 指定されたシートの先頭行を返します。
+'
+Public Function GetFirstRowOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
+    If ws Is Nothing Then
+        If sheetName = "" Then
+            Set ws = ActiveSheet
+        Else
+            Set ws = Sheets(sheetName)
+        End If
+    End If
+    Dim usedRng As Range
+    Dim firstRow As Range
+    Set usedRng = ws.UsedRange
+    Set firstRow = usedRng.rows(1).EntireRow
+    GetFirstRowOfSheet = firstRow.row
+End Function
+
+''
+' 指定されたシートの最終行を返します。
+'
+Public Function GetLastRowOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
+    If ws Is Nothing Then
+        If sheetName = "" Then
+            Set ws = ActiveSheet
+        Else
+            Set ws = Sheets(sheetName)
+        End If
+    End If
+    Dim usedRng As Range
+    Dim lastRow As Range
+    Set usedRng = ws.UsedRange
+    Set lastRow = usedRng.rows(usedRng.rows.count).EntireRow
+    GetLastRowOfSheet = lastRow.row
+End Function
+
+''
+' 指定されたシートの先頭列を返します。(A=1, B=2, ...)
+'
+Public Function GetFirstColOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
+    If ws Is Nothing Then
+        If sheetName = "" Then
+            Set ws = ActiveSheet
+        Else
+            Set ws = Sheets(sheetName)
+        End If
+    End If
+    Dim usedRng As Range
+    Dim firstCol As Range
+    Set usedRng = ws.UsedRange
+    Set firstCol = usedRng.Columns(1).EntireColumn
+    GetFirstColOfSheet = firstCol.Column
+End Function
+
+''
+' 指定されたシートの最終列を返します。(A=1, B=2, ...)
+'
+Public Function GetLastColOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
+    If ws Is Nothing Then
+        If sheetName = "" Then
+            Set ws = ActiveSheet
+        Else
+            Set ws = Sheets(sheetName)
+        End If
+    End If
+    Dim usedRng As Range
+    Dim lastCol As Range
+    Set usedRng = ws.UsedRange
+    Set lastCol = usedRng.Columns(usedRng.Columns.count).EntireColumn
+    GetLastColOfSheet = lastCol.Column
+End Function
+
+''
+' 指定された列の先頭行を返します。
+'
+Public Function GetFirstRowOfCol(col As String, Optional ws As Worksheet = Nothing) As Long
+    If ws Is Nothing Then
+        Set ws = ActiveSheet
+    End If
+    Dim n As Long
+    Dim row As Long
+    n = XlsColA2N(col)
+    If ws.Cells(1, n).value <> "" Then
+        GetFirstRowOfCol = 1
+        Exit Function
+    End If
+    row = ws.Cells(1, n).End(xlDown).row
+    If row = ws.rows.count And ws.Cells(ws.rows.count, n).value = "" Then
+        row = -1
+    End If
+    GetFirstRowOfCol = row
+End Function
+
+''
+' 指定された列の最終行を返します。
+'
+Public Function GetLastRowOfCol(col As String, Optional ws As Worksheet = Nothing) As Long
+    If ws Is Nothing Then
+        Set ws = ActiveSheet
+    End If
+    Dim n As Long
+    Dim row As Long
+    n = XlsColA2N(col)
+    row = ws.Cells(ws.rows.count, n).End(xlUp).row
+    GetLastRowOfCol = row
+End Function
+
+''
+' 指定された行の先頭列を返します。("A", "B", ...)
+'
+Public Function GetFirstColOfRow(row As Long, Optional ws As Worksheet = Nothing) As String
+    If ws Is Nothing Then
+        Set ws = ActiveSheet
+    End If
+    If ws.Cells(row, 1).value <> "" Then
+        GetFirstColOfRow = "A"
+        Exit Function
+    End If
+    Dim n As Long
+    Dim col As String
+    n = ws.Cells(row, 1).End(xlToRight).Column
+    If n = ws.Columns.count And ws.Cells(row, ws.Columns.count).value = "" Then
+        col = ""
+    Else
+        col = XlsColN2A(n)
+    End If
+    GetFirstColOfRow = col
+End Function
+
+''
+' 指定された行の最終列を返します。("A", "B", ...)
+'
+Public Function GetLastColOfRow(row As Long, Optional ws As Worksheet = Nothing) As String
+    If ws Is Nothing Then
+        Set ws = ActiveSheet
+    End If
+    Dim n As Long
+    Dim col As String
+    n = ws.Cells(row, ws.Columns.count).End(xlToLeft).Column
+    col = XlsColN2A(n)
+    GetLastColOfRow = col
+End Function
+
+''
+' 指定されたセルに計算式が存在するかを返します。
+'
+Public Function HasFormula(ref As String, Optional ws As Worksheet = Nothing) As Boolean
+    If ws Is Nothing Then
+        Set ws = ActiveSheet
+    End If
+    HasFormula = ws.Range(ref).HasFormula
+End Function
+
+''
+' シートの表示位置を左上に設定します。
+'
+Public Sub ScrollToUpperLeft(Optional ws As Worksheet = Nothing)
+    If ws Is Nothing Then
+        Set ws = ActiveSheet
+    End If
+    ws.Activate
+    ActiveWindow.ScrollColumn = 1
+    ActiveWindow.ScrollRow = 1
 End Sub
 
 ''
-' 配列のサイズを返します。
+' シートの表示位置をA1に設定します。
 '
-Public Function GetArraySize(ByRef arr As Variant, Optional dimension As Long = 1) As Long
-    GetArraySize = -1
-    On Error Resume Next
-    If IsEmptyArray(arr) Then
-        GetArraySize = 0
-    Else
-        GetArraySize = UBound(arr, dimension) - LBound(arr, dimension) + 1
+Public Sub ScrollToA1Cell(Optional ws As Worksheet = Nothing)
+    If ws Is Nothing Then
+        Set ws = ActiveSheet
     End If
-    On Error GoTo 0
-End Function
+    ws.Activate
+    Application.GoTo Reference:=Cells(1, 1), Scroll:=True
+End Sub
 
 ''
-' 配列の次元数を返します。
+' ブック内のすべての表示位置をA1に戻します。
 '
-Public Function GetArrayDimensions(ByRef arr As Variant) As Long
-    Dim i As Long
-    Dim n As Long
-    i = 0
-    n = 0
-    On Error Resume Next
-    Do While Err.Number = 0
-        i = i + 1
-        n = UBound(arr, i)
-    Loop
-    On Error GoTo 0
-    GetArrayDimensions = i - 1
-End Function
-
-''
-' 配列が空であるかを返します。
-'
-Public Function IsEmptyArray(arr As Variant) As Boolean
-    IsEmptyArray = False
-    Dim i As Long
-    On Error GoTo ErrHandler
-    i = UBound(arr)
-    Exit Function
-ErrHandler:
-    IsEmptyArray = True
-End Function
-
-''
-' 配列を重複要素のないSetコレクションに変換して返します。
-'
-Public Function Array2Set(ByRef arr As Variant) As Variant
-    Dim dic As Object
-    Set dic = CreateObject("Scripting.Dictionary")
-    Dim val As Variant
-    Dim i As Long
-    For i = 0 To UBound(arr)
-        val = arr(i)
-        If dic.Exists(val) Then
-            dic.Item(val) = dic.Item(val) + 1
-        Else
-            dic.Item(val) = 1
-        End If
-    Next
-    Array2Set = dic.Keys()
-End Function
-
-''
-' テキストを改行で区切って配列として返します。
-'
-Public Function TextToArray(txt As String) As String()
-    txt = ReplaceLineSeparator(txt, vbLf)
-    Dim arr() As String
-    arr = Split(txt, vbLf)
-    If arr(UBound(arr)) = "" Then
-        ReDim Preserve arr(UBound(arr) - 1)
+Public Sub ResetAllSheetsToA1(Optional wb As Workbook = Nothing)
+    If wb Is Nothing Then
+        Set wb = ActiveWorkbook
     End If
-    TextToArray = arr
-End Function
+    Dim ws As Worksheet
+    Dim i
+    For i = wb.Sheets.count To 1 Step -1
+        Set ws = wb.Sheets(i)
+        ws.Activate
+        Application.GoTo Reference:=ws.Cells(1, 1), Scroll:=True
+    Next i
+End Sub
 
 '------------------------------------------------------------------------------
 '# セル値
@@ -1098,6 +1218,98 @@ Public Function ClearSheet(Optional sheetName As String = "", Optional ws As Wor
 End Function
 
 '------------------------------------------------------------------------------
+'# 配列操作
+'------------------------------------------------------------------------------
+''
+' 配列に要素をpushします。
+'
+Public Sub ArrayPush(ByRef arr As Variant, val As Variant)
+    On Error GoTo ArrInit
+    ReDim Preserve arr(UBound(arr) + 1)
+    arr(UBound(arr)) = val
+    Exit Sub
+ArrInit:
+    ReDim arr(0)
+    arr(0) = val
+End Sub
+
+''
+' 配列のサイズを返します。
+'
+Public Function GetArraySize(ByRef arr As Variant, Optional dimension As Long = 1) As Long
+    GetArraySize = -1
+    On Error Resume Next
+    If IsEmptyArray(arr) Then
+        GetArraySize = 0
+    Else
+        GetArraySize = UBound(arr, dimension) - LBound(arr, dimension) + 1
+    End If
+    On Error GoTo 0
+End Function
+
+''
+' 配列の次元数を返します。
+'
+Public Function GetArrayDimensions(ByRef arr As Variant) As Long
+    Dim i As Long
+    Dim n As Long
+    i = 0
+    n = 0
+    On Error Resume Next
+    Do While Err.Number = 0
+        i = i + 1
+        n = UBound(arr, i)
+    Loop
+    On Error GoTo 0
+    GetArrayDimensions = i - 1
+End Function
+
+''
+' 配列が空であるかを返します。
+'
+Public Function IsEmptyArray(arr As Variant) As Boolean
+    IsEmptyArray = False
+    Dim i As Long
+    On Error GoTo ErrHandler
+    i = UBound(arr)
+    Exit Function
+ErrHandler:
+    IsEmptyArray = True
+End Function
+
+''
+' 配列を重複要素のないSetコレクションに変換して返します。
+'
+Public Function Array2Set(ByRef arr As Variant) As Variant
+    Dim dic As Object
+    Set dic = CreateObject("Scripting.Dictionary")
+    Dim val As Variant
+    Dim i As Long
+    For i = 0 To UBound(arr)
+        val = arr(i)
+        If dic.Exists(val) Then
+            dic.Item(val) = dic.Item(val) + 1
+        Else
+            dic.Item(val) = 1
+        End If
+    Next
+    Array2Set = dic.Keys()
+End Function
+
+''
+' テキストを改行で区切って配列として返します。
+'
+Public Function TextToArray(txt As String) As String()
+    txt = ReplaceLineSeparator(txt, vbLf)
+    Dim arr() As String
+    arr = Split(txt, vbLf)
+    If arr(UBound(arr)) = "" Then
+        ReDim Preserve arr(UBound(arr) - 1)
+    End If
+    TextToArray = arr
+End Function
+
+'------------------------------------------------------------------------------
 '# 文字列操作
 '------------------------------------------------------------------------------
 ''
@@ -1681,218 +1893,6 @@ Public Function IsOnlyColName(refs As String) As Boolean
         IsOnlyColName = True
     End If
 End Function
-
-'------------------------------------------------------------------------------
-'# ワークシート
-'------------------------------------------------------------------------------
-''
-' 指定された名前のシートが存在するかを返します。
-'
-Function SheetExists(name As String, Optional wb As Workbook = Nothing)
-    If wb Is Nothing Then
-        Set wb = ActiveWorkbook
-    End If
-    Dim ws As Worksheet
-    For Each ws In wb.Worksheets
-        If ws.name = name Then
-            SheetExists = True
-            Exit Function
-        End If
-    Next ws
-    SheetExists = False
-End Function
-
-''
-' 指定されたシートの先頭行を返します。
-'
-Public Function GetFirstRowOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
-    If ws Is Nothing Then
-        If sheetName = "" Then
-            Set ws = ActiveSheet
-        Else
-            Set ws = Sheets(sheetName)
-        End If
-    End If
-    Dim usedRng As Range
-    Dim firstRow As Range
-    Set usedRng = ws.UsedRange
-    Set firstRow = usedRng.rows(1).EntireRow
-    GetFirstRowOfSheet = firstRow.row
-End Function
-
-''
-' 指定されたシートの最終行を返します。
-'
-Public Function GetLastRowOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
-    If ws Is Nothing Then
-        If sheetName = "" Then
-            Set ws = ActiveSheet
-        Else
-            Set ws = Sheets(sheetName)
-        End If
-    End If
-    Dim usedRng As Range
-    Dim lastRow As Range
-    Set usedRng = ws.UsedRange
-    Set lastRow = usedRng.rows(usedRng.rows.count).EntireRow
-    GetLastRowOfSheet = lastRow.row
-End Function
-
-''
-' 指定されたシートの先頭列を返します。(A=1, B=2, ...)
-'
-Public Function GetFirstColOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
-    If ws Is Nothing Then
-        If sheetName = "" Then
-            Set ws = ActiveSheet
-        Else
-            Set ws = Sheets(sheetName)
-        End If
-    End If
-    Dim usedRng As Range
-    Dim firstCol As Range
-    Set usedRng = ws.UsedRange
-    Set firstCol = usedRng.Columns(1).EntireColumn
-    GetFirstColOfSheet = firstCol.Column
-End Function
-
-''
-' 指定されたシートの最終列を返します。(A=1, B=2, ...)
-'
-Public Function GetLastColOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
-    If ws Is Nothing Then
-        If sheetName = "" Then
-            Set ws = ActiveSheet
-        Else
-            Set ws = Sheets(sheetName)
-        End If
-    End If
-    Dim usedRng As Range
-    Dim lastCol As Range
-    Set usedRng = ws.UsedRange
-    Set lastCol = usedRng.Columns(usedRng.Columns.count).EntireColumn
-    GetLastColOfSheet = lastCol.Column
-End Function
-
-''
-' 指定された列の先頭行を返します。
-'
-Public Function GetFirstRowOfCol(col As String, Optional ws As Worksheet = Nothing) As Long
-    If ws Is Nothing Then
-        Set ws = ActiveSheet
-    End If
-    Dim n As Long
-    Dim row As Long
-    n = XlsColA2N(col)
-    If ws.Cells(1, n).value <> "" Then
-        GetFirstRowOfCol = 1
-        Exit Function
-    End If
-    row = ws.Cells(1, n).End(xlDown).row
-    If row = ws.rows.count And ws.Cells(ws.rows.count, n).value = "" Then
-        row = -1
-    End If
-    GetFirstRowOfCol = row
-End Function
-
-''
-' 指定された列の最終行を返します。
-'
-Public Function GetLastRowOfCol(col As String, Optional ws As Worksheet = Nothing) As Long
-    If ws Is Nothing Then
-        Set ws = ActiveSheet
-    End If
-    Dim n As Long
-    Dim row As Long
-    n = XlsColA2N(col)
-    row = ws.Cells(ws.rows.count, n).End(xlUp).row
-    GetLastRowOfCol = row
-End Function
-
-''
-' 指定された行の先頭列を返します。("A", "B", ...)
-'
-Public Function GetFirstColOfRow(row As Long, Optional ws As Worksheet = Nothing) As String
-    If ws Is Nothing Then
-        Set ws = ActiveSheet
-    End If
-    If ws.Cells(row, 1).value <> "" Then
-        GetFirstColOfRow = "A"
-        Exit Function
-    End If
-    Dim n As Long
-    Dim col As String
-    n = ws.Cells(row, 1).End(xlToRight).Column
-    If n = ws.Columns.count And ws.Cells(row, ws.Columns.count).value = "" Then
-        col = ""
-    Else
-        col = XlsColN2A(n)
-    End If
-    GetFirstColOfRow = col
-End Function
-
-''
-' 指定された行の最終列を返します。("A", "B", ...)
-'
-Public Function GetLastColOfRow(row As Long, Optional ws As Worksheet = Nothing) As String
-    If ws Is Nothing Then
-        Set ws = ActiveSheet
-    End If
-    Dim n As Long
-    Dim col As String
-    n = ws.Cells(row, ws.Columns.count).End(xlToLeft).Column
-    col = XlsColN2A(n)
-    GetLastColOfRow = col
-End Function
-
-''
-' 指定されたセルに計算式が存在するかを返します。
-'
-Public Function HasFormula(ref As String, Optional ws As Worksheet = Nothing) As Boolean
-    If ws Is Nothing Then
-        Set ws = ActiveSheet
-    End If
-    HasFormula = ws.Range(ref).HasFormula
-End Function
-
-''
-' シートの表示位置を左上に設定します。
-'
-Public Sub ScrollToUpperLeft(Optional ws As Worksheet = Nothing)
-    If ws Is Nothing Then
-        Set ws = ActiveSheet
-    End If
-    ws.Activate
-    ActiveWindow.ScrollColumn = 1
-    ActiveWindow.ScrollRow = 1
-End Sub
-
-''
-' シートの表示位置をA1に設定します。
-'
-Public Sub ScrollToA1Cell(Optional ws As Worksheet = Nothing)
-    If ws Is Nothing Then
-        Set ws = ActiveSheet
-    End If
-    ws.Activate
-    Application.GoTo Reference:=Cells(1, 1), Scroll:=True
-End Sub
-
-''
-' ブック内のすべての表示位置をA1に戻します。
-'
-Public Sub ResetAllSheetsToA1(Optional wb As Workbook = Nothing)
-    If wb Is Nothing Then
-        Set wb = ActiveWorkbook
-    End If
-    Dim ws As Worksheet
-    Dim i
-    For i = wb.Sheets.count To 1 Step -1
-        Set ws = wb.Sheets(i)
-        ws.Activate
-        Application.GoTo Reference:=ws.Cells(1, 1), Scroll:=True
-    Next i
-End Sub
 
 '------------------------------------------------------------------------------
 '# Date Time
