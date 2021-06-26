@@ -3,7 +3,7 @@
 '
 ' MIT License
 '
-' Copyright (c) 2020 Takashi Harano
+' Copyright 2020 Takashi Harano
 '
 ' Permission is hereby granted, free of charge, to any person obtaining a copy
 ' of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@
 ' SOFTWARE.
 '
 ' https://libutil.com/
-' v202106261220
+' v202106270009
 '==============================================================================
 Option Explicit
 
@@ -109,6 +109,17 @@ Public Function FileExists(path As String) As Boolean
         FileExists = False
     Else
         FileExists = True
+    End If
+End Function
+
+''
+' ファイル存在しない場合にTrueを返します。
+'
+Public Function FileNotFound(path As String) As Boolean
+    If Dir(path) = "" Then
+        FileNotFound = True
+    Else
+        FileNotFound = False
     End If
 End Function
 
