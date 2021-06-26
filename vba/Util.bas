@@ -24,7 +24,7 @@
 ' SOFTWARE.
 '
 ' https://libutil.com/
-' v202106200900
+' v202106261220
 '==============================================================================
 Option Explicit
 
@@ -427,8 +427,8 @@ Public Function GetSheetValues(Optional sheetName As String = "", Optional ws As
     Dim lastColN As Long
     Dim lastColA As String
 
-    lastRowN = GetLastRow(sheetName, ws)
-    lastColN = GetLastCol(sheetName, ws)
+    lastRowN = GetLastRowOfSheet(sheetName, ws)
+    lastColN = GetLastColOfSheet(sheetName, ws)
     lastColA = XlsColN2A(lastColN)
 
     Dim addr As String
@@ -1677,7 +1677,7 @@ End Function
 ''
 ' 指定されたシートの先頭行を返します。
 '
-Public Function GetFirstRow(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
+Public Function GetFirstRowOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
     If ws Is Nothing Then
         If sheetName = "" Then
             Set ws = ActiveSheet
@@ -1689,13 +1689,13 @@ Public Function GetFirstRow(Optional sheetName As String = "", Optional ws As Wo
     Dim firstRow As Range
     Set usedRng = ws.UsedRange
     Set firstRow = usedRng.rows(1).EntireRow
-    GetFirstRow = firstRow.row
+    GetFirstRowOfSheet = firstRow.row
 End Function
 
 ''
 ' 指定されたシートの最終行を返します。
 '
-Public Function GetLastRow(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
+Public Function GetLastRowOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
     If ws Is Nothing Then
         If sheetName = "" Then
             Set ws = ActiveSheet
@@ -1707,13 +1707,13 @@ Public Function GetLastRow(Optional sheetName As String = "", Optional ws As Wor
     Dim lastRow As Range
     Set usedRng = ws.UsedRange
     Set lastRow = usedRng.rows(usedRng.rows.count).EntireRow
-    GetLastRow = lastRow.row
+    GetLastRowOfSheet = lastRow.row
 End Function
 
 ''
 ' 指定されたシートの先頭列を返します。(A=1, B=2, ...)
 '
-Public Function GetFirstCol(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
+Public Function GetFirstColOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
     If ws Is Nothing Then
         If sheetName = "" Then
             Set ws = ActiveSheet
@@ -1725,13 +1725,13 @@ Public Function GetFirstCol(Optional sheetName As String = "", Optional ws As Wo
     Dim firstCol As Range
     Set usedRng = ws.UsedRange
     Set firstCol = usedRng.Columns(1).EntireColumn
-    GetFirstCol = firstCol.Column
+    GetFirstColOfSheet = firstCol.Column
 End Function
 
 ''
 ' 指定されたシートの最終列を返します。(A=1, B=2, ...)
 '
-Public Function GetLastCol(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
+Public Function GetLastColOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
     If ws Is Nothing Then
         If sheetName = "" Then
             Set ws = ActiveSheet
@@ -1743,7 +1743,7 @@ Public Function GetLastCol(Optional sheetName As String = "", Optional ws As Wor
     Dim lastCol As Range
     Set usedRng = ws.UsedRange
     Set lastCol = usedRng.Columns(usedRng.Columns.count).EntireColumn
-    GetLastCol = lastCol.Column
+    GetLastColOfSheet = lastCol.Column
 End Function
 
 ''
