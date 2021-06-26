@@ -24,7 +24,7 @@
 ' SOFTWARE.
 '
 ' https://libutil.com/
-' v202106270009
+' v202106270124
 '==============================================================================
 Option Explicit
 
@@ -1685,6 +1685,23 @@ End Function
 '------------------------------------------------------------------------------
 '# ワークシート
 '------------------------------------------------------------------------------
+''
+' 指定された名前のシートが存在するかを返します。
+'
+Function SheetExists(name As String, Optional wb As Workbook = Nothing)
+    If wb Is Nothing Then
+        Set wb = ActiveWorkbook
+    End If
+    Dim ws As Worksheet
+    For Each ws In wb.Worksheets
+        If ws.name = name Then
+            SheetExists = True
+            Exit Function
+        End If
+    Next ws
+    SheetExists = False
+End Function
+
 ''
 ' 指定されたシートの先頭行を返します。
 '
