@@ -24,7 +24,7 @@
 ' SOFTWARE.
 '
 ' https://libutil.com/
-' v202106270132
+' v202106272353
 '==============================================================================
 Option Explicit
 
@@ -256,7 +256,7 @@ End Function
 ' ExcelのBookを開きます。
 '
 ' Dim wb As Workbook
-' Set wb = Util.OpenBook("C:\Book1.xlsx")
+' Set wb = OpenBook("C:\Book1.xlsx")
 '
 Public Function OpenBook(path) As Workbook
     Set OpenBook = Nothing
@@ -303,6 +303,13 @@ Function SheetExists(name As String, Optional wb As Workbook = Nothing)
         End If
     Next ws
     SheetExists = False
+End Function
+
+''
+' 指定された名前のシートが存在しない場合にTrueを返します。
+'
+Function SheetNotFound(name As String, Optional wb As Workbook = Nothing)
+    SheetNotFound = Not SheetExists(name, wb)
 End Function
 
 ''
