@@ -1,56 +1,56 @@
 package com.libutil.util;
 
+import com.libutil.Base64Util;
 import com.libutil.Log;
-import com.libutil.Util;
 
 public class Base64Test {
 
   public static void main(String args[]) {
-    encodeBase64Test();
-    decodeBase64Test();
+    encodeTest();
+    decodeTest();
   }
 
-  private static void encodeBase64Test() {
+  private static void encodeTest() {
     String str = "abc";
-    Log.d("encodeBase64(\"" + str + "\")");
-    String encoded = Util.encodeBase64(str);
+    Log.d("encode(\"" + str + "\")");
+    String encoded = Base64Util.encode(str);
     Log.d(encoded);
 
     str = "";
-    Log.d("encodeBase64(\"" + str + "\")");
-    encoded = Util.encodeBase64("");
+    Log.d("encode(\"" + str + "\")");
+    encoded = Base64Util.encode("");
     Log.d(encoded);
 
     str = null;
-    Log.d("encodeBase64(null)");
-    encoded = Util.encodeBase64("");
+    Log.d("encode(null)");
+    encoded = Base64Util.encode("");
     Log.d(encoded);
 
     byte[] b = { 97, 98, 99 };
-    Log.d("encodeBase64([97,98,99]");
-    encoded = Util.encodeBase64(b);
+    Log.d("encode([97,98,99]");
+    encoded = Base64Util.encode(b);
     Log.d(encoded);
   }
 
-  private static void decodeBase64Test() {
+  private static void decodeTest() {
     String str = "YWJj";
-    Log.d("decodeBase64(\"" + str + "\")");
-    String decoded = Util.decodeBase64(str);
+    Log.d("decode(\"" + str + "\")");
+    String decoded = Base64Util.decode(str);
     Log.d(decoded);
 
     str = "";
-    Log.d("decodeBase64(\"" + str + "\")");
-    decoded = Util.decodeBase64(str);
+    Log.d("decode(\"" + str + "\")");
+    decoded = Base64Util.decode(str);
     Log.d(decoded);
 
     str = null;
-    Log.d("decodeBase64(null)");
-    decoded = Util.decodeBase64(str);
+    Log.d("decode(null)");
+    decoded = Base64Util.decode(str);
     Log.d(decoded);
 
     str = "YWJj";
-    Log.d("decodeBase64B(\"" + str + "\")");
-    byte[] d = Util.decodeBase64B(str);
+    Log.d("decodeB(\"" + str + "\")");
+    byte[] d = Base64Util.decodeB(str);
     for (int i = 0; i < d.length; i++) {
       Log.d(d[i]);
     }
