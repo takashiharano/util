@@ -32,6 +32,8 @@ public class SystemUtil {
 
   /**
    * Returns all system environment.
+   *
+   * @return systemenv
    */
   public static String getAllSystemEnv() {
     StringBuilder sb = new StringBuilder();
@@ -44,6 +46,8 @@ public class SystemUtil {
 
   /**
    * Returns the heap information string.
+   *
+   * @return the heap info
    */
   public static String getHeapInfoString() {
     HeapInfo info = new HeapInfo();

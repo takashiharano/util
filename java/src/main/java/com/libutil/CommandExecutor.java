@@ -41,6 +41,7 @@ public class CommandExecutor {
    *          a string array containing the program and its arguments
    * @return command result
    * @throws Exception
+   *           an exceptions that occurred during execution
    */
   public String exec(String[] command) throws Exception {
     return exec(command, 0, DEFAULT_CHARSET, null);
@@ -55,6 +56,7 @@ public class CommandExecutor {
    *          charset name
    * @return command result
    * @throws Exception
+   *           If an error occurs
    */
   public String exec(String[] command, String charset) throws Exception {
     return exec(command, 0, charset, null);
@@ -69,8 +71,11 @@ public class CommandExecutor {
    *          the maximum time to wait
    * @param charset
    *          charset name
+   * @param dir
+   *          the new working directory
    * @return command result
    * @throws Exception
+   *           If an error occurs
    */
   public String exec(String[] command, long timeout, String charset, File dir) throws Exception {
     InputStream inpStream = null;
@@ -152,6 +157,7 @@ public class CommandExecutor {
    *          a string array containing the program and its arguments
    * @return command result
    * @throws Exception
+   *           If an error occurs
    */
   public static String execCommand(String[] command) throws Exception {
     return execCommand(command, DEFAULT_CHARSET);
@@ -166,6 +172,7 @@ public class CommandExecutor {
    *          charset name
    * @return command result
    * @throws Exception
+   *           If an error occurs
    */
   public static String execCommand(String[] command, String charset) throws Exception {
     CommandExecutor executor = new CommandExecutor();
@@ -179,6 +186,7 @@ public class CommandExecutor {
    *          command string
    * @return command result
    * @throws Exception
+   *           If an error occurs
    */
   public static String execLinuxCommand(String command) throws Exception {
     return execLinuxCommand(command, "UTF-8");
@@ -193,6 +201,7 @@ public class CommandExecutor {
    *          charset name
    * @return command result
    * @throws Exception
+   *           If an error occurs
    */
   public static String execLinuxCommand(String command, String charset) throws Exception {
     String osName = System.getProperty("os.name");
@@ -211,6 +220,7 @@ public class CommandExecutor {
    *          command string
    * @return command result
    * @throws Exception
+   *           If an error occurs
    */
   public static String execWindowsCommand(String command) throws Exception {
     return execWindowsCommand(command, "SJIS");
@@ -225,6 +235,7 @@ public class CommandExecutor {
    *          charset name
    * @return command result
    * @throws Exception
+   *           If an error occurs
    */
   public static String execWindowsCommand(String command, String charset) throws Exception {
     String osName = System.getProperty("os.name");

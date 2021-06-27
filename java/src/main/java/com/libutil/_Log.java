@@ -151,6 +151,7 @@ public class _Log {
    * Sets output level.
    *
    * @param level
+   *          output level
    */
   public void setOutputLevel(int level) {
     outputLevel = level;
@@ -211,6 +212,7 @@ public class _Log {
    * Debug log.
    *
    * @param o
+   *          The Object to be printed.
    */
   public static void d(Object o) {
     getInstance().out(o, LogLevel.DEBUG, 0, true);
@@ -220,6 +222,7 @@ public class _Log {
    * Information log.
    *
    * @param o
+   *          The Object to be printed.
    */
   public static void i(Object o) {
     getInstance().out(o, LogLevel.INFO, 0, false);
@@ -229,6 +232,7 @@ public class _Log {
    * Warning log.
    *
    * @param o
+   *          The Object to be printed.
    */
   public static void w(Object o) {
     getInstance().out(o, LogLevel.WARN, 0, false);
@@ -238,6 +242,7 @@ public class _Log {
    * Error log.
    *
    * @param o
+   *          The Object to be printed.
    */
   public static void e(Object o) {
     getInstance().error(o, LogLevel.ERROR, null);
@@ -247,7 +252,9 @@ public class _Log {
    * Error log.
    *
    * @param o
+   *          The Object to be printed.
    * @param t
+   *          The throwable object to be printed.
    */
   public static void e(Object o, Throwable t) {
     getInstance().error(o, LogLevel.ERROR, t);
@@ -257,6 +264,7 @@ public class _Log {
    * Fatal log.
    *
    * @param o
+   *          The Object to be printed.
    */
   public static void f(Object o) {
     getInstance().error(o, LogLevel.FATAL, null);
@@ -266,7 +274,9 @@ public class _Log {
    * Fatal log.
    *
    * @param o
+   *          The Object to be printed.
    * @param t
+   *          The throwable object to be printed.
    */
   public static void f(Object o, Throwable t) {
     getInstance().error(o, LogLevel.FATAL, t);
@@ -276,6 +286,7 @@ public class _Log {
    * _Log with time measurement.
    *
    * @param msg
+   *          message
    * @return current time
    */
   public static long t(String msg) {
@@ -289,7 +300,9 @@ public class _Log {
    * _Log with time measurement.
    *
    * @param msg
+   *          message
    * @param t0
+   *          starting time
    * @return current time
    */
   public static long t(String msg, long t0) {
@@ -356,6 +369,7 @@ public class _Log {
    * @param lv
    *          log level
    * @param stackFrameOffset
+   *          offset of stackframe
    * @param printLine
    *          set true to output method():file:line
    */
@@ -384,8 +398,11 @@ public class _Log {
    * Output error message.
    *
    * @param o
+   *          message string or object
    * @param lv
+   *          output lebel
    * @param t
+   *          The throwable object to be printed
    */
   protected void error(Object o, LogLevel lv, Throwable t) {
     if (lv.getLevel() > outputLevel) {

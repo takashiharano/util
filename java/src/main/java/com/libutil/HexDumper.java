@@ -127,7 +127,8 @@ public class HexDumper {
    * 00000010 : 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F ................
    * 
    * @param src
-   * @return
+   *          the byte array
+   * @return the dumped string
    */
   public static String dump(byte[] src) {
     return dump(src, 0, 0);
@@ -281,10 +282,11 @@ public class HexDumper {
   }
 
   /**
-   * [0x00, 0x80, 0xFF] -> ["00", "80", "FF"]
+   * [0x00, 0x80, 0xFF] to ["00", "80", "FF"]
    *
    * @param src
-   * @return
+   *          the byte array
+   * @return the string array
    */
   public static String[] toHexArray(byte[] src) {
     int len = src.length;

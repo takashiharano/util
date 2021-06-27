@@ -124,16 +124,24 @@ public class DateTime {
    * Allocates a DateTime object and initializes with the given parameters.
    *
    * @param year
+   *          Year
    * @param month
+   *          Month
    * @param day
+   *          Day
    * @param hour
+   *          Hour
    * @param minute
+   *          Minute
    * @param second
+   *          Second
    * @param millisecond
+   *          Millisecond
    * @param timeZoneId
    *          the ID for a TimeZone, such as "PST", "America/Los_Angeles",
    *          "GMT-8:00"
    * @throws ParseException
+   *           If failed to parse
    */
   public DateTime(int year, int month, int day, int hour, int minute, int second, int millisecond, String timeZoneId)
       throws ParseException {
@@ -346,10 +354,10 @@ public class DateTime {
    * Returns the Date Time String of the instance in the specified format.
    *
    * @param format
-   *          "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" ->
+   *          "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" to
    *          "2019-07-13T12:34:56.987+09:00"<br>
-   *          "yyyyMMdd'T'HHmmssSSSXX" -> "20190713T123456.987+0900"
-   * @return
+   *          "yyyyMMdd'T'HHmmssSSSXX" to "20190713T123456.987+0900"
+   * @return the date time string
    */
   public String toString(String format) {
     SimpleDateFormat sdf = new SimpleDateFormat(format);
@@ -398,9 +406,9 @@ public class DateTime {
    *
    * @param format
    *          the pattern describing the date and time format
-   *          "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" ->
+   *          "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" to
    *          "2020-07-01T12:34:56.987+09:00"<br>
-   *          "yyyyMMdd'T'HHmmssSSSXX" -> "20190701T123456.987+0900"
+   *          "yyyyMMdd'T'HHmmssSSSXX" to "20190701T123456.987+0900"
    * @return the formatted date-time string
    */
   public static String formatDateTime(String format) {
@@ -412,11 +420,12 @@ public class DateTime {
    * Returns the Date Time String from Date object.
    *
    * @param date
+   *          the date
    * @param format
-   *          "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" ->
+   *          "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" to
    *          "2019-07-13T12:34:56.987+09:00"<br>
-   *          "yyyyMMdd'T'HHmmssSSSXX" -> "20190713T123456.987+0900"
-   * @return
+   *          "yyyyMMdd'T'HHmmssSSSXX" to "20190713T123456.987+0900"
+   * @return the date time string
    */
   public static String formatDateTime(Date date, String format) {
     DateTime dt = new DateTime(date);
@@ -430,9 +439,9 @@ public class DateTime {
    *          the milliseconds since January 1, 1970, 00:00:00 GMT.
    * @param format
    *          the pattern describing the date and time format
-   *          "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" ->
+   *          "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" to
    *          "2020-07-01T12:34:56.987+09:00"<br>
-   *          "yyyyMMdd'T'HHmmssSSSXX" -> "20190701T123456.987+0900"
+   *          "yyyyMMdd'T'HHmmssSSSXX" to "20190701T123456.987+0900"
    * @return the formatted date-time string
    */
   public static String formatDateTime(long timestamp, String format) {
@@ -454,7 +463,7 @@ public class DateTime {
   /**
    * Convert milliseconds to a time string.<br>
    * <br>
-   * e.g., (1234, "HH:mm:ss.SSS") -> "00:00:01.234"
+   * e.g., (1234, "HH:mm:ss.SSS") to "00:00:01.234"
    *
    * @param millis
    *          milliseconds to format
@@ -474,6 +483,7 @@ public class DateTime {
    * Returns if the year is leap year.
    *
    * @param year
+   *          Year
    * @return true if the year is leap year
    */
   public static boolean isLeapYear(int year) {
@@ -499,6 +509,7 @@ public class DateTime {
    *          A String whose beginning should be parsed
    * @return A Date parsed from the string
    * @throws ParseException
+   *           If failed to parse
    */
   public static Date parseDate(String pattern, String str) throws ParseException {
     SimpleDateFormat sdf = new SimpleDateFormat(pattern);
@@ -509,14 +520,14 @@ public class DateTime {
   /**
    * Format the date-time string in YYYYMMDDHHMISSfff format<br>
    * <br>
-   * 20200920 -> 20200920000000000000<br>
-   * 20200920T1234 -> 20200920123400000000<br>
-   * 20200920T123456.789 -> 20200920123456789000<br>
-   * 20200920T123456.789123 -> 20200920123456789123<br>
-   * 2020-09-20 12:34:56.789 -> 20200920123456789000<br>
-   * 2020-09-20 12:34:56.789123 -> 20200920123456789123<br>
-   * 2020/9/3 12:34:56.789 -> 20200903123456789000<br>
-   * 2020/9/3 12:34:56.789123 -> 20200903123456789123
+   * 20200920 to 20200920000000000000<br>
+   * 20200920T1234 to 20200920123400000000<br>
+   * 20200920T123456.789 to 20200920123456789000<br>
+   * 20200920T123456.789123 to 20200920123456789123<br>
+   * 2020-09-20 12:34:56.789 to 20200920123456789000<br>
+   * 2020-09-20 12:34:56.789123 to 20200920123456789123<br>
+   * 2020/9/3 12:34:56.789 to 20200903123456789000<br>
+   * 2020/9/3 12:34:56.789123 to 20200903123456789123
    *
    * @param src
    *          date time string to format

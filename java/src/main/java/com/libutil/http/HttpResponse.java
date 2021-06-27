@@ -67,6 +67,7 @@ public class HttpResponse {
    * Sets a status message.
    *
    * @param statusMessage
+   *          status message
    */
   public void setStatusMessage(String statusMessage) {
     this.statusMessage = statusMessage;
@@ -113,7 +114,7 @@ public class HttpResponse {
   /**
    * Returns the content length of the response.
    *
-   * @return
+   * @return the length of the content
    */
   public int getContentLength() {
     return contentLength;
@@ -143,8 +144,7 @@ public class HttpResponse {
    *
    * @param charsetName
    *          charset name
-   * @return
-   * @throws UnsupportedEncodingException
+   * @return the response text
    */
   public String getResponseText(String charsetName) {
     if (body == null) {
@@ -162,7 +162,7 @@ public class HttpResponse {
   /**
    * Returns an exception object.
    *
-   * @return
+   * @return an exception
    */
   public Exception getException() {
     return exception;

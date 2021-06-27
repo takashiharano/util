@@ -60,10 +60,7 @@ public class HttpRequest {
   /**
    * Send an HTTP request without parameters.
    *
-   * @param uri
-   * @param method
-   * @return
-   * @throws IOException
+   * @return HttpResponse objecy
    */
   public HttpResponse send() {
     return send((String) null);
@@ -73,8 +70,8 @@ public class HttpRequest {
    * Send an HTTP request with parameters.
    *
    * @param params
-   * @return
-   * @throws IOException
+   *          hash map of parameters
+   * @return HttpResponse object
    */
   public HttpResponse send(RequestParameters params) {
     return send(params, "UTF-8");
@@ -84,9 +81,10 @@ public class HttpRequest {
    * Send an HTTP request with parameters.
    *
    * @param params
+   *          hash map of parameters
    * @param encoding
-   * @return
-   * @throws IOException
+   *          encoding
+   * @return HttpResponse object
    */
   public HttpResponse send(RequestParameters params, String encoding) {
     String data;
@@ -106,7 +104,7 @@ public class HttpRequest {
    *
    * @param data
    *          a payload body
-   * @return
+   * @return HttpResponse object
    */
   public HttpResponse send(String data) {
     HttpResponse response;
@@ -125,8 +123,9 @@ public class HttpRequest {
    *
    * @param data
    *          a payload body
-   * @return
+   * @return HttpResponse object
    * @throws IOException
+   *           If an I/O error occurs
    */
   public HttpResponse _send(String data) throws IOException {
     if ("GET".equals(method)) {
@@ -213,9 +212,10 @@ public class HttpRequest {
    * Build a query string from hash table.
    *
    * @param params
+   *          parameter hash map
    * @param encoding
-   * @return
-   * @throws UnsupportedEncodingException
+   *          encoding
+   * @return the query string
    */
   public static String buildQueryString(RequestParameters params, String encoding) {
     try {
@@ -259,6 +259,7 @@ public class HttpRequest {
    * Proxy proxy = new Proxy(Proxy.Type.HTTP, socketAddr);<br>
    *
    * @param proxy
+   *          proxy object
    */
   public void setProxy(Proxy proxy) {
     this.proxy = proxy;
@@ -268,6 +269,7 @@ public class HttpRequest {
    * Set request header map.
    *
    * @param reqHeaders
+   *          the hash map of request header
    */
   public void setRequestHeaders(RequestHeaders reqHeaders) {
     this.reqHeaders = reqHeaders;
@@ -292,6 +294,7 @@ public class HttpRequest {
    * Returns if the request header contains the given field name.
    *
    * @param name
+   *          field name
    * @return true if exists
    */
   public boolean hasRequestHeader(String name) {
@@ -305,6 +308,7 @@ public class HttpRequest {
    * Add Content-Type field into the request header.
    *
    * @param type
+   *          the content type
    */
   public void setContentType(String type) {
     addRequestHeader("Content-Type", type);
@@ -314,6 +318,7 @@ public class HttpRequest {
    * Add User-Agent field into the request header.
    *
    * @param ua
+   *          the user agent
    */
   public void setUserAgent(String ua) {
     addRequestHeader("User-Agent", ua);
@@ -323,7 +328,9 @@ public class HttpRequest {
    * Set user name and password to Authorization header.
    *
    * @param user
+   *          user name
    * @param pass
+   *          password
    */
   public void setAuthentication(String user, String pass) {
     String userPass = user + ":" + pass;
@@ -335,6 +342,7 @@ public class HttpRequest {
    * Set the connection timeout in seconds.
    *
    * @param seconds
+   *          timeout value in seconds
    */
   public void setConnectionTimeout(int seconds) {
     this.connectionTimeoutSec = seconds;
@@ -344,6 +352,7 @@ public class HttpRequest {
    * Set the read timeout in seconds.
    *
    * @param seconds
+   *          timeout value in seconds
    */
   public void setReadTimeout(int seconds) {
     this.readTimeoutSec = seconds;

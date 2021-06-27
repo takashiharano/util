@@ -42,6 +42,7 @@ public class RandomUtil {
    * Returns a random integer value.
    *
    * @param max
+   *          the max value
    * @return 0-max
    */
   public static int getInt(int max) {
@@ -54,7 +55,9 @@ public class RandomUtil {
    * Returns a random integer value.
    *
    * @param min
+   *          the minimum value
    * @param max
+   *          the max value
    * @return min-max
    */
   public static int getInt(int min, int max) {
@@ -79,6 +82,11 @@ public class RandomUtil {
     return r.nextDouble();
   }
 
+  /**
+   * Returns a random boolean value
+   *
+   * @return true or false
+   */
   public static boolean getBoolean() {
     long seed = System.nanoTime();
     Random r = new Random(seed);
@@ -88,13 +96,15 @@ public class RandomUtil {
   /**
    * Returns a random string.<br>
    * <br>
-   * randomString("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
+   * getString("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
    * 8);<br>
-   * -> "TWEQWhq2"
+   * out: "TWEQWhq2"
    * 
    * @param table
+   *          characters to use
    * @param len
-   * @return
+   *          length of the output
+   * @return a randomly-generated string
    */
   public static String getString(String table, int len) {
     char[] cTable = table.toCharArray();

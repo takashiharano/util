@@ -35,6 +35,7 @@ public class IoUtil {
    *          input stream
    * @return read bytes
    * @throws IOException
+   *           If an I/O error occurs
    */
   public static byte[] readStream(InputStream is) throws IOException {
     byte[] buf = null;

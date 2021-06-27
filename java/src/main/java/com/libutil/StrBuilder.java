@@ -346,7 +346,7 @@ public class StrBuilder {
    * substring, starting at the specified index. The integer returned is the
    * smallest value k for which:<br>
    * <br>
-   * k >= Math.min(fromIndex, this.length()) &&<br>
+   * k -ge Math.min(fromIndex, this.length()) and<br>
    * this.toString().startsWith(str, k)<br>
    * <br>
    * If no such value of k exists, then -1 is returned.
@@ -387,13 +387,13 @@ public class StrBuilder {
    * Returns the index within this string of the last occurrence of the specified
    * substring. The integer returned is the largest value k such that:<br>
    * <br>
-   * k <= Math.min(fromIndex, this.length()) &&<br>
+   * k -le Math.min(fromIndex, this.length()) and<br>
    * this.toString().startsWith(str, k)<br>
    * <br>
    * If no such value of k exists, then -1 is returned.
    *
-   * @param the
-   *          substring to search for
+   * @param str
+   *          the substring to search for
    * @param fromIndex
    *          the index to start the search from
    * @return the index within this sequence of the last occurrence of the

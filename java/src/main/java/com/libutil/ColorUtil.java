@@ -31,9 +31,12 @@ public class ColorUtil {
    * Converts RGB to #RGB.
    *
    * @param r
+   *          Red
    * @param g
+   *          Green
    * @param b
-   * @return
+   *          Blue
+   * @return #RGB
    */
   public static String rgb(int r, int g, int b) {
     String[] rgb16 = rgb10to16(r, g, b);
@@ -49,7 +52,7 @@ public class ColorUtil {
    *          100-0-100
    * @param hue
    *          100-0-100
-   * @return
+   * @return #RGB
    */
   public static String adjust(String rgb16, int brightness, int hue) {
     int[] rgb10 = rgb16to10(rgb16);
@@ -90,9 +93,12 @@ public class ColorUtil {
    * Converts RGB to HSV.
    *
    * @param r
+   *          Red
    * @param g
+   *          Green
    * @param b
-   * @return
+   *          Blue
+   * @return [H, S, V]
    */
   public static int[] rgb2hsv(int r, int g, int b) {
     int h = getH(r, g, b);
@@ -106,9 +112,12 @@ public class ColorUtil {
    * Converts HSV to RGB.
    *
    * @param h
+   *          Hue
    * @param s
+   *          Saturation/Chroma
    * @param v
-   * @return
+   *          Value/Brightness
+   * @return [R, G, B]
    */
   public static int[] hsv2rgb(int h, int s, int v) {
     float r, g, b;
@@ -152,9 +161,12 @@ public class ColorUtil {
    * Converts a decimal RGB value to a hexadecimal value.
    *
    * @param r
+   *          Red
    * @param g
+   *          Green
    * @param b
-   * @return
+   *          Blue
+   * @return [R, G, B]
    */
   public static String[] rgb10to16(int r, int g, int b) {
     String r16 = String.format("%02x", Integer.valueOf(r));
@@ -179,7 +191,8 @@ public class ColorUtil {
    * Converts a hexadecimal RGB value to a decimal value.
    *
    * @param rgb16
-   * @return
+   *          #RGB
+   * @return [R, G, B]
    */
   public static int[] rgb16to10(String rgb16) {
     String r16, g16, b16;
@@ -209,8 +222,11 @@ public class ColorUtil {
    * Returns the hue value from the RGB value.
    *
    * @param r
+   *          Red
    * @param g
+   *          Green
    * @param b
+   *          Blue
    * @return 0-360
    */
   public static int getH(int r, int g, int b) {
@@ -238,8 +254,11 @@ public class ColorUtil {
    * Returns the saturation(chroma) value from the RGB value.
    *
    * @param r
+   *          Red
    * @param g
+   *          Green
    * @param b
+   *          Blue
    * @return 0-255
    */
   public static int getS(int r, int g, int b) {
@@ -254,8 +273,11 @@ public class ColorUtil {
    * Returns the Value (brightness) from the RGB value.
    *
    * @param r
+   *          Red
    * @param g
+   *          Green
    * @param b
+   *          Blue
    * @return 0-255
    */
   public static int getV(int r, int g, int b) {

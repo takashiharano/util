@@ -53,6 +53,7 @@ public class FileUtil {
    * @param newLine
    *          new line
    * @throws IOException
+   *           If an I/O error occurs
    */
   public static void appendLine(String path, String newLine) throws IOException {
     appendLine(path, newLine, 0);
@@ -68,6 +69,7 @@ public class FileUtil {
    * @param maxLines
    *          number of lines to limit
    * @throws IOException
+   *           If an I/O error occurs
    */
   public static void appendLine(String path, String newLine, int maxLines) throws IOException {
     String[] lines = readTextAsArray(path);
@@ -107,6 +109,7 @@ public class FileUtil {
    * Creates a new empty file.
    *
    * @param path
+   *          the new file path
    * @return true if the named file does not exist and was successfully created;
    *         false if the named file already exists or failed to create
    */
@@ -119,7 +122,9 @@ public class FileUtil {
    * Creates a new empty file.
    *
    * @param path
+   *          the new file path
    * @param createParent
+   *          if true, create the parent directories
    * @return true if the named file does not exist and was successfully created;
    *         false if the named file already exists or failed to create
    */
@@ -132,6 +137,7 @@ public class FileUtil {
    * Creates a new empty file.
    *
    * @param file
+   *          the new file path
    * @return true if the named file does not exist and was successfully created;
    *         false if the named file already exists or failed to create
    */
@@ -143,7 +149,9 @@ public class FileUtil {
    * Creates a new empty file.
    *
    * @param file
+   *          the new file path
    * @param createParent
+   *          if true, create the parent directories
    * @return true if the named file does not exist and was successfully created;
    *         false if the named file already exists or failed to create
    */
@@ -196,6 +204,7 @@ public class FileUtil {
    * @param destPath
    *          path to save the decoded file
    * @throws IOException
+   *           If an I/O error occurs
    */
   public static void fileToFileBase64Decoder(String srcPath, String destPath) throws IOException {
     String b64 = FileUtil.readText(srcPath);
@@ -205,9 +214,10 @@ public class FileUtil {
   /**
    * Returns the name of the file or directory denoted by the given pathname.<br>
    * <br>
-   * e.g., "C:/test/abc.txt" -> "abc.txt"
+   * e.g., "C:/test/abc.txt" to "abc.txt"
    *
    * @param path
+   *          file path
    * @return file name
    */
   public static String getFileName(String path) {
@@ -220,6 +230,7 @@ public class FileUtil {
    * Returns the file size.
    *
    * @param path
+   *          file path
    * @return file size. 0L if the file is directory or file does not exist.
    */
   public static long getFileSize(String path) {
@@ -231,6 +242,7 @@ public class FileUtil {
    * Returns the file size.
    *
    * @param file
+   *          the file object
    * @return file size. 0L if the file is directory or file does not exist.
    */
   public static long getFileSize(File file) {
@@ -244,7 +256,7 @@ public class FileUtil {
   /**
    * Returns the name of extension.<br>
    * <br>
-   * e.g., "C:/test/abc.txt" -> "txt"
+   * e.g., "C:/test/abc.txt" to "txt"
    *
    * @param path
    *          file path (absolute or related)
@@ -290,7 +302,7 @@ public class FileUtil {
   /**
    * Returns the current path.
    *
-   * @return
+   * @return the current path
    */
   public static String getCurrentPath() {
     String path = new File(".").getAbsoluteFile().getParent();
@@ -333,9 +345,10 @@ public class FileUtil {
    * pathname's name sequence except for the last. If the name sequence is empty
    * then the pathname does not name a parent directory.
    *
-   * e.g., "a/b/c.txt" -> "/a/b"
+   * e.g., "a/b/c.txt" to "/a/b"
    *
    * @param path
+   *          file path
    * @return parent path
    */
   public static String getParentPath(String path) {
@@ -345,14 +358,14 @@ public class FileUtil {
 
   /**
    * Returns parent path of the file.<br>
-   * e.g., "a/b/c.txt" -> "/a/b"
+   * e.g., "a/b/c.txt" to "/a/b"
    *
    * @param file
+   *          an file object
    * @return parent path
    */
   public static String getParentPath(File file) {
-    String parent = file.getParent();
-    return parent;
+    return file.getParent();
   }
 
   /**
@@ -372,7 +385,8 @@ public class FileUtil {
    * appear in alphabetical order.
    * 
    * @param path
-   * @return
+   *          the target path
+   * @return an file object array
    */
   public static File[] listFiles(String path) {
     File file = new File(path);
@@ -383,7 +397,8 @@ public class FileUtil {
    * Returns an array of strings naming the directories in the directory.
    *
    * @param dirPath
-   * @return
+   *          the directory path
+   * @return an array of strings naming the directories
    */
   public static String[] listDirNames(String dirPath) {
     File dir = new File(dirPath);
@@ -407,7 +422,8 @@ public class FileUtil {
    * Returns an array of strings naming the files in the directory.
    *
    * @param dirPath
-   * @return
+   *          the target path
+   * @return an array of strings naming the files
    */
   public static String[] listFileNames(String dirPath) {
     File dir = new File(dirPath);
@@ -432,6 +448,7 @@ public class FileUtil {
    * directory.
    * 
    * @param dirPath
+   *          the target path
    * @return an array of strings naming the files and directories
    */
   public static String[] listDirFileNames(String dirPath) {
@@ -513,6 +530,7 @@ public class FileUtil {
    * Read a binary file.
    *
    * @param path
+   *          file path
    * @return byte array of the file content. If the file does not exist, this
    *         method returns null.
    */
@@ -525,6 +543,7 @@ public class FileUtil {
    * Read a binary file.
    *
    * @param file
+   *          the file object
    * @return byte array of the file content. If the file does not exist, this
    *         method returns null.
    */
@@ -546,6 +565,7 @@ public class FileUtil {
    * Read a text file.
    *
    * @param path
+   *          file path
    * @return text content. If the file does not exist, this method returns null.
    */
   public static String readText(String path) {
@@ -556,6 +576,7 @@ public class FileUtil {
    * Read a text file.
    *
    * @param file
+   *          the file object to read
    * @return text content. If the file does not exist, this method returns null.
    */
   public static String readText(File file) {
@@ -609,6 +630,7 @@ public class FileUtil {
    * Read a text file as an array.
    *
    * @param path
+   *          file path
    * @return text content
    */
   public static String[] readTextAsArray(String path) {
@@ -619,7 +641,9 @@ public class FileUtil {
    * Read a text file as an array.
    *
    * @param path
+   *          file path to read
    * @param charsetName
+   *          charset name to decode
    * @return text content
    */
   public static String[] readTextAsArray(String path, String charsetName) {
@@ -642,6 +666,7 @@ public class FileUtil {
    * Read a file as Base64 encoded string.
    *
    * @param path
+   *          file path to read
    * @return file content in Base64 encoded string. If the file does not exist,
    *         this method returns null.
    */
@@ -654,6 +679,7 @@ public class FileUtil {
    * Read a file as Base64 encoded string.
    *
    * @param file
+   *          the file object to read
    * @return file content in Base64 encoded string. If the file does not exist,
    *         this method returns null.
    */
@@ -680,8 +706,11 @@ public class FileUtil {
    * Write a content using a byte array into a file.
    *
    * @param path
+   *          file path
    * @param content
+   *          the content to write
    * @throws IOException
+   *           If an I/O error occurs
    */
   public static void write(String path, byte[] content) throws IOException {
     File file = new File(path);
@@ -692,8 +721,11 @@ public class FileUtil {
    * Write a content using a byte array into a file.
    *
    * @param file
+   *          the file object
    * @param content
+   *          the content to write
    * @throws IOException
+   *           If an I/O error occurs
    */
   public static void write(File file, byte[] content) throws IOException {
     mkParentDir(file);
@@ -709,8 +741,11 @@ public class FileUtil {
    * Write a text into a file.
    *
    * @param path
+   *          file path
    * @param content
+   *          the content to write
    * @throws IOException
+   *           If an I/O error occurs
    */
   public static void write(String path, String content) throws IOException {
     File file = new File(path);
@@ -721,8 +756,11 @@ public class FileUtil {
    * Write a text into a file.
    *
    * @param file
+   *          the file object
    * @param content
+   *          the content to write
    * @throws IOException
+   *           If an I/O error occurs
    */
   public static void write(File file, String content) throws IOException {
     mkParentDir(file);
@@ -737,8 +775,11 @@ public class FileUtil {
    * Decodes a Base64 encoded String and writes it to a file.
    *
    * @param path
+   *          file path
    * @param base64
+   *          the content that is encoded in Base64 to write
    * @throws IOException
+   *           If an I/O error occurs
    */
   public static void writeFromBase64(String path, String base64) throws IOException {
     File file = new File(path);
@@ -749,8 +790,11 @@ public class FileUtil {
    * Decodes a Base64 encoded String and writes it to a file.
    *
    * @param file
+   *          the file object
    * @param base64
+   *          the content that is encoded in Base64 to write
    * @throws IOException
+   *           If an I/O error occurs
    */
   public static void writeFromBase64(File file, String base64) throws IOException {
     byte[] content = Base64.getDecoder().decode(base64);

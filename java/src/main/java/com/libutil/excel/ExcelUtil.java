@@ -68,7 +68,7 @@ public class ExcelUtil {
    * @param workbook
    *          workbook
    * @param index
-   *          of the sheet number (0-based physical & logical)
+   *          index of the sheet number (0-based physical and logical)
    * @return Sheet at the provided index
    */
   public static Sheet getSheet(Workbook workbook, int index) {
@@ -80,9 +80,10 @@ public class ExcelUtil {
    * Get the cell with the given position.
    *
    * @param sheet
-   * @param position
-   *          "A1"
-   * @return
+   *          sheet
+   * @param address
+   *          cell address
+   * @return the cell
    */
   public static Cell getCell(Sheet sheet, String address) {
     CellReference reference = new CellReference(address);
@@ -100,8 +101,10 @@ public class ExcelUtil {
    * Get the value of the cell as a string.
    *
    * @param sheet
+   *          sheet
    * @param address
-   * @return
+   *          cell address
+   * @return the value
    */
   public static String getStringCellValue(Sheet sheet, String address) {
     Cell cell = ExcelUtil.getCell(sheet, address);
@@ -113,8 +116,11 @@ public class ExcelUtil {
    * Set a string value for the cell.
    *
    * @param sheet
+   *          sheet
    * @param address
+   *          cell address
    * @param value
+   *          the value
    */
   public static void setCellValue(Sheet sheet, String address, String value) {
     Cell cell = ExcelUtil.getCell(sheet, address);
@@ -125,8 +131,10 @@ public class ExcelUtil {
    * Get the value of the cell as a number.
    *
    * @param sheet
+   *          sheet
    * @param address
-   * @return
+   *          cell address
+   * @return the numeric cell value
    */
   public static double getNumericCellValue(Sheet sheet, String address) {
     Cell cell = ExcelUtil.getCell(sheet, address);
@@ -138,8 +146,11 @@ public class ExcelUtil {
    * Set a numeric value for the cell.
    *
    * @param sheet
+   *          sheet
    * @param address
+   *          cell address
    * @param value
+   *          the value
    */
   public static void setCellValue(Sheet sheet, String address, int value) {
     Cell cell = ExcelUtil.getCell(sheet, address);
@@ -150,8 +161,10 @@ public class ExcelUtil {
    * Get the value of the cell as a boolean.
    *
    * @param sheet
+   *          sheet
    * @param address
-   * @return
+   *          cell address
+   * @return true or false
    */
   public static boolean getBooleanCellValue(Sheet sheet, String address) {
     Cell cell = ExcelUtil.getCell(sheet, address);
@@ -163,8 +176,11 @@ public class ExcelUtil {
    * Set a boolean value for the cell.
    *
    * @param sheet
+   *          sheet
    * @param address
+   *          cell address
    * @param value
+   *          true or false
    */
   public static void setCellValue(Sheet sheet, String address, boolean value) {
     Cell cell = ExcelUtil.getCell(sheet, address);
@@ -175,8 +191,10 @@ public class ExcelUtil {
    * Get the value of the cell as a date.
    *
    * @param sheet
+   *          sheet
    * @param address
-   * @return
+   *          cell address
+   * @return date
    */
   public static Date getDateCellValue(Sheet sheet, String address) {
     Cell cell = ExcelUtil.getCell(sheet, address);
@@ -189,8 +207,11 @@ public class ExcelUtil {
    * that into the cell.
    *
    * @param sheet
+   *          sheet
    * @param address
+   *          address
    * @param value
+   *          date
    */
   public static void setCellValue(Sheet sheet, String address, Date value) {
     Cell cell = ExcelUtil.getCell(sheet, address);
@@ -201,8 +222,10 @@ public class ExcelUtil {
    * Return a formula for the cell, for example, SUM(A1:C1).
    *
    * @param sheet
+   *          sheet
    * @param address
-   * @return
+   *          cell address
+   * @return the formula
    */
   public static String getCellFormula(Sheet sheet, String address) {
     Cell cell = ExcelUtil.getCell(sheet, address);
@@ -214,8 +237,11 @@ public class ExcelUtil {
    * Sets formula for this cell.
    *
    * @param sheet
+   *          sheet
    * @param address
+   *          cell address
    * @param formula
+   *          the formula
    */
   public static void setCellFormula(Sheet sheet, String address, String formula) {
     Cell cell = ExcelUtil.getCell(sheet, address);
@@ -226,8 +252,10 @@ public class ExcelUtil {
    * Returns comment associated with this cell.
    *
    * @param sheet
+   *          sheet
    * @param address
-   * @return
+   *          cell address
+   * @return the cell comment
    */
   public static Comment getCellComment(Sheet sheet, String address) {
     Cell cell = ExcelUtil.getCell(sheet, address);
@@ -239,8 +267,11 @@ public class ExcelUtil {
    * Assign a comment to this cell.
    *
    * @param sheet
+   *          sheet
    * @param address
+   *          cell address
    * @param comment
+   *          the cell comment
    */
   public static void setCellComment(Sheet sheet, String address, Comment comment) {
     Cell cell = ExcelUtil.getCell(sheet, address);
@@ -251,7 +282,8 @@ public class ExcelUtil {
    * Returns column index from the given column name.
    *
    * @param name
-   * @return "A" -> 0, "B" -> 1, ... "Z" -> 25, "AA" -> 26
+   *          the column name
+   * @return "A" = 0, "B" = 1, ... "Z" = 25, "AA" = 26
    */
   public static int getColIndex(String name) {
     int index = CellReference.convertColStringToIndex(name);
@@ -263,7 +295,7 @@ public class ExcelUtil {
    *
    * @param index
    *          0 origin
-   * @return 0 -> "A", 1 -> "B", ... 25 -> "Z", 26 -> "AA"
+   * @return 0 = "A", 1 = "B", ... 25 = "Z", 26 = "AA"
    */
   public static String getColName(int index) {
     String colName = CellReference.convertNumToColString(index);
@@ -274,8 +306,11 @@ public class ExcelUtil {
    * Create a new cell object within the row and return it.
    *
    * @param sheet
+   *          sheet
    * @param rowIndex
+   *          row index
    * @param colIndex
+   *          column index
    * @return Cell a high level representation of the created cell.
    */
   public static Cell createCell(Sheet sheet, int rowIndex, int colIndex) {
@@ -286,9 +321,13 @@ public class ExcelUtil {
    * Create a new cell object within the row and return it.
    *
    * @param sheet
+   *          sheet
    * @param rowIndex
+   *          row index
    * @param colIndex
+   *          column index
    * @param value
+   *          value
    * @return Cell a high level representation of the created cell.
    */
   public static Cell createCell(Sheet sheet, int rowIndex, int colIndex, String value) {
@@ -307,6 +346,7 @@ public class ExcelUtil {
    * Set the background color of the cell with RGB value.
    *
    * @param cellStyle
+   *          cell style
    * @param colorCode
    *          #rrggbb
    */
@@ -321,7 +361,9 @@ public class ExcelUtil {
    * Set the background color of the cell with the indexed color value.
    *
    * @param cellStyle
+   *          cell style
    * @param indexedColor
+   *          background color
    */
   public static void setCellColor(CellStyle cellStyle, IndexedColors indexedColor) {
     cellStyle.setFillForegroundColor(indexedColor.getIndex());
@@ -331,8 +373,11 @@ public class ExcelUtil {
    * Set the font name of the cell.
    *
    * @param workbook
+   *          workbook
    * @param cell
+   *          cell
    * @param fontName
+   *          font name
    */
   public static void setCellFont(Workbook workbook, Cell cell, String fontName) {
     setCellFont(workbook, cell, fontName, 0, null);
@@ -342,8 +387,11 @@ public class ExcelUtil {
    * Set the font size of the cell.
    *
    * @param workbook
+   *          workbook
    * @param cell
+   *          cell
    * @param fontSize
+   *          font size
    */
   public static void setCellFont(Workbook workbook, Cell cell, int fontSize) {
     setCellFont(workbook, cell, null, fontSize, null);
@@ -353,9 +401,13 @@ public class ExcelUtil {
    * Set the font name and size of the cell.
    *
    * @param workbook
+   *          workbook
    * @param cell
+   *          cell
    * @param fontName
+   *          font name
    * @param fontSize
+   *          font size
    */
   public static void setCellFont(Workbook workbook, Cell cell, String fontName, int fontSize) {
     setCellFont(workbook, cell, fontName, fontSize, null);
@@ -365,9 +417,13 @@ public class ExcelUtil {
    * Set the font of the cell.
    *
    * @param workbook
+   *          workbook
    * @param cell
+   *          cell
    * @param fontName
+   *          font name
    * @param fontSize
+   *          font size
    * @param colorCode
    *          #rrggbb
    */
@@ -399,8 +455,11 @@ public class ExcelUtil {
    * Set the font color of the cell.
    *
    * @param workbook
+   *          workbook
    * @param cell
+   *          cell
    * @param colorCode
+   *          #rrggbb
    */
   public static void setCellFontColor(Workbook workbook, Cell cell, String colorCode) {
     setCellFont(workbook, cell, null, 0, colorCode);
@@ -410,19 +469,24 @@ public class ExcelUtil {
    * Set the width of the cell.
    *
    * @param sheet
-   * @param colimn
+   *          sheet
+   * @param columnIndex
+   *          column index
    * @param width
+   *          width
    */
-  public static void setColumnWidth(Sheet sheet, int colimn, int width) {
+  public static void setColumnWidth(Sheet sheet, int columnIndex, int width) {
     int w = width * 256;
-    sheet.setColumnWidth(0, w);
+    sheet.setColumnWidth(columnIndex, w);
   }
 
   /**
    * Set the height of the row.
    *
    * @param row
+   *          row
    * @param height
+   *          height
    */
   public static void setRowHeight(Row row, int height) {
     short h = (short) (height * 20);
@@ -433,10 +497,15 @@ public class ExcelUtil {
    * Merge the cells.
    *
    * @param sheet
+   *          sheet
    * @param firstRow
+   *          first row
    * @param firstCol
+   *          first column
    * @param lastRow
+   *          last row
    * @param lastCol
+   *          last column
    */
   public static void addMergedRegion(Sheet sheet, int firstRow, int firstCol, int lastRow, int lastCol) {
     sheet.addMergedRegion(new CellRangeAddress(firstRow, lastRow, firstCol, lastCol));
@@ -468,7 +537,9 @@ public class ExcelUtil {
    * Write the Excel book to the file.
    *
    * @param workbook
+   *          workbook
    * @param path
+   *          file path to save
    */
   public static void saveExcelBook(Workbook workbook, String path) {
     FileOutputStream fos = null;

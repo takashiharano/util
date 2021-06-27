@@ -39,7 +39,7 @@ public class StrUtil {
    *
    * @param arr
    *          source array
-   * @return
+   * @return the text
    */
   public static String array2text(String[] arr) {
     return array2text(arr, SystemUtil.LINE_SEPARATOR);
@@ -52,7 +52,7 @@ public class StrUtil {
    *          source array
    * @param sep
    *          line separator
-   * @return
+   * @return the text
    */
   public static String array2text(String[] arr, String sep) {
     StringBuilder sb = new StringBuilder();
@@ -66,7 +66,9 @@ public class StrUtil {
    * Convert newline control character.
    *
    * @param src
+   *          source string
    * @param newLine
+   *          new line code
    * @return converted string
    */
   public static String convertNewLine(String src, String newLine) {
@@ -77,8 +79,10 @@ public class StrUtil {
    * Counts the number of matches for a regex.
    *
    * @param target
+   *          the target string
    * @param regex
-   * @return count
+   *          the regext
+   * @return matched count
    */
   public static int countMatcher(String target, String regex) {
     return countMatcher(target, regex, 0);
@@ -88,9 +92,12 @@ public class StrUtil {
    * Counts the number of matches for a regex.
    *
    * @param target
+   *          the target string
    * @param regex
+   *          the regex
    * @param flags
-   * @return count
+   *          flags
+   * @return count matched count
    */
   public static int countMatcher(String target, String regex, int flags) {
     return countMatcher(target, regex, flags, false);
@@ -100,9 +107,12 @@ public class StrUtil {
    * Counts the number of matches for a regex.
    *
    * @param target
+   *          the target string
    * @param regex
+   *          the regex
    * @param complex
-   * @return count
+   *          true or false
+   * @return count matched count
    */
   public static int countMatcher(String target, String regex, boolean complex) {
     return countMatcher(target, regex, 0, complex);
@@ -112,8 +122,11 @@ public class StrUtil {
    * Counts the number of matches for a regex.
    *
    * @param target
+   *          the target string
    * @param regex
+   *          the regex
    * @param flags
+   *          flags
    * @param complex
    *          matcher pattern
    *
@@ -130,7 +143,7 @@ public class StrUtil {
    *            aa
    *          </pre>
    * 
-   * @return count
+   * @return count matched count
    */
   public static int countMatcher(String target, String regex, int flags, boolean complex) {
     Pattern p = Pattern.compile(regex, flags);
@@ -157,7 +170,7 @@ public class StrUtil {
    *          the string to check
    * @param pattern
    *          the pattern to count
-   * @return count
+   * @return count matched count
    */
   public static int countStrPattern(String str, String pattern) {
     Pattern p = Pattern.compile(pattern);
@@ -295,10 +308,15 @@ public class StrUtil {
    * string when such a group successfully matches the empty string in the input.
    *
    * @param target
+   *          the target string
    * @param regex
+   *          the regex
    * @param flags
+   *          flags
    * @param index
-   * @return
+   *          index
+   * @return the input subsequence captured by the given group during the previous
+   *         match operation
    */
   public static String group(String target, String regex, int flags, int index) {
     Pattern p = Pattern.compile(regex, flags);
@@ -313,8 +331,11 @@ public class StrUtil {
    * Returns the sentence "N SUBJECT have/has been PRED."
    *
    * @param subject
+   *          the subject
    * @param predicate
+   *          the predicate
    * @param n
+   *          number
    * @return the sentence
    */
   public static String haveBeen(String subject, String predicate, int n) {
@@ -325,8 +346,11 @@ public class StrUtil {
    * Returns the sentence "N SUBJECT have/has been PRED."
    *
    * @param subject
+   *          the subject
    * @param predicate
+   *          the predicate
    * @param n
+   *          number
    * @param flag
    *          if set to true, simply add "s" to the subject for plurals
    * @return the sentence
@@ -338,12 +362,14 @@ public class StrUtil {
 
   /**
    * Integer to Decimal formated string.<br>
-   * 1000, 3 -> 1.000<br>
-   * 1, 3 -> 0.001
+   * 1000, 3 to 1.000<br>
+   * 1, 3 to 0.001
    *
    * @param number
+   *          number
    * @param scale
-   * @return
+   *          scale
+   * @return Decimal formated string
    */
   public static String intnum2decimal(long number, int scale) {
     if (number == 0) {
@@ -464,8 +490,11 @@ public class StrUtil {
    * end, and group methods.
    *
    * @param target
+   *          the target string
    * @param regex
+   *          the regex
    * @param flags
+   *          flags
    * @return true if, and only if, a subsequence of the input sequence matches
    *         this matcher's pattern
    */
@@ -601,7 +630,7 @@ public class StrUtil {
    *          source string
    * @param quote
    *          character to enclose fields
-   * @return
+   * @return a quoted string
    */
   public static String quote(String src, String quote) {
     return quote(src, quote, null);
@@ -616,7 +645,7 @@ public class StrUtil {
    *          character to enclose fields
    * @param esc
    *          escape character
-   * @return Quoted string
+   * @return a quoted string
    */
   public static String quote(String src, String quote, String esc) {
     if (quote == null) {
@@ -638,7 +667,7 @@ public class StrUtil {
    *
    * @param str
    *          a string to replace
-   * @return replaced string
+   * @return the replaced string
    */
   public static String removeSpaceNewline(String str) {
     return str.replaceAll("\\s", "").replaceAll("\\r\\n", "\\n").replaceAll("\\r", "\\n").replaceAll("\\n", "");
@@ -651,7 +680,7 @@ public class StrUtil {
    *          source string
    * @param n
    *          number of repeat
-   * @return repeated string
+   * @return the repeated string
    */
   public static String repeat(String str, int n) {
     StringBuilder sb = new StringBuilder();
@@ -693,7 +722,7 @@ public class StrUtil {
    * <br>
    * e.g.,<br>
    * 1 2 3 "abc" "d ef" "g\"hi" ("jkl" + m) 'xyz' 'a"b b"a'<br>
-   * -> [1, 2, 3, "abc", "d ef", "g\"hi", ("jkl" + m), 'xyz', 'a"b b"a']<br>
+   * to [1, 2, 3, "abc", "d ef", "g\"hi", ("jkl" + m), 'xyz', 'a"b b"a']<br>
    * 
    * @param src
    *          the source string
@@ -799,7 +828,7 @@ public class StrUtil {
 
   /**
    * Split the string by line separator.<br>
-   * "aaa\nbbb\nccc" -> ["aaa", "bbb", "ccc"]
+   * "aaa\nbbb\nccc" to ["aaa", "bbb", "ccc"]
    * 
    * @param src
    *          the string to split
@@ -821,7 +850,7 @@ public class StrUtil {
   /**
    * Strip leading and trailing zeros.<br>
    * <br>
-   * e.g., 0123.450 -> 123.45
+   * e.g., 0123.450 to 123.45
    *
    * @param value
    *          numeric string

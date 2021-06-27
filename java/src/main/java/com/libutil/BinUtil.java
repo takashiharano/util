@@ -29,7 +29,7 @@ import java.io.IOException;
 public class BinUtil {
 
   /**
-   * byte[] -> "01 02 03 ..."
+   * byte[] to "01 02 03 ..."
    *
    * @param src
    *          the byte array to dump
@@ -40,7 +40,7 @@ public class BinUtil {
   }
 
   /**
-   * byte[] -> "01 02 03 ..."
+   * byte[] to "01 02 03 ..."
    *
    * @param src
    *          the byte array to dump
@@ -56,9 +56,13 @@ public class BinUtil {
    * Copy byte array.
    *
    * @param src
+   *          source
    * @param dest
+   *          destination
    * @param offset
+   *          offset of the destination array
    * @param size
+   *          Copy size. Must be within range of the source.
    */
   public static void copyByteArray(byte[] src, byte[] dest, int offset, int size) {
     for (int i = 0; i < size; i++) {
@@ -96,9 +100,9 @@ public class BinUtil {
    * @param size
    *          size to generate in bytes
    * @param s
-   *          value of the first byte. -1 -> '1'
+   *          value of the first byte. -1 to '1'
    * @param e
-   *          value of the last byte. -1 -> [0-9] of the end position
+   *          value of the last byte. -1 to [0-9] of the end position
    * @return byte array
    */
   public static byte[] getTestBytes(int size, int s, int e) {
@@ -126,7 +130,7 @@ public class BinUtil {
   }
 
   /**
-   * "01 02 03 ..." -> byte[]
+   * "01 02 03 ..." to byte[]
    *
    * @param src
    *          hex string
@@ -147,8 +151,11 @@ public class BinUtil {
    * Write a binary content into a file from the hex string.
    *
    * @param path
+   *          file path to output
    * @param hex
+   *          hex string
    * @throws IOException
+   *           If an I/O error occurs
    */
   public static void writeFileFromHex(String path, String hex) throws IOException {
     File file = new File(path);
@@ -159,8 +166,11 @@ public class BinUtil {
    * Write a binary content into a file from the hex string.
    *
    * @param file
+   *          the file object to output
    * @param hex
+   *          hex string
    * @throws IOException
+   *           If an I/O error occurs
    */
   public static void writeFileFromHex(File file, String hex) throws IOException {
     byte[] b = hex2bytes(hex);

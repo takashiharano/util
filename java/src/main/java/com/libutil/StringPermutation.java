@@ -30,8 +30,10 @@ public class StringPermutation {
    * Count the number of total patterns of the table.
    *
    * @param chars
+   *          characters to use
    * @param digit
-   * @return
+   *          the length
+   * @return the number of total pattern
    */
   public static long count(String chars, int digit) {
     String[] tbl = chars.split("");
@@ -47,8 +49,10 @@ public class StringPermutation {
    * Returns the index of the given pattern.
    *
    * @param chars
+   *          characters to use
    * @param pattern
-   * @return
+   *          a string
+   * @return the index
    */
   public static long index(String chars, String pattern) {
     int len = pattern.length();
@@ -68,8 +72,10 @@ public class StringPermutation {
    * Returns a String pattern at the specified position.
    *
    * @param chars
+   *          characters to use
    * @param idx
-   * @return
+   *          the index
+   * @return the string
    */
   public static String getString(String chars, long idx) {
     String[] tbl = chars.split("");

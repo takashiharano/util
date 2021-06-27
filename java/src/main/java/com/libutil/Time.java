@@ -42,6 +42,7 @@ public class Time {
    * of milliseconds.
    *
    * @param millis
+   *          the time in milliseconds
    */
   public Time(long millis) {
     long wk = millis;
@@ -142,10 +143,10 @@ public class Time {
    * To string the time.
    *
    * @param h
-   *          >= 24h instead of days. true: 47h 45m 59s
+   *          -ge 24h instead of days. true: 47h 45m 59s
    * @param f
    *          to display millis. true: 1d 23h 45m 59s 123
-   * @return
+   * @return the time string
    */
   public String toString(boolean h, boolean f) {
     StringBuilder sb = new StringBuilder();
@@ -186,7 +187,7 @@ public class Time {
 
   /**
    * Returns human-readable time string.<br>
-   * 171959000 -> "1d 23h 45m 59s"
+   * 171959000 to "1d 23h 45m 59s"
    *
    * @param millis
    *          milliseconds
