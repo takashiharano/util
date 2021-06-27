@@ -30,6 +30,8 @@ import java.util.concurrent.TimeUnit;
 
 public class CommandExecutor {
 
+  public static final String DEFAULT_CHARSET = "UTF-8";
+
   private Process process;
 
   /**
@@ -41,7 +43,7 @@ public class CommandExecutor {
    * @throws Exception
    */
   public String exec(String[] command) throws Exception {
-    return exec(command, 0, "UTF-8", null);
+    return exec(command, 0, DEFAULT_CHARSET, null);
   }
 
   /**
@@ -139,6 +141,99 @@ public class CommandExecutor {
    */
   public int getExitStatus() {
     return process.exitValue();
+  }
+
+  // -----
+
+  /**
+   * Execute a command.
+   *
+   * @param command
+   *          a string array containing the program and its arguments
+   * @return command result
+   * @throws Exception
+   */
+  public static String execCommand(String[] command) throws Exception {
+    return execCommand(command, DEFAULT_CHARSET);
+  }
+
+  /**
+   * Execute a command.
+   *
+   * @param command
+   *          a string array containing the program and its arguments
+   * @param charset
+   *          charset name
+   * @return command result
+   * @throws Exception
+   */
+  public static String execCommand(String[] command, String charset) throws Exception {
+    CommandExecutor executor = new CommandExecutor();
+    return executor.exec(command, 0, charset, null);
+  }
+
+  /**
+   * Execute Linux command.
+   *
+   * @param command
+   *          command string
+   * @return command result
+   * @throws Exception
+   */
+  public static String execLinuxCommand(String command) throws Exception {
+    return execLinuxCommand(command, "UTF-8");
+  }
+
+  /**
+   * Execute Linux command.
+   *
+   * @param command
+   *          command string
+   * @param charset
+   *          charset name
+   * @return command result
+   * @throws Exception
+   */
+  public static String execLinuxCommand(String command, String charset) throws Exception {
+    String osName = System.getProperty("os.name");
+    if ("Linux".equals(osName)) {
+      String[] cmds = { "/bin/sh", "-c", command };
+      return execCommand(cmds, charset);
+    } else {
+      throw new Exception("Linux command is not available on " + osName);
+    }
+  }
+
+  /**
+   * Execute Windows command.
+   *
+   * @param command
+   *          command string
+   * @return command result
+   * @throws Exception
+   */
+  public static String execWindowsCommand(String command) throws Exception {
+    return execWindowsCommand(command, "SJIS");
+  }
+
+  /**
+   * Execute Windows command.
+   *
+   * @param command
+   *          command string
+   * @param charset
+   *          charset name
+   * @return command result
+   * @throws Exception
+   */
+  public static String execWindowsCommand(String command, String charset) throws Exception {
+    String osName = System.getProperty("os.name");
+    if ((osName != null) && osName.startsWith("Windows")) {
+      String[] cmds = { "cmd", "/c", command };
+      return execCommand(cmds, charset);
+    } else {
+      throw new Exception("Windows command is not available on " + osName);
+    }
   }
 
 }

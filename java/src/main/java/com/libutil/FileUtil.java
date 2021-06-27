@@ -189,6 +189,20 @@ public class FileUtil {
   }
 
   /**
+   * Base64 decoder. (file to file)
+   *
+   * @param srcPath
+   *          Base64 text file path
+   * @param destPath
+   *          path to save the decoded file
+   * @throws IOException
+   */
+  public static void fileToFileBase64Decoder(String srcPath, String destPath) throws IOException {
+    String b64 = FileUtil.readText(srcPath);
+    FileUtil.writeFromBase64(destPath, b64);
+  }
+
+  /**
    * Returns the name of the file or directory denoted by the given pathname.<br>
    * <br>
    * e.g., "C:/test/abc.txt" -> "abc.txt"
@@ -200,6 +214,31 @@ public class FileUtil {
     File file = new File(path);
     String name = file.getName();
     return name;
+  }
+
+  /**
+   * Returns the file size.
+   *
+   * @param path
+   * @return file size. 0L if the file is directory or file does not exist.
+   */
+  public static long getFileSize(String path) {
+    File file = new File(path);
+    return getFileSize(file);
+  }
+
+  /**
+   * Returns the file size.
+   *
+   * @param file
+   * @return file size. 0L if the file is directory or file does not exist.
+   */
+  public static long getFileSize(File file) {
+    if (file.exists() && file.isFile()) {
+      return file.length();
+    } else {
+      return 0;
+    }
   }
 
   /**
@@ -218,29 +257,6 @@ public class FileUtil {
       extension = path.substring(i + 1);
     }
     return extension;
-  }
-
-  /**
-   * Returns the current path.
-   *
-   * @return
-   */
-  public static String getCurrentPath() {
-    String path = new File(".").getAbsoluteFile().getParent();
-    return path;
-  }
-
-  /**
-   * Returns the length of the file denoted by this abstract pathname.
-   *
-   * @param path
-   *          file path
-   * @return The length, in bytes, of the file denoted by this abstract pathname,
-   *         or 0L if the file does not exist.
-   */
-  public static long getFileLen(String path) {
-    File file = new File(path);
-    return file.length();
   }
 
   /**
@@ -272,6 +288,45 @@ public class FileUtil {
   }
 
   /**
+   * Returns the current path.
+   *
+   * @return
+   */
+  public static String getCurrentPath() {
+    String path = new File(".").getAbsoluteFile().getParent();
+    return path;
+  }
+
+  /**
+   * Returns hash value of the file content.
+   *
+   * @param path
+   *          file path to read
+   * @param algorithm
+   *          hash algorithm (MD5 / SHA-1 / SHA-256 / SHA-512)
+   * @return hash value
+   */
+  public static String getHash(String path, String algorithm) {
+    File file = new File(path);
+    return getHash(file, algorithm);
+  }
+
+  /**
+   * Returns hash value of the file content.
+   *
+   * @param file
+   *          file to read
+   * @param algorithm
+   *          hash algorithm (MD5 / SHA-1 / SHA-256 / SHA-512)
+   * @return hash value
+   */
+  public static String getHash(File file, String algorithm) {
+    byte[] b = FileUtil.read(file);
+    String hash = HashUtil.getHash(b, algorithm);
+    return hash;
+  }
+
+  /**
    * Returns the pathname string of this abstract pathname's parent, or null if
    * this pathname does not name a parent directory. The parent of an abstract
    * pathname consists of the pathname's prefix, if any, and each name in the
@@ -298,33 +353,6 @@ public class FileUtil {
   public static String getParentPath(File file) {
     String parent = file.getParent();
     return parent;
-  }
-
-  /**
-   * Returns the file size.
-   *
-   * @param path
-   * @return file size. directory:0, not found:-1
-   */
-  public static long getSize(String path) {
-    File file = new File(path);
-    return getSize(file);
-  }
-
-  /**
-   * Returns the file size.
-   *
-   * @param file
-   * @return file size. directory:0, not found:-1
-   */
-  public static long getSize(File file) {
-    if (!file.exists()) {
-      return -1;
-    } else if (file.isFile()) {
-      return file.length();
-    } else {
-      return 0;
-    }
   }
 
   /**

@@ -39,7 +39,7 @@ public class StreamGobbler implements Runnable {
   @Override
   public void run() {
     try {
-      output = Util.readStream(is);
+      output = IoUtil.readStream(is);
     } catch (IOException e) {
       exception = e;
     }

@@ -2,7 +2,7 @@ package com.libutil.util.bin;
 
 import com.libutil.HexDumper;
 import com.libutil.Log;
-import com.libutil.Util;
+import com.libutil.SystemUtil;
 
 public class HexDumpTest {
 
@@ -79,35 +79,35 @@ public class HexDumpTest {
     byte[] b = { 0, 97, 98, 99, 127, (byte) 0x1A, (byte) 0xA1, (byte) 0xfe, (byte) 0xff, (byte) 0xA1, (byte) 0xfe,
         (byte) 0xff, (byte) 0x1, (byte) 0x2, (byte) 0x3, (byte) 0x4, (byte) 0x5, (byte) 0x6, (byte) 0x7, (byte) 0x8 };
     String d = null;
-    long t1 = Util.now();
+    long t1 = SystemUtil.now();
     for (int i = 0; i < 1000000; i++) {
       d = HexDumper.dump(b);
     }
-    long t2 = Util.now();
+    long t2 = SystemUtil.now();
     Log.d(d);
     Log.d("elapsed=" + (t2 - t1));
 
-    t1 = Util.now();
+    t1 = SystemUtil.now();
     for (int i = 0; i < 100000; i++) {
       d = HexDumper.dump(b);
     }
-    t2 = Util.now();
+    t2 = SystemUtil.now();
     Log.d(d);
     Log.d("elapsed=" + (t2 - t1));
 
-    t1 = Util.now();
+    t1 = SystemUtil.now();
     for (int i = 0; i < 100000; i++) {
       d = HexDumper.dump(b, 2);
     }
-    t2 = Util.now();
+    t2 = SystemUtil.now();
     Log.d(d);
     Log.d("elapsed=" + (t2 - t1));
 
-    t1 = Util.now();
+    t1 = SystemUtil.now();
     for (int i = 0; i < 100000; i++) {
       d = HexDumper.dump(b, 4);
     }
-    t2 = Util.now();
+    t2 = SystemUtil.now();
     Log.d(d);
     Log.d("elapsed=" + (t2 - t1));
 

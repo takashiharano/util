@@ -1,7 +1,7 @@
 package com.libutil.util;
 
+import com.libutil.CommandExecutor;
 import com.libutil.Log;
-import com.libutil.Util;
 
 public class ExecCommandTest {
 
@@ -18,10 +18,10 @@ public class ExecCommandTest {
   private static void _execCommandTest() {
     String[] command = { "cmd", "/c", "dir c:\\tmp" };
     try {
-      String result = Util.execCommand(command);
+      String result = CommandExecutor.execCommand(command);
       Log.d(result);
 
-      result = Util.execCommand(command, "SJIS");
+      result = CommandExecutor.execCommand(command, "SJIS");
       Log.d(result);
 
     } catch (Exception e) {

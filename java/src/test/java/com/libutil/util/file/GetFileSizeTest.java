@@ -3,7 +3,7 @@ package com.libutil.util.file;
 import com.libutil.FileUtil;
 import com.libutil.Log;
 
-public class GetSizeTest {
+public class GetFileSizeTest {
 
   public static void main(String args[]) {
     test1();
@@ -13,19 +13,19 @@ public class GetSizeTest {
 
   private static void test1() {
     String path = "C:/test/a.txt";
-    long size = FileUtil.getSize(path);
+    long size = FileUtil.getFileSize(path);
     Log.d("OK: " + path + ": " + size);
   }
 
   private static void test2() {
     String path = "C:/test/404.txt";
-    long size = FileUtil.getSize(path);
+    long size = FileUtil.getFileSize(path);
     Log.d("OK: " + path + ": " + size);
   }
 
   private static void test3() {
     String path = "C:/test/";
-    long size = FileUtil.getSize(path);
+    long size = FileUtil.getFileSize(path);
     Log.d("OK: " + path + ": " + size);
   }
 

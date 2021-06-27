@@ -1,7 +1,7 @@
-package com.libutil.util;
+package com.libutil.util.file;
 
+import com.libutil.FileUtil;
 import com.libutil.Log;
-import com.libutil.Util;
 
 public class FileHashTest {
 
@@ -11,9 +11,9 @@ public class FileHashTest {
 
   private static void fileHashTest() {
     String path = "C:/test/a.txt";
-    Log.d(Util.getFileHash(path, "SHA-1"));
-    Log.d(Util.getFileHash(path, "SHA-256"));
-    Log.d(Util.getFileHash(path, "SHA-512"));
+    Log.d(FileUtil.getHash(path, "SHA-1"));
+    Log.d(FileUtil.getHash(path, "SHA-256"));
+    Log.d(FileUtil.getHash(path, "SHA-512"));
   }
 
 }

@@ -53,6 +53,20 @@ public class BinUtil {
   }
 
   /**
+   * Copy byte array.
+   *
+   * @param src
+   * @param dest
+   * @param offset
+   * @param size
+   */
+  public static void copyByteArray(byte[] src, byte[] dest, int offset, int size) {
+    for (int i = 0; i < size; i++) {
+      dest[offset + i] = src[i];
+    }
+  }
+
+  /**
    * HEX dump.
    *
    * @param src

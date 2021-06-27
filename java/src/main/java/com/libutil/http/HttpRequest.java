@@ -35,7 +35,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map.Entry;
 
-import com.libutil.Util;
+import com.libutil.Base64Util;
+import com.libutil.IoUtil;
 
 public class HttpRequest {
 
@@ -179,7 +180,7 @@ public class HttpRequest {
       statusMessage = conn.getResponseMessage();
       is = conn.getInputStream();
       if (is != null) {
-        body = Util.readStream(is);
+        body = IoUtil.readStream(is);
         is.close();
       }
     } catch (SocketTimeoutException ste) {
@@ -187,7 +188,7 @@ public class HttpRequest {
     } catch (IOException e) {
       is = conn.getErrorStream();
       if (is != null) {
-        body = Util.readStream(is);
+        body = IoUtil.readStream(is);
         is.close();
       }
     } finally {
@@ -326,7 +327,7 @@ public class HttpRequest {
    */
   public void setAuthentication(String user, String pass) {
     String userPass = user + ":" + pass;
-    String authData = Util.encodeBase64(userPass);
+    String authData = Base64Util.encode(userPass);
     addRequestHeader("Authorization", "Basic " + authData);
   }
 

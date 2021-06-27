@@ -29,7 +29,7 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.xml.bind.DatatypeConverter;
 
-public class Hash {
+public class HashUtil {
 
   public static String md5(byte[] input) {
     return getHash(input, "MD5");

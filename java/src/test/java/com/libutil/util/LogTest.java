@@ -3,6 +3,7 @@ package com.libutil.util;
 import java.util.ArrayList;
 
 import com.libutil.Log;
+import com.libutil._Log.LogLevel;
 
 public class LogTest {
 
@@ -78,14 +79,14 @@ public class LogTest {
 
   private static void outputLeveltTest() {
     Log.i("--- LogLevel 4 ---");
-    Log.setOutputLevel(4);
+    Log.setLevel(4);
     Log.d("4: DEBUG");
     Log.i("4: INFO");
     Log.w("4: WARN");
     Log.e("4: ERROR");
 
     Log.i("--- LogLevel DEBUG ---");
-    Log.setOutputLevel(Log.LogLevel.DEBUG);
+    Log.setLevel(LogLevel.DEBUG);
     Log.d("DEBUG: DEBUG");
     Log.i("DEBUG: INFO");
     Log.w("DEBUG: WARN");

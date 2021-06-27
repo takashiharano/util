@@ -2,7 +2,6 @@ package com.libutil.util;
 
 import com.libutil.CommandExecutor;
 import com.libutil.Log;
-import com.libutil.Util;
 
 public class CommandTest {
   private static final int LOOP = 1;
@@ -41,7 +40,7 @@ public class CommandTest {
 
   private static void execCommandTest2(String command, String charset) {
     try {
-      String result = Util.execWindowsCommand(command, charset);
+      String result = CommandExecutor.execWindowsCommand(command, charset);
       Log.d(result);
     } catch (Exception e) {
       e.printStackTrace();

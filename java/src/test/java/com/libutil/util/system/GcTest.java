@@ -1,12 +1,12 @@
-package com.libutil.util;
+package com.libutil.util.system;
 
 import com.libutil.Log;
-import com.libutil.Util;
+import com.libutil.SystemUtil;
 
 public class GcTest {
 
   public static void main(String args[]) {
-    String result = Util.gc();
+    String result = SystemUtil.gc();
     Log.i(result);
   }
 
