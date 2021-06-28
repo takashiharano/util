@@ -23,6 +23,16 @@
  */
 package com.libutil;
 
+// public class Log extends _Log {
+//
+//   public static void init(int level, String moduleName) {
+//     instance = new Log();
+//     Log.setLevel(level);
+//     Log.setModuleName(moduleName);
+//   }
+//
+// }
+
 public class _Log {
 
   protected static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXX";
@@ -128,26 +138,6 @@ public class _Log {
   }
 
   /**
-   * Sets log output level.
-   *
-   * @param level
-   *          log level
-   */
-  public static void setLevel(int level) {
-    getInstance().setOutputLevel(level);
-  }
-
-  /**
-   * Sets output level.
-   *
-   * @param level
-   *          output level
-   */
-  public static void setLevel(LogLevel level) {
-    getInstance().setOutputLevel(level);
-  }
-
-  /**
    * Sets output level.
    *
    * @param level
@@ -163,9 +153,29 @@ public class _Log {
    * @param level
    *          output level
    */
+  public static void setLevel(int level) {
+    getInstance().setOutputLevel(level);
+  }
+
+  /**
+   * Sets output level.
+   *
+   * @param level
+   *          output level
+   */
   public void setOutputLevel(LogLevel level) {
     int lv = level.getLevel();
-    setOutputLevel(lv);
+    setLevel(lv);
+  }
+
+  /**
+   * Sets output level.
+   *
+   * @param level
+   *          output level
+   */
+  public static void setLevel(LogLevel level) {
+    getInstance().setOutputLevel(level);
   }
 
   /**
@@ -194,8 +204,8 @@ public class _Log {
    * @param name
    *          module name
    */
-  public static void setModuleName(String name) {
-    getInstance().setLoggingModuleName(name);
+  public void setLoggingModuleName(String name) {
+    moduleName = name;
   }
 
   /**
@@ -204,8 +214,8 @@ public class _Log {
    * @param name
    *          module name
    */
-  public void setLoggingModuleName(String name) {
-    moduleName = name;
+  public static void setModuleName(String name) {
+    getInstance().setLoggingModuleName(name);
   }
 
   /**

@@ -8,6 +8,8 @@ import com.libutil._Log.LogLevel;
 public class LogTest {
 
   public static void main(String args[]) {
+    Log.init(5, "ModuleA");
+
     Log.d("Debug");
     Log.i("Information");
     Log.w("Warning");
@@ -73,7 +75,7 @@ public class LogTest {
   }
 
   private static void moduleNameTest() {
-    Log.setModuleName("ModuleA");
+    Log.setModuleName("ModuleB");
     Log.d("test");
   }
 
