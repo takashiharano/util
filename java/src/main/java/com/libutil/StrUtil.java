@@ -404,10 +404,10 @@ public class StrUtil {
    *
    * @param str
    *          the source string
-   * @return true if the string is empty.
+   * @return true if the string is empty; "", " ", or null.
    */
   public static boolean isEmpty(String str) {
-    return isEmpty(str, false);
+    return isEmpty(str, true);
   }
 
   /**
@@ -416,7 +416,7 @@ public class StrUtil {
    * @param str
    *          the source string
    * @param whitespace
-   *          set to true, whitespace only will be treated as empty
+   *          set to true, even blanks will be treated as empty.
    * @return true if the string is empty.
    */
   public static boolean isEmpty(String str, boolean whitespace) {
