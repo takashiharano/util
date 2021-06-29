@@ -27,8 +27,8 @@ package com.libutil;
 //
 //   public static void init(int level, String moduleName) {
 //     instance = new Log();
-//     Log.setLevel(level);
-//     Log.setModuleName(moduleName);
+//     setLevel(level);
+//     setModuleName(moduleName);
 //   }
 //
 // }
