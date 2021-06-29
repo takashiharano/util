@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202106252234
+v = 202106292033
 
 import sys
 import os
@@ -1526,6 +1526,9 @@ def append_line_to_text_file(path, text, encoding=DEFAULT_ENCODING, max=0):
 
 def path_exists(path):
   return os.path.exists(path)
+
+def path_not_found(path):
+  return not os.path.exists(path)
 
 def is_file(path):
   return os.path.isfile(path)
