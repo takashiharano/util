@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202106292033
+v = 202106292101
 
 import sys
 import os
@@ -210,6 +210,10 @@ def delete_patterns(s, patterns):
   for i in range(len(patterns)):
     s = re.sub(patterns[i], '', s)
   return s
+
+# '', ' ', None
+def is_empty(s):
+  return s is None or s.strip() == ''
 
 # '-0102.3040'
 # -> '-102.304'
