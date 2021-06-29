@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202106292101
+v = 202106300001
 
 import sys
 import os
@@ -26,6 +26,7 @@ from http import cookies
 import urllib.request
 import urllib.parse
 import ssl
+import csv
 import logging
 import zipfile
 
@@ -2414,6 +2415,23 @@ def round_angle(v):
   if v >= 360:
     v = v % 360
   return v
+
+#------------------------------------------------------------------------------
+# CSV
+#------------------------------------------------------------------------------
+def read_csv(file_path, newline='', encoding='utf-8', delimiter=',', quotechar='"'):
+  csv_data = []
+  with open(file_path, newline=newline, encoding=encoding) as csvfile:
+    spamreader = csv.reader(csvfile, delimiter=delimiter, quotechar=quotechar)
+    for row in spamreader:
+      csv_data.append(row)
+  return csv_data
+
+def write_csv(file_path, data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL):
+  with open(file_path, 'w', newline='') as csvfile:
+    spamwriter = csv.writer(csvfile, delimiter=delimiter, quotechar=quotechar, quoting=quoting)
+    for row in data:
+      spamwriter.writerow(row)
 
 #------------------------------------------------------------------------------
 # Record Data
