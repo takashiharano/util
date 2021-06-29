@@ -17,6 +17,7 @@ __pycache__/
 
 # mypy
 .mypy_cache/
+python/test/test/
 python/test/file/a.txt
 python/test/file/a-kana-sjis.txt
 python/test/file/a-kana-utf8.txt
