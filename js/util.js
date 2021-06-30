@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202106200900';
+util.v = '202107010000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -178,11 +178,8 @@ util._getTzPos = function(s) {
  * 2020/9/3 12:34:56.789   -> 20200903123456789
  */
 util.serializeDateTimeString = function(s) {
-  var w = s;
-  w = w.trim().replace(/\s{2,}/g, ' ');
-  w = w.replace(/T/, ' ');
+  var w = s.trim().replace(/\s{2,}/g, ' ').replace(/T/, ' ').replace(/,/, '.');
   if (!w.match(/[-/:]/)) return util._serializeDateTimeString(w);
-
   var prt = w.split(' ');
   var date = prt[0];
   var time = (prt[1] ? prt[1] : '');
@@ -192,7 +189,6 @@ util.serializeDateTimeString = function(s) {
   var m = util.lpad(prt[1], '0', 2);
   var d = util.lpad(prt[2], '0', 2);
   date = y + m + d;
-
   prt = time.split('.');
   var ms = '';
   if (prt[1]) {
@@ -210,12 +206,8 @@ util.serializeDateTimeString = function(s) {
   return util._serializeDateTimeString(date + time);
 };
 util._serializeDateTimeString = function(s) {
-  s = s.replace(/-/g, '');
-  s = s.replace(/\s/g, '');
-  s = s.replace(/:/g, '');
-  s = s.replace(/\./g, '');
-  s = (s + '000000000').substr(0, 17);
-  return s;
+  s = s.replace(/-/g, '').replace(/\s/g, '').replace(/:/g, '').replace(/\./g, '');
+  return (s + '000000000').substr(0, 17);
 };
 
 /**
