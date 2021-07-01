@@ -273,7 +273,7 @@ public class StrUtil {
 
   /**
    * Extract a matched part of the input string.<br>
-   * e.g., "[ABC]" "\\[(.+)\\]" -> "ABC"
+   * e.g., input:"[ABC]" regex:"\\[(.+)\\]" return:"ABC"
    *
    * @param input
    *          an input string
