@@ -81,7 +81,10 @@ public class DateTime {
   }
 
   public DateTime(String source) throws ParseException {
-    this(source, DEFAULT_FORMAT);
+    String s = serializeDateTime(source);
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+    Date date = sdf.parse(s);
+    _init(date);
   }
 
   public DateTime(String source, String format) throws ParseException {
@@ -402,6 +405,36 @@ public class DateTime {
   }
 
   /**
+   * Convert milliseconds to a time string.<br>
+   *
+   * @param millis
+   *          milliseconds to format
+   * @return the formatted time string
+   */
+  public static String formatTime(long millis) {
+    return formatTime(millis, "HH:mm:ss.SSS");
+  }
+
+  /**
+   * Convert milliseconds to a time string.<br>
+   * <br>
+   * e.g., (1234, "HH:mm:ss.SSS") to "00:00:01.234"
+   *
+   * @param millis
+   *          milliseconds to format
+   * @param format
+   *          "HH:mm:ss.SSS"
+   * @return the formatted time string
+   */
+  public static String formatTime(long millis, String format) {
+    SimpleDateFormat sdf = new SimpleDateFormat(format);
+    TimeZone tz = TimeZone.getTimeZone("UTC");
+    sdf.setTimeZone(tz);
+    String time = sdf.format(millis);
+    return time;
+  }
+
+  /**
    * Returns the current Date Time String in the specified format.
    *
    * @param format
@@ -413,6 +446,29 @@ public class DateTime {
    */
   public static String getString(String format) {
     DateTime dt = new DateTime();
+    return dt.toString(format);
+  }
+
+  /**
+   * Returns the Date Time String in the specified format.
+   *
+   * @param datetime
+   *          the date-time string
+   * @param format
+   *          the pattern describing the date and time format
+   *          "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" to
+   *          "2021-07-01T12:34:56.987+09:00"<br>
+   *          "yyyyMMdd'T'HHmmssSSSXX" to<br>
+   *          "20210701T123456.987+0900"
+   * @return the formatted date-time string
+   */
+  public static String getString(String datetime, String format) {
+    DateTime dt;
+    try {
+      dt = new DateTime(datetime);
+    } catch (ParseException e) {
+      return null;
+    }
     return dt.toString(format);
   }
 
@@ -447,36 +503,6 @@ public class DateTime {
   public static String getString(long timestamp, String format) {
     DateTime dt = new DateTime(timestamp);
     return dt.toString(format);
-  }
-
-  /**
-   * Convert milliseconds to a time string.<br>
-   *
-   * @param millis
-   *          milliseconds to format
-   * @return the formatted time string
-   */
-  public static String formatTime(long millis) {
-    return formatTime(millis, "HH:mm:ss.SSS");
-  }
-
-  /**
-   * Convert milliseconds to a time string.<br>
-   * <br>
-   * e.g., (1234, "HH:mm:ss.SSS") to "00:00:01.234"
-   *
-   * @param millis
-   *          milliseconds to format
-   * @param format
-   *          "HH:mm:ss.SSS"
-   * @return the formatted time string
-   */
-  public static String formatTime(long millis, String format) {
-    SimpleDateFormat sdf = new SimpleDateFormat(format);
-    TimeZone tz = TimeZone.getTimeZone("UTC");
-    sdf.setTimeZone(tz);
-    String time = sdf.format(millis);
-    return time;
   }
 
   /**
