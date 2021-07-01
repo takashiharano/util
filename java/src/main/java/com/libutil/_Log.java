@@ -471,7 +471,7 @@ public class _Log {
       String typeName = o.getClass().getTypeName();
       if ("byte[]".equals(typeName)) {
         byte[] b = (byte[]) o;
-        sb.append("byte[" + b.length + "] = " + HexDumper.toHex(b, 1024));
+        sb.append("byte[" + b.length + "] = " + BinUtil.toHexString(b, 1024));
       } else if ("int[]".equals(typeName)) {
         int[] wk = (int[]) o;
         sb.append("[");
