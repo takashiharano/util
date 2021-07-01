@@ -272,6 +272,58 @@ public class StrUtil {
   }
 
   /**
+   * Extract a matched part of the input string.<br>
+   * e.g., "[ABC]" "\\[(.+)\\]" -> "ABC"
+   *
+   * @param input
+   *          an input string
+   * @param regex
+   *          the regex
+   * @return a matched part
+   */
+  public static String extract(String input, String regex) {
+    return extract(input, regex, 0, 1);
+  }
+
+  /**
+   * Extract a matched part of the input string.
+   *
+   * @param input
+   *          an input string
+   * @param regex
+   *          the regex
+   * @param flags
+   *          flags
+   * @return a matched part
+   */
+  public static String extract(String input, String regex, int flags) {
+    return extract(input, regex, flags, 1);
+  }
+
+  /**
+   * Extract a matched part of the input string.
+   *
+   * @param input
+   *          an input string
+   * @param regex
+   *          the regex
+   * @param flags
+   *          flags
+   * @param index
+   *          index
+   * @return the input subsequence captured by the given group during the previous
+   *         match operation
+   */
+  public static String extract(String input, String regex, int flags, int index) {
+    Pattern p = Pattern.compile(regex, flags);
+    Matcher m = p.matcher(input);
+    if (m.find() && m.groupCount() >= index) {
+      return m.group(index);
+    }
+    return null;
+  }
+
+  /**
    * Specialization of format.
    *
    * @param number
@@ -348,41 +400,6 @@ public class StrUtil {
    */
   public static String fromLong(long l) {
     return Long.toString(l);
-  }
-
-  /**
-   * Returns the input subsequence captured by the given group during the previous
-   * match operation.<br>
-   * For a matcher m, input sequence s, and group index g, the expressions
-   * m.group(g) and s.substring(m.start(g), m.end(g)) are equivalent.<br>
-   * <br>
-   * Capturing groups are indexed from left to right, starting at one. Group zero
-   * denotes the entire pattern, so the expression m.group(0) is equivalent to
-   * m.group().<br>
-   * <br>
-   * If the match was successful but the group specified failed to match any part
-   * of the input sequence, then null is returned. Note that some groups, for
-   * example (a*), match the empty string. This method will return the empty
-   * string when such a group successfully matches the empty string in the input.
-   *
-   * @param target
-   *          the target string
-   * @param regex
-   *          the regex
-   * @param flags
-   *          flags
-   * @param index
-   *          index
-   * @return the input subsequence captured by the given group during the previous
-   *         match operation
-   */
-  public static String group(String target, String regex, int flags, int index) {
-    Pattern p = Pattern.compile(regex, flags);
-    Matcher m = p.matcher(target);
-    if (m.find()) {
-      return m.group(index);
-    }
-    return null;
   }
 
   /**
@@ -560,14 +577,14 @@ public class StrUtil {
    *          the regex
    * @param flags
    *          flags<br>
-   *          // UNIX_LINES = 1;<br>
-   *          // CASE_INSENSITIVE= 2;<br>
-   *          // COMMENTS = 4;<br>
-   *          // MULTILINE = 8;<br>
-   *          // LITERAL = 16;<br>
-   *          // DOTALL = 32;<br>
-   *          // UNICODE_CASE = 64;<br>
-   *          // CANON_EQ = 128;<br>
+   *          // UNIX_LINES = 1<br>
+   *          // CASE_INSENSITIVE= 2<br>
+   *          // COMMENTS = 4<br>
+   *          // MULTILINE = 8<br>
+   *          // LITERAL = 16<br>
+   *          // DOTALL = 32<br>
+   *          // UNICODE_CASE = 64<br>
+   *          // CANON_EQ = 128<br>
    *          // UNICODE_CHARACTER_CLASS = 256<br>
    * @return true if, and only if, a subsequence of the input sequence matches
    *         this matcher's pattern
