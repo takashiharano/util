@@ -430,7 +430,7 @@ public class _Log {
   }
 
   protected String buildMessage(Object o, LogLevel lv, int stackFrameOffset, boolean printLine) {
-    String time = DateTime.formatDateTime(dateTimeFormat);
+    String time = DateTime.getString(dateTimeFormat);
     Thread th = Thread.currentThread();
     long tid = th.getId();
 

@@ -411,7 +411,7 @@ public class DateTime {
    *          "yyyyMMdd'T'HHmmssSSSXX" to "20190701T123456.987+0900"
    * @return the formatted date-time string
    */
-  public static String formatDateTime(String format) {
+  public static String getString(String format) {
     DateTime dt = new DateTime();
     return dt.toString(format);
   }
@@ -427,7 +427,7 @@ public class DateTime {
    *          "yyyyMMdd'T'HHmmssSSSXX" to "20190713T123456.987+0900"
    * @return the date time string
    */
-  public static String formatDateTime(Date date, String format) {
+  public static String getString(Date date, String format) {
     DateTime dt = new DateTime(date);
     return dt.toString(format);
   }
@@ -444,7 +444,7 @@ public class DateTime {
    *          "yyyyMMdd'T'HHmmssSSSXX" to "20190701T123456.987+0900"
    * @return the formatted date-time string
    */
-  public static String formatDateTime(long timestamp, String format) {
+  public static String getString(long timestamp, String format) {
     DateTime dt = new DateTime(timestamp);
     return dt.toString(format);
   }

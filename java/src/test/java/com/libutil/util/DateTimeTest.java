@@ -45,7 +45,7 @@ public class DateTimeTest {
     _test(datetime, "JST");
 
     formatTimeTest();
-    formatDateTimeTest();
+    getStringTest();
 
     test1();
     test2();
@@ -97,9 +97,9 @@ public class DateTimeTest {
     Log.d(t + " = " + DateTime.formatTime(t, "HH:mm:ss.SSS"));
   }
 
-  static void formatDateTimeTest() {
+  static void getStringTest() {
     long t = 1594092896789L;
-    Log.d(t + " = " + DateTime.formatDateTime(t, "yyyy-MM-dd'T'HH:mm:ss.SSS XXX"));
+    Log.d(t + " = " + DateTime.getString(t, "yyyy-MM-dd'T'HH:mm:ss.SSS XXX"));
   }
 
   @Test
