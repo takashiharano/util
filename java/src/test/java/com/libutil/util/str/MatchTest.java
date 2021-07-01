@@ -1,0 +1,18 @@
+package com.libutil.util.str;
+
+import java.util.regex.Pattern;
+
+import com.libutil.Log;
+import com.libutil.StrUtil;
+
+public class MatchTest {
+
+  public static void main(String args[]) {
+    String str = "Abc123";
+    Log.d(StrUtil.match(str, "Abc123"));
+    Log.d(StrUtil.match(str, "Abc"));
+    Log.d(StrUtil.match(str, "abc"));
+    Log.d(StrUtil.match(str, "abc", Pattern.CASE_INSENSITIVE));
+  }
+
+}

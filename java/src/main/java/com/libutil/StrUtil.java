@@ -538,21 +538,37 @@ public class StrUtil {
   }
 
   /**
-   * Attempts to find the next subsequence of the input sequence that matches the
-   * pattern.<br>
-   * This method starts at the beginning of this matcher's region, or, if a
-   * previous invocation of the method was successful and the matcher has not
-   * since been reset, at the first character not matched by the previous
-   * match.<br>
-   * If the match succeeds then more information can be obtained via the start,
-   * end, and group methods.
+   * Returns if the input sequence matches the pattern.
+   *
+   * @param target
+   *          the target string
+   * @param regex
+   *          the regex
+   * @return if, and only if, a subsequence of the input sequence matches this
+   *         matcher's pattern
+   */
+  public static boolean match(String target, String regex) {
+    return match(target, regex, 0);
+  }
+
+  /**
+   * Returns if the input sequence matches the pattern.
    *
    * @param target
    *          the target string
    * @param regex
    *          the regex
    * @param flags
-   *          flags
+   *          flags<br>
+   *          // UNIX_LINES = 1;<br>
+   *          // CASE_INSENSITIVE= 2;<br>
+   *          // COMMENTS = 4;<br>
+   *          // MULTILINE = 8;<br>
+   *          // LITERAL = 16;<br>
+   *          // DOTALL = 32;<br>
+   *          // UNICODE_CASE = 64;<br>
+   *          // CANON_EQ = 128;<br>
+   *          // UNICODE_CHARACTER_CLASS = 256<br>
    * @return true if, and only if, a subsequence of the input sequence matches
    *         this matcher's pattern
    */
