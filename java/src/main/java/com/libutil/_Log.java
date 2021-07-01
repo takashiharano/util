@@ -25,7 +25,7 @@ package com.libutil;
 
 // public class Log extends _Log {
 //
-//   public static void init(int level, String moduleName) {
+//   public static void setup(int level, String moduleName) {
 //     instance = new Log();
 //     setLevel(level);
 //     setModuleName(moduleName);
@@ -37,6 +37,12 @@ public class _Log {
 
   protected static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXX";
   protected static _Log instance;
+
+  public static final int FLAG_TIME = 1;
+  public static final int FLAG_LEVEL = 2;
+  public static final int FLAG_MODULE_NAME = 4;
+  public static final int FLAG_TID = 8;
+  public static final int FLAG_LINE = 16;
 
   public enum LogLevel {
     FATAL("F", 1), ERROR("E", 2), WARN("W", 3), INFO("I", 4), DEBUG("D", 5);
@@ -61,6 +67,7 @@ public class _Log {
   protected String dateTimeFormat = DEFAULT_DATE_TIME_FORMAT;
   protected int outputLevel = LogLevel.DEBUG.level;
   protected String moduleName = null;
+  protected int flag = FLAG_TIME | FLAG_LEVEL | FLAG_MODULE_NAME | FLAG_TID | FLAG_LINE;
 
   /**
    * Returns the instance.
@@ -117,6 +124,26 @@ public class _Log {
     outputLevel = level;
     moduleName = module;
     dateTimeFormat = format;
+  }
+
+  /**
+   * Sets output flag.
+   *
+   * @param flag
+   *          flag values
+   */
+  public void setOutputFlag(int flag) {
+    this.flag = flag;
+  }
+
+  /**
+   * Sets output flag.
+   *
+   * @param flag
+   *          flag values
+   */
+  public static void setFlag(int flag) {
+    getInstance().setOutputFlag(flag);
   }
 
   /**
@@ -323,6 +350,11 @@ public class _Log {
     return t1;
   }
 
+  public static void print(Object o) {
+    _Log l = getInstance();
+    l.printLog(l.dump(o));
+  }
+
   /**
    * Print stack trace.
    */
@@ -430,28 +462,36 @@ public class _Log {
   }
 
   protected String buildMessage(Object o, LogLevel lv, int stackFrameOffset, boolean printLine) {
-    String time = DateTime.getString(dateTimeFormat);
     Thread th = Thread.currentThread();
-    long tid = th.getId();
+    StringBuilder sb = new StringBuilder();
 
-    StringBuilder sb = new StringBuilder(time);
-    sb.append(" ");
-
-    sb.append("[");
-    sb.append(lv.getTypeSymbol());
-    sb.append("]");
-
-    if (moduleName != null) {
-      sb.append("[");
-      sb.append(moduleName);
-      sb.append("]");
+    if ((flag & FLAG_TIME) != 0) {
+      String time = DateTime.getString(dateTimeFormat);
+      sb.append(time);
+      sb.append(" ");
     }
 
-    sb.append("[tid:");
-    sb.append(tid);
-    sb.append("]");
+    StringBuilder inf = new StringBuilder();
+    if ((flag & FLAG_LEVEL) != 0) {
+      inf.append("[");
+      inf.append(lv.getTypeSymbol());
+      inf.append("]");
+    }
 
-    if (printLine) {
+    if (((flag & FLAG_MODULE_NAME) != 0) && (moduleName != null)) {
+      inf.append("[");
+      inf.append(moduleName);
+      inf.append("]");
+    }
+
+    if ((flag & FLAG_TID) != 0) {
+      long tid = th.getId();
+      inf.append("[tid:");
+      inf.append(tid);
+      inf.append("]");
+    }
+
+    if (((flag & FLAG_LINE) != 0) && (printLine)) {
       StackTraceElement[] stack = th.getStackTrace();
       int stackFrameIndex = 4 + stackFrameOffset;
       StackTraceElement frame = stack[stackFrameIndex];
@@ -459,12 +499,22 @@ public class _Log {
       String fileName = frame.getFileName();
       int line = frame.getLineNumber();
       String fileLine = method + ":" + fileName + ":" + line;
-      sb.append("[");
-      sb.append(fileLine);
-      sb.append("]");
+      inf.append("[");
+      inf.append(fileLine);
+      inf.append("]");
     }
 
-    sb.append(" ");
+    if (inf.length() > 0) {
+      sb.append(inf);
+      sb.append(" ");
+    }
+    sb.append(dump(o));
+
+    return sb.toString();
+  }
+
+  protected String dump(Object o) {
+    StringBuilder sb = new StringBuilder();
     if (o == null) {
       sb.append("null");
     } else {
@@ -496,7 +546,6 @@ public class _Log {
         sb.append(o.toString());
       }
     }
-
     return sb.toString();
   }
 

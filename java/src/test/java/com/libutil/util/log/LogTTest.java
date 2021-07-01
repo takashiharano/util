@@ -1,4 +1,4 @@
-package com.libutil.util;
+package com.libutil.util.log;
 
 import com.libutil.Log;
 

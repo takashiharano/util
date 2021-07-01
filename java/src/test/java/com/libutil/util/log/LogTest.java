@@ -1,4 +1,4 @@
-package com.libutil.util;
+package com.libutil.util.log;
 
 import java.util.ArrayList;
 
@@ -8,7 +8,7 @@ import com.libutil._Log.LogLevel;
 public class LogTest {
 
   public static void main(String args[]) {
-    Log.init(5, "ModuleA");
+    Log.setup(5, "ModuleA");
 
     Log.d("Debug");
     Log.i("Information");
