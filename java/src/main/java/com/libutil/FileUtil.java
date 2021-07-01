@@ -35,10 +35,14 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+
+import javax.xml.bind.DatatypeConverter;
 
 public class FileUtil {
 
@@ -334,7 +338,14 @@ public class FileUtil {
    */
   public static String getHash(File file, String algorithm) {
     byte[] b = FileUtil.read(file);
-    String hash = HashUtil.getHash(b, algorithm);
+    String hash = null;
+    try {
+      MessageDigest md = MessageDigest.getInstance(algorithm);
+      byte[] h = md.digest(b);
+      hash = DatatypeConverter.printHexBinary(h).toLowerCase();
+    } catch (NoSuchAlgorithmException e) {
+      throw new RuntimeException(e);
+    }
     return hash;
   }
 
