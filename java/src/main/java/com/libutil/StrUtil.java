@@ -34,6 +34,9 @@ import java.util.regex.Pattern;
 
 public class StrUtil {
 
+  public static final String DEFAULT_CHARSET = "UTF-8";
+  public static final String LINE_SEPARATOR = "\n";
+
   /**
    * String array to string.
    *
@@ -42,7 +45,7 @@ public class StrUtil {
    * @return the text
    */
   public static String array2text(String[] arr) {
-    return array2text(arr, SystemUtil.LINE_SEPARATOR);
+    return array2text(arr, LINE_SEPARATOR);
   }
 
   /**
@@ -206,7 +209,7 @@ public class StrUtil {
    */
   public static String decodeUri(String src, String encoding) {
     if (encoding == null) {
-      encoding = "UTF-8";
+      encoding = DEFAULT_CHARSET;
     }
     String decoded;
     try {
@@ -241,7 +244,7 @@ public class StrUtil {
    */
   public static String encodeUri(String src, String encoding) {
     if (encoding == null) {
-      encoding = "UTF-8";
+      encoding = DEFAULT_CHARSET;
     }
     String encoded;
     try {
@@ -290,6 +293,61 @@ public class StrUtil {
   public static String formatNumber(double number) {
     NumberFormat nf = NumberFormat.getNumberInstance();
     return nf.format(number);
+  }
+
+  /**
+   * Converts a boolean to a string.
+   *
+   * @param b
+   *          a boolean value
+   * @return "true" or "false"
+   */
+  public static String fromBoolean(boolean b) {
+    return (b ? "true" : "false");
+  }
+
+  /**
+   * Converts a double to a string.
+   *
+   * @param d
+   *          the double to be converted.
+   * @return a string representation of the argument.
+   */
+  public static String fromDouble(double d) {
+    return Double.toString(d);
+  }
+
+  /**
+   * Converts a float to a string.
+   *
+   * @param f
+   *          the float to be converted.
+   * @return a string representation of the argument.
+   */
+  public static String fromFloat(float f) {
+    return Float.toString(f);
+  }
+
+  /**
+   * Converts an integer to a string.
+   *
+   * @param i
+   *          an integer to be converted.
+   * @return a string representation of the argument in base 10.
+   */
+  public static String fromInteger(int i) {
+    return Integer.toString(i);
+  }
+
+  /**
+   * Converts along r to a string.
+   *
+   * @param l
+   *          a long to be converted.
+   * @return a string representation of the argument in base 10.
+   */
+  public static String fromLong(long l) {
+    return Long.toString(l);
   }
 
   /**
@@ -845,6 +903,157 @@ public class StrUtil {
       arr = tmp;
     }
     return arr;
+  }
+
+  /**
+   * Converts a string to a boolean value.
+   *
+   * @param s
+   *          a string value
+   * @return a boolean value
+   */
+  public static boolean toBoolean(String s) {
+    if (s == null) {
+      return false;
+    }
+    s = s.trim().toLowerCase();
+    return s.equals("true");
+  }
+
+  /**
+   * Converts a string to a double.
+   *
+   * @param s
+   *          a string value
+   * @return a double value
+   */
+  public static double toDouble(String s) {
+    return toDouble(s, 0.0);
+  }
+
+  /**
+   * Converts a string to a double.
+   *
+   * @param s
+   *          a string value
+   * @param defaultValue
+   *          value for parse error
+   * @return a double value
+   */
+  public static double toDouble(String s, double defaultValue) {
+    if (s == null) {
+      return defaultValue;
+    }
+    s = s.trim();
+    double v = defaultValue;
+    try {
+      v = Double.parseDouble(s);
+    } catch (NumberFormatException e) {
+      // nop
+    }
+    return v;
+  }
+
+  /**
+   * Converts a string to a float.
+   *
+   * @param s
+   *          a string value
+   * @return a float value
+   */
+  public static float toFloat(String s) {
+    return toFloat(s, 0f);
+  }
+
+  /**
+   * Converts a string to a float.
+   *
+   * @param s
+   *          a string value
+   * @param defaultValue
+   *          value for parse error
+   * @return a float value
+   */
+  public static float toFloat(String s, float defaultValue) {
+    if (s == null) {
+      return defaultValue;
+    }
+    s = s.trim();
+    float v = defaultValue;
+    try {
+      v = Float.parseFloat(s);
+    } catch (NumberFormatException e) {
+      // nop
+    }
+    return v;
+  }
+
+  /**
+   * Converts a string to a signed decimal integer.
+   *
+   * @param s
+   *          a string value
+   * @return an integer value
+   */
+  public static int toInteger(String s) {
+    return toInteger(s, 0);
+  }
+
+  /**
+   * Converts a string to a signed decimal integer.
+   *
+   * @param s
+   *          a string value
+   * @param defaultValue
+   *          value for parse error
+   * @return an integer value
+   */
+  public static int toInteger(String s, int defaultValue) {
+    if (s == null) {
+      return defaultValue;
+    }
+    s = s.trim();
+    int v = defaultValue;
+    try {
+      v = Integer.parseInt(s);
+    } catch (NumberFormatException e) {
+      // nop
+    }
+    return v;
+  }
+
+  /**
+   * Converts a string to a signed decimal integer.
+   *
+   * @param s
+   *          a string value
+   * @return an integer value
+   */
+  public static long toLong(String s) {
+    return toLong(s, 0L);
+  }
+
+  /**
+   * Converts a string to a signed decimal long.
+   *
+   * @param s
+   *          a string value
+   * @param defaultValue
+   *          value for parse error
+   * @return a long value
+   */
+  public static long toLong(String s, long defaultValue) {
+    if (s == null) {
+      return defaultValue;
+    }
+    s = s.trim();
+    long v = defaultValue;
+    try {
+      v = Long.parseLong(s);
+    } catch (NumberFormatException e) {
+      // nop
+    }
+    return v;
   }
 
   /**
