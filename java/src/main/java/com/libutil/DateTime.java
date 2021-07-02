@@ -515,6 +515,8 @@ public class DateTime {
   /**
    * Returns the current date-time string in the specified format.
    *
+   * @param format
+   *          the pattern describing the date and time format
    * @return the current date-time string.
    */
   public static String now(String format) {
