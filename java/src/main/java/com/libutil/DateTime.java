@@ -347,20 +347,20 @@ public class DateTime {
   }
 
   /**
-   * Returns the Date Time String of the instance in the default format.
+   * Returns the date-time string of the instance in the default format.
    */
   public String toString() {
     return toString(DEFAULT_FORMAT);
   }
 
   /**
-   * Returns the Date Time String of the instance in the specified format.
+   * Returns the date-time string of the instance in the specified format.
    *
    * @param format
    *          "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" to
    *          "2019-07-13T12:34:56.987+09:00"<br>
    *          "yyyyMMdd'T'HHmmssSSSXX" to "20190713T123456.987+0900"
-   * @return the date time string
+   * @return the date-time string
    */
   public String toString(String format) {
     SimpleDateFormat sdf = new SimpleDateFormat(format);
@@ -389,8 +389,8 @@ public class DateTime {
    * @param days
    *          offset
    * @param format
-   *          date time format for result
-   * @return the calculated date time string
+   *          date-time format for result
+   * @return the calculated date-time string
    */
   public static String addDate(String date, int days, String format) {
     String s = serializeDateTime(date);
@@ -435,22 +435,7 @@ public class DateTime {
   }
 
   /**
-   * Returns the current Date Time String in the specified format.
-   *
-   * @param format
-   *          the pattern describing the date and time format
-   *          "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" to
-   *          "2020-07-01T12:34:56.987+09:00"<br>
-   *          "yyyyMMdd'T'HHmmssSSSXX" to "20190701T123456.987+0900"
-   * @return the formatted date-time string
-   */
-  public static String getString(String format) {
-    DateTime dt = new DateTime();
-    return dt.toString(format);
-  }
-
-  /**
-   * Returns the Date Time String in the specified format.
+   * Returns the date-time string in the specified format.
    *
    * @param datetime
    *          the date-time string
@@ -473,7 +458,7 @@ public class DateTime {
   }
 
   /**
-   * Returns the Date Time String from Date object.
+   * Returns the date-time string from Date object.
    *
    * @param date
    *          the date
@@ -481,7 +466,7 @@ public class DateTime {
    *          "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" to
    *          "2019-07-13T12:34:56.987+09:00"<br>
    *          "yyyyMMdd'T'HHmmssSSSXX" to "20190713T123456.987+0900"
-   * @return the date time string
+   * @return the date-time string
    */
   public static String getString(Date date, String format) {
     DateTime dt = new DateTime(date);
@@ -489,7 +474,8 @@ public class DateTime {
   }
 
   /**
-   * Returns the current Date Time String in the specified format. * @param millis
+   * Returns the date-time string represented by the time-stamp in the specified
+   * format.
    *
    * @param timestamp
    *          the milliseconds since January 1, 1970, 00:00:00 GMT.
@@ -527,6 +513,16 @@ public class DateTime {
   }
 
   /**
+   * Returns the current date-time string in the specified format.
+   *
+   * @return the current date-time string.
+   */
+  public static String now(String format) {
+    DateTime dt = new DateTime();
+    return dt.toString(format);
+  }
+
+  /**
    * Parses text from the beginning of the given string to produce a date.
    *
    * @param pattern
@@ -556,7 +552,7 @@ public class DateTime {
    * 2020/9/3 12:34:56.789123 to 20200903123456789123
    *
    * @param src
-   *          date time string to format
+   *          date-time string to format
    * @return YYYYMMDDHHMISSfff
    */
   public static String serializeDateTime(String src) {

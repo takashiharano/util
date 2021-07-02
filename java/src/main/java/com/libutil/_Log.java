@@ -466,7 +466,7 @@ public class _Log {
     StringBuilder sb = new StringBuilder();
 
     if ((flag & FLAG_TIME) != 0) {
-      String time = DateTime.getString(dateTimeFormat);
+      String time = DateTime.now(dateTimeFormat);
       sb.append(time);
       sb.append(" ");
     }
