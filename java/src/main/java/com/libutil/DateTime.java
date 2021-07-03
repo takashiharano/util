@@ -431,7 +431,9 @@ public class DateTime {
   /**
    * Convert milliseconds to a time string.<br>
    * <br>
-   * e.g., (1234, "HH:mm:ss.SSS") to "00:00:01.234"
+   * e.g.,<br>
+   * (1234, "HH:mm:ss.SSS") to "00:00:01.234"<br>
+   * (171954123, "Dd HH:mm:ss.SSS") to "1d 23:45:54.123"<br>
    *
    * @param millis
    *          milliseconds to format
@@ -440,11 +442,52 @@ public class DateTime {
    * @return the formatted time string
    */
   public static String formatTime(long millis, String format) {
-    SimpleDateFormat sdf = new SimpleDateFormat(format);
-    TimeZone tz = TimeZone.getTimeZone("UTC");
-    sdf.setTimeZone(tz);
-    String time = sdf.format(millis);
-    return time;
+    long v = millis;
+    String sn = "+";
+    if (millis < 0) {
+      v *= (-1);
+      sn = "-";
+    }
+
+    long d = v / 86400000;
+    long hr = 0;
+    if (v >= 3600000) {
+      hr = v / 3600000;
+      v -= hr * 3600000;
+    }
+    long m = 0;
+    if (v >= 60000) {
+      m = v / 60000;
+      v -= (m * 60000);
+    }
+    long s = v / 1000;
+    long f = v - s * 1000;
+    long h = hr - d * 24;
+
+    String dd = d + "";
+
+    String hh = "00" + h;
+    hh = hh.substring(hh.length() - 2);
+    String hrs = ((hr < 10) ? "0" + hr : hr + "");
+
+    String mm = "00" + m;
+    mm = mm.substring(mm.length() - 2);
+
+    String ss = "00" + s;
+    ss = ss.substring(ss.length() - 2);
+
+    String f3 = "000" + f;
+    f3 = f3.substring(f3.length() - 3);
+
+    String r = format;
+    r = r.replace("D", dd);
+    r = r.replace("sn", sn);
+    r = r.replace("HR", hrs);
+    r = r.replace("HH", hh);
+    r = r.replace("mm", mm);
+    r = r.replace("ss", ss);
+    r = r.replace("SSS", f3);
+    return r;
   }
 
   /**
