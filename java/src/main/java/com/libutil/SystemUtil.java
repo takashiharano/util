@@ -31,6 +31,22 @@ public class SystemUtil {
   public static final String LINE_SEPARATOR = "\n";
 
   /**
+   * Runs the garbage collector.
+   *
+   * @return execution result details
+   */
+  public static String gc() {
+    HeapInfo info0 = new HeapInfo();
+    long t0 = System.currentTimeMillis();
+    Runtime.getRuntime().gc();
+    long t1 = System.currentTimeMillis();
+    HeapInfo info1 = new HeapInfo();
+    String elapsed = Time.ms2str(t1 - t0);
+    String details = "GC: " + info0.getPercent() + "% -> " + info1.getPercent() + "% (" + elapsed + ")";
+    return details;
+  }
+
+  /**
    * Returns all system environment.
    *
    * @return systemenv
@@ -57,32 +73,6 @@ public class SystemUtil {
     long used = info.getUsed();
     String percent = info.getPercent();
     return "Heap: total=" + total + " / used=" + used + "(" + percent + "%) / free=" + free + " / max=" + max;
-  }
-
-  /**
-   * Runs the garbage collector.
-   *
-   * @return execution result details
-   */
-  public static String gc() {
-    HeapInfo info0 = new HeapInfo();
-    long t0 = System.currentTimeMillis();
-    Runtime.getRuntime().gc();
-    long t1 = System.currentTimeMillis();
-    HeapInfo info1 = new HeapInfo();
-    String elapsed = Time.ms2str(t1 - t0);
-    String details = "GC: " + info0.getPercent() + "% -> " + info1.getPercent() + "% (" + elapsed + ")";
-    return details;
-  }
-
-  /**
-   * Returns the current time in milliseconds.
-   *
-   * @return the difference, measured in milliseconds, between the current time
-   *         and midnight, January 1, 1970 UTC.
-   */
-  public static long now() {
-    return System.currentTimeMillis();
   }
 
   // ------------------------------------------------------------
