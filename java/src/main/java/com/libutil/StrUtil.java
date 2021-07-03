@@ -555,6 +555,20 @@ public class StrUtil {
   }
 
   /**
+   * Returns if the given string represents true.
+   *
+   * @param s
+   *          the string to check
+   * @return true if the string can be considered true
+   */
+  public static boolean isTrue(String s) {
+    if ((s == null) || ("".equals(s)) || ("0".equals(s)) || ("false".equals(s.toLowerCase()))) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * Returns if the input sequence matches the pattern.
    *
    * @param target
