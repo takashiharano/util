@@ -151,8 +151,6 @@ public class DateTime {
    * @param timeZoneId
    *          the ID for a TimeZone, such as "PST", "America/Los_Angeles",
    *          "GMT-8:00"
-   * @throws ParseException
-   *           If failed to parse
    */
   public DateTime(int year, int month, int day, int hour, int minute, int second, int millisecond, String timeZoneId) {
     Calendar calendar = Calendar.getInstance();
