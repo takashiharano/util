@@ -1090,6 +1090,17 @@ public class StrUtil {
   }
 
   /**
+   * Returns a string representation of the object.
+   *
+   * @param o
+   *          the object
+   * @return a string representation of the object.
+   */
+  public static String toString(Object o) {
+    return ((o == null) ? "null" : o.toString());
+  }
+
+  /**
    * Strip leading and trailing zeros.<br>
    * <br>
    * e.g., 0123.450 to 123.45
