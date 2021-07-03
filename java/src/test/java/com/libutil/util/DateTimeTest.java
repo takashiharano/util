@@ -2,8 +2,6 @@ package com.libutil.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.text.ParseException;
-
 import org.junit.jupiter.api.Test;
 
 import com.libutil.DateTime;
@@ -21,25 +19,17 @@ public class DateTimeTest {
     Log.d(datetime.getTimeZoneId());
     Log.d(datetime.getTimeZoneDisplayName());
 
-    try {
-      datetime = new DateTime(2019, 12, 05, 23, 30);
-      str = datetime.toString();
-      Log.d(str);
-      Log.d(datetime.getTimeZoneId());
-      Log.d(datetime.getTimeZoneDisplayName());
-    } catch (ParseException e) {
-      Log.e(e);
-    }
+    datetime = new DateTime(2019, 12, 05, 23, 30);
+    str = datetime.toString();
+    Log.d(str);
+    Log.d(datetime.getTimeZoneId());
+    Log.d(datetime.getTimeZoneDisplayName());
 
-    try {
-      datetime = new DateTime(2019, 12, 05, 23, 30, "PST");
-      str = datetime.toString();
-      Log.d(str);
-      Log.d(datetime.getTimeZoneId());
-      Log.d(datetime.getTimeZoneDisplayName());
-    } catch (ParseException e) {
-      Log.e(e);
-    }
+    datetime = new DateTime(2019, 12, 05, 23, 30, "PST");
+    str = datetime.toString();
+    Log.d(str);
+    Log.d(datetime.getTimeZoneId());
+    Log.d(datetime.getTimeZoneDisplayName());
 
     _test(datetime, "PST");
     _test(datetime, "JST");

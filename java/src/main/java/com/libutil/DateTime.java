@@ -80,46 +80,54 @@ public class DateTime {
     _init(date, timeZoneId);
   }
 
-  public DateTime(String source) throws ParseException {
+  public DateTime(String source) {
     String s = serializeDateTime(source);
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-    Date date = sdf.parse(s);
+    Date date;
+    try {
+      date = sdf.parse(s);
+    } catch (ParseException e) {
+      throw new RuntimeException(e);
+    }
     _init(date);
   }
 
-  public DateTime(String source, String format) throws ParseException {
+  public DateTime(String source, String format) {
     SimpleDateFormat sdf = new SimpleDateFormat(format);
-    Date date = sdf.parse(source);
+    Date date;
+    try {
+      date = sdf.parse(source);
+    } catch (ParseException e) {
+      throw new RuntimeException(e);
+    }
     _init(date);
   }
 
-  public DateTime(int year, int month, int day) throws ParseException {
+  public DateTime(int year, int month, int day) {
     this(year, month, day, 0, 0, 0, 0, null);
   }
 
-  public DateTime(int year, int month, int day, String timeZoneId) throws ParseException {
+  public DateTime(int year, int month, int day, String timeZoneId) {
     this(year, month, day, 0, 0, 0, 0, timeZoneId);
   }
 
-  public DateTime(int year, int month, int day, int hour, int minute) throws ParseException {
+  public DateTime(int year, int month, int day, int hour, int minute) {
     this(year, month, day, hour, minute, 0, 0, null);
   }
 
-  public DateTime(int year, int month, int day, int hour, int minute, String timeZoneId) throws ParseException {
+  public DateTime(int year, int month, int day, int hour, int minute, String timeZoneId) {
     this(year, month, day, hour, minute, 0, 0, timeZoneId);
   }
 
-  public DateTime(int year, int month, int day, int hour, int minute, int second) throws ParseException {
+  public DateTime(int year, int month, int day, int hour, int minute, int second) {
     this(year, month, day, hour, minute, second, 0, null);
   }
 
-  public DateTime(int year, int month, int day, int hour, int minute, int second, String timeZoneId)
-      throws ParseException {
+  public DateTime(int year, int month, int day, int hour, int minute, int second, String timeZoneId) {
     this(year, month, day, hour, minute, second, 0, timeZoneId);
   }
 
-  public DateTime(int year, int month, int day, int hour, int minute, int second, int millisecond)
-      throws ParseException {
+  public DateTime(int year, int month, int day, int hour, int minute, int second, int millisecond) {
     this(year, month, day, hour, minute, second, millisecond, null);
   }
 
@@ -146,8 +154,7 @@ public class DateTime {
    * @throws ParseException
    *           If failed to parse
    */
-  public DateTime(int year, int month, int day, int hour, int minute, int second, int millisecond, String timeZoneId)
-      throws ParseException {
+  public DateTime(int year, int month, int day, int hour, int minute, int second, int millisecond, String timeZoneId) {
     Calendar calendar = Calendar.getInstance();
     if (timeZoneId != null) {
       TimeZone tz = TimeZone.getTimeZone(timeZoneId);
@@ -395,11 +402,7 @@ public class DateTime {
   public static String addDate(String date, int days, String format) {
     String s = serializeDateTime(date);
     DateTime dt0;
-    try {
-      dt0 = new DateTime(s, "yyyyMMddHHmmssSSS");
-    } catch (ParseException e) {
-      return null;
-    }
+    dt0 = new DateTime(s, "yyyyMMddHHmmssSSS");
     DateTime dt1 = dt0.addDays(days);
     return dt1.toString(format);
   }
@@ -449,11 +452,7 @@ public class DateTime {
    */
   public static String getString(String datetime, String format) {
     DateTime dt;
-    try {
-      dt = new DateTime(datetime);
-    } catch (ParseException e) {
-      return null;
-    }
+    dt = new DateTime(datetime);
     return dt.toString(format);
   }
 
