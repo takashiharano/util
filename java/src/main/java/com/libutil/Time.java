@@ -186,6 +186,45 @@ public class Time {
   }
 
   /**
+   * To string the time.
+   *
+   * @param format
+   *          "Dd HH:mm:ss.SSS"
+   * @return the formatted time string
+   */
+  public String toString(String format) {
+    String sn = "+";
+    if (millis < 0) {
+      sn = "-";
+    }
+
+    String dd = days + "";
+
+    String sHrs = "00" + hours;
+    sHrs = sHrs.substring(sHrs.length() - 2);
+    String hh = ((hrs < 10) ? "0" + hrs : hrs + "");
+
+    String mm = "00" + minutes;
+    mm = mm.substring(mm.length() - 2);
+
+    String ss = "00" + seconds;
+    ss = ss.substring(ss.length() - 2);
+
+    String f3 = "000" + milliseconds;
+    f3 = f3.substring(f3.length() - 3);
+
+    String r = format;
+    r = r.replace("D", dd);
+    r = r.replace("sn", sn);
+    r = r.replace("HR", sHrs);
+    r = r.replace("HH", hh);
+    r = r.replace("mm", mm);
+    r = r.replace("ss", ss);
+    r = r.replace("SSS", f3);
+    return r;
+  }
+
+  /**
    * Returns human-readable time string.<br>
    * 171959000 to "1d 23h 45m 59s"
    *
