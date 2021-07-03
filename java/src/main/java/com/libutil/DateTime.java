@@ -81,7 +81,10 @@ public class DateTime {
   }
 
   public DateTime(String source) {
-    String s = serializeDateTime(source);
+    String[] w = splitDateTimeAndTimezone(source);
+    String sdt = w[0];
+    String tz = w[1];
+    String s = serializeDateTime(sdt);
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
     Date date;
     try {
@@ -89,7 +92,16 @@ public class DateTime {
     } catch (ParseException e) {
       throw new RuntimeException(e);
     }
-    _init(date);
+    if (tz != null) {
+      if (tz.equals("Z")) {
+        tz = "+0000";
+      }
+      tz = "GMT" + tz;
+      int tzdiff = getTimezoneOffsetDiff(tz);
+      long timestamp = date.getTime() - tzdiff;
+      date = new Date(timestamp);
+    }
+    _init(date, tz);
   }
 
   public DateTime(String source, String format) {
@@ -608,6 +620,54 @@ public class DateTime {
     s = s.replaceAll("[-\\s:\\.]", "");
     s = (s + "000000000").substring(0, 17);
     return s;
+  }
+
+  private int getTimezoneOffsetDiff(String timeZoneId) {
+    TimeZone tz0 = TimeZone.getDefault();
+    TimeZone tz1 = TimeZone.getTimeZone(timeZoneId);
+    int offset0 = tz0.getRawOffset();
+    int offset1 = tz1.getRawOffset();
+    return offset1 - offset0;
+  }
+
+  private static String[] splitDateTimeAndTimezone(String s) {
+    String w = s;
+    String tz = null;
+    if (w.length() > 10) {
+      int zPos = getTzPos(w);
+      if (zPos != -1) {
+        tz = w.substring(zPos);
+        w = w.substring(0, zPos);
+      }
+    }
+    String[] ret = { w, tz };
+    return ret;
+  }
+
+  private static int getTzPos(String s) {
+    int p = s.indexOf("Z");
+    if (p != -1) {
+      return p;
+    }
+    int tzSnCnt = countMatcher(s, "\\+");
+    if (tzSnCnt == 1) {
+      return s.indexOf("+");
+    }
+    tzSnCnt = countMatcher(s, "-");
+    if (tzSnCnt > 0) {
+      return s.indexOf("-", s.length() - 6);
+    }
+    return -1;
+  };
+
+  private static int countMatcher(String target, String regex) {
+    Pattern p = Pattern.compile(regex);
+    Matcher m = p.matcher(target);
+    int count = 0;
+    while (m.find()) {
+      count++;
+    }
+    return count;
   }
 
   private static String zeroPadding(String s) {
