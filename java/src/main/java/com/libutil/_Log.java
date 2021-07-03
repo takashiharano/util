@@ -70,18 +70,6 @@ public class _Log {
   protected int flag = FLAG_TIME | FLAG_LEVEL | FLAG_MODULE_NAME | FLAG_TID | FLAG_LINE;
 
   /**
-   * Returns the instance.
-   *
-   * @return instance
-   */
-  public static _Log getInstance() {
-    if (instance == null) {
-      instance = new _Log();
-    }
-    return instance;
-  }
-
-  /**
    * Initialize the module.
    */
   public _Log() {
@@ -137,22 +125,23 @@ public class _Log {
   }
 
   /**
-   * Sets output flag.
+   * Adds output flag.
    *
    * @param flag
-   *          flag values
+   *          flag value
    */
-  public static void setFlag(int flag) {
-    getInstance().setOutputFlag(flag);
+  public void addOutputFlag(int flag) {
+    this.flag |= flag;
   }
 
   /**
-   * Returns current output level.
+   * Removes output flag.
    *
-   * @return output level
+   * @param flag
+   *          flag value
    */
-  public static int getLevel() {
-    return getInstance().getOutputLevel();
+  public void removeOutputFlag(int flag) {
+    this.flag &= ~flag;
   }
 
   /**
@@ -180,39 +169,9 @@ public class _Log {
    * @param level
    *          output level
    */
-  public static void setLevel(int level) {
-    getInstance().setOutputLevel(level);
-  }
-
-  /**
-   * Sets output level.
-   *
-   * @param level
-   *          output level
-   */
   public void setOutputLevel(LogLevel level) {
     int lv = level.getLevel();
-    setLevel(lv);
-  }
-
-  /**
-   * Sets output level.
-   *
-   * @param level
-   *          output level
-   */
-  public static void setLevel(LogLevel level) {
-    getInstance().setOutputLevel(level);
-  }
-
-  /**
-   * Sets date-time format.
-   *
-   * @param format
-   *          date-time format like "yyyy-MM-dd' 'HH:mm:ss.SSS XX"
-   */
-  public static void setDateTimeFormat(String format) {
-    getInstance().setLogDateTimeFormat(format);
+    setOutputLevel(lv);
   }
 
   /**
@@ -233,6 +192,87 @@ public class _Log {
    */
   public void setLoggingModuleName(String name) {
     moduleName = name;
+  }
+
+  /**
+   * Returns the instance.
+   *
+   * @return instance
+   */
+  public static _Log getInstance() {
+    if (instance == null) {
+      instance = new _Log();
+    }
+    return instance;
+  }
+
+  /**
+   * Sets output flag.
+   *
+   * @param flag
+   *          flag values
+   */
+  public static void setFlag(int flag) {
+    getInstance().setOutputFlag(flag);
+  }
+
+  /**
+   * Adds output flag.
+   *
+   * @param flag
+   *          flag value
+   */
+  public static void addFlag(int flag) {
+    getInstance().addOutputFlag(flag);
+  }
+
+  /**
+   * Removes output flag.
+   *
+   * @param flag
+   *          flag value
+   */
+  public static void removeFlag(int flag) {
+    getInstance().removeOutputFlag(flag);
+  }
+
+  /**
+   * Returns current output level.
+   *
+   * @return output level
+   */
+  public static int getLevel() {
+    return getInstance().getOutputLevel();
+  }
+
+  /**
+   * Sets output level.
+   *
+   * @param level
+   *          output level
+   */
+  public static void setLevel(int level) {
+    getInstance().setOutputLevel(level);
+  }
+
+  /**
+   * Sets output level.
+   *
+   * @param level
+   *          output level
+   */
+  public static void setLevel(LogLevel level) {
+    getInstance().setOutputLevel(level);
+  }
+
+  /**
+   * Sets date-time format.
+   *
+   * @param format
+   *          date-time format like "yyyy-MM-dd' 'HH:mm:ss.SSS XX"
+   */
+  public static void setDateTimeFormat(String format) {
+    getInstance().setLogDateTimeFormat(format);
   }
 
   /**
@@ -329,7 +369,7 @@ public class _Log {
   public static long t(String msg) {
     long t1 = System.currentTimeMillis();
     String m = "[T+00:00:00.000] " + msg;
-    getInstance().out(m, LogLevel.DEBUG, 0, true);
+    i(m);
     return t1;
   }
 
@@ -345,8 +385,8 @@ public class _Log {
   public static long t(String msg, long t0) {
     long t1 = System.currentTimeMillis();
     long delta = t1 - t0;
-    String m = "[T+" + DateTime.formatTime(delta, "HH:mm:ss.SSS") + "] " + msg;
-    getInstance().out(m, LogLevel.DEBUG, 0, true);
+    String m = "[" + DateTime.formatTime(delta, "TsnHH:mm:ss.SSS") + "] " + msg;
+    i(m);
     return t1;
   }
 
@@ -491,7 +531,7 @@ public class _Log {
       inf.append("]");
     }
 
-    if (((flag & FLAG_LINE) != 0) && (printLine)) {
+    if (((flag & FLAG_LINE) != 0) && printLine) {
       StackTraceElement[] stack = th.getStackTrace();
       int stackFrameIndex = 4 + stackFrameOffset;
       StackTraceElement frame = stack[stackFrameIndex];

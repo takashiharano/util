@@ -25,13 +25,26 @@ public class LogFlagTest {
     Log.print("----------");
     Log.setFlag(Log.FLAG_TIME | Log.FLAG_LEVEL);
     logTest();
+
+    Log.print("add FLAG_TIME----------");
+    Log.setFlag(0);
+    Log.addFlag(Log.FLAG_TIME);
+    logTest();
+
+    Log.print("add FLAG_LEVEL----------");
+    Log.addFlag(Log.FLAG_LEVEL);
+    logTest();
+
+    Log.print("remove FLAG_LEVEL----------");
+    Log.removeFlag(Log.FLAG_LEVEL);
+    logTest();
   }
 
   private static void logTest() {
-    Log.d("DEBUG");
-    Log.i("INFO");
-    Log.w("WARN");
-    Log.e("ERROR");
+    Log.d("THIS_IS_DEBUG_LOG");
+    Log.i("THIS_IS_INFO_LOG");
+    Log.w("THIS_IS_WARN_LOG");
+    Log.e("THIS_IS_ERROR_LOG");
   }
 
 }
