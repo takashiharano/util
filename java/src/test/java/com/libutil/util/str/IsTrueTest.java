@@ -14,6 +14,13 @@ public class IsTrueTest {
     test("False", false);
     test("FALSE", false);
 
+    test(" ", false);
+    test("  ", false);
+    test(" 0 ", false);
+    test(" false ", false);
+    test(" False ", false);
+    test(" FALSE ", false);
+
     Log.i("---------- true ----------");
     test("1", true);
     test("2", true);
@@ -21,7 +28,13 @@ public class IsTrueTest {
     test("True", true);
     test("TRUE", true);
     test("A", true);
-    test(" ", true);
+
+    test(" 1 ", true);
+    test(" 2 ", true);
+    test(" true ", true);
+    test(" True ", true);
+    test(" TRUE ", true);
+    test(" A ", true);
   }
 
   private static void test(String s, boolean exp) {

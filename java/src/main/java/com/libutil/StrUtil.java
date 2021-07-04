@@ -555,14 +555,19 @@ public class StrUtil {
   }
 
   /**
-   * Returns if the given string represents true.
+   * Returns if the given string represents true.<br>
    *
    * @param s
    *          the string to check
-   * @return true if the string can be considered true
+   * @return false if the given string is "false"(case insensitive), "0", "" or
+   *         null, otherwise true.
    */
   public static boolean isTrue(String s) {
-    if ((s == null) || ("".equals(s)) || ("0".equals(s)) || ("false".equals(s.toLowerCase()))) {
+    if (s == null) {
+      return false;
+    }
+    s = s.trim();
+    if ("".equals(s) || "0".equals(s) || "false".equals(s.toLowerCase())) {
       return false;
     }
     return true;
