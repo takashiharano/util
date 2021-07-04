@@ -36,6 +36,33 @@ public class DateTimeTest {
     datetime = new DateTime(src);
     test(datetime);
 
+    try {
+      Log.d("DateTime(\"\")");
+      src = "";
+      datetime = new DateTime(src);
+      test(datetime);
+    } catch (Exception e) {
+      Log.e(e);
+    }
+
+    try {
+      Log.d("DateTime(\"aaa\")");
+      src = "aaa";
+      datetime = new DateTime(src);
+      test(datetime);
+    } catch (Exception e) {
+      Log.e(e);
+    }
+
+    try {
+      Log.d("DateTime(null)");
+      src = null;
+      datetime = new DateTime(src);
+      test(datetime);
+    } catch (Exception e) {
+      Log.e(e);
+    }
+
     formatTimeTest();
   }
 

@@ -49,6 +49,38 @@ public class AddDateTest {
     in = "2021/01/01";
     exp = "2021-01-02";
     test(in, 1, exp, format);
+
+    try {
+      in = "";
+      exp = "";
+      test(in, 1, exp, format);
+    } catch (Exception e) {
+      Log.e(e);
+    }
+
+    try {
+      in = "2021/01";
+      exp = "";
+      test(in, 1, exp, format);
+    } catch (Exception e) {
+      Log.e(e);
+    }
+
+    try {
+      in = "aaa";
+      exp = "";
+      test(in, 1, exp, format);
+    } catch (Exception e) {
+      Log.e(e);
+    }
+
+    try {
+      in = null;
+      exp = "";
+      test(in, 1, exp, format);
+    } catch (Exception e) {
+      Log.e(e);
+    }
   }
 
   private static void test(String in, int days, String exp, String format) {
