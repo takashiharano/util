@@ -6,42 +6,37 @@ import com.libutil.Log;
 public class DateTimeTest {
 
   public static void main(String args[]) {
-    Log.d("test1 ----------");
+    Log.d("DateTime() ----------");
     DateTime datetime = new DateTime();
     test(datetime);
 
-    Log.d("test2 ----------");
+    Log.d("setTimeZone(\"PST\") ----------");
     datetime.setTimeZone("PST");
     test(datetime);
 
-    Log.d("test3 ----------");
+    Log.d("DateTime(2019, 12, 05, 23, 30) ----------");
     datetime = new DateTime(2019, 12, 05, 23, 30);
     test(datetime);
 
-    Log.d("test4 ----------");
+    Log.d("DateTime(2019, 12, 05, 23, 30, \"PST\") ----------");
     datetime = new DateTime(2019, 12, 05, 23, 30, "PST");
     test(datetime);
 
-    Log.d("test5 ----------");
-    datetime = new DateTime();
-    test(datetime);
-
-    Log.d("test6 ----------");
+    Log.d("DateTime(1594092896789L) ----------");
     datetime = new DateTime(1594092896789L);
     test(datetime);
 
-    Log.d("test7 ----------");
+    Log.d("DateTime(\"20210703T123456.789+0900\") ----------");
     String src = "20210703T123456.789+0900";
     datetime = new DateTime(src);
     test(datetime);
 
-    Log.d("test8 ----------");
+    Log.d("DateTime(\"20210703T123456.789-0800\")");
     src = "20210703T123456.789-0800";
     datetime = new DateTime(src);
     test(datetime);
 
     formatTimeTest();
-
   }
 
   private static void test(DateTime datetime) {
