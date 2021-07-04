@@ -88,6 +88,10 @@ public class DateTime {
   }
 
   public DateTime(String source) {
+    if (source == null) {
+      _init(null, null);
+      return;
+    }
     String[] w = splitDateTimeAndTimezone(source);
     String sdt = w[0];
     String tzId = w[1];
@@ -209,6 +213,9 @@ public class DateTime {
   }
 
   private void _init(Date date, TimeZone tz) {
+    if (date == null) {
+      date = new Date();
+    }
     Calendar calendar = Calendar.getInstance();
     calendar.setTime(date);
     if (tz == null) {
@@ -752,6 +759,14 @@ public class DateTime {
    * @return YYYYMMDDHHMISSfff
    */
   public static String serializeDateTime(String src) {
+    try {
+      return _serializeDateTime(src);
+    } catch (Exception e) {
+      throw new RuntimeException("PARSE_ERROR: " + src);
+    }
+  }
+
+  private static String _serializeDateTime(String src) {
     String w = src;
     w = w.trim();
     w = w.replaceAll("\\s{2,}", " ");
@@ -760,7 +775,7 @@ public class DateTime {
     Pattern p = Pattern.compile("[-/:]");
     Matcher m = p.matcher(w);
     if (!m.find()) {
-      return _serializeDateTime(w);
+      return __serializeDateTime(w);
     }
 
     String[] prt = w.split(" ");
@@ -798,10 +813,10 @@ public class DateTime {
     }
 
     time = hh + mi + ss + f;
-    return _serializeDateTime(date + time);
+    return __serializeDateTime(date + time);
   }
 
-  private static String _serializeDateTime(String s) {
+  private static String __serializeDateTime(String s) {
     s = s.replaceAll("[-\\s:\\.]", "");
     s = (s + "000000000").substring(0, 17);
     return s;
