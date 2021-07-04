@@ -27,6 +27,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The class HttpResponse represents a HTTP response.
+ */
 public class HttpResponse {
   private int status = 0;
   private String statusMessage;

@@ -26,6 +26,9 @@ package com.libutil;
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 
+/**
+ * This class implements the Base64 encode and decode.
+ */
 public class Base64Util {
 
   public static final String DEFAULT_CHARSET = "UTF-8";

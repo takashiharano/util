@@ -36,6 +36,9 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * Archives files and directories into ZIP files.
+ */
 public class ZipArchiver {
 
   private static final int BUF_SIZE = 1048576;

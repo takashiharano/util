@@ -23,6 +23,9 @@
  */
 package com.libutil.zip;
 
+/**
+ * This class implements ZIP manipulations.
+ */
 public class ZipUtil {
 
   /**

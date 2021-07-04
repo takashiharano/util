@@ -26,6 +26,9 @@ package com.libutil;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Builds a JSON text sequentially.
+ */
 public class JsonBuilder {
 
   StringBuilder buffer;

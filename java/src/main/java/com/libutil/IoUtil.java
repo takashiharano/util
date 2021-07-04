@@ -26,6 +26,9 @@ package com.libutil;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * This class implements the IO related processing.
+ */
 public class IoUtil {
 
   /**

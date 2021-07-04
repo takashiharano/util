@@ -32,6 +32,9 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+/**
+ * Extracts files and directories from ZIP files.
+ */
 public class ZipExtractor {
 
   private static final int BUF_SIZE = 1048576;

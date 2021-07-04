@@ -26,6 +26,9 @@ package com.libutil;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * This class implements the binary related processing.
+ */
 public class BinUtil {
 
   /**

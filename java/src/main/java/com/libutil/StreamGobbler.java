@@ -27,6 +27,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
+/**
+ * Consumes a stream. For any Process, the input and error streams must read
+ * even if the data written to these streams is not used by the application. The
+ * generally accepted solution for this problem is a stream gobbler thread that
+ * does nothing but consume data from an input stream until stopped.
+ */
 public class StreamGobbler implements Runnable {
   private InputStream is;
   private byte[] output;

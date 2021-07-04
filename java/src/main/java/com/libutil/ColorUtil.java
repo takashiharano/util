@@ -25,6 +25,9 @@ package com.libutil;
 
 import java.util.Arrays;
 
+/**
+ * This class implements the processing for manipulating color values.
+ */
 public class ColorUtil {
 
   /**

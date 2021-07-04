@@ -28,6 +28,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Command executor.
+ */
 public class CommandExecutor {
 
   public static final String DEFAULT_CHARSET = "UTF-8";

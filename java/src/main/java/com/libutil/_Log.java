@@ -33,6 +33,9 @@ package com.libutil;
 //
 // }
 
+/**
+ * Logger.
+ */
 public class _Log {
 
   protected static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXX";
@@ -44,6 +47,9 @@ public class _Log {
   public static final int FLAG_TID = 8;
   public static final int FLAG_LINE = 16;
 
+  /**
+   * Log level.
+   */
   public enum LogLevel {
     FATAL("F", 1), ERROR("E", 2), WARN("W", 3), INFO("I", 4), DEBUG("D", 5);
 

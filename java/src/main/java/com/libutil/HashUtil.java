@@ -29,6 +29,9 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.xml.bind.DatatypeConverter;
 
+/**
+ * This class implements the hash related processing.
+ */
 public class HashUtil {
 
   public static String md5(byte[] input) {

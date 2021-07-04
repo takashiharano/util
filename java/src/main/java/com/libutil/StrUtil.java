@@ -32,6 +32,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * This class implements the string related processing.
+ */
 public class StrUtil {
 
   public static final String DEFAULT_CHARSET = "UTF-8";

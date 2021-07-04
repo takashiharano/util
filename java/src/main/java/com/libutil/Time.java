@@ -23,7 +23,12 @@
  */
 package com.libutil;
 
+/**
+ * The class Time represents a specific instant in time, with millisecond
+ * precision.
+ */
 public class Time {
+
   public static final long DAY = 86400000;
   public static final long HOUR = 3600000;
   public static final long MINUTE = 60000;

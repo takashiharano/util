@@ -25,6 +25,9 @@ package com.libutil;
 
 import java.util.Map;
 
+/**
+ * This class implements the system related processing.
+ */
 public class SystemUtil {
 
   public static final String DEFAULT_CHARSET = "UTF-8";
@@ -77,6 +80,9 @@ public class SystemUtil {
 
   // ------------------------------------------------------------
 
+  /**
+   * This class represents the heap usage of the Java VM.
+   */
   public static class HeapInfo {
     private long total;
     private long used;

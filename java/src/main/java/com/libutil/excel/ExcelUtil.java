@@ -46,6 +46,9 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 
+/**
+ * This class implements the Excel related manipulations.
+ */
 public class ExcelUtil {
 
   /**

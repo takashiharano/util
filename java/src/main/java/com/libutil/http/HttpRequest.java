@@ -38,6 +38,9 @@ import java.util.Map.Entry;
 import com.libutil.Base64Util;
 import com.libutil.IoUtil;
 
+/**
+ * The class HttpRequest represents a HTTP request.
+ */
 public class HttpRequest {
 
   private String uri;

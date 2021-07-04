@@ -25,6 +25,9 @@ package com.libutil;
 
 import java.util.Random;
 
+/**
+ * Generates random values.
+ */
 public class RandomUtil {
 
   /**

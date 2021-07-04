@@ -32,6 +32,10 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * The class DateTime represents a specific instant in time, with millisecond
+ * precision.
+ */
 public class DateTime {
 
   public static final String DATE_FORMAT_ISO8601 = "yyyyMMdd'T'HHmmss.SSS";

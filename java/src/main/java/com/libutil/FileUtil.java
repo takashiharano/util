@@ -44,6 +44,9 @@ import java.util.List;
 
 import javax.xml.bind.DatatypeConverter;
 
+/**
+ * File and directory manipulation.
+ */
 public class FileUtil {
 
   public static final String DEFAULT_CHARSET = "UTF-8";

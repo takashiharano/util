@@ -23,6 +23,9 @@
  */
 package com.libutil;
 
+/**
+ * The class HeapInfo represents the heap usage of the Java VM.
+ */
 public class HeapInfo {
 
   private long total;

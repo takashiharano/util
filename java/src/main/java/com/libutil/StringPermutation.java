@@ -25,6 +25,9 @@ package com.libutil;
 
 import java.util.ArrayList;
 
+/**
+ * Generates all permutations of a given string.
+ */
 public class StringPermutation {
   /**
    * Count the number of total patterns of the table.

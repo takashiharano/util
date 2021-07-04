@@ -27,6 +27,9 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+/**
+ * This class parses a JSON and returns its values.
+ */
 public class JsonParser {
 
   private String json;
