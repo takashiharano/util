@@ -1,7 +1,6 @@
-package com.libutil.util;
+package com.libutil.util.str;
 
 import com.libutil.StrUtil;
-import com.libutil.StringPermutation;
 
 public class StringPermutationTest {
   public static void main(String args[]) {
@@ -13,16 +12,16 @@ public class StringPermutationTest {
       chars = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
     }
     int digit = target.length();
-    long lastIndex = StringPermutation.count(chars, digit);
-    System.out.println("lastIndex: " + lastIndex);
+    long lastIndex = StrUtil.Permutation.countTotal(chars, digit);
+    System.out.println("lastIndex(total count) =  " + lastIndex);
 
-    long targetIndex = StringPermutation.index(chars, target);
-    System.out.println("targetIndex: " + targetIndex);
+    long targetIndex = StrUtil.Permutation.getIndex(chars, target);
+    System.out.println("targetIndex =  " + targetIndex);
 
     long start = System.currentTimeMillis();
     long elapsed = 0;
     for (int i = 1; i <= lastIndex; i++) {
-      String str = StringPermutation.getString(chars, i);
+      String str = StrUtil.Permutation.getString(chars, i);
       if (str.equals(target)) {
         System.out.println(i + ": " + str);
         break;
