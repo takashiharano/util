@@ -13,18 +13,26 @@ public class GetValueTest {
   }
 
   public static void test1(Props props) {
-    for (int i = 1; i <= 9; i++) {
+    for (int i = 0; i <= 20; i++) {
       String key = "key" + i;
       String value = props.getValue(key);
-      Log.i(key + "=\"" + value + "\"");
+      if (value == null) {
+        Log.i(key + "=null");
+      } else {
+        Log.i(key + "=\"" + value + "\"");
+      }
     }
   }
 
   public static void test2(Props props) {
-    for (int i = 1; i <= 9; i++) {
+    for (int i = 0; i <= 20; i++) {
       String key = "key" + i;
       String value = props.getValue(key, "NOT_FOUND");
-      Log.i(key + "=\"" + value + "\"");
+      if (value == null) {
+        Log.i(key + "=null");
+      } else {
+        Log.i(key + "=\"" + value + "\"");
+      }
     }
   }
 

@@ -11,7 +11,7 @@ public class GetAllPropsTest {
   }
 
   public static void test1(Props props) {
-    String values = props.dumpAllProperties();
+    String values = props.getAllProperties();
     Log.i(values);
   }
 

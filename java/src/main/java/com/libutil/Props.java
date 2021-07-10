@@ -23,11 +23,11 @@
  */
 package com.libutil;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Properties;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The Props class represents a persistent set of properties.
@@ -35,13 +35,13 @@ import java.util.Properties;
 public class Props {
 
   protected String filePath;
-  protected Properties properties;
+  protected LinkedHashMap<String, String> properties;
 
   /**
    * Creates an empty property list with no values.
    */
   public Props() {
-    properties = new Properties();
+    properties = new LinkedHashMap<>();
   }
 
   /**
@@ -53,17 +53,99 @@ public class Props {
   public Props(String filePath) {
     filePath = filePath.replace("\\", "/");
     this.filePath = filePath;
-    properties = new Properties();
+    properties = new LinkedHashMap<>();
     load(filePath);
   }
 
   private void load(String filePath) {
-    try (FileInputStream fis = new FileInputStream(filePath)) {
-      properties.load(fis);
-    } catch (IOException ioe) {
+    String[] content = FileUtil.readTextAsArray(filePath);
+    if (content == null) {
       String message = "Failed to load properties file: " + filePath;
-      throw new RuntimeException(message, ioe);
+      throw new RuntimeException(message);
     }
+    parse(content);
+  }
+
+  private void parse(String[] content) {
+    String key = null;
+    StringBuilder valBuf = null;
+    boolean cnt = false;
+    for (int i = 0; i < content.length; i++) {
+      String value;
+      String line = content[i];
+
+      if (cnt) {
+        value = extractValue(line);
+        if (isContinuationLine(value)) {
+          value = extractContinuationValue(value);
+          valBuf.append(value);
+        } else {
+          cnt = false;
+          valBuf.append(value);
+          value = decodeEscaped5c(valBuf.toString());
+          properties.put(key, value);
+        }
+        valBuf.append(value);
+        continue;
+      }
+
+      String[] pair = line.split("=", 2);
+      String pt1 = pair[0].trim();
+      if ("".equals(pt1) || pt1.startsWith("#")) {
+        continue;
+      }
+
+      if (pair.length < 2) {
+        key = pt1;
+        properties.put(key, "");
+        continue;
+      }
+
+      key = pt1;
+      value = extractValue(pair[1]);
+      if (isContinuationLine(value)) {
+        value = extractContinuationValue(value);
+        valBuf = new StringBuilder();
+        valBuf.append(value);
+        cnt = true;
+      } else {
+        value = decodeEscaped5c(value);
+        properties.put(key, value);
+      }
+    }
+  }
+
+  private String extractValue(String s) {
+    s = trimLeadingSpace(s);
+    s = decodeEscaped(s);
+    return s;
+  }
+
+  private String extractContinuationValue(String s) {
+    return s.replaceAll("\\\\\s*$", "");
+  }
+
+  private String trimLeadingSpace(String s) {
+    return s.replaceAll("^\s+", "");
+  }
+
+  private boolean isContinuationLine(String s) {
+    s = s.trim();
+    Pattern p = Pattern.compile("[^\\\\]\\\\$");
+    Matcher m = p.matcher(s);
+    return m.find();
+  }
+
+  private String decodeEscaped(String s) {
+    s = s.replaceAll("[^\\\\]\\\\r", "\r");
+    s = s.replaceAll("[^\\\\]\\\\n", "\n");
+    s = s.replaceAll("[^\\\\]\\\\t", "\t");
+    return s;
+  }
+
+  private String decodeEscaped5c(String s) {
+    s = s.replaceAll("\\\\(.)", "$1");
+    return s;
   }
 
   /**
@@ -96,7 +178,7 @@ public class Props {
    * @return the value in this property list with the specified key value.
    */
   public String getValue(String key, String defaultValue) {
-    String value = properties.getProperty(key);
+    String value = properties.get(key);
     if (value == null) {
       value = defaultValue;
     }
@@ -272,15 +354,32 @@ public class Props {
   }
 
   /**
+   * Returns all properties as a key = value pair.
+   *
+   * @return properties
+   */
+  public String getAllProperties() {
+    StringBuilder sb = new StringBuilder();
+    for (Entry<String, String> entry : properties.entrySet()) {
+      String key = entry.getKey();
+      String value = entry.getValue();
+      sb.append(key);
+      sb.append("=");
+      sb.append(value);
+      sb.append("\n");
+    }
+    return sb.toString();
+  }
+
+  /**
    * Returns the keys of the properties.
    *
    * @return keys
    */
   public String[] getKeys() {
-    Enumeration<?> names = properties.propertyNames();
     ArrayList<String> keys = new ArrayList<>();
-    while (names.hasMoreElements()) {
-      String key = (String) names.nextElement();
+    for (Entry<String, String> entry : properties.entrySet()) {
+      String key = entry.getKey();
       keys.add(key);
     }
     return keys.toArray(new String[keys.size()]);
@@ -293,22 +392,6 @@ public class Props {
    */
   public int size() {
     return properties.size();
-  }
-
-  /**
-   * Returns all properties as a key = value pair.
-   *
-   * @return properties
-   */
-  public String dumpAllProperties() {
-    StringBuilder sb = new StringBuilder();
-    Enumeration<?> keys = properties.propertyNames();
-    while (keys.hasMoreElements()) {
-      String key = (String) keys.nextElement();
-      String value = getValue(key);
-      sb.append(key + "=" + value + "\n");
-    }
-    return sb.toString();
   }
 
 }
