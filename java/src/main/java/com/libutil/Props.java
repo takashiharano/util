@@ -23,8 +23,14 @@
  */
 package com.libutil;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,6 +39,9 @@ import java.util.regex.Pattern;
  * The Props class represents a persistent set of properties.
  */
 public class Props {
+
+  public static final String DEFAULT_CHARSET = "UTF-8";
+  public static String LINE_SEPARATOR = "\n";
 
   protected String filePath;
   protected LinkedHashMap<String, String> properties;
@@ -58,12 +67,26 @@ public class Props {
   }
 
   private void load(String filePath) {
-    String[] content = FileUtil.readTextAsArray(filePath);
+    String[] content = readTextFileAsArray(filePath);
     if (content == null) {
       String message = "Failed to load properties file: " + filePath;
       throw new RuntimeException(message);
     }
     parse(content);
+  }
+
+  public static String[] readTextFileAsArray(String path) {
+    String charsetName = DEFAULT_CHARSET;
+    Path filePath = Paths.get(path);
+    List<String> lines;
+    try {
+      lines = Files.readAllLines(filePath, Charset.forName(charsetName));
+    } catch (IOException e) {
+      return null;
+    }
+    String[] text = new String[lines.size()];
+    lines.toArray(text);
+    return text;
   }
 
   private void parse(String[] content) {
@@ -366,7 +389,7 @@ public class Props {
       sb.append(key);
       sb.append("=");
       sb.append(value);
-      sb.append("\n");
+      sb.append(LINE_SEPARATOR);
     }
     return sb.toString();
   }
