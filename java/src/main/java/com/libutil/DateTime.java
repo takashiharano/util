@@ -257,6 +257,20 @@ public class DateTime {
   }
 
   /**
+   * Compares the instance and the specified DateTime object.
+   *
+   * @param datetime
+   *          DateTime object to compare
+   * @return a long value indicating the result of the comparison, as follows:<br>
+   *         0, if the instance and the datetime are equal;<br>
+   *         a negative value if the instance is less than the datetime;<br>
+   *         a positive value if the instance is greater than the datetime.
+   */
+  public long compare(DateTime datetime) {
+    return timestamp - datetime.getTimeStamp();
+  }
+
+  /**
    * Returns the number of milliseconds since January 1, 1970, 00:00:00 GMT
    * represented by this Date object.
    *
@@ -486,6 +500,24 @@ public class DateTime {
     dt0 = new DateTime(s, "yyyyMMddHHmmssSSS");
     DateTime dt1 = dt0.addDays(days);
     return dt1.toString(format);
+  }
+
+  /**
+   * Compares the two date-time dt1 and dt2.
+   *
+   * @param dt1
+   *          Date-time string 1
+   * @param dt2
+   *          Date-time string 2
+   * @return a long value indicating the result of the comparison, as follows:<br>
+   *         0, if the dt1 and dt2 are equal;<br>
+   *         a negative value if dt1 is less than dt2;<br>
+   *         a positive value if dt1 is greater than dt2.
+   */
+  public static long compareDateTime(String dt1, String dt2) {
+    DateTime datetime1 = new DateTime(dt1);
+    DateTime datetime2 = new DateTime(dt2);
+    return datetime1.compare(datetime2);
   }
 
   /**
