@@ -16,7 +16,7 @@ public class GetValueTest {
     for (int i = 1; i <= 9; i++) {
       String key = "key" + i;
       String value = props.getValue(key);
-      Log.i(key + "=" + value);
+      Log.i(key + "=\"" + value + "\"");
     }
   }
 
@@ -24,7 +24,7 @@ public class GetValueTest {
     for (int i = 1; i <= 9; i++) {
       String key = "key" + i;
       String value = props.getValue(key, "NOT_FOUND");
-      Log.i(key + "=" + value);
+      Log.i(key + "=\"" + value + "\"");
     }
   }
 

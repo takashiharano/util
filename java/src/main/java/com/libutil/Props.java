@@ -25,6 +25,7 @@ package com.libutil;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Properties;
 
@@ -32,7 +33,9 @@ import java.util.Properties;
  * The Props class represents a persistent set of properties.
  */
 public class Props {
-  private Properties properties;
+
+  protected String filePath;
+  protected Properties properties;
 
   /**
    * Creates an empty property list with no values.
@@ -48,6 +51,8 @@ public class Props {
    *          the properties file path
    */
   public Props(String filePath) {
+    filePath = filePath.replace("\\", "/");
+    this.filePath = filePath;
     properties = new Properties();
     load(filePath);
   }
@@ -59,6 +64,15 @@ public class Props {
       String message = "Failed to load properties file: " + filePath;
       throw new RuntimeException(message, ioe);
     }
+  }
+
+  /**
+   * Returns the file path of the properties.
+   *
+   * @return file path
+   */
+  public String getFilePath() {
+    return filePath;
   }
 
   /**
@@ -255,6 +269,30 @@ public class Props {
       }
     }
     return false;
+  }
+
+  /**
+   * Returns the keys of the properties.
+   *
+   * @return keys
+   */
+  public String[] getKeys() {
+    Enumeration<?> names = properties.propertyNames();
+    ArrayList<String> keys = new ArrayList<>();
+    while (names.hasMoreElements()) {
+      String key = (String) names.nextElement();
+      keys.add(key);
+    }
+    return keys.toArray(new String[keys.size()]);
+  }
+
+  /**
+   * Returns the number of keys in this hashtable.
+   *
+   * @return the number of keys in this hashtable
+   */
+  public int size() {
+    return properties.size();
   }
 
   /**
