@@ -122,11 +122,11 @@ public class Props {
   }
 
   private String extractContinuationValue(String s) {
-    return s.replaceAll("\\\\\s*$", "");
+    return s.replaceAll("\\\\\\s*$", "");
   }
 
   private String trimLeadingSpace(String s) {
-    return s.replaceAll("^\s+", "");
+    return s.replaceAll("^\\s+", "");
   }
 
   private boolean isContinuationLine(String s) {
