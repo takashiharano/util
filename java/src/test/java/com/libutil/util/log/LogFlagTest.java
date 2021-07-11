@@ -1,6 +1,6 @@
 package com.libutil.util.log;
 
-import com.libutil.Log;
+import com.libutil.test.Log;
 
 public class LogFlagTest {
 

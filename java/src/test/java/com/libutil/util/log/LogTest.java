@@ -2,8 +2,8 @@ package com.libutil.util.log;
 
 import java.util.ArrayList;
 
-import com.libutil.Log;
 import com.libutil._Log.LogLevel;
+import com.libutil.test.Log;
 
 public class LogTest {
 

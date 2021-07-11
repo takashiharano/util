@@ -74,6 +74,7 @@ public class _Log {
   protected int outputLevel = LogLevel.DEBUG.level;
   protected String moduleName = null;
   protected int flag = FLAG_TIME | FLAG_LEVEL | FLAG_MODULE_NAME | FLAG_TID | FLAG_LINE;
+  protected long logT0 = 0;
 
   /**
    * Initialize the module.
@@ -366,34 +367,38 @@ public class _Log {
   }
 
   /**
-   * _Log with time measurement.
+   * Logging with time measurement.
    *
    * @param msg
    *          message
-   * @return current time
+   * @return elapsed time in milliseconds
    */
   public static long t(String msg) {
     long t1 = System.currentTimeMillis();
-    String m = "[T+00:00:00.000] " + msg;
+    _Log self = getInstance();
+    long t0 = self.logT0;
+    if (t0 == 0) {
+      t0 = t1;
+      self.logT0 = t0;
+    }
+    long delta = t1 - t0;
+    String m = "[" + DateTime.formatTime(delta, "TsnHH:mm:ss.SSS") + "] " + msg;
     i(m);
-    return t1;
+    return delta;
   }
 
   /**
-   * _Log with time measurement.
+   * Logging with time measurement.
    *
    * @param msg
    *          message
    * @param t0
-   *          starting time
-   * @return current time
+   *          offset; set 0 to reset
+   * @return elapsed time in milliseconds
    */
   public static long t(String msg, long t0) {
-    long t1 = System.currentTimeMillis();
-    long delta = t1 - t0;
-    String m = "[" + DateTime.formatTime(delta, "TsnHH:mm:ss.SSS") + "] " + msg;
-    i(m);
-    return t1;
+    getInstance().logT0 = System.currentTimeMillis() - t0;
+    return t(msg);
   }
 
   public static void print(Object o) {
