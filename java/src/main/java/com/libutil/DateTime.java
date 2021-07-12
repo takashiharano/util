@@ -181,13 +181,6 @@ public class DateTime {
    *          "GMT-8:00"
    */
   public DateTime(int year, int month, int day, int hour, int minute, int second, int millisecond, String timeZoneId) {
-    // Calendar calendar = Calendar.getInstance();
-    // calendar.set(year, --month, day, hour, minute, second);
-    // calendar.set(Calendar.MILLISECOND, millisecond);
-    // calendar.getTimeInMillis();
-    // long timestamp = calendar.getTimeInMillis();
-    // Date date = new Date(timestamp);
-
     String yyyy = year + "";
     String mm = intToStr2(month);
     String dd = intToStr2(day);
@@ -203,9 +196,7 @@ public class DateTime {
     } catch (ParseException e) {
       throw new RuntimeException(e);
     }
-
     TimeZone tz = getTimezoneFromId(timeZoneId);
-
     int tzdiff = getTimezoneOffsetDiff(tz);
     long ts = date.getTime() - tzdiff;
     date = new Date(ts);
