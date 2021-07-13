@@ -2,7 +2,7 @@ package com.libutil.test.log;
 
 import com.libutil.test.Log;
 
-public class LogTTest {
+public class SetT0Test {
 
   public static void main(String args[]) {
     test();
@@ -24,7 +24,6 @@ public class LogTTest {
     sleep(1000);
     Log.t("MECO");
     sleep(1000);
-    Log.resetT();
     Log.t("FAIRING");
     sleep(1000);
     Log.t("ENTRY BURN");
@@ -32,7 +31,6 @@ public class LogTTest {
     Log.t("LANDING BURN");
     sleep(1000);
     Log.t("TOUCH DOWN & SHUT OFF");
-    Log.setT0(60000);
     sleep(1000);
     Log.t("SECO");
     Log.i("Test end");
