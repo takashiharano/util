@@ -1166,22 +1166,26 @@ public class StrUtil {
   }
 
   /**
-   * Converts the Excel column letter to a numeric index.
+   * Converts the Excel column letter to a numeric index.<br>
+   * <br>
+   * e.g., "A"=1, "B"=2, ... "Z"=26, "AA"=27, ... "XFD"=16384
    *
    * @param s
-   *          the letter to convert
-   * @return Index corresponding to a character (starts from 1)
+   *          the letter to convert ("A"-"XFD")
+   * @return Index corresponding to a character (1-16384)
    */
   public static int xlscol(String s) {
     return (int) Permutation.getIndex("ABCDEFGHIJKLMNOPQRSTUVWXYZ", s.toUpperCase());
   }
 
   /**
-   * Converts the Excel column index to a letter.
+   * Converts the Excel column index to a letter.<br>
+   * <br>
+   * e.g., 1="A", 2="B", ... 26="Z", 27="AA", ... 16384="XFD"
    *
    * @param n
-   *          the index to convert
-   * @return the letter corresponding to the index
+   *          the index to convert (1-16384)
+   * @return the letter corresponding to the index ("A-"XFD")
    */
   public static String xlscol(int n) {
     return Permutation.getString("ABCDEFGHIJKLMNOPQRSTUVWXYZ", n);
