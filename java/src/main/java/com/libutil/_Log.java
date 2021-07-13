@@ -401,6 +401,23 @@ public class _Log {
     return t(msg);
   }
 
+  /**
+   * Resets t0 for t().
+   */
+  public static void resetT() {
+    setT0(0);
+  }
+
+  /**
+   * Sets t0 for t().
+   *
+   * @param t0
+   *          offset; set 0 to reset
+   */
+  public static void setT0(long t0) {
+    getInstance().logT0 = System.currentTimeMillis() - t0;
+  }
+
   public static void print(Object o) {
     _Log l = getInstance();
     l.printLog(l.dump(o));
