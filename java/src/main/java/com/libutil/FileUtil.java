@@ -196,9 +196,12 @@ public class FileUtil {
    * @param path
    *          the path of file or directory
    * @return true if and only if the file or directory denoted by this abstract
-   *         pathname exists; false otherwise
+   *         pathname exists; false otherwise (including the case of null)
    */
   public static boolean exists(String path) {
+    if (path == null) {
+      return false;
+    }
     File file = new File(path);
     return file.exists();
   }
@@ -533,9 +536,12 @@ public class FileUtil {
    * @param path
    *          the path of file or directory
    * @return true if the file or directory denoted by this abstract pathname does
-   *         not exists; false otherwise
+   *         not exists or the path is null; false otherwise
    */
   public static boolean notExist(String path) {
+    if (path == null) {
+      return true;
+    }
     File file = new File(path);
     return !file.exists();
   }
