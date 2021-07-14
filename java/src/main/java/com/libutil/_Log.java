@@ -404,7 +404,7 @@ public class _Log {
   /**
    * Resets t0 for t().
    */
-  public static void resetT() {
+  public static void resetT0() {
     setT0(0);
   }
 
