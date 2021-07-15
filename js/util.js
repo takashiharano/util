@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202107010000';
+util.v = '202107152213';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2090,37 +2090,31 @@ $el.fn = {
   html: function(html, speed) {
     if (html == undefined) return this.innerHTML;
     if (speed == undefined) speed = 0;
-    util.writeHTML(this, html, speed);
+    util.callFn4El(util.writeHTML, this, html, speed);
   },
   text: function(text, speed) {
     if (text == undefined) return this.innerText;
     var html = util.escHtml(text);
     if (speed == undefined) speed = 0;
-    util.writeHTML(this, html, speed);
+    util.callFn4El(util.writeHTML, this, html, speed);
   },
   clear: function(speed) { // Not available for <pre> on IE11
-    var el = this;
-    if (util.isTextInput(el)) {
-      el.value = '';
-    } else {
-      if (speed == undefined) speed = 0;
-      util.clearHTML(el, speed);
-    }
+    util.callFn4El(util.elClear, this, speed);
   },
   disable: function() {
-    this.disabled = true;
+    util.callFn4El(util.toDisable, this);
   },
   enable: function() {
-    this.disabled = false;
+    util.callFn4El(util.toEnable, this);
   },
   textseq: function(text, opt) {
-    return util.textseq(this, text, opt);
+    return util.callFn4El(util.textseq, this, text, opt);
   },
   startTextSeq: function() {
-    util.textseq.start(this);
+    util.callFn4El(util.textseq.start, this);
   },
   stopTextSeq: function() {
-    util.textseq.stop(this);
+    util.callFn4El(util.textseq.stop, this);
   },
   setStyle: function(n, v) {
     util.setStyle(this, n, v);
@@ -2141,10 +2135,10 @@ $el.fn = {
     return util.isActiveElement(this);
   },
   center: function() {
-    util.center(this);
+    util.callFn4El(util.center, this);
   },
   position: function(x, y) {
-    util.setPosition(this, x, y);
+    util.callFn4El(util.setPosition, this, x, y);
   },
   blink: function(a) {
     if (a === false) {
@@ -2158,18 +2152,10 @@ $el.fn = {
     }
   },
   hide: function() {
-    var el = this;
-    var v = el.style.display;
-    if (v == 'none') return;
-    el.displayBak = v;
-    el.style.display = 'none';
+    util.callFn4El(util.elHide, this);
   },
   show: function() {
-    var el = this;
-    if (el.style.display != 'none') return;
-    var v = el.displayBak;
-    if (v == undefined) v = '';
-    el.style.display = v;
+    util.callFn4El(util.elShow, this);
   },
   fadeIn: function(speed, cb, arg) {
     util.fadeIn(this, speed, cb, arg);
@@ -2205,7 +2191,51 @@ util.getElement = function(target, idx) {
   return el;
 };
 
+util.callFn4El = function(f, el, a1, a2) {
+  var r;
+  if (el.toString() == '[object NodeList]') {
+    for (var i = 0; i < el.length; i++) {
+     r = f(el[i], a1, a2);
+    }
+  } else {
+    r = f(el, a1, a2);
+  }
+  return r;
+};
+
+util.toEnable = function(el) {
+  el.disabled = false;
+};
+util.toDisable = function(el) {
+  el.disabled = true;
+};
+
+util.elShow = function(el) {
+  if (el.style.display != 'none') return;
+  var v = el.displayBak;
+  if (v == undefined) v = '';
+  el.style.display = v;
+};
+util.elHide = function(el) {
+  var v = el.style.display;
+  if (v == 'none') return;
+  el.displayBak = v;
+  el.style.display = 'none';
+};
+
+util.elClear = function(el, speed) {
+  if (util.isTextInput(el)) {
+    el.value = '';
+  } else {
+    if (speed == undefined) speed = 0;
+    util.clearHTML(el, speed);
+  }
+};
+
 util.addClass = function(el, n) {
+  util.callFn4El(util._addClass, el, n);
+};
+util._addClass = function(el, n) {
   el = util.getElement(el);
   if (util.hasClass(el, n)) return;
   if (el.className == '') {
@@ -2216,6 +2246,9 @@ util.addClass = function(el, n) {
 };
 
 util.removeClass = function(el, n) {
+  util.callFn4El(util._removeClass, el, n);
+};
+util._removeClass = function(el, n) {
   el = util.getElement(el);
   var names = el.className.split(' ');
   var nm = '';
@@ -2238,7 +2271,11 @@ util.hasClass = function(el, n) {
 };
 
 util.isActiveElement = function(el, idx) {
-  return util.getElement(el, idx) == document.activeElement;
+  if (el.toString() != '[object NodeList]') return util.getElement(el, idx) == document.activeElement;
+  for (var i = 0; i < el.length; i++) {
+    if (util.getElement(el[i]) == document.activeElement) return true;
+  }
+  return false;
 };
 
 util.hasParent = function(el, parent) {
@@ -3138,10 +3175,16 @@ util.setupStyle = function() {
 };
 
 util.setStyle = function(el, n, v) {
+  util.callFn4El(util._setStyle, el, n, v);
+};
+util._setStyle = function(el, n, v) {
   el = util.getElement(el);
   if (el) el.style.setProperty(n, v, 'important');
 };
 util.setStyles = function(el, s) {
+  util.callFn4El(util._setStyles, el, s);
+};
+util._setStyles = function(el, s) {
   for (var k in s) {
     util.setStyle(el, k, s[k]);
   }
