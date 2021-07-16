@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202107170000';
+util.v = '202107170117';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1203,12 +1203,12 @@ util.copyProps = function(src, dst) {
   }
 };
 
-util.copyDefaultProps = function(tgt, dflt) {
+util.copyDefaultProps = function(dflt, tgt) {
   for (var k in dflt) {
     if (!(k in tgt)) {
       tgt[k] = dflt[k];
     } else if (tgt[k] instanceof Object) {
-      util.copyDefaultProps(tgt[k], dflt[k]);
+      util.copyDefaultProps(dflt[k], tgt[k]);
     }
   }
 };
@@ -2418,7 +2418,7 @@ util.overlay.show = function(tgt, el, opt) {
   el = util.getElement(el);
   if (!tgt || !el || tgt.contains(el)) return;
   if (!opt) opt = {};
-  util.copyDefaultProps(opt, util.overlay.DFLT_SHOW_OPT);
+  util.copyDefaultProps(util.overlay.DFLT_SHOW_OPT, opt);
   el.style.opacity = 0;
   el.style.position = 'absolute';
   if (opt.fade > 0) util.addClass(el, 'fadeout');
@@ -2476,7 +2476,7 @@ util.overlay.hide = function(tgt, el, opt) {
   el = util.getElement(el);
   if (!tgt || !el || !tgt.contains(el)) return;
   if (!opt) opt = {};
-  util.copyDefaultProps(opt, util.overlay.DFLT_HIDE_OPT);
+  util.copyDefaultProps(util.overlay.DFLT_HIDE_OPT, opt);
   var o = {el: el, tgt: tgt};
   if (opt.fade > 0) {
     util.fadeOut(el, opt.fade, util.overlay._hide, o);
@@ -2844,7 +2844,7 @@ util.textseq = function(el, text, opt) {
   if (!opt) opt = {};
   var cursor = opt.cursor;
   if (typeof opt.cursor == 'number') delete opt.cursor;
-  util.copyDefaultProps(opt, util.textseq.DFLT_OPT);
+  util.copyDefaultProps(util.textseq.DFLT_OPT, opt);
   if (typeof cursor == 'number') opt.cursor.n = cursor;
   if (text instanceof Array) {
     el.$$textseqCtx = {textList: text, idx: 0, opt: opt};
@@ -3623,7 +3623,7 @@ util.loader.show = function(el, opt) {
     el = null;
   }
   if (!opt) opt = {};
-  util.copyDefaultProps(opt, util.loader.DFLTOPT);
+  util.copyDefaultProps(util.loader.DFLTOPT, opt);
   el = util.getElement(el);
   if (!el) el = document.body;
   var ctx = util.getCtx4El(util.loader.ctxs, el);
@@ -4634,6 +4634,7 @@ util.Meter.buildHTML = function(val, opt) {
  *   color: '#0f0',
  *   offColor: '#888',
  *   shadow: '0 0 5px',
+ *   speed: 100,
  *   className: 'xxx',
  *   labelClassName: 'xxx',
  *   active: true
@@ -4642,10 +4643,7 @@ util.Meter.buildHTML = function(val, opt) {
 util.Led = function(target, opt) {
   var baseEl = util.getElement(target);
   if (!opt) opt = {};
-  if (opt.size == undefined) opt.size = '16px';
-  if (opt.color == undefined) opt.color = util.Led.DFLT_COLOR;
-  if (opt.offColor == undefined) opt.offColor = util.Led.DFLT_INACTV_COLOR;
-  if (opt.shadow == undefined) opt.shadow = '0 0 5px';
+  util.copyDefaultProps(util.Led.DFLTOPT, opt);
   var active = opt.active ? true : false;
 
   var ledEl = document.createElement('span');
@@ -4670,8 +4668,13 @@ util.Led = function(target, opt) {
   this.timerId = 0;
   this.blinkDuration = util.Led.DFLT_BLINK_DURATION;
 };
-util.Led.DFLT_COLOR = '#0f0';
-util.Led.DFLT_INACTV_COLOR = '#888';
+util.Led.DFLTOPT = {
+  size: '16px',
+  color: '#0f0',
+  offColor: '#888',
+  shadow: '0 0 5px',
+  speed: 0
+};
 util.Led.DFLT_BLINK_DURATION = 700;
 util.Led.prototype = {
   on: function(a1, a2) {
@@ -4708,6 +4711,7 @@ util.Led.prototype = {
   },
   _on: function(ctx, speed) {
     ctx.lighted = true;
+    if (speed == undefined) speed = ctx.opt.speed;
     speed = (speed ? (speed / 1000) : 0);
     var style = {
       color: ctx.opt.color,
@@ -4717,6 +4721,7 @@ util.Led.prototype = {
   },
   _off: function(ctx, speed) {
     ctx.lighted = false;
+    if (speed == undefined) speed = ctx.opt.speed;
     speed = (speed ? (speed / 1000) : 0);
     var style = {
       color: ctx.opt.offColor,
@@ -5389,7 +5394,7 @@ util.Counter = function(el, opt) {
   var ctx = this;
   el = util.getElement(el);
   if (!opt) opt = {};
-  util.copyDefaultProps(opt, util.Counter.DFLTOPT);
+  util.copyDefaultProps(util.Counter.DFLTOPT, opt);
   if (typeof opt.duration == 'number') {
     opt.duration = {min: opt.duration, max: opt.duration};
   }
