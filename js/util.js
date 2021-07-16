@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202107152213';
+util.v = '202107170000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -4674,35 +4674,55 @@ util.Led.DFLT_COLOR = '#0f0';
 util.Led.DFLT_INACTV_COLOR = '#888';
 util.Led.DFLT_BLINK_DURATION = 700;
 util.Led.prototype = {
-  on: function(color) {
+  on: function(a1, a2) {
+    var color = a1;
+    var speed = a2;
+    if (typeof a1 == 'number') {
+      color = '';speed = a1;
+    }
     var ctx = this;
     ctx._stopBlink();
     if (color) ctx.opt.color = color;
     ctx.active = true;
-    ctx._on(ctx);
+    ctx._on(ctx, speed);
   },
-  off: function(color) {
+  off: function(a1, a2) {
+    var color = a1;
+    var speed = a2;
+    if (typeof a1 == 'number') {
+      color = '';speed = a1;
+    }
     var ctx = this;
     ctx._stopBlink();
     if (color) ctx.opt.offColor = color;
     ctx.active = false;
-    ctx._off(ctx);
+    ctx._off(ctx, speed);
   },
-  toggle: function() {
+  toggle: function(speed) {
     var ctx = this;
     if (ctx.active) {
-      ctx.off();
+      ctx.off(speed);
     } else {
-      ctx.on();
+      ctx.on(speed);
     }
   },
-  _on: function(ctx) {
+  _on: function(ctx, speed) {
     ctx.lighted = true;
-    util.setStyle(ctx.ledEl, 'color', ctx.opt.color);
+    speed = (speed ? (speed / 1000) : 0);
+    var style = {
+      color: ctx.opt.color,
+      transition: 'all ' + speed + 's ease-out'
+    };
+    util.setStyles(ctx.ledEl, style);
   },
-  _off: function(ctx) {
+  _off: function(ctx, speed) {
     ctx.lighted = false;
-    util.setStyle(ctx.ledEl, 'color', ctx.opt.offColor);
+    speed = (speed ? (speed / 1000) : 0);
+    var style = {
+      color: ctx.opt.offColor,
+      transition: 'all ' + speed + 's ease-in'
+    };
+    util.setStyles(ctx.ledEl, style);
   },
   blink: function(d) {
     var ctx = this;
