@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202107170117';
+util.v = '202107171623';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2119,9 +2119,6 @@ $el.fn = {
   setStyle: function(n, v) {
     util.setStyle(this, n, v);
   },
-  setStyles: function(n, v) {
-    util.setStyles(this, n, v);
-  },
   addClass: function(n) {
     util.addClass(this, n);
   },
@@ -2346,7 +2343,7 @@ util.center = function(el) {
 
 util.setPosition = function(el, x, y) {
   var style = {left: x + 'px', top: y + 'px'};
-  util.setStyles(el, style);
+  util.setStyle(el, style);
 };
 
 util.isTextInput = function(el) {
@@ -3023,7 +3020,7 @@ util.textseq.createCtx = function(el, text, opt) {
   delete el.$$textseqSpan;
   if (opt.style && !isInp) {
     var span = document.createElement('span');
-    util.setStyles(span, opt.style);
+    util.setStyle(span, opt.style);
     el.$$textseqSpan = span;
     el.appendChild(span);
   }
@@ -3174,19 +3171,18 @@ util.setupStyle = function() {
   }
 };
 
-util.setStyle = function(el, n, v) {
-  util.callFn4El(util._setStyle, el, n, v);
+util.setStyle = function(el, a1, a2) {
+  util.callFn4El(util._setStyle, el, a1, a2);
 };
-util._setStyle = function(el, n, v) {
+util._setStyle = function(el, a1, a2) {
   el = util.getElement(el);
-  if (el) el.style.setProperty(n, v, 'important');
-};
-util.setStyles = function(el, s) {
-  util.callFn4El(util._setStyles, el, s);
-};
-util._setStyles = function(el, s) {
-  for (var k in s) {
-    util.setStyle(el, k, s[k]);
+  if (!el) return;
+  if (a1 instanceof Object) {
+    for (var k in a1) {
+      el.style.setProperty(k, a1[k], 'important');
+    }
+  } else {
+    el.style.setProperty(a1, a2, 'important');
   }
 };
 
@@ -3590,7 +3586,7 @@ util.createFadeScreenEl = function(bg) {
     'background': bg,
     'z-index': util.SCREEN_FADER_ZINDEX
   };
-  util.setStyles(el, style);
+  util.setStyle(el, style);
   return el;
 };
 
@@ -3661,7 +3657,7 @@ util.loader.create = function(opt) {
     margin: 'auto',
     animation: 'loader-rotate ' + opt.speed + ' linear infinite'
   };
-  util.setStyles(el, s);
+  util.setStyle(el, s);
   return el;
 };
 
@@ -3704,7 +3700,7 @@ util.modal = function(child, addCloseHandler) {
   var style = {};
   util.copyProps(util.modal.DFLT_STYLE, style);
   if (util.modal.style) util.copyProps(util.modal.style, style);
-  util.setStyles(el, style);
+  util.setStyle(el, style);
   el.style.opacity = '0';
   if (addCloseHandler) el.addEventListener('click', this.onClick);
   if (child) el.appendChild(child);
@@ -3831,7 +3827,7 @@ util.dialog.prototype = {
       'padding': util.dialog.PADDING + 'px',
       'z-index': '1100'
     };
-    util.setStyles(base, style);
+    util.setStyle(base, style);
 
     if (opt && opt.style && opt.style.body) {
       for (var key in opt.style.body) {
@@ -3853,7 +3849,7 @@ util.dialog.prototype = {
       'vertical-align': 'middle',
       'text-align': 'center'
     };
-    util.setStyles(body, style);
+    util.setStyle(body, style);
     var title;
     var buttons;
     if (opt) {
@@ -3868,7 +3864,7 @@ util.dialog.prototype = {
         'margin-bottom': '0.5em',
         'font-weight': 'bold'
       };
-      util.setStyles(titleArea, style);
+      util.setStyle(titleArea, style);
       if (opt && opt.style && opt.style.title) {
         for (var key in opt.style.title) {
           util.setStyle(titleArea, key, opt.style.title[key]);
@@ -3884,7 +3880,7 @@ util.dialog.prototype = {
     } else {
       style = {'margin': '10px 0'};
     }
-    util.setStyles(contentArea, style);
+    util.setStyle(contentArea, style);
 
     if (typeof content == 'string') {
       contentArea.innerHTML = content;
@@ -3908,7 +3904,7 @@ util.dialog.prototype = {
           'margin-bottom': '0',
         };
         if (i > 0) style['margin-left'] = '0.5em';
-        util.setStyles(btnEl, style);
+        util.setStyle(btnEl, style);
         if (opt && opt.style && opt.style.button) {
           for (key in opt.style.button) {
             util.setStyle(btnEl, key, opt.style.button[key]);
@@ -4410,7 +4406,7 @@ util.Meter = function(target, opt) {
     border: bd,
     'border-radius': bdRd
   };
-  util.setStyles(base, style);
+  util.setStyle(base, style);
 
   var v = value / max * 100;
   var bar = document.createElement('div');
@@ -4422,7 +4418,7 @@ util.Meter = function(target, opt) {
     transition: 'all 0.25s ease-out'
   };
   if (opt && opt.transition) style.transition = opt.transition;
-  util.setStyles(bar, style);
+  util.setStyle(bar, style);
   base.appendChild(bar);
 
   var scales;
@@ -4446,7 +4442,7 @@ util.Meter = function(target, opt) {
         border: 'none',
         'border-right': ss
       };
-      util.setStyles(e, s);
+      util.setStyle(e, s);
       base.appendChild(e);
     }
   }
@@ -4470,8 +4466,8 @@ util.Meter = function(target, opt) {
       'text-align': 'center',
       'vertical-align': 'middle'
     };
-    util.setStyles(lblEl, s);
-    if (label.style) util.setStyles(lblEl, label.style);
+    util.setStyle(lblEl, s);
+    if (label.style) util.setStyle(lblEl, label.style);
     lblEl.innerHTML = label.text;
     base.appendChild(lblEl);
   }
@@ -4524,7 +4520,7 @@ util.Meter.prototype = {
     this.redraw();
   },
   setTextStyle: function(s) {
-    util.setStyles(this.lblEl, s);
+    util.setStyle(this.lblEl, s);
     this.redraw();
   },
   increase: function(v) {
@@ -4655,7 +4651,7 @@ util.Led = function(target, opt) {
     cursor: 'default'
   };
   if (opt.shadow) style['text-shadow'] = opt.shadow;
-  util.setStyles(ledEl, style);
+  util.setStyle(ledEl, style);
   ledEl.innerHTML = '&#x25CF;';
   baseEl.appendChild(ledEl);
 
@@ -4717,7 +4713,7 @@ util.Led.prototype = {
       color: ctx.opt.color,
       transition: 'all ' + speed + 's ease-out'
     };
-    util.setStyles(ctx.ledEl, style);
+    util.setStyle(ctx.ledEl, style);
   },
   _off: function(ctx, speed) {
     ctx.lighted = false;
@@ -4727,7 +4723,7 @@ util.Led.prototype = {
       color: ctx.opt.offColor,
       transition: 'all ' + speed + 's ease-in'
     };
-    util.setStyles(ctx.ledEl, style);
+    util.setStyle(ctx.ledEl, style);
   },
   blink: function(d) {
     var ctx = this;
