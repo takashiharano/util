@@ -1,4 +1,4 @@
-package com.libutil.test.util;
+package com.libutil.test.json.parser;
 
 import com.libutil.JsonParser;
 import com.libutil.test.Log;
