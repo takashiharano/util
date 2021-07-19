@@ -198,7 +198,7 @@ public class JsonBuilder {
   }
 
   /**
-   * Appends a list of string value to this sequence.
+   * Appends a list of string values to this sequence.
    *
    * <pre>
    * e.g.,
@@ -216,7 +216,7 @@ public class JsonBuilder {
   }
 
   /**
-   * Appends a list of integer value to this sequence.
+   * Appends a list of integer values to this sequence.
    *
    * <pre>
    * e.g.,
@@ -234,7 +234,7 @@ public class JsonBuilder {
   }
 
   /**
-   * Appends a list of long value to this sequence.
+   * Appends a list of long values to this sequence.
    *
    * <pre>
    * e.g.,
@@ -252,7 +252,7 @@ public class JsonBuilder {
   }
 
   /**
-   * Appends a list of float value to this sequence.
+   * Appends a list of float values to this sequence.
    *
    * <pre>
    * e.g.,
@@ -270,7 +270,7 @@ public class JsonBuilder {
   }
 
   /**
-   * Appends a list of double value to this sequence.
+   * Appends a list of double values to this sequence.
    *
    * <pre>
    * e.g.,
@@ -288,7 +288,7 @@ public class JsonBuilder {
   }
 
   /**
-   * Appends a list of boolean value to this sequence.
+   * Appends a list of boolean values to this sequence.
    *
    * <pre>
    * e.g.,
@@ -306,7 +306,7 @@ public class JsonBuilder {
   }
 
   /**
-   * Appends a list of string value to this sequence.
+   * Appends a list of string values to this sequence.
    *
    * <pre>
    * e.g.,
@@ -317,7 +317,7 @@ public class JsonBuilder {
    * @param key
    *          the key to append
    * @param list
-   *          the array to append
+   *          the list to append
    */
   public void appendList(String key, List<String> list) {
     _append(key, toJson(list));
@@ -489,7 +489,7 @@ public class JsonBuilder {
   }
 
   /**
-   * Returns the JSON string representation of this sequence. *
+   * Returns the JSON string representation of this sequence.
    *
    * <pre>
    * e.g.,
