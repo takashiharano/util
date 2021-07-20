@@ -237,8 +237,8 @@ public class CsvBuilder {
   }
 
   /**
-   * Appends a chunk to this sequence.
-   * 
+   * Appends a string as is as a chunk to this sequence.
+   *
    * <pre>
    * e.g.,
    * CHUNK="bbb,ccc"
@@ -251,18 +251,10 @@ public class CsvBuilder {
    *          the chunk data
    */
   public void appendChunk(String chunk) {
-    _append(chunk, false);
-  }
-
-  /**
-   * Appends a string as is to this sequence.<br>
-   * Note that the counter values ​​are inconsistent.
-   *
-   * @param s
-   *          the string to append
-   */
-  public void appendRaw(String s) {
-    buffer.append(s);
+    if (colCount > 0) {
+      buffer.append(separator);
+    }
+    buffer.append(chunk);
     colCount++;
   }
 
