@@ -23,9 +23,6 @@
  */
 package com.libutil;
 
-import java.io.File;
-import java.io.IOException;
-
 /**
  * This class implements the binary related processing.
  */
@@ -404,36 +401,6 @@ public class BinUtil {
       hex[i] = String.valueOf(cU) + String.valueOf(cL);
     }
     return hex;
-  }
-
-  /**
-   * Write a binary content into a file from the hex string.
-   *
-   * @param path
-   *          file path to output
-   * @param hex
-   *          hex string
-   * @throws IOException
-   *           If an I/O error occurs
-   */
-  public static void writeFileFromHexString(String path, String hex) throws IOException {
-    File file = new File(path);
-    writeFileFromHexString(file, hex);
-  }
-
-  /**
-   * Write a binary content into a file from the hex string.
-   *
-   * @param file
-   *          the file object to output
-   * @param hex
-   *          hex string
-   * @throws IOException
-   *           If an I/O error occurs
-   */
-  public static void writeFileFromHexString(File file, String hex) throws IOException {
-    byte[] b = fromHexString(hex);
-    FileUtil.write(file, b);
   }
 
 }
