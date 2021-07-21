@@ -440,7 +440,8 @@ public class DateTime {
   }
 
   /**
-   * Returns the date-time string of the instance in the default format.
+   * Returns the date-time string of the instance in the default format
+   * "yyyy-MM-dd HH:mm:ss.SSS XXX".
    */
   public String toString() {
     return toString(DEFAULT_FORMAT);
