@@ -4,7 +4,7 @@
 
   <groupId>com.libutil</groupId>
   <artifactId>util</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Util</name>
@@ -38,6 +38,7 @@
   </properties>
 
   <build>
+    <finalName>${project.artifactId}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
