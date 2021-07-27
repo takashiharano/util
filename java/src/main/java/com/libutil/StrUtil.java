@@ -776,7 +776,24 @@ public class StrUtil {
   }
 
   /**
-   * Remove white space characters and newlines from the given string.
+   * Removes the BOM character from the specified string.
+   *
+   * @param s
+   *          the string to remove the BOM
+   * @return a string with BOM removed. If the input is null, the output will also
+   *         be null.
+   */
+  public static String removeBom(String s) {
+    if (s == null) {
+      return null;
+    } else if ((s.length() != 0) && (s.codePointAt(0) == 0xFEFF)) {
+      s = s.substring(1);
+    }
+    return s;
+  }
+
+  /**
+   * Removes white space characters and newlines from the given string.
    *
    * @param str
    *          a string to replace
