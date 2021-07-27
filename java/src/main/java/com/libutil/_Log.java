@@ -424,6 +424,28 @@ public class _Log {
   }
 
   /**
+   * Dumps code-points of the specified string.
+   *
+   * @param s
+   *          the string to dump
+   */
+  public static void dumpString(String s) {
+    if (s == null) {
+      i("[null]");
+    } else if (s.length() == 0) {
+      i("[]");
+    } else {
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < s.length(); i++) {
+        sb.append("[");
+        sb.append(Integer.toString(s.codePointAt(i), 16).toUpperCase());
+        sb.append("]");
+      }
+      i(sb.toString());
+    }
+  }
+
+  /**
    * Print stack trace.
    */
   public static void stack() {
