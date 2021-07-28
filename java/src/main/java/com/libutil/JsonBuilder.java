@@ -23,13 +23,17 @@
  */
 package com.libutil;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 /**
  * Builds a JSON string sequentially.
  */
 public class JsonBuilder {
+
+  public static final String DEFAULT_CHARSET = "UTF-8";
 
   StringBuilder buffer;
   int count;
@@ -195,6 +199,46 @@ public class JsonBuilder {
    */
   public void appendObject(String key, String json) {
     _append(key, json);
+  }
+
+  /**
+   * Encodes a string value in Base64 and appends to this sequence.
+   *
+   * @param key
+   *          the key to append
+   * @param value
+   *          the value to append
+   */
+  public void appendWithBase64(String key, String value) {
+    String v = "null";
+    if (value != null) {
+      String encoded = null;
+      try {
+        byte[] srcBytes = value.getBytes(DEFAULT_CHARSET);
+        encoded = Base64.getEncoder().encodeToString(srcBytes);
+      } catch (UnsupportedEncodingException e) {
+        throw new RuntimeException(e);
+      }
+      v = "\"" + encoded + "\"";
+    }
+    _append(key, v);
+  }
+
+  /**
+   * Encodes a byte array in Base64 and appends to this sequence.
+   *
+   * @param key
+   *          the key to append
+   * @param value
+   *          the value to append
+   */
+  public void appendWithBase64(String key, byte[] value) {
+    String v = "null";
+    if (value != null) {
+      String encoded = Base64.getEncoder().encodeToString(value);
+      v = "\"" + encoded + "\"";
+    }
+    _append(key, v);
   }
 
   /**
