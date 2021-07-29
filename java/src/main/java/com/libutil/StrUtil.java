@@ -395,7 +395,7 @@ public class StrUtil {
   }
 
   /**
-   * Converts along r to a string.
+   * Converts a long to a string.
    *
    * @param l
    *          a long to be converted.
@@ -403,6 +403,22 @@ public class StrUtil {
    */
   public static String fromLong(long l) {
     return Long.toString(l);
+  }
+
+  /**
+   * Indicates whether the string contains a BOM character.
+   *
+   * @param s
+   *          The string to check for
+   * @return true if the string has the BOM, otherwise false
+   */
+  public static boolean hasBom(String s) {
+    if (s != null) {
+      if ((s.length() != 0) && (s.codePointAt(0) == 0xFEFF)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -784,9 +800,7 @@ public class StrUtil {
    *         be null.
    */
   public static String removeBom(String s) {
-    if (s == null) {
-      return null;
-    } else if ((s.length() != 0) && (s.codePointAt(0) == 0xFEFF)) {
+    if (hasBom(s)) {
       s = s.substring(1);
     }
     return s;
