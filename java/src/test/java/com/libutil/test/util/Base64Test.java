@@ -18,12 +18,12 @@ public class Base64Test {
 
     str = "";
     Log.d("encode(\"" + str + "\")");
-    encoded = Base64Util.encode("");
+    encoded = Base64Util.encode(str);
     Log.d(encoded);
 
     str = null;
     Log.d("encode(null)");
-    encoded = Base64Util.encode("");
+    encoded = Base64Util.encode(str);
     Log.d(encoded);
 
     byte[] b = { 97, 98, 99 };
@@ -54,6 +54,11 @@ public class Base64Test {
     for (int i = 0; i < d.length; i++) {
       Log.d(d[i]);
     }
+
+    str = null;
+    Log.d("decodeB(\"" + str + "\")");
+    d = Base64Util.decodeB(str);
+    Log.d(d);
   }
 
 }
