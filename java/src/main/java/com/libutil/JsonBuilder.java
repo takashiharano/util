@@ -210,17 +210,7 @@ public class JsonBuilder {
    *          the value to append
    */
   public void appendWithBase64(String key, String value) {
-    String v = "null";
-    if (value != null) {
-      String encoded = null;
-      try {
-        byte[] srcBytes = value.getBytes(DEFAULT_CHARSET);
-        encoded = Base64.getEncoder().encodeToString(srcBytes);
-      } catch (UnsupportedEncodingException e) {
-        throw new RuntimeException(e);
-      }
-      v = "\"" + encoded + "\"";
-    }
+    String v = encodeBase64(value);
     _append(key, v);
   }
 
@@ -504,6 +494,25 @@ public class JsonBuilder {
    */
   public void appendListElement(boolean value) {
     _appendListElement(Boolean.toString(value));
+  }
+
+  /**
+   * Encodes a string value in Base64 and appends to the list part of this
+   * sequence.
+   *
+   * <pre>
+   * e.g.,
+   * {
+   *   "key": [
+   *   <i>"BASE64_VALUE"</i>
+   * </pre>
+   *
+   * @param value
+   *          the value to append
+   */
+  public void appendListElementWithBase64(String value) {
+    String v = encodeBase64(value);
+    _appendListElement(v);
   }
 
   /**
@@ -816,6 +825,21 @@ public class JsonBuilder {
         .replace("\t", "\\t");
     value = StrUtil.quote(value);
     return value;
+  }
+
+  private String encodeBase64(String s) {
+    String v = "null";
+    if (s != null) {
+      String encoded = null;
+      try {
+        byte[] srcBytes = s.getBytes(DEFAULT_CHARSET);
+        encoded = Base64.getEncoder().encodeToString(srcBytes);
+      } catch (UnsupportedEncodingException e) {
+        throw new RuntimeException(e);
+      }
+      v = "\"" + encoded + "\"";
+    }
+    return v;
   }
 
 }
