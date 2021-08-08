@@ -66,16 +66,21 @@ public class Props {
     load(filePath);
   }
 
-  private void load(String filePath) {
+  /**
+   * Loads the properties from a file.
+   *
+   * @param filePath
+   *          file path of properties
+   */
+  public void load(String filePath) {
     String[] content = readTextFileAsArray(filePath);
     if (content == null) {
-      String message = "Failed to load properties file: " + filePath;
-      throw new RuntimeException(message);
+      throw new RuntimeException("Failed to load properties file: " + filePath);
     }
     parse(content);
   }
 
-  public static String[] readTextFileAsArray(String path) {
+  private static String[] readTextFileAsArray(String path) {
     String charsetName = DEFAULT_CHARSET;
     Path filePath = Paths.get(path);
     List<String> lines;
@@ -172,12 +177,22 @@ public class Props {
   }
 
   /**
-   * Returns the file path of the properties.
+   * Returns the path of the properties file.
    *
    * @return file path
    */
   public String getFilePath() {
     return filePath;
+  }
+
+  /**
+   * Sets the path of the properties file.
+   *
+   * @param filePath
+   *          file path
+   */
+  public void setFilePath(String filePath) {
+    this.filePath = filePath;
   }
 
   /**
@@ -409,9 +424,97 @@ public class Props {
   }
 
   /**
-   * Returns the number of keys in this hashtable.
+   * Sets the value for the key. If the map previously contained a mapping for the
+   * key, the old value is replaced.
    *
-   * @return the number of keys in this hashtable
+   * @param key
+   *          key with which the specified value is to be associated
+   * @param value
+   *          value to be associated with the specified key
+   */
+  public void setValue(String key, String value) {
+    properties.put(key, value);
+  }
+
+  /**
+   * Sets the integer value for the key. If the map previously contained a mapping
+   * for the key, the old value is replaced.
+   *
+   * @param key
+   *          key with which the specified value is to be associated
+   * @param value
+   *          integer value to be associated with the specified key
+   */
+  public void setValue(String key, int value) {
+    properties.put(key, Integer.toString(value));
+  }
+
+  /**
+   * Sets the long value for the key. If the map previously contained a mapping
+   * for the key, the old value is replaced.
+   *
+   * @param key
+   *          key with which the specified value is to be associated
+   * @param value
+   *          long value to be associated with the specified key
+   */
+  public void setValue(String key, long value) {
+    properties.put(key, Long.toString(value));
+  }
+
+  /**
+   * Sets the float value for the key. If the map previously contained a mapping
+   * for the key, the old value is replaced.
+   *
+   * @param key
+   *          key with which the specified value is to be associated
+   * @param value
+   *          float value to be associated with the specified key
+   */
+  public void setValue(String key, float value) {
+    properties.put(key, Float.toString(value));
+  }
+
+  /**
+   * Sets the double value for the key. If the map previously contained a mapping
+   * for the key, the old value is replaced.
+   *
+   * @param key
+   *          key with which the specified value is to be associated
+   * @param value
+   *          double value to be associated with the specified key
+   */
+  public void setValue(String key, double value) {
+    properties.put(key, Double.toString(value));
+  }
+
+  /**
+   * Sets the boolean value for the key. If the map previously contained a mapping
+   * for the key, the old value is replaced.
+   *
+   * @param key
+   *          key with which the specified value is to be associated
+   * @param value
+   *          boolean value to be associated with the specified key
+   */
+  public void setValue(String key, boolean value) {
+    properties.put(key, Boolean.toString(value));
+  }
+
+  /**
+   * Removes the value for the key from this map if present.
+   *
+   * @param key
+   *          the key to remove
+   */
+  public void removeValue(String key) {
+    properties.remove(key);
+  }
+
+  /**
+   * Returns the number of keys in this hash table.
+   *
+   * @return the number of keys in this hash table
    */
   public int size() {
     return properties.size();
