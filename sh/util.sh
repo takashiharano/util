@@ -4,7 +4,7 @@
 # Copyright 2021 Takashi Harano
 # Released under the MIT license
 # https://libutil.com/
-# v.202108091900
+# v.202108091901
 #
 DATE_TIME_FORMAT="%Y-%m-%dT%H:%M:%S.%3N%:z"
 
@@ -16,11 +16,9 @@ DATE_TIME_FORMAT="%Y-%m-%dT%H:%M:%S.%3N%:z"
 # trap error_handler ERR
 #######################################
 function error_handler() {
-  local st
-  st=$?
+  EXIT_STATUS=$?
   echo ""
-  echo "Error! (${st})" >&2
-  on_end
+  echo "Error! (${EXIT_STATUS})" >&2
   exit 1
 }
 
