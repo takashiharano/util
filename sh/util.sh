@@ -4,7 +4,7 @@
 # Copyright 2021 Takashi Harano
 # Released under the MIT license
 # https://libutil.com/
-# v.202108091901
+# v.202108092055
 #
 DATE_TIME_FORMAT="%Y-%m-%dT%H:%M:%S.%3N%:z"
 
@@ -30,9 +30,8 @@ function error_handler() {
 #   Writes current unixtime to stdout
 #######################################
 function unixtime() {
-  echo date +%s.%3N
+  date +%s.%3N
 }
-
 
 #######################################
 # Print the current time
@@ -43,7 +42,7 @@ function unixtime() {
 # Outputs:
 #   Writes current time to stdout
 #######################################
-function print_current_time() {
+function current_time() {
   local t
   t=$(date +"${DATE_TIME_FORMAT}")
   echo "${t}"
@@ -65,21 +64,18 @@ function log() {
 }
 
 #######################################
-# Print CPU Usage
+# Print CPU/Memory Usage
 # Arguments:
 #   "tsv" or None
 # Outputs:
-#   CPU usage percentage or details in TSV format.
+#   CPU/Memory usage percentage or details in TSV format.
 #######################################
-function print_cpu_usage() {
+function cpu_mem() {
   local fmt
   fmt=""
   if [ $# -ge 1 ]; then
     fmt=$1
   fi
-
-  local current_unixtime
-  current_unixtime=$(date +%s)
 
   local vmstat_res
   ###############################
@@ -88,6 +84,10 @@ function print_cpu_usage() {
   vmstat_res=$(vmstat 1 2)
   ###############################
 
+  # procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+  #  r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+  #  0  0 357632 209012   2892 2934188    0    2    33   227  132    8  9  4 86  1  0
+  #  0  0 357632 209056   2892 2934188    0    0     0     0 2416  337  0  2 98  0  0
   local cpu_info
   cpu_info=${vmstat_res}
   cpu_info=$(echo "${cpu_info}" | sed -E "s/\s+/ /g")
@@ -95,16 +95,16 @@ function print_cpu_usage() {
   cpu_info=$(echo "${cpu_info}" | sed -E "s/[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s//")
 
   local vals
-  #local v_r
-  #local v_b
-  #local v_swpd
-  #local v_free
+  local v_r
+  local v_b
+  local v_swpd
+  local v_free
   #local v_buff
   #local v_cache
   #local v_si
   #local v_so
-  #local v_bi
-  #local v_bo
+  local v_bi
+  local v_bo
   #local v_in
   #local v_cs
   local v_us
@@ -114,16 +114,16 @@ function print_cpu_usage() {
   local v_st
 
   vals=(${cpu_info// / })
-  #v_r=${vals[0]} # The number of runnable processes (running or waiting for run time)
-  #v_b=${vals[1]} # The number of processes blocked waiting for I/O to complete
-  #v_swpd=${vals[2]} # the amount of swap memory used.
-  #v_free=${vals[3]} # the amount of idle memory
+  v_r=${vals[0]} # The number of runnable processes (running or waiting for run time)
+  v_b=${vals[1]} # The number of processes blocked waiting for I/O to complete
+  v_swpd=${vals[2]} # the amount of swap memory used.
+  v_free=${vals[3]} # the amount of idle memory
   #v_buff=${vals[4]} # the amount of memory used as buffers
   #v_cache=${vals[5]} # the amount of memory used as cache
   #v_si=${vals[6]} # Amount of memory swapped in from disk (/s)
   #v_so=${vals[7]} # Amount of memory swapped to disk (/s)
-  #v_bi=${vals[8]} # Blocks received from a block device (blocks/s)
-  #v_bo=${vals[9]} # Blocks sent to a block device (blocks/s)
+  v_bi=${vals[8]} # Blocks received from a block device (blocks/s)
+  v_bo=${vals[9]} # Blocks sent to a block device (blocks/s)
   #v_in=${vals[10]} # number of interrupts per second, including the clock
   #v_cs=${vals[11]} # number of context switches per second
   v_us=${vals[12]} # user time
@@ -138,10 +138,10 @@ function print_cpu_usage() {
 
   if [[ ${fmt} = "tsv" ]]; then
     local info_tsv
-    info_tsv=$(echo -e "${current_unixtime}\\t${usage}\\t${v_us}\\t${v_sy}\\t${v_id}\\t${v_wa}\\t${v_st}")
+    info_tsv=$(echo -e "${usage}\\t${v_us}\\t${v_sy}\\t${v_wa}\\t${v_st}\\t${v_r}\\t${v_b}\\t${v_swpd}\\t${v_free}\\t${v_bi}\\t${v_bo}")
     echo -e "${info_tsv}"
   else
-    echo "${usage}"
+    echo "cpu:${usage}%  user:${v_us}%  kernel:${v_sy}%  wa:${v_wa}  st:${v_st}  proc_r:${v_r}  proc_b:${v_b}  swpd:${v_swpd}  free:${v_free}  bi:${v_bi}  bo:${v_bo}"
   fi
 }
 
@@ -153,14 +153,25 @@ function print_cpu_usage() {
 #   Java Heap Usage.
 #   in TSV format if "tsv" is specified for the second argument.
 #
-# Usage: jheap <TARGET_NAME>|<PID>
+# Usage: print_jheap TARGET_NAME|PID
 # e.g.,
-# jheap "helloworld.jar"
-# jheap 1234
+# print_jheap "helloworld.jar"
+# print_jheap 1234
 #######################################
-function print_jheap() {
+function java_heap() {
+  if [ $# -lt 1 ]; then
+    echo "Error: no target name or pid"
+    return 1
+  fi
   local target
   target=$1
+
+  local fmt
+  fmt=""
+  if [ $# -ge 2 ]; then
+    fmt=$2
+  fi
+
   local pid
   pid=""
   if [[ ${target} =~ ^[0-9]+$ ]]; then
@@ -169,19 +180,21 @@ function print_jheap() {
     # find the PID corresponding to the target name
     local res_array
     res_array=($(jps | grep "${target}"))
+
+    if [ ${#res_array[@]} -eq 0 ]; then
+      echo "process_not_found"
+      return
+    fi
     pid=${res_array[0]}
   fi
 
-  local fmt
-  fmt=""
-  if [ $# -ge 2 ]; then
-    fmt=$2
-  fi
+  local jstat_res
+  ###############################
+  jstat_res=$(jstat -gc "${pid}")
+  ###############################
+  #echo "${pid}"
+  #echo "${jstat_res}"
 
-  local current_unixtime
-  current_unixtime=$(date +%s)
-
-  # https://docs.oracle.com/javase/jp/8/docs/technotes/tools/unix/jstat.html
   # 0   1   2   3   4  5  6  7  8  9  10   11   12  13   14  15   16
   # S0C S1C S0U S1U EC EU OC OU MC MU CCSC CCSU YGC YGCT FGC FGCT GCT
   #
@@ -194,13 +207,8 @@ function print_jheap() {
   #
   # Used
   # (S0U + S1U + EU + OU) / 1024 = MB
-  local jstat_res
-  ###############################
-  jstat_res=$(jstat -gc "${pid}")
-  ###############################
-  #echo "${pid}"
-  #echo "${jstat_res}"
-
+  #
+  # https://docs.oracle.com/javase/jp/8/docs/technotes/tools/unix/jstat.html
   local heap_info
   heap_info=$(echo "${jstat_res}" | sed -E "s/\r//g")
   heap_info=$(echo "${heap_info}" | sed -E "s/\s+/ /g")
@@ -218,15 +226,15 @@ function print_jheap() {
   local eu
   local oc
   local ou
-  local mc
-  local mu
-  local ccsc
-  local ccsu
-  local ygc
-  local ygct
+  #local mc
+  #local mu
+  #local ccsc
+  #local ccsu
+  #local ygc
+  #local ygct
   local fgc
   local fgct
-  local gct
+  #local gct
 
   s0c=${vals[0]} # Survisor0: capacity (KB)
   s1c=${vals[1]} # Survisor1: capacity (KB)
@@ -236,15 +244,15 @@ function print_jheap() {
   eu=${vals[5]} # Eden: utilization (KB)
   oc=${vals[6]} # Old: capacity (KB)
   ou=${vals[7]} # Old: utilization: (KB)
-  mc=${vals[8]} # Meta space: capacity (KB)
-  mu=${vals[9]} # Meta space: utilization (KB)
-  ccsc=${vals[10]} # Compressed class space capacity (KB)
-  ccsu=${vals[11]} # Compressed class space used (KB)
-  ygc=${vals[12]} # Number of young generation garbage collection events
-  ygct=${vals[13]} # Young generation garbage collection time
+  #mc=${vals[8]} # Meta space: capacity (KB)
+  #mu=${vals[9]} # Meta space: utilization (KB)
+  #ccsc=${vals[10]} # Compressed class space capacity (KB)
+  #ccsu=${vals[11]} # Compressed class space used (KB)
+  #ygc=${vals[12]} # Number of young generation garbage collection events
+  #ygct=${vals[13]} # Young generation garbage collection time
   fgc=${vals[14]} # Number of full GC events
   fgct=${vals[15]} # Full garbage collection time
-  gct=${vals[16]} # Total garbage collection time
+  #gct=${vals[16]} # Total garbage collection time
 
   local new
   local old
@@ -284,8 +292,8 @@ function print_jheap() {
   fi
 
   if [[ ${fmt} = "tsv" ]]; then
-    echo -e "${current_unixtime}\\t${usage}\\t${used}\\t${free}\\t${max}\\t${s0c}\\t${s1c}\\t${s0u}\\t${s1u}\\t${ec}\\t${eu}\\t${oc}\\t${ou}\\t${mc}\\t${mu}\\t${ccsc}\\t${ccsu}\\t${ygc}\\t${ygct}\\t${fgc}\\t${fgct}\\t${gct}"
+    echo -e "${usage}\\t${used}\\t${free}\\t${max}\\t${ep}\\t${s0p}\\t${s1p}\\t${op}\\t${fgc}\\t${fgct}"
   else
-    echo "Used: ${used} MB (${usage}%) | Free:${free} MB | Max: ${max} MB | Eden: ${ep}% | S0: ${s0p}% | S1: ${s1p}% | Old: ${op}% | FullGC: ${fgc} (${fgct}s)"
+    echo "Used:${used}MB (${usage}%)  Free:${free}MB  Max:${max}MB  Eden:${ep}%  S0:${s0p}%  S1:${s1p}%  Old:${op}%  FullGC:${fgc} (${fgct}s)"
   fi
 }
