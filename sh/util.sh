@@ -4,7 +4,7 @@
 # Copyright 2021 Takashi Harano
 # Released under the MIT license
 # https://libutil.com/
-# v.202106230006
+# v.202108091900
 #
 DATE_TIME_FORMAT="%Y-%m-%dT%H:%M:%S.%3N%:z"
 
@@ -23,6 +23,18 @@ function error_handler() {
   on_end
   exit 1
 }
+
+#######################################
+# Print the current unixtime
+# Arguments:
+#   None
+# Outputs:
+#   Writes current unixtime to stdout
+#######################################
+function unixtime() {
+  echo date +%s.%3N
+}
+
 
 #######################################
 # Print the current time
