@@ -21,7 +21,7 @@ fi
 while true
 do
   if [ "${fmt}" == "tsv" ]; then
-    time=$(unixtime)
+    time=$(unix_millis)
   else
     time=$(current_time)
   fi
