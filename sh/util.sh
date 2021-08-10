@@ -4,7 +4,7 @@
 # Copyright 2021 Takashi Harano
 # Released under the MIT license
 # https://libutil.com/
-# v.202108092055
+# v.202108102200
 #
 DATE_TIME_FORMAT="%Y-%m-%dT%H:%M:%S.%3N%:z"
 
@@ -31,6 +31,10 @@ function error_handler() {
 #######################################
 function unixtime() {
   date +%s.%3N
+}
+
+function unix_millis() {
+  date +%s%3N
 }
 
 #######################################
@@ -279,16 +283,20 @@ function java_heap() {
   op="0"
 
   if [ "${ec}" != "0.0" ]; then
-    ep=$(echo "scale=0; (${eu} / ${ec}) * 100" | bc)
+    ep=$(echo "scale=2; (${eu} / ${ec}) * 100" | bc)
+    ep=$(echo "${ep}" | sed -E "s/\.00$//")
   fi
   if [ "${s0c}" != "0.0" ]; then
-    s0p=$(echo "scale=0; (${s0u} / ${s0c}) * 100" | bc)
+    s0p=$(echo "scale=2; (${s0u} / ${s0c}) * 100" | bc)
+    s0p=$(echo "${s0p}" | sed -E "s/\.00$//")
   fi
   if [ "${s1c}" != "0.0" ]; then
-    s1p=$(echo "scale=0; (${s1u} / ${s1c}) * 100" | bc)
+    s1p=$(echo "scale=2; (${s1u} / ${s1c}) * 100" | bc)
+    s1p=$(echo "${s1p}" | sed -E "s/\.00$//")
   fi
   if [ "${oc}" != "0.0" ]; then
-    ep=$(echo "scale=0; (${ou} / ${oc}) * 100" | bc)
+    op=$(echo "scale=2; (${ou} / ${oc}) * 100" | bc)
+    op=$(echo "${op}" | sed -E "s/\.00$//")
   fi
 
   if [[ ${fmt} = "tsv" ]]; then
