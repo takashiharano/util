@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202108112233';
+util.v = '202108120030';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -456,21 +456,22 @@ util.diffDays = function(ms1, ms2, abs) {
 };
 
 /**
- * Calc Estimated Time to Complete
+ * Calc Estimated Time of Accomplishment
  * t0: origin unix millis
- * val: current value
  * total: total value
+ * val: current value
+ * t1: calculation time point
  */
-util.calcETC = function(t0, val, total, now) {
-  if (now == undefined) now = Date.now();
-  var dt = now - t0;
+util.calcETA = function(t0, total, val, t1) {
+  if (t1 == undefined) t1 = Date.now();
+  var dt = t1 - t0;
   var avg = dt / val;
   var tt = Math.ceil(avg * total);
   var rt = Math.ceil(avg * (total - val));
   var r = {
-    completion: now + rt,
+    completion: t1 + rt,
     remaining: rt,
-    total: tt,
+    totaltime: tt,
     elapsed: dt,
     average: Math.ceil(dt / val)
   };
