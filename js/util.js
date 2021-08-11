@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202107171623';
+util.v = '202108112233';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -57,7 +57,7 @@ util.DateTime = function(src, tzOffset) {
     tzOffset = util.getTZ();
   } else {
     var os = tzOffset;
-    if (typeof os == 'string') os = util.getTzLocalOffset(os);
+    if (typeof os == 'string') os = util.getOffsetFromLocalTz(os);
     dt = new Date(timestamp + os);
     timestamp = dt.getTime();
   }
@@ -65,7 +65,7 @@ util.DateTime = function(src, tzOffset) {
   if (st) {
     timestamp += st.millisecond;
     if (st.tz != '') {
-      var tzdf = util.getTzLocalOffset(st.tz);
+      var tzdf = util.getOffsetFromLocalTz(st.tz);
       timestamp -= tzdf;
     }
   }
@@ -280,6 +280,19 @@ util.getTimeStampOfDay = function(timeString, offset) {
 };
 
 /**
+ * Returns timestamp at 00:00 from specified timestamp.
+ * ms: timestamp in millis
+ * offset: timezone offset. -12 or '-1200' to 14 or '+1400'
+ * 1628679929040 -> 1628640000000 (offset=0)
+ */
+util.getTimeStampOfMidnight = function(ms, offset) {
+  var t = util.getDateTime(ms);
+  var dt = new Date(t.year, t.month - 1, t.day);
+  var os = util.getOffsetFromLocalTz(offset);
+  return new util.DateTime(dt).timestamp - os;
+};
+
+/**
  * millis to struct
  * -> {'millis': millis, 'days': 1, 'hrs': 0, 'hours': 24, 'minutes': 34, 'seconds': 56, 'milliseconds': 123}
  */
@@ -379,11 +392,11 @@ util.getTzName = function() {
 };
 
 /**
- * Returns TZ offset in minutes
- * +0900 ->  540
- * -0800 -> -480
+ * Returns local TZ offset in minutes
+ * at +0900 ->  540
+ * at -0800 -> -480
  */
-util.getTzOffset = function() {
+util.getLocalTzOffsetMin = function() {
   return new Date().getTimezoneOffset() * -1;
 };
 
@@ -399,11 +412,18 @@ util.tz2ms = function(tz) {
 };
 
 /**
- * +0900: +0000 -> -32400000
+ * (at +0900)
+ * '+0800' or    8 -> -3600000
+ * '+1030' or 10.5 ->  5400000
  */
-util.getTzLocalOffset = function(tz) {
-  if (!tz) return 0;
-  var ms = util.tz2ms(tz);
+util.getOffsetFromLocalTz = function(tz) {
+  if (tz == undefined) return 0;
+  var ms;
+  if (typeof tz == 'string') {
+    ms = util.tz2ms(tz);
+  } else {
+    ms = tz * 3600000;
+  }
   var os = new Date().getTimezoneOffset() * 60000;
   return os + ms;
 };
