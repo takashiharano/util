@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202108121953';
+util.v = '202108130001';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -1409,6 +1409,25 @@ util.countStr = function(s, p) {
 
 util.lenB = function(s) {
   return (new Blob([s], {type: 'text/plain'})).size;
+};
+
+util.split = function(v, s, l) {
+  l |= 0;
+  var r = [];
+  var p = 0;
+  var c = 0;
+  while (true) {
+    var i = v.indexOf(s, p);
+    if ((l > 0) && (c >= l - 1) || (i == -1)) {
+      r.push(v.substr(p));
+      break;
+    } else {
+      r.push(v.substring(p, i));
+      p = i + s.length;
+      c++;
+    }
+  }
+  return r;
 };
 
 util.convertNewLine = function(s, nl) {
