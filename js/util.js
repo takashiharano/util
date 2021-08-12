@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202108120030';
+util.v = '202108121953';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -256,7 +256,7 @@ util.getDateTimeString = function(t, fmt) {
  *          1 -> Tomorrow
  */
 util.getDateTimeFromTime = function(timeString, offset) {
-  var t = util.getTimeStampOfDay(timeString, offset);
+  var t = util.getTimestampOfDay(timeString, offset);
   return util.getDateTime(t);
 };
 
@@ -266,7 +266,7 @@ util.getDateTimeFromTime = function(timeString, offset) {
  *          0 -> Today (default)
  *          1 -> Tomorrow
  */
-util.getTimeStampOfDay = function(timeString, offset) {
+util.getTimestampOfDay = function(timeString, offset) {
   var tm = timeString.replace(/:/g, '').replace(/\./, '');
   var hh = tm.substr(0, 2);
   var mi = tm.substr(2, 2);
@@ -285,7 +285,7 @@ util.getTimeStampOfDay = function(timeString, offset) {
  * offset: timezone offset. -12 or '-1200' to 14 or '+1400'
  * 1628679929040 -> 1628640000000 (offset=0)
  */
-util.getTimeStampOfMidnight = function(ms, offset) {
+util.getTimestampOfMidnight = function(ms, offset) {
   var t = util.getDateTime(ms);
   var dt = new Date(t.year, t.month - 1, t.day);
   var os = util.getOffsetFromLocalTz(offset);

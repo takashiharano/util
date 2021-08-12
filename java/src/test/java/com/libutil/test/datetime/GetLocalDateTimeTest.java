@@ -48,7 +48,7 @@ public class GetLocalDateTimeTest {
     Log.i("Second     = " + datetime.getSecond());
     Log.i("Millisecond= " + datetime.getMillisecond());
     Log.i("TimeZoneId = " + datetime.getTimeZoneId());
-    Log.i("timestamp = " + datetime.getTimeStamp());
+    Log.i("timestamp = " + datetime.getTimestamp());
     Log.i("");
   }
 

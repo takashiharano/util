@@ -6,38 +6,38 @@ import com.libutil.test.Log;
 public class DateTimeTest {
 
   public static void main(String args[]) {
-    Log.d("DateTime() ----------");
+    Log.i("DateTime() ----------");
     DateTime datetime = new DateTime();
     test(datetime);
 
-    Log.d("setTimeZone(\"PST\") ----------");
+    Log.i("setTimeZone(\"PST\") ----------");
     datetime.setTimeZone("PST");
     test(datetime);
 
-    Log.d("DateTime(2019, 12, 05, 23, 30) ----------");
+    Log.i("DateTime(2019, 12, 05, 23, 30) ----------");
     datetime = new DateTime(2019, 12, 05, 23, 30);
     test(datetime);
 
-    Log.d("DateTime(2019, 12, 05, 23, 30, \"PST\") ----------");
+    Log.i("DateTime(2019, 12, 05, 23, 30, \"PST\") ----------");
     datetime = new DateTime(2019, 12, 05, 23, 30, "PST");
     test(datetime);
 
-    Log.d("DateTime(1594092896789L) ----------");
+    Log.i("DateTime(1594092896789L) ----------");
     datetime = new DateTime(1594092896789L);
     test(datetime);
 
-    Log.d("DateTime(\"20210703T123456.789+0900\") ----------");
+    Log.i("DateTime(\"20210703T123456.789+0900\") ----------");
     String src = "20210703T123456.789+0900";
     datetime = new DateTime(src);
     test(datetime);
 
-    Log.d("DateTime(\"20210703T123456.789-0800\")");
+    Log.i("DateTime(\"20210703T123456.789-0800\")");
     src = "20210703T123456.789-0800";
     datetime = new DateTime(src);
     test(datetime);
 
     try {
-      Log.d("DateTime(\"\")");
+      Log.i("DateTime(\"\")");
       src = "";
       datetime = new DateTime(src);
       test(datetime);
@@ -46,7 +46,7 @@ public class DateTimeTest {
     }
 
     try {
-      Log.d("DateTime(\"aaa\")");
+      Log.i("DateTime(\"aaa\")");
       src = "aaa";
       datetime = new DateTime(src);
       test(datetime);
@@ -55,7 +55,7 @@ public class DateTimeTest {
     }
 
     try {
-      Log.d("DateTime(null)");
+      Log.i("DateTime(null)");
       src = null;
       datetime = new DateTime(src);
       test(datetime);
@@ -68,22 +68,22 @@ public class DateTimeTest {
 
   private static void test(DateTime datetime) {
     String str = datetime.toString();
-    Log.d(str);
-    Log.d("Year       = " + datetime.getYear());
-    Log.d("Month      = " + datetime.getMonth());
-    Log.d("Day        = " + datetime.getDay());
-    Log.d("Hour       = " + datetime.getHour());
-    Log.d("Minute     = " + datetime.getMinute());
-    Log.d("Second     = " + datetime.getSecond());
-    Log.d("Millisecond= " + datetime.getMillisecond());
-    Log.d("TimeZoneId = " + datetime.getTimeZoneId());
-    Log.d("timestamp = " + datetime.getTimeStamp());
-    Log.d("");
+    Log.i(str);
+    Log.i("Year       = " + datetime.getYear());
+    Log.i("Month      = " + datetime.getMonth());
+    Log.i("Day        = " + datetime.getDay());
+    Log.i("Hour       = " + datetime.getHour());
+    Log.i("Minute     = " + datetime.getMinute());
+    Log.i("Second     = " + datetime.getSecond());
+    Log.i("Millisecond= " + datetime.getMillisecond());
+    Log.i("TimeZoneId = " + datetime.getTimeZoneId());
+    Log.i("timestamp = " + datetime.getTimestamp());
+    Log.i("");
   }
 
   private static void formatTimeTest() {
     long t = 1234;
-    Log.d(t + " = " + DateTime.formatTime(t, "HH:mm:ss.SSS"));
+    Log.i(t + " = " + DateTime.formatTime(t, "HH:mm:ss.SSS"));
   }
 
 }

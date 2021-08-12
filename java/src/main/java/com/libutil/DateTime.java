@@ -258,7 +258,7 @@ public class DateTime {
    *         a positive value if the instance is greater than the datetime.
    */
   public long compare(DateTime datetime) {
-    return timestamp - datetime.getTimeStamp();
+    return timestamp - datetime.getTimestamp();
   }
 
   /**
@@ -268,7 +268,7 @@ public class DateTime {
    * @return the number of milliseconds since January 1, 1970, 00:00:00 GMT
    *         represented by this date.
    */
-  public long getTimeStamp() {
+  public long getTimestamp() {
     return timestamp;
   }
 
@@ -409,8 +409,6 @@ public class DateTime {
    * @return A newly-allocated DateTime object
    */
   public DateTime getLocalDateTime(TimeZone targetTz) {
-    // int tzdiff = getTimezoneOffsetDiff(targetTz);
-    // long newTimestamp = getTimeStamp() + tzdiff;
     return new DateTime(timestamp, targetTz);
   }
 
