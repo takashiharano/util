@@ -36,7 +36,7 @@ import java.net.URLEncoder;
 import java.util.Map.Entry;
 
 import com.libutil.Base64Util;
-import com.libutil.IoUtil;
+import com.libutil.BinUtil;
 
 /**
  * The class HttpRequest represents a HTTP request.
@@ -182,7 +182,7 @@ public class HttpRequest {
       statusMessage = conn.getResponseMessage();
       is = conn.getInputStream();
       if (is != null) {
-        body = IoUtil.readStream(is);
+        body = readStream(is);
         is.close();
       }
     } catch (SocketTimeoutException ste) {
@@ -190,7 +190,7 @@ public class HttpRequest {
     } catch (IOException e) {
       is = conn.getErrorStream();
       if (is != null) {
-        body = IoUtil.readStream(is);
+        body = readStream(is);
         is.close();
       }
     } finally {
@@ -367,6 +367,38 @@ public class HttpRequest {
     } else {
       return false;
     }
+  }
+
+  /**
+   * Read byte array from input stream.
+   *
+   * @param is
+   *          input stream
+   * @return read bytes
+   * @throws IOException
+   *           If an I/O error occurs
+   */
+  private byte[] readStream(InputStream is) throws IOException {
+    byte[] buf = null;
+    byte[] b = new byte[1048576];
+    int size = 0;
+    int readSize;
+    byte[] wkBuf = null;
+    while ((readSize = is.read(b)) != -1) {
+      int offset = 0;
+      if (buf != null) {
+        wkBuf = new byte[size];
+        BinUtil.copyByteArray(buf, wkBuf, 0, buf.length);
+      }
+      offset = size;
+      size += readSize;
+      buf = new byte[size];
+      if (wkBuf != null) {
+        BinUtil.copyByteArray(wkBuf, buf, 0, wkBuf.length);
+      }
+      BinUtil.copyByteArray(b, buf, offset, readSize);
+    }
+    return buf;
   }
 
 }

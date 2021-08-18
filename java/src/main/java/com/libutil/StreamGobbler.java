@@ -45,7 +45,7 @@ public class StreamGobbler implements Runnable {
   @Override
   public void run() {
     try {
-      output = IoUtil.readStream(is);
+      output = readStream(is);
     } catch (IOException e) {
       exception = e;
     }
@@ -78,6 +78,38 @@ public class StreamGobbler implements Runnable {
 
   public boolean hasError() {
     return exception != null;
+  }
+
+  /**
+   * Read byte array from input stream.
+   *
+   * @param is
+   *          input stream
+   * @return read bytes
+   * @throws IOException
+   *           If an I/O error occurs
+   */
+  private static byte[] readStream(InputStream is) throws IOException {
+    byte[] buf = null;
+    byte[] b = new byte[1048576];
+    int size = 0;
+    int readSize;
+    byte[] wkBuf = null;
+    while ((readSize = is.read(b)) != -1) {
+      int offset = 0;
+      if (buf != null) {
+        wkBuf = new byte[size];
+        BinUtil.copyByteArray(buf, wkBuf, 0, buf.length);
+      }
+      offset = size;
+      size += readSize;
+      buf = new byte[size];
+      if (wkBuf != null) {
+        BinUtil.copyByteArray(wkBuf, buf, 0, wkBuf.length);
+      }
+      BinUtil.copyByteArray(b, buf, offset, readSize);
+    }
+    return buf;
   }
 
 }
