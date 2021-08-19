@@ -181,7 +181,7 @@ public class ColorUtil {
     String g1 = g16.substring(1, 2);
     String b0 = b16.substring(0, 1);
     String b1 = b16.substring(1, 2);
-    if ((r0 == r1) && (g0 == g1) && (b0 == b1)) {
+    if ((r0.equals(r1)) && (g0.equals(g1)) && (b0.equals(b1))) {
       r16 = r0;
       g16 = g0;
       b16 = b0;
