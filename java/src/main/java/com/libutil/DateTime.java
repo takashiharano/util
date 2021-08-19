@@ -240,7 +240,7 @@ public class DateTime {
    * @return the calculated DateTime object
    */
   public DateTime addDays(int days) {
-    long ts = timestamp + (86400000 * days);
+    long ts = timestamp + (86400000L * days);
     Date date = new Date(ts);
     TimeZone tz = timeZone;
     String timeZoneId = tz.getID();

@@ -167,11 +167,15 @@ public class ZipArchiver {
     zos.closeEntry();
   }
 
-  private void getAllFilesInDir(List<File> files, File parentDir) {
-    for (File file : parentDir.listFiles()) {
-      files.add(file);
+  private void getAllFilesInDir(List<File> fileList, File parentDir) {
+    File[] files = parentDir.listFiles();
+    if (files == null) {
+      return;
+    }
+    for (File file : files) {
+      fileList.add(file);
       if (file.isDirectory()) {
-        getAllFilesInDir(files, file);
+        getAllFilesInDir(fileList, file);
       }
     }
   }

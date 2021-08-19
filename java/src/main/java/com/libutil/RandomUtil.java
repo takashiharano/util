@@ -23,12 +23,14 @@
  */
 package com.libutil;
 
-import java.util.Random;
+import java.security.SecureRandom;
 
 /**
  * Generates random values.
  */
 public class RandomUtil {
+
+  private static SecureRandom r = new SecureRandom();
 
   /**
    * Returns a random integer value.
@@ -36,8 +38,6 @@ public class RandomUtil {
    * @return random integer value
    */
   public static int getInt() {
-    long seed = System.nanoTime();
-    Random r = new Random(seed);
     return r.nextInt();
   }
 
@@ -49,8 +49,6 @@ public class RandomUtil {
    * @return 0-max
    */
   public static int getInt(int max) {
-    long seed = System.nanoTime();
-    Random r = new Random(seed);
     return r.nextInt(max + 1);
   }
 
@@ -64,7 +62,6 @@ public class RandomUtil {
    * @return min-max
    */
   public static int getInt(int min, int max) {
-    Random r = new Random(System.currentTimeMillis());
     int i;
     max++;
     do {
@@ -80,8 +77,6 @@ public class RandomUtil {
    * @return 0.0 - 1.0
    */
   public static double getDouble() {
-    long seed = System.nanoTime();
-    Random r = new Random(seed);
     return r.nextDouble();
   }
 
@@ -91,8 +86,6 @@ public class RandomUtil {
    * @return true or false
    */
   public static boolean getBoolean() {
-    long seed = System.nanoTime();
-    Random r = new Random(seed);
     return r.nextBoolean();
   }
 
@@ -113,8 +106,6 @@ public class RandomUtil {
     char[] cTable = table.toCharArray();
     int lastIdx = cTable.length - 1;
     char[] buf = new char[len];
-    long seed = System.nanoTime();
-    Random r = new Random(seed);
     for (int i = 0; i < len; i++) {
       int idx = r.nextInt(lastIdx + 1);
       buf[i] = cTable[idx];
