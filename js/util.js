@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202108130001';
+util.v = '202108200006';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2559,14 +2559,6 @@ util.fn2text = function(f, s, e) {
 };
 
 /**
- * R, G, B -> #RGB
- */
-util.rgb = function(r, g, b) {
-  var rgb = util.color.rgb10to16(r, g, b);
-  return '#' + rgb.r + rgb.g + rgb.b;
-};
-
-/**
  * http://xxx/ -> <a href="http://xxx/">http://xxx/</a>
  */
 util.linkUrls = function(s, attr) {
@@ -2577,11 +2569,23 @@ util.linkUrls = function(s, attr) {
   return s.replace(/(https?:\/\/[!#$&'()*+,/:;=?@[\]0-9A-Za-z\-._~]+)/g, t);
 };
 
+//-----------------------------------------------------------------------------
+util.color = {};
+
+/**
+ * R, G, B <-> #RGB
+ */
+util.color.rgb = function(r, g, b) {
+  if (typeof r == 'string') return util.color.rgb16to10(r);
+  var rgb = util.color.rgb10to16(r, g, b);
+  return '#' + rgb.r + rgb.g + rgb.b;
+};
+
 /**
  * R, G, B -> {h, s, v}
  * r: R or #RGB
  */
-util.rgb2hsv = function(r, g, b) {
+util.color.rgb2hsv = function(r, g, b) {
   if (typeof r == 'string') {
     var rgb = util.color.rgb16to10(r);
     r = rgb.r;
@@ -2599,7 +2603,7 @@ util.rgb2hsv = function(r, g, b) {
 /**
  * H, S, V -> {r, g, b}
  */
-util.hsv2rgb = function(h, s, v) {
+util.color.hsv2rgb = function(h, s, v) {
   var r, g, b;
   var max = v;
   var min = max - ((s / 255) * max);
@@ -2628,12 +2632,7 @@ util.hsv2rgb = function(h, s, v) {
     g = min;
     b = ((360 - h) / 60) * (max - min) + min;
   }
-  var rgb = {
-    r: Math.round(r),
-    g: Math.round(g),
-    b: Math.round(b)
-  };
-  return rgb;
+  return {r: Math.round(r), g: Math.round(g), b: Math.round(b)};
 };
 
 /**
@@ -2641,9 +2640,9 @@ util.hsv2rgb = function(h, s, v) {
  * brightness: -100-0-100
  * hue: -100-0-100
  */
-util.color = function(rgb16, brightness, hue) {
+util.color.adjust = function(rgb16, brightness, hue) {
   hue |= 0;
-  var hsv = util.rgb2hsv(rgb16);
+  var hsv = util.color.rgb2hsv(rgb16);
   var h = hsv.h + ((hue / 100) * 255);
   var s = hsv.s;
   var v = hsv.v;
@@ -2667,8 +2666,8 @@ util.color = function(rgb16, brightness, hue) {
   } else if (v > 255) {
     v = 255;
   }
-  var rgb = util.hsv2rgb(h, s, v);
-  return util.rgb(rgb.r, rgb.g, rgb.b);
+  var rgb = util.color.hsv2rgb(h, s, v);
+  return util.color.rgb(rgb.r, rgb.g, rgb.b);
 };
 
 util.color.rgb10to16 = function(r, g, b) {
@@ -2686,10 +2685,8 @@ util.color.rgb10to16 = function(r, g, b) {
     g16 = g0;
     b16 = b0;
   }
-  var rgb = {r: r16, g: g16, b: b16};
-  return rgb;
+  return {r: r16, g: g16, b: b16};
 };
-
 util.color.rgb16to10 = function(rgb16) {
   var r16, g16, b16, r10, g10, b10;
   rgb16 = rgb16.replace(/#/, '').replace(/\s/g, '');
@@ -2708,10 +2705,8 @@ util.color.rgb16to10 = function(rgb16) {
   r10 = parseInt(r16, 16);
   g10 = parseInt(g16, 16);
   b10 = parseInt(b16, 16);
-  var rgb = {r: r10, g: g10, b: b10};
-  return rgb;
+  return {r: r10, g: g10, b: b10};
 };
-
 // Hue 0-360
 util.color.getH = function(r, g, b) {
   if ((r == g) && (g == b)) return 0;
@@ -2729,7 +2724,6 @@ util.color.getH = function(r, g, b) {
   if (h < 0) h += 360;
   return Math.round(h);
 };
-
 // Saturation/Chroma 0-255
 util.color.getS = function(r, g, b) {
   var a = util.color.sortRGB(r, g, b);
@@ -2738,15 +2732,12 @@ util.color.getS = function(r, g, b) {
   var s = (max - min) / max;
   return Math.round(s * 255);
 };
-
 // Value/Brightness 0-255
 util.color.getV = function(r, g, b) {
   return util.color.sortRGB(r, g, b)[2];
 };
-
 util.color.sortRGB = function(r, g, b) {
-  var a = [r, g, b];
-  return a.sort(function(_a, _b) {return _a - _b});
+  return [r, g, b].sort(function(v1, v2) {return v1 - v2});
 };
 
 //-----------------------------------------------------------------------------
