@@ -52,9 +52,9 @@ public class ColorUtil {
    * @param rgb16
    *          #RGB
    * @param brightness
-   *          100-0-100
+   *          -100-0-100
    * @param hue
-   *          100-0-100
+   *          -100-0-100
    * @return #RGB
    */
   public static String adjust(String rgb16, int brightness, int hue) {
