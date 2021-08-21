@@ -1,8 +1,5 @@
 package com.libutil.test.csv.builder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.libutil.CsvBuilder;
 import com.libutil.test.Log;
 
@@ -14,42 +11,56 @@ public class AppendChunkTest {
 
   private static void test() {
     CsvBuilder builder;
+    String chunk;
 
-    String[] sArr = { "abc", "xyz" };
-    builder = new CsvBuilder();
-    builder.append(sArr);
+    chunk = "aa,bb,cc";
+    builder = new CsvBuilder(",", false);
+    builder.append("123");
+    builder.appendChunk(chunk);
     Log.i(builder);
 
-    List<String> sList = new ArrayList<>();
-    sList.add("abc");
-    sList.add("xyz");
-    builder = new CsvBuilder();
-    builder.append(sList);
+    chunk = "\"aa\",\"bb\",\"cc\"";
+    builder = new CsvBuilder(",", true);
+    builder.append("123");
+    builder.appendChunk(chunk);
     Log.i(builder);
 
-    int[] iArr = { 1, 2 };
-    builder = new CsvBuilder();
-    builder.append(iArr);
+    chunk = "aa,bb,cc";
+    builder = new CsvBuilder(",", true);
+    builder.append("123");
+    builder.appendChunk(chunk);
     Log.i(builder);
 
-    long[] lArr = { 1L, 2L };
-    builder = new CsvBuilder();
-    builder.append(lArr);
+    chunk = "\"aa\",\"bb\",\"cc\"";
+    builder = new CsvBuilder(",", false);
+    builder.append("123");
+    builder.appendChunk(chunk);
     Log.i(builder);
 
-    float[] fArr = { 1.5f, 2.1f };
-    builder = new CsvBuilder();
-    builder.append(fArr);
+    Log.i("----------");
+
+    chunk = "aa,bb,cc";
+    builder = new CsvBuilder(",", false);
+    builder.appendChunk(chunk);
+    builder.append(123);
     Log.i(builder);
 
-    double[] dArr = { 1.5, 2.1 };
-    builder = new CsvBuilder();
-    builder.append(dArr);
+    chunk = "\"aa\",\"bb\",\"cc\"";
+    builder = new CsvBuilder(",", true);
+    builder.appendChunk(chunk);
+    builder.append("123");
     Log.i(builder);
 
-    boolean[] bArr = { true, false };
-    builder = new CsvBuilder();
-    builder.append(bArr);
+    chunk = "aa,bb,cc";
+    builder = new CsvBuilder(",", true);
+    builder.appendChunk(chunk);
+    builder.append("123");
+    Log.i(builder);
+
+    chunk = "\"aa\",\"bb\",\"cc\"";
+    builder = new CsvBuilder(",", false);
+    builder.appendChunk(chunk);
+    builder.append("123");
     Log.i(builder);
 
   }
