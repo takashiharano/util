@@ -65,36 +65,84 @@ public class BinUtil {
   }
 
   /**
+   * 1234567890123...
+   *
+   * @param size
+   *          size to generate in bytes
+   * @return byte array
+   */
+  public static byte[] getTestBytes(int size) {
+    return getTestBytes(size, null, null, 0);
+  }
+
+  /**
+   * 1234567890123...
+   *
+   * @param size
+   *          size to generate in bytes
+   * @param indexOfLineBreak
+   *          the column index for inserting line breaks
+   * @return byte array
+   */
+  public static byte[] getTestBytes(int size, int indexOfLineBreak) {
+    return getTestBytes(size, null, null, indexOfLineBreak);
+  }
+
+  /**
    * [s]234567890123...[e]
    *
    * @param size
    *          size to generate in bytes
    * @param s
-   *          value of the first byte. -1 to '1'
+   *          value of the first byte. null = "1"
    * @param e
-   *          value of the last byte. -1 to [0-9] of the end position
+   *          value of the last byte. null = [0-9] of the end position
    * @return byte array
    */
-  public static byte[] getTestBytes(int size, int s, int e) {
+  public static byte[] getTestBytes(int size, String s, String e) {
+    return getTestBytes(size, s, e, 0);
+  }
+
+  /**
+   * [s]234567890123...[e]
+   *
+   * @param size
+   *          size to generate in bytes
+   * @param s
+   *          value of the first byte. null = "1"
+   * @param e
+   *          value of the last byte. null = [0-9] of the end position
+   * @param indexOfLineBreak
+   *          the column index for inserting line breaks
+   * @return byte array
+   */
+  public static byte[] getTestBytes(int size, String s, String e, int indexOfLineBreak) {
     byte[] bytes = new byte[size];
+    int lastIndex = size - 1;
     byte b;
-    for (int i = 1; i <= size; i++) {
-      if (i == 1) {
-        if (s == -1) {
+    int c = 0;
+    for (int i = 0; i < size; i++) {
+      c++;
+      if (i == 0) {
+        if (s == null) {
           b = 0x31;
         } else {
-          b = (byte) s;
+          b = s.getBytes()[0];
         }
-      } else if (i == size) {
-        if (s == -1) {
-          b = (byte) (i % 10 + 0x30);
+      } else if (i == lastIndex) {
+        if (s == null) {
+          b = (byte) (c % 10 + 0x30);
         } else {
-          b = (byte) e;
+          b = e.getBytes()[0];
         }
       } else {
-        b = (byte) (i % 10 + 0x30);
+        b = (byte) (c % 10 + 0x30);
       }
-      bytes[i - 1] = b;
+      bytes[i] = b;
+      if ((indexOfLineBreak != 0) && ((c % indexOfLineBreak) == 0)) {
+        i++;
+        bytes[i] = 0x0A;
+      }
     }
     return bytes;
   }
