@@ -1,7 +1,5 @@
 package com.libutil.test.file;
 
-import java.io.IOException;
-
 import com.libutil.FileUtil;
 import com.libutil.test.Log;
 
@@ -14,7 +12,6 @@ public class FileUtilTest {
     // readTextFileTest10000AsArray();
     // readFileArrayTest();
     readFileAsBase64Test();
-    // writeFileTest();
     // getParentPathTest();
     listFileNamesTest();
     listDirNamesTest();
@@ -123,27 +120,6 @@ public class FileUtilTest {
   private static void getParentPathTest() {
     String parent = FileUtil.getParentPath("C:/test/a/b/c/x.txt");
     Log.d(parent);
-  }
-
-  private static void writeFileTest() {
-    String parent = "C:/test/";
-    String path1 = parent + "file1.txt";
-    String content1 = "abc\nあいうえお\n华语";
-    try {
-      FileUtil.write(path1, content1);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    String path2 = parent + "file2.txt";
-    byte[] content2 = { 97, 98, 99 };
-    try {
-      FileUtil.write(path2, content2);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    Log.d("done");
   }
 
   private static void listFileNamesTest() {

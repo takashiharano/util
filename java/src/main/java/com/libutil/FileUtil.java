@@ -28,8 +28,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -763,13 +763,29 @@ public class FileUtil {
    * @param path
    *          file path
    * @param content
-   *          the content to write
+   *          the string content to write
    * @throws IOException
    *           If an I/O error occurs
    */
   public static void write(String path, String content) throws IOException {
+    write(path, content, DEFAULT_CHARSET);
+  }
+
+  /**
+   * Write a text into a file.
+   *
+   * @param path
+   *          file path
+   * @param content
+   *          the string content to write
+   * @param charsetName
+   *          charset name
+   * @throws IOException
+   *           If an I/O error occurs
+   */
+  public static void write(String path, String content, String charsetName) throws IOException {
     File file = new File(path);
-    write(file, content);
+    write(file, content, charsetName);
   }
 
   /**
@@ -778,13 +794,30 @@ public class FileUtil {
    * @param file
    *          the file object
    * @param content
-   *          the content to write
+   *          the string content to write
    * @throws IOException
    *           If an I/O error occurs
    */
   public static void write(File file, String content) throws IOException {
     mkParentDir(file);
-    try (FileWriter fw = new FileWriter(file); BufferedWriter bw = new BufferedWriter(fw);) {
+    write(file, content, DEFAULT_CHARSET);
+  }
+
+  /**
+   * Write a text into a file.
+   * 
+   * @param file
+   *          the file object
+   * @param content
+   *          the string content to write
+   * @param charsetName
+   *          charset name. e.g., "UTF-8", "Shift_JIS"
+   * @throws IOException
+   *           If an I/O error occurs
+   */
+  public static void write(File file, String content, String charsetName) throws IOException {
+    mkParentDir(file);
+    try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charsetName))) {
       bw.write(content);
     } catch (IOException e) {
       throw e;
