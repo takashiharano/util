@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202108200006';
+util.v = '202109030000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2165,6 +2165,9 @@ $el.fn = {
   removeClass: function(n) {
     util.removeClass(this, n);
   },
+  toggleClass: function(n) {
+    util.toggleClass(this, n);
+  },
   hasClass: function(n) {
     return util.hasClass(this, n);
   },
@@ -2270,41 +2273,32 @@ util.elClear = function(el, speed) {
 };
 
 util.addClass = function(el, n) {
+  el = util.getElement(el);
   util.callFn4El(util._addClass, el, n);
 };
 util._addClass = function(el, n) {
-  el = util.getElement(el);
-  if (util.hasClass(el, n)) return;
-  if (el.className == '') {
-    el.className = n;
-  } else {
-    el.className += ' ' + n;
-  }
+  el.classList.add(n);
 };
 
 util.removeClass = function(el, n) {
+  el = util.getElement(el);
   util.callFn4El(util._removeClass, el, n);
 };
 util._removeClass = function(el, n) {
+  el.classList.remove(n);
+};
+
+util.toggleClass = function(el, n) {
   el = util.getElement(el);
-  var names = el.className.split(' ');
-  var nm = '';
-  for (var i = 0; i < names.length; i++) {
-    if (names[i] != n) {
-      if (i > 0) nm += ' ';
-      nm += names[i];
-    }
-  }
-  el.className = nm;
+  util.callFn4El(util._toggleClass, el, n);
+};
+util._toggleClass = function(el, n) {
+  el.classList.toggle(n);
 };
 
 util.hasClass = function(el, n) {
   el = util.getElement(el);
-  var names = el.className.split(' ');
-  for (var i = 0; i < names.length; i++) {
-    if (names[i] == n) return true;
-  }
-  return false;
+  return el.classList.contains(n);
 };
 
 util.isActiveElement = function(el, idx) {
