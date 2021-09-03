@@ -206,7 +206,7 @@ public class _Log {
    *
    * @return instance
    */
-  public static _Log getInstance() {
+  public static synchronized _Log getInstance() {
     if (instance == null) {
       instance = new _Log();
     }
