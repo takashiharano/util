@@ -66,6 +66,9 @@ public class ParseLineTest {
   }
 
   private String dump(String[] a) {
+    if (a == null) {
+      return "null";
+    }
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < a.length; i++) {
       if (i < 0) {
