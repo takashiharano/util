@@ -275,6 +275,63 @@ public class StrUtil {
   }
 
   /**
+   * Compares two strings.<br>
+   *
+   * <pre>
+   * StrUtil.equals("abc", "abc") = true
+   * StrUtil.equals(null, null)   = true
+   * StrUtil.equals(null, "abc")  = false
+   * StrUtil.equals("abc", null)  = false
+   * StrUtil.equals("abc", "ABC") = false
+   * StrUtil.equals("abc", "xyz") = false
+   * </pre>
+   *
+   * @param s1
+   *          the first string, may be null
+   * @param s2
+   *          the second string, may be null
+   * @return true if the strings are equal (case-sensitive), or both null
+   */
+  public static boolean equals(String s1, String s2) {
+    if ((s1 == null) && (s2 == null)) {
+      return true;
+    }
+    if (s1 == null) {
+      return false;
+    }
+    return s1.equals(s2);
+  }
+
+  /**
+   * Compares two strings, ignoring case.<br>
+   *
+   * <pre>
+   * StrUtil.equalsIgnoreCase("abc", "abc") = true
+   * StrUtil.equalsIgnoreCase("abc", "ABC") = true
+   * StrUtil.equalsIgnoreCase(null, null)   = true
+   * StrUtil.equalsIgnoreCase("abc", "xyz") = false
+   * StrUtil.equalsIgnoreCase(null, "abc")  = false
+   * StrUtil.equalsIgnoreCase("abc", null)  = false
+   * StrUtil.equalsIgnoreCase("abc", "xyz") = false
+   * </pre>
+   *
+   * @param s1
+   *          the first string, may be null
+   * @param s2
+   *          the second string, may be null
+   * @return true if the strings are equal (case-insensitive), or both null
+   */
+  public static boolean equalsIgnoreCase(String s1, String s2) {
+    if ((s1 == null) && (s2 == null)) {
+      return true;
+    }
+    if ((s1 == null) || (s2 == null)) {
+      return false;
+    }
+    return s1.toLowerCase().equals(s2.toLowerCase());
+  }
+
+  /**
    * Extract a matched part of the input string.<br>
    * e.g., input:"[ABC]" regex:"\\[(.+)\\]" return:"ABC"
    *
