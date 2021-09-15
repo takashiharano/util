@@ -386,6 +386,22 @@ public class FileUtil {
   }
 
   /**
+   * Joins the specified paths by appropriately padding them with "/"
+   *
+   * @param path1
+   *          the first path segment to join
+   * @param path2
+   *          the second path segment to join
+   * @return the concatenated path with "/"
+   */
+  public static String joinPath(String path1, String path2) {
+    path1 = path1.replace("\\", "/").replaceAll("/$", "");
+    path2 = path2.replace("\\", "/").replaceAll("^/", "");
+    String path = path1 + "/" + path2;
+    return path;
+  }
+
+  /**
    * Returns an array of abstract pathnames denoting the files in the directory
    * denoted by this abstract pathname. If this abstract pathname does not denote
    * a directory, then this method returns null. Otherwise an array of File
