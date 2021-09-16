@@ -9,20 +9,20 @@ public class LogFlagTest {
 
     logTest();
 
-    Log.print("----------");
+    Log.print("--setFlag(0)--------");
     Log.setFlag(0);
     logTest();
 
-    Log.print("----------");
+    Log.print("--setFlag(Log.FLAG_TIME)--------");
     Log.setFlag(Log.FLAG_TIME);
     logTest();
 
-    Log.print("----------");
+    Log.print("--setDateTimeFormat(\"HH:mm:ss.SSS\")--------");
     Log.setFlag(Log.FLAG_TIME);
     Log.setDateTimeFormat("HH:mm:ss.SSS");
     logTest();
 
-    Log.print("----------");
+    Log.print("--setFlag(Log.FLAG_TIME | Log.FLAG_LEVEL)--------");
     Log.setFlag(Log.FLAG_TIME | Log.FLAG_LEVEL);
     logTest();
 
