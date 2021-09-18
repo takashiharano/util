@@ -650,6 +650,51 @@ public class StrUtil {
   }
 
   /**
+   * Left pad a String with a specified string.
+   *
+   * @param str
+   *          the string to pad out, may be null
+   * @param pad
+   *          the string to pad with
+   * @param len
+   *          the total length of padded string
+   * @return left padded string, null if null string input
+   */
+  public static String leftPad(String str, String pad, int len) {
+    return leftPad(str, pad, len, false);
+  }
+
+  /**
+   * Left pad a String with a specified string.
+   *
+   * @param str
+   *          the string to pad out, may be null
+   * @param pad
+   *          the string to pad with
+   * @param len
+   *          the total length of padded string
+   * @param align
+   *          if true, aligns the output to exactly the specified length
+   * @return left padded string, null if null string input
+   */
+  public static String leftPad(String str, String pad, int len, boolean align) {
+    if (str == null) {
+      return null;
+    }
+    int padLen = len - str.length();
+    if (padLen <= 0) {
+      if (align) {
+        str = str.substring(0, len);
+      }
+      return str;
+    }
+    String pd = repeat(pad, padLen);
+    StringBuilder sb = new StringBuilder(pd);
+    sb.append(str);
+    return sb.toString();
+  }
+
+  /**
    * Returns if the input sequence matches the pattern.
    *
    * @param target
@@ -888,6 +933,51 @@ public class StrUtil {
     for (int i = 0; i < n; i++) {
       sb.append(str);
     }
+    return sb.toString();
+  }
+
+  /**
+   * Right pad a String with a specified string.
+   *
+   * @param str
+   *          the string to pad out, may be null
+   * @param pad
+   *          the string to pad with
+   * @param len
+   *          the total length of padded string
+   * @return right padded string, null if null string input
+   */
+  public static String rightPad(String str, String pad, int len) {
+    return rightPad(str, pad, len, false);
+  }
+
+  /**
+   * Right pad a String with a specified string.
+   *
+   * @param str
+   *          the string to pad out, may be null
+   * @param pad
+   *          the string to pad with
+   * @param len
+   *          the total length of padded string
+   * @param align
+   *          if true, aligns the output to exactly the specified length
+   * @return right padded string, null if null string input
+   */
+  public static String rightPad(String str, String pad, int len, boolean align) {
+    if (str == null) {
+      return null;
+    }
+    int padLen = len - str.length();
+    if (padLen <= 0) {
+      if (align) {
+        str = str.substring(0, len);
+      }
+      return str;
+    }
+    String pd = repeat(pad, padLen);
+    StringBuilder sb = new StringBuilder(str);
+    sb.append(pd);
     return sb.toString();
   }
 
