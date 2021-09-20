@@ -693,6 +693,29 @@ public class StrUtil {
   }
 
   /**
+   * Counts the length of the string, with 1 for half-width and 2 for full-width.
+   *
+   * @param str
+   *          the string to count
+   * @return the length of the string
+   */
+  public static int lenW(String str) {
+    int n = 0;
+    for (int i = 0; i < str.length(); i++) {
+      int p = str.codePointAt(i);
+      if ((p <= 0x7F) || ((p >= 0xFF61) && (p <= 0xFF9F))) {
+        n++;
+      } else {
+        n += 2;
+      }
+      if (p >= 0x10000) {
+        i++;
+      }
+    }
+    return n;
+  }
+
+  /**
    * Returns if the input sequence matches the pattern.
    *
    * @param target
