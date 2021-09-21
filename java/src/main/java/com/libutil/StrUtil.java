@@ -693,6 +693,51 @@ public class StrUtil {
   }
 
   /**
+   * Left pad a String with a specified string. (Full-width compatible)
+   *
+   * @param str
+   *          the string to pad out, may be null
+   * @param pad
+   *          the string to pad with
+   * @param len
+   *          the total length of padded string (count in half-width)
+   * @return left padded string, null if null string input
+   */
+  public static String leftPadW(String str, String pad, int len) {
+    return leftPadW(str, pad, len, false);
+  }
+
+  /**
+   * Left pad a String with a specified string. (Full-width compatible)
+   *
+   * @param str
+   *          the string to pad out, may be null
+   * @param pad
+   *          the string to pad with
+   * @param len
+   *          the total length of padded string (count in half-width)
+   * @param align
+   *          if true, aligns the output to exactly the specified length
+   * @return left padded string, null if null string input
+   */
+  public static String leftPadW(String str, String pad, int len, boolean align) {
+    if (str == null) {
+      return null;
+    }
+    int padLen = len - lenW(str);
+    if (padLen <= 0) {
+      if ((align) && (str.length() > len)) {
+        str = str.substring(0, len);
+      }
+      return str;
+    }
+    String pd = repeat(pad, padLen);
+    StringBuilder sb = new StringBuilder(pd);
+    sb.append(str);
+    return sb.toString();
+  }
+
+  /**
    * Counts the length of the string, with 1 for half-width and 2 for full-width.
    *
    * @param str
@@ -992,6 +1037,51 @@ public class StrUtil {
     int padLen = len - str.length();
     if (padLen <= 0) {
       if (align) {
+        str = str.substring(0, len);
+      }
+      return str;
+    }
+    String pd = repeat(pad, padLen);
+    StringBuilder sb = new StringBuilder(str);
+    sb.append(pd);
+    return sb.toString();
+  }
+
+  /**
+   * Right pad a String with a specified string. (Full-width compatible)
+   *
+   * @param str
+   *          the string to pad out, may be null
+   * @param pad
+   *          the string to pad with
+   * @param len
+   *          the total length of padded string (count in half-width)
+   * @return right padded string, null if null string input
+   */
+  public static String rightPadW(String str, String pad, int len) {
+    return rightPadW(str, pad, len, false);
+  }
+
+  /**
+   * Right pad a String with a specified string. (Full-width compatible)
+   *
+   * @param str
+   *          the string to pad out, may be null
+   * @param pad
+   *          the string to pad with
+   * @param len
+   *          the total length of padded string (count in half-width)
+   * @param align
+   *          if true, aligns the output to exactly the specified length
+   * @return right padded string, null if null string input
+   */
+  public static String rightPadW(String str, String pad, int len, boolean align) {
+    if (str == null) {
+      return null;
+    }
+    int padLen = len - lenW(str);
+    if (padLen <= 0) {
+      if ((align) && (str.length() > len)) {
         str = str.substring(0, len);
       }
       return str;
