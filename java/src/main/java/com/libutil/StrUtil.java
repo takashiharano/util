@@ -1333,6 +1333,56 @@ public class StrUtil {
   }
 
   /**
+   * Converts from half-width to full-width.
+   *
+   * @param s
+   *          the string to convert
+   * @return the converted string
+   */
+  public static String toFullWidth(String s) {
+    StringBuffer sb = new StringBuffer(s);
+    for (int i = 0; i < sb.length(); i++) {
+      char c = sb.charAt(i);
+      if (c >= '!' && c <= '~') {
+        sb.setCharAt(i, (char) (c + 65248));
+      } else if (c == ' ') {
+        sb.setCharAt(i, (char) (0x3000));
+      }
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Converts from full-width to half-width.
+   *
+   * @param s
+   *          the string to convert
+   * @return the converted string
+   */
+  public static String toHalfWidth(String s) {
+    StringBuffer sb = new StringBuffer(s);
+    for (int i = 0; i < sb.length(); i++) {
+      char c = sb.charAt(i);
+      if (c >= '！' && c <= '～') {
+        sb.setCharAt(i, (char) (c - 65248));
+      } else if (c == '　') {
+        sb.setCharAt(i, ' ');
+      } else if ((c == '“') || (c == '”')) {
+        sb.setCharAt(i, '"');
+      } else if (c == '‘') {
+        sb.setCharAt(i, '`');
+      } else if (c == '’') {
+        sb.setCharAt(i, '\'');
+      } else if (c == '〜') {
+        sb.setCharAt(i, '~');
+      } else if (c == '￥') {
+        sb.setCharAt(i, '\\');
+      }
+    }
+    return sb.toString();
+  }
+
+  /**
    * Converts a string to a signed decimal integer.
    *
    * @param s
