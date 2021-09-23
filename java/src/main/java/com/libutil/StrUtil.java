@@ -565,17 +565,40 @@ public class StrUtil {
   }
 
   /**
+   * Returns if the specified string is not empty (""), not null and not
+   * whitespace only.
+   *
+   * @param str
+   *          the string to check, may be null
+   * @return true if the string is not null, not empty and not whitespace only
+   */
+  public static boolean isNotBlank(String str) {
+    return !isBlank(str);
+  }
+
+  /**
    * Returns if the specified string is empty ("") or null.
    *
    * @param str
    *          the string to check, may be null
-   * @return true if the string is empty null
+   * @return true if the string is empty or null
    */
   public static boolean isEmpty(String str) {
     if (str == null) {
       return true;
     }
     return str.equals("");
+  }
+
+  /**
+   * Returns if the specified string is not empty ("") and not null.
+   *
+   * @param str
+   *          the string to check, may be null
+   * @return true if the string is not empty and not null
+   */
+  public static boolean isNotEmpty(String str) {
+    return !isEmpty(str);
   }
 
   /**
