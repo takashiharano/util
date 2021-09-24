@@ -69,13 +69,33 @@ public class StrUtil {
   }
 
   /**
+   * Capitalizes the string<br>
+   * e.g., abc to Abc
+   *
+   * @param s
+   *          the source string
+   * @return the capitalized string
+   */
+  public static String capitalize(String s) {
+    if ((s == null) || "".equals(s)) {
+      return s;
+    }
+    String s1 = s.substring(0, 1);
+    String s2 = "";
+    if (s.length() >= 2) {
+      s2 = s.substring(1);
+    }
+    return s1.toUpperCase() + s2.toLowerCase();
+  };
+
+  /**
    * Convert newline control character.
    *
    * @param src
-   *          source string
+   *          the source string
    * @param newLine
    *          new line code
-   * @return converted string
+   * @return the converted string
    */
   public static String convertNewLine(String src, String newLine) {
     return src.replaceAll("\r\n", "\n").replaceAll("\r", "\n").replaceAll("\n", newLine);
