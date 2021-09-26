@@ -71,8 +71,8 @@ public class BinUtil {
    *          size to generate in bytes
    * @return byte array
    */
-  public static byte[] getTestBytes(int size) {
-    return getTestBytes(size, null, null, 0);
+  public static byte[] getSequentialBytes(int size) {
+    return getSequentialBytes(size, null, null, 0);
   }
 
   /**
@@ -84,8 +84,8 @@ public class BinUtil {
    *          the column index for inserting line breaks
    * @return byte array
    */
-  public static byte[] getTestBytes(int size, int indexOfLineBreak) {
-    return getTestBytes(size, null, null, indexOfLineBreak);
+  public static byte[] getSequentialBytes(int size, int indexOfLineBreak) {
+    return getSequentialBytes(size, null, null, indexOfLineBreak);
   }
 
   /**
@@ -99,8 +99,8 @@ public class BinUtil {
    *          value of the last byte. null = [0-9] of the end position
    * @return byte array
    */
-  public static byte[] getTestBytes(int size, String s, String e) {
-    return getTestBytes(size, s, e, 0);
+  public static byte[] getSequentialBytes(int size, String s, String e) {
+    return getSequentialBytes(size, s, e, 0);
   }
 
   /**
@@ -116,7 +116,7 @@ public class BinUtil {
    *          the column index for inserting line breaks
    * @return byte array
    */
-  public static byte[] getTestBytes(int size, String s, String e, int indexOfLineBreak) {
+  public static byte[] getSequentialBytes(int size, String s, String e, int indexOfLineBreak) {
     byte[] bytes = new byte[size];
     int lastIndex = size - 1;
     byte b;
