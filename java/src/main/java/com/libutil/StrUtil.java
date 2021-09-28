@@ -1046,6 +1046,21 @@ public class StrUtil {
   }
 
   /**
+   * Reverses a string.
+   *
+   * @param s
+   *          the string to reverse, may be null
+   * @return reversed string
+   */
+  public static String reverse(String s) {
+    if (s == null) {
+      return null;
+    }
+    StringBuilder sb = new StringBuilder(s);
+    return sb.reverse().toString();
+  }
+
+  /**
    * Right pad a String with a specified string.
    *
    * @param str
