@@ -483,6 +483,89 @@ public class StrUtil {
   }
 
   /**
+   * 1234567890123...
+   *
+   * @param len
+   *          length to generate
+   * @return the string
+   */
+  public static String getSequentialString(int len) {
+    return getSequentialString(len, null, null, 0);
+  }
+
+  /**
+   * 1234567890123...
+   *
+   * @param len
+   *          length to generate
+   * @param indexOfLineBreak
+   *          the column index for inserting line breaks
+   * @return the string
+   */
+  public static String getSequentialString(int len, int indexOfLineBreak) {
+    return getSequentialString(len, null, null, indexOfLineBreak);
+  }
+
+  /**
+   * [s]234567890123...[e]
+   *
+   * @param len
+   *          length to generate
+   * @param s
+   *          value of the first character. null = "1"
+   * @param e
+   *          value of the last character. null = [0-9] of the end position
+   * @return the string
+   */
+  public static String getSequentialString(int len, String s, String e) {
+    return getSequentialString(len, s, e, 0);
+  }
+
+  /**
+   * [s]234567890123...[e]
+   *
+   * @param len
+   *          length to generate
+   * @param s
+   *          value of the first character. null = "1"
+   * @param e
+   *          value of the last character. null = [0-9] of the end position
+   * @param indexOfLineBreak
+   *          the column index for inserting line breaks
+   * @return the string
+   */
+  public static String getSequentialString(int len, String s, String e, int indexOfLineBreak) {
+    byte[] bytes = new byte[len];
+    int lastIndex = len - 1;
+    byte b;
+    int c = 0;
+    for (int i = 0; i < len; i++) {
+      c++;
+      if (i == 0) {
+        if (s == null) {
+          b = 0x31;
+        } else {
+          b = s.getBytes()[0];
+        }
+      } else if (i == lastIndex) {
+        if (s == null) {
+          b = (byte) (c % 10 + 0x30);
+        } else {
+          b = e.getBytes()[0];
+        }
+      } else {
+        b = (byte) (c % 10 + 0x30);
+      }
+      bytes[i] = b;
+      if ((indexOfLineBreak != 0) && ((c % indexOfLineBreak) == 0)) {
+        i++;
+        bytes[i] = 0x0A;
+      }
+    }
+    return new String(bytes);
+  }
+
+  /**
    * Indicates whether the string contains a BOM character.
    *
    * @param s
