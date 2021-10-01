@@ -17,7 +17,7 @@ public class WriteFileTestBig {
 
     String path = dir + "file_big.txt";
     Log.t("1");
-    byte[] b = BinUtil.getTestBytes(100 * 1024 * 1024, "!", "#", 1000);
+    byte[] b = BinUtil.getSequentialBytes(100 * 1024 * 1024, "!", "#", 1000);
     Log.t("2");
     try {
       Log.t("3", 0);
