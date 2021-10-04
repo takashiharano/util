@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202106300001
+v = 202110050015
 
 import sys
 import os
@@ -1510,7 +1510,7 @@ def write_file_from_base64(path, data):
   write_binary_file(path, b)
 
 # Base64 decoder (file to file)
-def file_to_file_base64_decoder(src_path, dest_path):
+def base64_file_to_file_decoder(src_path, dest_path):
   d = read_text_file(src_path)
   write_file_from_base64(dest_path, d)
 
