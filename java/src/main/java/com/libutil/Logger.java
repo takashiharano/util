@@ -23,7 +23,7 @@
  */
 package com.libutil;
 
-// public class Log extends _Log {
+// public class Log extends Logger {
 //
 //   public static void setup(int level, String moduleName) {
 //     instance = new Log();
@@ -36,10 +36,10 @@ package com.libutil;
 /**
  * Logger.
  */
-public class _Log {
+public class Logger {
 
   protected static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXX";
-  protected static _Log instance;
+  protected static Logger instance;
 
   public static final int FLAG_TIME = 1;
   public static final int FLAG_LEVEL = 2;
@@ -79,7 +79,7 @@ public class _Log {
   /**
    * Initialize the module.
    */
-  public _Log() {
+  public Logger() {
     this(5);
   }
 
@@ -89,7 +89,7 @@ public class _Log {
    * @param level
    *          log level
    */
-  public _Log(int level) {
+  public Logger(int level) {
     this(level, null);
   }
 
@@ -101,7 +101,7 @@ public class _Log {
    * @param module
    *          module name
    */
-  public _Log(int level, String module) {
+  public Logger(int level, String module) {
     this(level, module, DEFAULT_DATE_TIME_FORMAT);
   }
 
@@ -115,7 +115,7 @@ public class _Log {
    * @param format
    *          date time format like "yyyy-MM-dd' 'HH:mm:ss.SSS XX"
    */
-  public _Log(int level, String module, String format) {
+  public Logger(int level, String module, String format) {
     outputLevel = level;
     moduleName = module;
     dateTimeFormat = format;
@@ -206,9 +206,9 @@ public class _Log {
    *
    * @return instance
    */
-  public static synchronized _Log getInstance() {
+  public static synchronized Logger getInstance() {
     if (instance == null) {
-      instance = new _Log();
+      instance = new Logger();
     }
     return instance;
   }
@@ -375,7 +375,7 @@ public class _Log {
    */
   public static long t(String msg) {
     long t1 = System.currentTimeMillis();
-    _Log self = getInstance();
+    Logger self = getInstance();
     long t0 = self.logT0;
     if (t0 == 0) {
       t0 = t1;
@@ -419,7 +419,7 @@ public class _Log {
   }
 
   public static void print(Object o) {
-    _Log l = getInstance();
+    Logger l = getInstance();
     l.printLog(l.dump(o));
   }
 
@@ -459,7 +459,7 @@ public class _Log {
    *          frame offset to output
    */
   public static void stack(int offset) {
-    _Log log = getInstance();
+    Logger log = getInstance();
     StackTraceElement stack[] = (new Throwable()).getStackTrace();
     log.printLog("Stack:");
     for (int i = offset; i < stack.length; i++) {
@@ -472,7 +472,7 @@ public class _Log {
   }
 
   protected static void printStackTraceString(Throwable t, LogLevel lv, boolean printLine) {
-    _Log log = getInstance();
+    Logger log = getInstance();
     log.out(t.toString(), lv, 2, printLine);
     log._printStackTraceString(t, lv, printLine);
     while ((t = t.getCause()) != null) {
