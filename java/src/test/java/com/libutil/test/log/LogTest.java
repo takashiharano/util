@@ -2,7 +2,7 @@ package com.libutil.test.log;
 
 import java.util.ArrayList;
 
-import com.libutil.Logger.LogLevel;
+import com.libutil._Log.LogLevel;
 import com.libutil.test.Log;
 
 public class LogTest {

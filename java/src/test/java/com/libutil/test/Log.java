@@ -1,8 +1,8 @@
 package com.libutil.test;
 
-import com.libutil.Logger;
+import com.libutil._Log;
 
-public class Log extends Logger {
+public class Log extends _Log {
 
   public static void setup(int level, String moduleName) {
     instance = new Log();
