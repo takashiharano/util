@@ -174,6 +174,24 @@ public class FileUtil {
   }
 
   /**
+   * Base64 file to file decoder.
+   *
+   * @param srcPath
+   *          Base64 text file path
+   * @param destPath
+   *          file path to save the decoded file
+   * @throws IOException
+   *           If an I/O error occurs
+   */
+  public static void decodeBase64FileToFile(String srcPath, String destPath) throws IOException {
+    String b64 = FileUtil.readText(srcPath);
+    if (b64 != null) {
+      b64 = b64.replaceAll("\r\n", "\n").replaceAll("\r", "\n").replaceAll("\n", "");
+      FileUtil.writeFromBase64(destPath, b64);
+    }
+  }
+
+  /**
    * Deletes the file or directory denoted by this abstract pathname. If this
    * pathname denotes a directory, then the directory must be empty in order to be
    * deleted.
@@ -187,6 +205,57 @@ public class FileUtil {
     File file = new File(path);
     boolean deleted = file.delete();
     return deleted;
+  }
+
+  /**
+   * Base64 file to file encoder.
+   *
+   * @param srcPath
+   *          file path to encode
+   * @param destPath
+   *          file path to save the Base64 encoded string
+   * @throws IOException
+   *           If an I/O error occurs
+   */
+  public static void encodeBase64FileToFile(String srcPath, String destPath) throws IOException {
+    encodeBase64FileToFile(srcPath, destPath, 0);
+  }
+
+  /**
+   * Base64 file to file encoder.
+   *
+   * @param srcPath
+   *          file path to encode
+   * @param destPath
+   *          file path to save the Base64 encoded string
+   * @param newlinePosition
+   *          newline position. 0=do not insert newline
+   * @throws IOException
+   *           If an I/O error occurs
+   */
+  public static void encodeBase64FileToFile(String srcPath, String destPath, int newlinePosition) throws IOException {
+    String b64 = FileUtil.readAsBase64(srcPath);
+    if (b64 == null) {
+      return;
+    }
+    if (newlinePosition > 0) {
+      b64 = insertNewLine(b64, newlinePosition);
+    }
+    FileUtil.write(destPath, b64);
+  }
+
+  private static String insertNewLine(String str, int pos) {
+    StringBuilder sb = new StringBuilder(str);
+    int p = 0;
+    while (p < sb.length()) {
+      p += pos;
+      if (p >= sb.length()) {
+        break;
+      }
+      sb.insert(p, "\r\n");
+      p += 2;
+    }
+    return sb.toString();
   }
 
   /**
@@ -204,21 +273,6 @@ public class FileUtil {
     }
     File file = new File(path);
     return file.exists();
-  }
-
-  /**
-   * Base64 decoder. (file to file)
-   *
-   * @param srcPath
-   *          Base64 text file path
-   * @param destPath
-   *          path to save the decoded file
-   * @throws IOException
-   *           If an I/O error occurs
-   */
-  public static void fileToFileBase64Decoder(String srcPath, String destPath) throws IOException {
-    String b64 = FileUtil.readText(srcPath);
-    FileUtil.writeFromBase64(destPath, b64);
   }
 
   /**
@@ -344,6 +398,9 @@ public class FileUtil {
    */
   public static String getHash(File file, String algorithm) {
     byte[] b = FileUtil.read(file);
+    if (b == null) {
+      return null;
+    }
     String hash = null;
     try {
       MessageDigest md = MessageDigest.getInstance(algorithm);
@@ -592,7 +649,7 @@ public class FileUtil {
       @SuppressWarnings("unused")
       int readSize = fis.read(content, 0, content.length);
     } catch (IOException ioe) {
-      content = new byte[0];
+      content = null;
     }
     return content;
   }
@@ -683,6 +740,9 @@ public class FileUtil {
    * @return text content
    */
   public static String[] readTextAsArray(String path, String charsetName) {
+    if (notExist(path)) {
+      return null;
+    }
     if (charsetName == null) {
       charsetName = DEFAULT_CHARSET;
     }
@@ -722,7 +782,7 @@ public class FileUtil {
   public static String readAsBase64(File file) {
     String encoded = null;
     byte[] bytes = read(file);
-    if ((bytes != null) && (bytes.length != 0)) {
+    if (bytes != null) {
       encoded = Base64.getEncoder().encodeToString(bytes);
     }
     return encoded;
