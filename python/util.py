@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202110050015
+v = 202110102104
 
 import sys
 import os
@@ -1509,10 +1509,28 @@ def write_file_from_base64(path, data):
   b = base64.b64decode(data)
   write_binary_file(path, b)
 
-# Base64 decoder (file to file)
-def base64_file_to_file_decoder(src_path, dest_path):
+# Base64 file to file decoder
+def decode_base64_file_to_file(src_path, dest_path):
   d = read_text_file(src_path)
   write_file_from_base64(dest_path, d)
+
+# Base64 file to file encoder
+def encode_base64_file_to_file(src_path, dest_path, newline_position=76):
+  s = read_file_as_base64(src_path)
+  if newline_position > 0:
+    s = insert_newline(s, newline_position)
+  write_text_file(dest_path, s)
+
+def insert_newline(s, pos):
+  a = list(s)
+  p = 0
+  while p < len(a):
+    p = p + pos
+    if p >= len(a):
+      break
+    a.insert(p, '\r\n')
+    p = p + 2;
+  return ''.join(a)
 
 # Append a line to text file
 def append_line_to_text_file(path, text, encoding=DEFAULT_ENCODING, max=0):
