@@ -216,8 +216,12 @@ public class _Log {
   /**
    * Sets output flag.
    *
+   * <pre>
+   * FLAG_TIME(1) | FLAG_LEVEL(2) | FLAG_MODULE_NAME(4) | FLAG_TID(8) | FLAG_LINE(16)
+   * </pre>
+   *
    * @param flag
-   *          flag values
+   *          logical sum of flag values
    */
   public static void setFlag(int flag) {
     getInstance().setOutputFlag(flag);
@@ -226,8 +230,16 @@ public class _Log {
   /**
    * Adds output flag.
    *
+   * <pre>
+   * FLAG_TIME (1)
+   * FLAG_LEVEL (2)
+   * FLAG_MODULE_NAME (4)
+   * FLAG_TID (8)
+   * FLAG_LINE (16)
+   * </pre>
+   *
    * @param flag
-   *          flag value
+   *          a flag value
    */
   public static void addFlag(int flag) {
     getInstance().addOutputFlag(flag);
@@ -236,8 +248,16 @@ public class _Log {
   /**
    * Removes output flag.
    *
+   * <pre>
+   * FLAG_TIME (1)
+   * FLAG_LEVEL (2)
+   * FLAG_MODULE_NAME (4)
+   * FLAG_TID (8)
+   * FLAG_LINE (16)
+   * </pre>
+   *
    * @param flag
-   *          flag value
+   *          a flag value
    */
   public static void removeFlag(int flag) {
     getInstance().removeOutputFlag(flag);
