@@ -218,7 +218,7 @@ public class FileUtil {
    *           If an I/O error occurs
    */
   public static void encodeBase64FileToFile(String srcPath, String destPath) throws IOException {
-    encodeBase64FileToFile(srcPath, destPath, 0);
+    encodeBase64FileToFile(srcPath, destPath, 76);
   }
 
   /**
