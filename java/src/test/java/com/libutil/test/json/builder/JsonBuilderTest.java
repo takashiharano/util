@@ -116,7 +116,7 @@ public class JsonBuilderTest {
     String v = "JSON";
     jb.append(v);
     Log.i("toString()     : " + jb.toString());
-    Log.i("toString(true) : " + jb.toString(true));
+    Log.i("toStringAsIs() : " + jb.toStringAsIs());
   }
 
 }

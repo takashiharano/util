@@ -29,10 +29,10 @@ public class BuildListTest {
     String objectJson2 = "{\"key2\":\"xyz\"}";
     jb = new JsonBuilder();
     jb.openList();
-    jb.appendObjectToList(objectJson1);
-    jb.appendObjectToList(objectJson2);
+    jb.appendListElementAsObject(objectJson1);
+    jb.appendListElementAsObject(objectJson2);
     jb.closeList();
-    Log.i("list: " + jb.toString(true));
+    Log.i("list: " + jb.toStringAsIs());
   }
 
 }

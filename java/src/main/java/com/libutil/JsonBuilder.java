@@ -497,6 +497,24 @@ public class JsonBuilder {
   }
 
   /**
+   * Appends an object represented by JSON string to the list part of this
+   * sequence.
+   *
+   * <pre>
+   * e.g.,
+   * {
+   *   "key": [
+   *   <i>JSON</i>
+   * </pre>
+   *
+   * @param json
+   *          the JSON string to append
+   */
+  public void appendListElementAsObject(String json) {
+    _appendListElement(json);
+  }
+
+  /**
    * Encodes a string value in Base64 and appends to the list part of this
    * sequence.
    *
@@ -516,24 +534,6 @@ public class JsonBuilder {
   }
 
   /**
-   * Appends an object represented by JSON string to the list part of this
-   * sequence.
-   *
-   * <pre>
-   * e.g.,
-   * {
-   *   "key": [
-   *   <i>JSON</i>
-   * </pre>
-   *
-   * @param json
-   *          the JSON string to append
-   */
-  public void appendObjectToList(String json) {
-    _appendListElement(json);
-  }
-
-  /**
    * Appends "]" to this sequence.
    */
   public void closeList() {
@@ -544,39 +544,20 @@ public class JsonBuilder {
   /**
    * Returns the JSON string representation of this sequence.
    *
-   * <pre>
-   * e.g.,
-   * {BUFFER}
-   * </pre>
+   * @return a JSON string representation of this sequence like {BUFFER}
    */
   public String toString() {
-    return toString(false);
+    return "{" + buffer.toString() + "}";
   }
 
   /**
-   * Returns the JSON string representation of this sequence.
+   * Returns the contents of the buffer as a string without leading "{" and
+   * trailing "}".
    *
-   * <pre>
-   * e.g.,
-   * partial=false:
-   *   {BUFFER}
-   *
-   * partial=true:
-   *   BUFFER
-   * </pre>
-   *
-   * @param partial
-   *          if true, the buffer is returned as is.
-   * @return a JSON string representation of this sequence
+   * @return a string representation of this sequence
    */
-  public String toString(boolean partial) {
-    String json;
-    if (partial) {
-      json = buffer.toString();
-    } else {
-      json = "{" + buffer.toString() + "}";
-    }
-    return json;
+  public String toStringAsIs() {
+    return buffer.toString();
   }
 
   private void _appendListElement(String value) {
