@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202110132205';
+util.v = '202110132243';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -228,7 +228,7 @@ util._serializeDateTime = function(s) {
  * 2020/09/20 12:34:56.789 +09:00
  * -> millis from 19700101T0000Z
  */
-util.unixmillis = function(s) {
+util.getTimestamp = function(s) {
   return new util.DateTime(s).timestamp;
 };
 
@@ -445,8 +445,8 @@ util.getOffsetFromLocalTz = function(tz) {
  * return t1 - t0 in millis
  */
 util.difftime = function(t0, t1) {
-  t0 = util.unixmillis(t0);
-  t1 = (t1 == undefined ? Date.now() : util.unixmillis(t1));
+  t0 = util.getTimestamp(t0);
+  t1 = (t1 == undefined ? Date.now() : util.getTimestamp(t1));
   return t1 - t0;
 };
 
