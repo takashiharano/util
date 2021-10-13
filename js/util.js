@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202110132243';
+util.v = '202110140012';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -676,8 +676,9 @@ util.timecounter.start = function(el, t0, opt) {
   if (o) {
     if (t0 !== undefined) o.t0 = t0;
     if (opt.interval != undefined) o.interval = opt.interval;
-    if (opt.mode !== undefined) o.mode = opt.mode;
-    if (opt.cb !== undefined) o.cb = opt.cb;
+    if (opt.mode != undefined) o.mode = opt.mode;
+    if (opt.signed != undefined) o.signed = opt.signed;
+    if (opt.cb != undefined) o.cb = opt.cb;
   } else {
     o = new util.TimeCounter(el, t0, opt);
     util.timecounter.objs[o.id] = o;
@@ -752,10 +753,11 @@ util.timecounter.ids = function() {
  */
 util.TimeCounter = function(el, t0, opt) {
   if (!opt) opt = {};
+  util.copyDefaultProps(util.TimeCounter.DFLT_OPT, opt);
   this.el = el;
   this.t0 = (t0 == undefined ? Date.now() : t0);
-  this.interval = (opt.interval == undefined ? 500 : opt.interval);
-  this.mode = (opt.mode == undefined ? 1 : opt.mode);
+  this.interval = opt.interval;
+  this.mode = opt.mode;
   this.signed = opt.signed;
   this.cb = opt.cb;
   this.id = '_timecounter-' + util.timecounter.id++;
@@ -780,6 +782,7 @@ util.TimeCounter.prototype = {
     util.IntervalProc.remove(ctx.id);
   }
 };
+util.TimeCounter.DFLT_OPT = {interval: 500, mode: 1, signed: true, cb: null};
 
 //------------------------------------------------
 // Clock
