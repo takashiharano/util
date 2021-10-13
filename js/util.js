@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202110132105';
+util.v = '202110132205';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -293,6 +293,17 @@ util.getTimestampOfMidnight = function(ms, offset) {
 };
 
 /**
+ * Millis to clock format '1d 12:34:56.789'.
+ *
+ * fmt
+ *  '%Dd %H:%m:%S.%s'
+ *  days=auto: '%d%H:%m:%S.%s'
+ */
+util.getTimeString = function(ms, fmt) {
+  return (new util.Time(ms)).toClock(fmt);
+};
+
+/**
  * millis to struct
  * -> {'millis': millis, 'days': 1, 'hrs': 0, 'hours': 24, 'minutes': 34, 'seconds': 56, 'milliseconds': 123}
  */
@@ -500,21 +511,25 @@ util.Time.prototype = {
    * To clock format
    *
    * fmt
-   *  'DHMSs'
+   *  '%Dd %H:%m:%S.%s'
    */
   toClock: function(fmt) {
     var ctx = this;
-    if (!fmt) fmt = 'HMSs';
+    if (!fmt) fmt = '%d%H:%m:%S.%s';
     var d = ctx.days;
     var h = ctx.hours;
     var m = ctx.minutes;
     var s = ctx.seconds;
     var ms = ctx.milliseconds;
 
-    if (fmt.match(/D/)) h = ctx.hrs;
-    if (!fmt.match(/H/)) m += h * 60;
-    if (!fmt.match(/M/)) s += m * 60;
-    if (!fmt.match(/S/)) ms += s * 1000;
+    if (fmt.match(/%d/)) {
+      if (d > 0) h = ctx.hrs;
+    } else if (fmt.match(/%D/)) {
+      h = ctx.hrs;
+    }
+    if (!fmt.match(/%H/)) m += h * 60;
+    if (!fmt.match(/%m/)) s += m * 60;
+    if (!fmt.match(/%S/)) ms += s * 1000;
 
     d += '';
     h += '';
@@ -527,12 +542,19 @@ util.Time.prototype = {
     s = ('0' + s).slice(-2);
     ms = ('00' + ms).slice(-3);
 
-    var r = '';
-    if (fmt.match(/D/)) r += d + 'd ';
-    if (fmt.match(/H/)) r += h + ':';
-    if (fmt.match(/M/)) r += m;
-    if (fmt.match(/S/)) r += ':' + s;
-    if (fmt.match(/s/)) r += '.' + ms;
+    var r = fmt;
+    var ds = '';
+    if (fmt.match(/%d/) && (d > 0)) {
+      ds = d + 'd ';
+    } else if (fmt.match(/%D/)) {
+      ds = d;
+    }
+    r = r.replace(/%D/i, ds);
+    r = r.replace(/%H/, h);
+    r = r.replace(/%m/, m);
+    r = r.replace(/%S/, s);
+    r = r.replace(/%s/, ms);
+    if (ctx.millis < 0) r = '-' + r;
     return r;
   },
 
