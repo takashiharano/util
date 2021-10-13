@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202110140012';
+util.v = '202110140038';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -613,7 +613,7 @@ util.Time.prototype = {
  *   1: s
  *   2: ms
  */
-util.ms2str = function(ms, mode, signed) {
+util.ms2str = function(ms, mode, unsigned) {
   var t = new util.Time(ms);
   var r = '';
   var sn = 0;
@@ -623,12 +623,12 @@ util.ms2str = function(ms, mode, signed) {
   }
   if (mode == 2) {
     r = t.toString(false, true);
-    if (!signed) r = r.replace('-', '');
+    if (unsigned) r = r.replace('-', '');
     return r;
   }
   if ((mode == 1) || (ms >= 60000)) {
     r = t.toString(false, false);
-    if (!signed) r = r.replace('-', '');
+    if (unsigned) r = r.replace('-', '');
     return r;
   }
   var ss = t.seconds;
@@ -650,7 +650,7 @@ util.ms2str = function(ms, mode, signed) {
       r += ss + '.' + msec + 's';
     }
   }
-  if (signed) r = (sn ? '-' : '') + r;
+  if (!unsigned) r = (sn ? '-' : '') + r;
   return r;
 };
 
@@ -666,7 +666,7 @@ util.timecounter.objs = {};
  * opt = {
  *  interval: 500,
  *  mode: 1,
- *  signed: true,
+ *  unsigned: false,
  *  cb: null
  * }
  */
@@ -677,7 +677,7 @@ util.timecounter.start = function(el, t0, opt) {
     if (t0 !== undefined) o.t0 = t0;
     if (opt.interval != undefined) o.interval = opt.interval;
     if (opt.mode != undefined) o.mode = opt.mode;
-    if (opt.signed != undefined) o.signed = opt.signed;
+    if (opt.unsigned != undefined) o.unsigned = opt.unsigned;
     if (opt.cb != undefined) o.cb = opt.cb;
   } else {
     o = new util.TimeCounter(el, t0, opt);
@@ -709,11 +709,11 @@ util.timecounter.stop = function(el) {
  * t1:1600000083000 - t0:1600000000000 = 83000 -> '1m 23s'
  * t1:'2020-09-20 20:01:23' - t0:'2020-09-20 20:00:00' = 83000 -> '1m 23s'
 
- * signed: false='1m 23s' / true='+1m 23s' | '-1m 23s'
+ * unsigned: true='1m 23s' / false='1m 23s' | '-1m 23s'
  */
-util.timecounter.delta = function(t0, t1, mode, signed) {
+util.timecounter.delta = function(t0, t1, mode, unsigned) {
   var ms = util.difftime(t0, t1);
-  return util.ms2str(ms, mode, signed);
+  return util.ms2str(ms, mode, unsigned);
 };
 
 /**
@@ -735,7 +735,7 @@ util.timecounter.getText = function(el) {
   var o = util.timecounter.getObj(el);
   if (o) {
     v = o.update(o);
-    s = util.ms2str(v, o.mode, o.signed);
+    s = util.ms2str(v, o.mode, o.unsigned);
   }
   return s;
 };
@@ -758,7 +758,7 @@ util.TimeCounter = function(el, t0, opt) {
   this.t0 = (t0 == undefined ? Date.now() : t0);
   this.interval = opt.interval;
   this.mode = opt.mode;
-  this.signed = opt.signed;
+  this.unsigned = opt.unsigned;
   this.cb = opt.cb;
   this.id = '_timecounter-' + util.timecounter.id++;
 };
@@ -772,7 +772,7 @@ util.TimeCounter.prototype = {
   update: function(ctx) {
     var v = Date.now() - ctx.t0;
     var el = util.getElement(ctx.el);
-    if (el) el.innerHTML = util.ms2str(v, ctx.mode, ctx.signed);
+    if (el) el.innerHTML = util.ms2str(v, ctx.mode, ctx.unsigned);
     if (ctx.cb) ctx.cb(v);
     return v;
   },
@@ -782,7 +782,7 @@ util.TimeCounter.prototype = {
     util.IntervalProc.remove(ctx.id);
   }
 };
-util.TimeCounter.DFLT_OPT = {interval: 500, mode: 1, signed: true, cb: null};
+util.TimeCounter.DFLT_OPT = {interval: 500, mode: 1, unsigned: false, cb: null};
 
 //------------------------------------------------
 // Clock
