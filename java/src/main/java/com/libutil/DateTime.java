@@ -254,11 +254,17 @@ public class DateTime {
    *          DateTime object to compare
    * @return a long value indicating the result of the comparison, as follows:<br>
    *         0, if the instance and the datetime are equal;<br>
-   *         a negative value if the instance is less than the datetime;<br>
-   *         a positive value if the instance is greater than the datetime.
+   *         -1 if the instance is less than the datetime;<br>
+   *         1 value if the instance is greater than the datetime.
    */
-  public long compare(DateTime datetime) {
-    return timestamp - datetime.getTimestamp();
+  public long compareTo(DateTime datetime) {
+    long d = timestamp - datetime.getTimestamp();
+    if (d == 0) {
+      return 0;
+    } else if (d < 0) {
+      return -1;
+    }
+    return 1;
   }
 
   /**
@@ -493,21 +499,21 @@ public class DateTime {
   }
 
   /**
-   * Compares the two date-time dt1 and dt2.
+   * Compares the two date-time.
    *
-   * @param dt1
+   * @param datetime1
    *          Date-time string 1
-   * @param dt2
+   * @param datetime2
    *          Date-time string 2
    * @return a long value indicating the result of the comparison, as follows:<br>
-   *         0, if the dt1 and dt2 are equal;<br>
-   *         a negative value if dt1 is less than dt2;<br>
-   *         a positive value if dt1 is greater than dt2.
+   *         0, if the datetime1 and datetime2 are equal;<br>
+   *         a negative value if datetime1 is less than datetime2;<br>
+   *         a positive value if datetime1 is greater than datetime2.
    */
-  public static long compareDateTime(String dt1, String dt2) {
-    DateTime datetime1 = new DateTime(dt1);
-    DateTime datetime2 = new DateTime(dt2);
-    return datetime1.compare(datetime2);
+  public static long compare(String datetime1, String datetime2) {
+    DateTime dt1 = new DateTime(datetime1);
+    DateTime dt2 = new DateTime(datetime2);
+    return dt1.compareTo(dt2);
   }
 
   /**
