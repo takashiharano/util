@@ -69,8 +69,7 @@ public class GetTimestampTest {
   }
 
   private static void test(String in, long exp) {
-    DateTime dt = new DateTime(in);
-    long timestamp = dt.getTimestamp();
+    long timestamp = DateTime.getTimestamp(in);
     String ret = "NG";
     if (timestamp == exp) {
       ret = "OK";

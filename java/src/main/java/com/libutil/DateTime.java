@@ -262,17 +262,6 @@ public class DateTime {
   }
 
   /**
-   * Returns the number of milliseconds since January 1, 1970, 00:00:00 GMT
-   * represented by this Date object.
-   *
-   * @return the number of milliseconds since January 1, 1970, 00:00:00 GMT
-   *         represented by this date.
-   */
-  public long getTimestamp() {
-    return timestamp;
-  }
-
-  /**
    * Returns the year of this date.
    *
    * @return year
@@ -329,6 +318,17 @@ public class DateTime {
 
   public int getMillisecond() {
     return millisecond;
+  }
+
+  /**
+   * Returns the number of milliseconds since January 1, 1970, 00:00:00 GMT
+   * represented by this Date object.
+   *
+   * @return the number of milliseconds since January 1, 1970, 00:00:00 GMT
+   *         represented by this date.
+   */
+  public long getTimestamp() {
+    return timestamp;
   }
 
   public TimeZone getTimeZone() {
@@ -634,6 +634,17 @@ public class DateTime {
   public static String getString(long timestamp, String format) {
     DateTime dt = new DateTime(timestamp);
     return dt.toString(format);
+  }
+
+  /**
+   * Converts a date time string to UnixMillis.
+   *
+   * @param datetime
+   *          the date time string
+   * @return the number of milliseconds since January 1, 1970, 00:00:00 GMT
+   */
+  public static long getTimestamp(String datetime) {
+    return new DateTime(datetime).getTimestamp();
   }
 
   /**
