@@ -584,59 +584,6 @@ public class DateTime {
   }
 
   /**
-   * Returns the date-time string in the specified format.
-   *
-   * @param datetime
-   *          the date-time string
-   * @param format
-   *          the pattern describing the date and time format
-   *          "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" to
-   *          "2021-07-01T12:34:56.987+09:00"<br>
-   *          "yyyyMMdd'T'HHmmssSSSXX" to<br>
-   *          "20210701T123456.987+0900"
-   * @return the formatted date-time string
-   */
-  public static String getString(String datetime, String format) {
-    DateTime dt;
-    dt = new DateTime(datetime);
-    return dt.toString(format);
-  }
-
-  /**
-   * Returns the date-time string from Date object.
-   *
-   * @param date
-   *          the date
-   * @param format
-   *          "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" to
-   *          "2019-07-13T12:34:56.987+09:00"<br>
-   *          "yyyyMMdd'T'HHmmssSSSXX" to "20190713T123456.987+0900"
-   * @return the date-time string
-   */
-  public static String getString(Date date, String format) {
-    DateTime dt = new DateTime(date);
-    return dt.toString(format);
-  }
-
-  /**
-   * Returns the date-time string represented by the time-stamp in the specified
-   * format.
-   *
-   * @param timestamp
-   *          the milliseconds since January 1, 1970, 00:00:00 GMT.
-   * @param format
-   *          the pattern describing the date and time format
-   *          "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" to
-   *          "2020-07-01T12:34:56.987+09:00"<br>
-   *          "yyyyMMdd'T'HHmmssSSSXX" to "20190701T123456.987+0900"
-   * @return the formatted date-time string
-   */
-  public static String getString(long timestamp, String format) {
-    DateTime dt = new DateTime(timestamp);
-    return dt.toString(format);
-  }
-
-  /**
    * Converts a date time string to UnixMillis.
    *
    * @param datetime
@@ -857,6 +804,59 @@ public class DateTime {
     s = s.replaceAll("[-\\s:\\.]", "");
     s = (s + "000000000").substring(0, 17);
     return s;
+  }
+
+  /**
+   * Returns the date-time string represented by the time-stamp in the specified
+   * format.
+   *
+   * @param timestamp
+   *          the milliseconds since January 1, 1970, 00:00:00 GMT.
+   * @param format
+   *          the pattern describing the date and time format
+   *          "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" to
+   *          "2020-07-01T12:34:56.987+09:00"<br>
+   *          "yyyyMMdd'T'HHmmssSSSXX" to "20190701T123456.987+0900"
+   * @return the formatted date-time string
+   */
+  public static String toString(long timestamp, String format) {
+    DateTime dt = new DateTime(timestamp);
+    return dt.toString(format);
+  }
+
+  /**
+   * Returns the date-time string from Date object.
+   *
+   * @param date
+   *          the date
+   * @param format
+   *          "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" to
+   *          "2019-07-13T12:34:56.987+09:00"<br>
+   *          "yyyyMMdd'T'HHmmssSSSXX" to "20190713T123456.987+0900"
+   * @return the date-time string
+   */
+  public static String toString(Date date, String format) {
+    DateTime dt = new DateTime(date);
+    return dt.toString(format);
+  }
+
+  /**
+   * Returns the date-time string in the specified format.
+   *
+   * @param datetime
+   *          the date-time string
+   * @param format
+   *          the pattern describing the date and time format
+   *          "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" to
+   *          "2021-07-01T12:34:56.987+09:00"<br>
+   *          "yyyyMMdd'T'HHmmssSSSXX" to<br>
+   *          "20210701T123456.987+0900"
+   * @return the formatted date-time string
+   */
+  public static String toString(String datetime, String format) {
+    DateTime dt;
+    dt = new DateTime(datetime);
+    return dt.toString(format);
   }
 
   private static String[] splitDateTimeAndTimezone(String s) {
