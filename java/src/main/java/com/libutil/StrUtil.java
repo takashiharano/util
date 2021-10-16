@@ -295,7 +295,7 @@ public class StrUtil {
   }
 
   /**
-   * Compares two strings.<br>
+   * Checks if the two strings are equal.<br>
    *
    * <pre>
    * StrUtil.equals("abc", "abc") = true
@@ -320,6 +320,19 @@ public class StrUtil {
       return false;
     }
     return s1.equals(s2);
+  }
+
+  /**
+   * Checks if the two strings are not equal.
+   *
+   * @param s1
+   *          the first string, may be null
+   * @param s2
+   *          the second string, may be null
+   * @return true if the strings are not equal (case-sensitive)
+   */
+  public static boolean notEquals(String s1, String s2) {
+    return !equals(s1, s2);
   }
 
   /**
