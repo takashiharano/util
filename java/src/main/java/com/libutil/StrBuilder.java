@@ -194,6 +194,13 @@ public class StrBuilder {
   }
 
   /**
+   * Appends a line separator to the sequence.
+   */
+  public void appendln() {
+    buf.append(lineseparator);
+  }
+
+  /**
    * Appends the string representation of the boolean argument and line separator
    * to the sequence.
    *
