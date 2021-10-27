@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.libutil.CsvBuilder;
-import com.libutil.test.Log;
+import com.libutil.TestUtil;
 
 public class AppendArrayTest {
 
@@ -18,40 +18,39 @@ public class AppendArrayTest {
     String[] sArr = { "abc", "xyz" };
     builder = new CsvBuilder();
     builder.append(sArr);
-    Log.i(builder);
+    TestUtil.assertEquals("abc,xyz", builder);
 
     List<String> sList = new ArrayList<>();
     sList.add("abc");
     sList.add("xyz");
     builder = new CsvBuilder();
     builder.append(sList);
-    Log.i(builder);
+    TestUtil.assertEquals("abc,xyz", builder);
 
     int[] iArr = { 1, 2 };
     builder = new CsvBuilder();
     builder.append(iArr);
-    Log.i(builder);
+    TestUtil.assertEquals("1,2", builder);
 
     long[] lArr = { 1L, 2L };
     builder = new CsvBuilder();
     builder.append(lArr);
-    Log.i(builder);
+    TestUtil.assertEquals("1,2", builder);
 
     float[] fArr = { 1.5f, 2.1f };
     builder = new CsvBuilder();
     builder.append(fArr);
-    Log.i(builder);
+    TestUtil.assertEquals("1.5,2.1", builder);
 
     double[] dArr = { 1.5, 2.1 };
     builder = new CsvBuilder();
     builder.append(dArr);
-    Log.i(builder);
+    TestUtil.assertEquals("1.5,2.1", builder);
 
     boolean[] bArr = { true, false };
     builder = new CsvBuilder();
     builder.append(bArr);
-    Log.i(builder);
-
+    TestUtil.assertEquals("true,false", builder);
   }
 
 }
