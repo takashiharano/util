@@ -14,6 +14,9 @@ public class FileHashTest {
     Log.d(FileUtil.getHash(path, "SHA-1"));
     Log.d(FileUtil.getHash(path, "SHA-256"));
     Log.d(FileUtil.getHash(path, "SHA-512"));
+
+    path = "C:/test/NotFound";
+    Log.d(FileUtil.getHash(path, "SHA-1")); // null
   }
 
 }
