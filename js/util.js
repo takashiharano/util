@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202110292000';
+util.v = '202110292125';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -2195,12 +2195,6 @@ $el.fn = {
   isActive: function() {
     return util.isActiveElement(this);
   },
-  center: function() {
-    util.callFn4El(util.center, this);
-  },
-  position: function(x, y) {
-    util.callFn4El(util.setPosition, this, x, y);
-  },
   blink: function(a) {
     if (a === false) {
       util.removeClass(this, 'blink');
@@ -2224,6 +2218,9 @@ $el.fn = {
   fadeOut: function(speed, cb, arg) {
     util.fadeOut(this, speed, cb, arg);
   },
+  getRect: function() {
+    return this.getBoundingClientRect();
+  },
   loading: function(opt, force) {
     if (opt === false) {
       util.loader.hide(this, force);
@@ -2231,8 +2228,17 @@ $el.fn = {
       util.loader.show(this, opt);
     }
   },
-  getRect: function() {
-    return this.getBoundingClientRect();
+  center: function() {
+    util.callFn4El(util.center, this);
+  },
+  position: function(x, y) {
+    util.callFn4El(util.setPosition, this, x, y);
+  },
+  scrollX: function(x) {
+    return util.callFn4El(util.scrollX, this, x);
+  },
+  scrollY: function(y) {
+    return util.callFn4El(util.scrollY, this, y);
   },
   prev: function() {
     return util.prevElement(this);
@@ -2429,6 +2435,43 @@ util.getClientHeight = function() {
 
 util.getZoomRatio = function() {
   return Math.round(window.devicePixelRatio * 100);
+};
+
+util.scrollX = function(el, x) {
+  el = util.getElement(el);
+  if (!el) return;
+  if (x == undefined) return el.scrollLeft;
+  x += '';
+  if ((x.charAt(0) == '+') || (x.charAt(0) == '-')) {
+    x = el.scrollLeft + (x | 0);
+  } else if (x == 'left') {
+    x = 0;
+  } else if (x == 'center') {
+    el.scrollLeft = el.scrollWidth;
+    x = el.scrollLeft / 2;
+  } else if (x == 'right') {
+    x = el.scrollWidth;
+  }
+  el.scrollLeft = x;
+  return el.scrollLeft;
+};
+util.scrollY = function(el, y) {
+  el = util.getElement(el);
+  if (!el) return;
+  if (y == undefined) return el.scrollTop;
+  y += '';
+  if ((y.charAt(0) == '+') || (y.charAt(0) == '-')) {
+    y = el.scrollTop + (y | 0);
+  } else if (y == 'top') {
+    y = 0;
+  } else if (y == 'middle') {
+    el.scrollTop = el.scrollHeight;
+    y = el.scrollTop / 2;
+  } else if (y == 'bottom') {
+    y = el.scrollHeight;
+  }
+  el.scrollTop = y;
+  return el.scrollTop;
 };
 
 util.escHtml = function(s) {
