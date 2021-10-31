@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202110292125';
+util.v = '202111010000';
 
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
@@ -3080,11 +3080,7 @@ util.textseq.createCtx = function(el, text, opt) {
   var step = opt.step;
   var cutLen = step;
   if (opt.reverse) {
-    if (opt.start == 0) {
-      var start = txtLen - 1;
-    } else {
-      start = opt.start - 1;
-    }
+    var start = ((opt.start == 0) ? txtLen - 1 : opt.start - 1);
     var end = -1;
     if (len > 0) end = start - len;
     if (end < 0) end = -1;
@@ -3093,11 +3089,7 @@ util.textseq.createCtx = function(el, text, opt) {
     var pos = start;
     if (pos < 0) pos = txtLen - 1;
   } else {
-    if (opt.start == 0) {
-      start = 0;
-    } else {
-      start = opt.start;
-    }
+    start = ((opt.start == 0) ? 0 : opt.start);
     end = txtLen;
     if (len > 0) end = start + len;
     prevPos = start;
@@ -3964,11 +3956,7 @@ util.dialog.prototype = {
 
     var contentArea = document.createElement('pre');
     contentArea.className = 'dialog-content';
-    if (title) {
-      style = {'margin': '0'};
-    } else {
-      style = {'margin': '10px 0'};
-    }
+    style = (title ? {'margin': '0'} : {'margin': '10px 0'});
     util.setStyle(contentArea, style);
 
     if (typeof content == 'string') {
@@ -3988,10 +3976,7 @@ util.dialog.prototype = {
       for (var i = 0; i < buttons.length; i++) {
         var button = buttons[i];
         var btnEl = document.createElement('button');
-        style = {
-          'margin-top': '1em',
-          'margin-bottom': '0',
-        };
+        style = {'margin-top': '1em', 'margin-bottom': '0'};
         if (i > 0) style['margin-left'] = '0.5em';
         util.setStyle(btnEl, style);
         if (opt && opt.style && opt.style.button) {
@@ -5024,16 +5009,6 @@ util.getBrowserType = function(ua) {
     brws.family = 'IE';
     return brws;
   }
-  if (ua.indexOf('Trident/6.') >= 1) {
-    brws.name = 'IE10';
-    brws.family = 'IE';
-    return brws;
-  }
-  if (ua.indexOf('Trident/5.') >= 1) {
-    brws.name = 'IE9';
-    brws.family = 'IE';
-    return brws;
-  }
   if ((ua.indexOf('Safari/') >= 1) && (ua.indexOf('Version/') >= 1)) {
     brws.name = 'Safari';
     ver = ua.match(/Version\/(.*)\sSafari/);
@@ -5065,37 +5040,19 @@ util.getColoredBrowserName = function(n, dark) {
       }
       break;
     case 'Edge Legacy':
-      if (dark) {
-        c = '#0af';
-      } else {
-        c = '#08d';
-      }
+      c = (dark ? '#0af' : '#08d');
       s = '<span style="color:' + c + '">Edge</span>';
       break;
     case 'Firefox':
-      if (dark) {
-        c = '#e57f25';
-      } else {
-        c = '#e60';
-      }
+      c = (dark ? '#e57f25' : '#e60');
       s = '<span style="color:' + c + '">' + n + '</span>';
       break;
     case 'Opera':
-      if (dark) {
-        c = '#f44';
-      } else {
-        c = '#ff1b2c';
-      }
+      c = (dark ? '#f44' : '#ff1b2c');
       s = '<span style="color:' + c + '">' + n + '</span>';
       break;
     case 'IE11':
-    case 'IE10':
-    case 'IE9':
-      if (dark) {
-        c = '#61d5f8';
-      } else {
-        c = '#0af';
-      }
+      c = (dark ? '#61d5f8' : '#0af');
       s = '<span style="color:' + c + '">' + n + '</span>';
       break;
     case 'Safari':
