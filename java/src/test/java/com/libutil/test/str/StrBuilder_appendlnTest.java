@@ -18,6 +18,13 @@ public class StrBuilder_appendlnTest {
     tb.appendln("abc");
     tb.appendln("123");
     Log.d(tb.toString());
+
+    Log.d("---");
+    tb = new StrBuilder();
+    tb.appendln("abc");
+    tb.appendln();
+    tb.appendln("123");
+    Log.d(tb.toString());
   }
 
 }
