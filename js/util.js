@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202111072054';
+util.v = '202111072117';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3901,8 +3901,7 @@ util.Window.prototype = {
       height: (fontSize + util.Window.WIN_TITLE_H_MRGN * 2 - util.Window.WIN_BORDER * 2) + 'px',
       padding: 0,
       border: 'none',
-      overflow: 'hidden',
-      'text-overflow': 'ellipsis',
+      'table-layout': 'fixed',
       'white-space': 'nowrap',
       'font-size': fontSize + 'px',
       cursor: 'default'
@@ -3915,8 +3914,11 @@ util.Window.prototype = {
     s = {
       display: 'table-cell',
       position: 'relative',
+      width: '80%',
       left: '4px',
       'vertical-align': 'middle',
+      overflow: 'hidden',
+      'text-overflow': 'ellipsis',
       'font-size': fontSize + 'px'
     };
     util.setStyle(t, s);
