@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202111070102';
+util.v = '202111071307';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2357,6 +2357,21 @@ util.hasParent = function(el, parent) {
   return false;
 };
 
+util.hasChild = function(el, child) {
+  el = util.getElement(el);
+  child = util.getElement(child);
+  var children = el.childNodes;
+  for (var i = 0; i < children.length; i++) {
+    var c = children[i];
+    if (c == child) {
+      return true;
+    } else if (c.childNodes.length > 0) {
+      if (util.hasChild(c, child)) return true;
+    }
+  }
+  return false;
+};
+
 util.prevElement = function(node) {
   var el = node.previousElementSibling;
   if (el) {
@@ -3255,18 +3270,28 @@ util.setupStyle = function() {
   }
 };
 
-util.setStyle = function(el, a1, a2) {
-  util.callFn4El(util._setStyle, el, a1, a2);
+util.setStyle = function(el, a1, a2, a3) {
+  util.callFn4El(util._setStyle, el, a1, a2, a3);
 };
-util._setStyle = function(el, a1, a2) {
+util._setStyle = function(el, a1, a2, a3) {
   el = util.getElement(el);
   if (!el) return;
+  var imp = true;
+  if ((a1 === false) || (a2 === false) || (a3 === false)) imp = false;
   if (a1 instanceof Object) {
     for (var k in a1) {
-      el.style.setProperty(k, a1[k], 'important');
+      if (imp) {
+        el.style.setProperty(k, a1[k], 'important');
+      } else {
+        el.style[k] = a1[k];
+      }
     }
   } else {
-    el.style.setProperty(a1, a2, 'important');
+    if (imp) {
+      el.style.setProperty(a1, a2, 'important');
+    } else {
+      el.style[a1] = a2;
+    }
   }
 };
 
@@ -3824,9 +3849,19 @@ util.Window.prototype = {
   createWin: function(ctx, opt) {
     var win = document.createElement('div');
     win.className = 'fadeout';
+    var s = {
+      display: 'inline-block',
+      position: 'fixed',
+      'box-sizing': 'content-box',
+      border: '1px solid #888',
+      padding: 0,
+      'box-shadow': util.Window.WIN_SHADOW + 'px ' + util.Window.WIN_SHADOW + 'px 10px rgba(0,0,0,.2)',
+      'z-index': util.Window.BASE_ZINDEX
+    };
+    util.setStyle(win, s);
     var w = opt.width ? opt.width : util.Window.DFLT_WIN_W;
     var h = opt.height ? opt.height : util.Window.DFLT_WIN_H;
-    util.setStyle(win, {width: w + 'px', height: h + 'px'});
+    util.setStyle(win, {width: w + 'px', height: h + 'px'}, false);
     util.setStyle(win, opt.style);
     if (opt.className) win.className += ' ' + opt.className;
 
@@ -4276,6 +4311,17 @@ util.Window.prototype = {
   setTitle: function(v) {
     this.title.innerText = v;
   },
+  getBodyElement: function() {
+    return this.body;
+  },
+  appendElement: function(el) {
+    el = util.getElement(el);
+    if (el) this.body.appendChild(el);
+  },
+  removeElement: function(el) {
+    el = util.getElement(el);
+    if (el && util.hasChild(this.body, el)) this.body.removeChild(el);
+  },
   draw: function(v) {
     this.body.innerHTML = v;
   },
@@ -4332,17 +4378,7 @@ util.Window.DFLT_OPT = {
   className: '',
   zoom: 1,
   hidden: false,
-  style: {
-    display: 'inline-block',
-    position: 'fixed',
-    'box-sizing': 'content-box',
-    border: '1px solid #888',
-    padding: 0,
-    left: 0,
-    top: 0,
-    'box-shadow': util.Window.WIN_SHADOW + 'px ' + util.Window.WIN_SHADOW + 'px 10px rgba(0,0,0,.2)',
-    'z-index': util.Window.BASE_ZINDEX
-  },
+  style: {},
   title: {
     text: '',
     fontSize: 12,
