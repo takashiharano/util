@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202111071805';
+util.v = '202111072054';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3843,9 +3843,9 @@ util.Window = function(opt) {
   ctx.win = this.createWin(ctx, opt);
   ctx.win.ctx = ctx;
   document.body.appendChild(ctx.win);
-  ctx.moveToInitPos(ctx);
-  ctx.initWidth = ctx.win.offsetWidth;
-  ctx.initHeight = ctx.win.offsetHeight;
+  ctx.moveToInitPos();
+  ctx.initWidth = ctx.win.offsetWidth - util.Window.WIN_BORDER * 2;
+  ctx.initHeight = ctx.win.offsetHeight - util.Window.WIN_BORDER * 2;
   ctx.setTitle(opt.title.text);
   ctx.body.innerHTML = opt.content;
   util.callFn(opt.oncreate, ctx);
@@ -3868,9 +3868,7 @@ util.Window.prototype = {
       'z-index': util.Window.BASE_ZINDEX
     };
     util.setStyle(win, s);
-    var w = opt.width ? opt.width : util.Window.DFLT_WIN_W;
-    var h = opt.height ? opt.height : util.Window.DFLT_WIN_H;
-    util.setStyle(win, {width: w + 'px', height: h + 'px'}, false);
+    util.setStyle(win, {width: opt.width + 'px', height: opt.height + 'px'}, false);
     util.setStyle(win, opt.style);
     if (opt.className) win.className += ' ' + opt.className;
 
@@ -3896,7 +3894,7 @@ util.Window.prototype = {
     var fontSize = ctx.fontSize;
     var e = document.createElement('div');
     var s = {
-      display: 'inline-block',
+      display: 'table',
       position: 'relative',
       'box-sizing': 'content-box',
       width: '100%',
@@ -3906,7 +3904,8 @@ util.Window.prototype = {
       overflow: 'hidden',
       'text-overflow': 'ellipsis',
       'white-space': 'nowrap',
-      'font-size': fontSize + 'px'
+      'font-size': fontSize + 'px',
+      cursor: 'default'
     };
     util.setStyle(e, s);
     if (opt.title.style) util.setStyle(e, opt.title.style);
@@ -3914,8 +3913,10 @@ util.Window.prototype = {
 
     var t = document.createElement('span');
     s = {
+      display: 'table-cell',
       position: 'relative',
       left: '4px',
+      'vertical-align': 'middle',
       'font-size': fontSize + 'px'
     };
     util.setStyle(t, s);
@@ -3929,10 +3930,13 @@ util.Window.prototype = {
     return e;
   },
   createTitleBtns: function(ctx, opt, fontSize) {
-    var spn = document.createElement('span');
+    var spn = document.createElement('div');
     var s = {
+      display: 'table',
       position: 'absolute',
-      right: '4px',
+      height: '100%',
+      right: '6px',
+      'vertical-align': 'middle',
       'font-size': fontSize + 'px'
     };
     util.setStyle(spn, s);
@@ -3940,18 +3944,21 @@ util.Window.prototype = {
     var b = document.createElement('span');
     spn.appendChild(b);
     s = {
+      display: 'table-cell',
       position: 'relative',
-      top: (-5 * ctx.zoom) + 'px',
-      color: '#ddd',
+      'vertical-align': 'middle',
+      top: (-4 * ctx.zoom) + 'px',
       'font-size': (18 * ctx.zoom) + 'px',
       cursor: 'pointer'
     };
     util.setStyle(b, s);
+    var btnStyle = opt.title.buttons.style;
+    util.setStyle(b, btnStyle);
     b.innerText = 'x';
     b.className = 'win-nomove';
     b.onclick = ctx.close;
     b.onmouseover = new Function('util.setStyle(this, \'color\', \'#faa\');');
-    b.onmouseout = new Function('util.setStyle(this, \'color\', \'#ddd\');');
+    b.onmouseout = new Function('util.setStyle(this, \'color\', \'' + btnStyle.color + '\');');
     return spn;
   },
   createWinBodyBase: function(ctx, opt) {
@@ -3962,7 +3969,6 @@ util.Window.prototype = {
       'box-sizing': 'content-box',
       width: '100%',
       height: 'calc(100% - ' + titleH + 'px)',
-      top: '-4px',
       margin: 0,
       padding: 0,
       border: 'none',
@@ -4087,7 +4093,6 @@ util.Window.prototype = {
   startMove: function(ctx, x, y) {
     util.Window.disableTextSelect();
     ctx.uiStatus |= util.Window.UI_ST_DRAGGING;
-    ctx.win.style.cursor = 'move';
     ctx.ptOfstY = y - ctx.win.offsetTop;
     ctx.ptOfstX = x - ctx.win.offsetLeft;
     if (!document.all) {
@@ -4110,10 +4115,23 @@ util.Window.prototype = {
   },
   endMove: function(ctx) {
     ctx.uiStatus &= ~util.Window.UI_ST_DRAGGING;
-    ctx.win.style.cursor = 'default';
     util.Window.enableTextSelect();
   },
-  moveToInitPos: function(ctx) {
+  resetSize: function() {
+    var ctx = this;
+    ctx.win.style.width = ctx.initWidth + 'px';
+    ctx.win.style.height = ctx.initHeight + 'px';
+  },
+  resetPos: function() {
+    this.moveToInitPos();
+  },
+  resetWindow: function() {
+    this.resetSize();
+    this.resetPos();
+    this.uiStatus |= util.Window.UI_ST_POS_AUTO_ADJ;
+  },
+  moveToInitPos: function() {
+    var ctx = this;
     var n = util.Window.count() * 15;
     var pos = ctx.opt.pos;
     if (pos == 'auto') {
@@ -4280,7 +4298,7 @@ util.Window.prototype = {
     if (h != undefined) ctx.win.style.height = h + 'px';
   },
   onResize: function(ctx) {
-    if (ctx.uiStatus & util.Window.UI_ST_POS_AUTO_ADJ) ctx.moveToInitPos(ctx);
+    if (ctx.uiStatus & util.Window.UI_ST_POS_AUTO_ADJ) ctx.moveToInitPos();
   },
   show: function() {
     var ctx = this;
@@ -4406,7 +4424,7 @@ util.Window.WIN_MIN_H = 25;
 util.Window.WIN_SHADOW = 8;
 util.Window.WIN_BORDER = 1;
 util.Window.RESIZE_BOX_SIZE = 6;
-util.Window.WIN_TITLE_H_MRGN = 2;
+util.Window.WIN_TITLE_H_MRGN = 4;
 util.Window.BASE_FONT_SIZE = 12;
 util.Window.BASE_ZINDEX = 10000;
 util.Window.activeWinCtx = null;
@@ -4436,6 +4454,11 @@ util.Window.DFLT_OPT = {
     style: {
       background: 'linear-gradient(150deg, rgba(0,80,255,0.8),rgba(0,32,255,0.8))',
       color: '#fff'
+    },
+    buttons: {
+      style: {
+        color: '#ddd'
+      }
     }
   },
   body: {
