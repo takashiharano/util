@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202111071307';
+util.v = '202111071805';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3821,14 +3821,23 @@ util.Window = function(opt) {
   ctx.name = opt.name;
   ctx.zoom = opt.zoom;
   ctx.uiStatus = util.Window.UI_ST_POS_AUTO_ADJ;
-  ctx.computedMinW = util.Window.WIN_MIN_W * ctx.zoom;
-  ctx.computedMinH = util.Window.WIN_MIN_H * ctx.zoom;
   ctx.orgSizePos = {w: 0, h: 0, t: 0, l: 0};
   ctx.clickedPosX = 0;
   ctx.clickedPosY = 0;
   ctx.ptOfstX = 0;
   ctx.ptOfstY = 0;
   ctx.fontSize = util.Window.BASE_FONT_SIZE * ctx.zoom;
+
+  ctx.computedMinW = util.Window.WIN_MIN_W * ctx.zoom;
+  if (ctx.computedMinW < opt.minWidth) ctx.computedMinW = opt.minWidth;
+  ctx.computedMinH = util.Window.WIN_MIN_H * ctx.zoom;
+  if (ctx.computedMinH < opt.minHeight) ctx.computedMinH = opt.minHeight;
+
+  ctx.computedMaxW = 0;
+  if (ctx.computedMaxW < opt.maxWidth) ctx.computedMaxW = opt.maxWidth;
+  ctx.computedMaxH = 0;
+  if (ctx.computedMaxH < opt.maxHeight) ctx.computedMaxH = opt.maxHeight;
+
   if (opt.draggable !== false) ctx.uiStatus |= util.Window.UI_ST_DRAGGABLE;
   if (opt.resizable !== false) ctx.uiStatus |= util.Window.UI_ST_RESIZABLE;
   ctx.win = this.createWin(ctx, opt);
@@ -4166,7 +4175,7 @@ util.Window.prototype = {
   },
   getSelfSizePos: function(ctx) {
     var rect = ctx.win.getBoundingClientRect();
-    var resizeBoxSize = 6;
+    var resizeBoxSize = util.Window.RESIZE_BOX_SIZE;
     var sp = {};
     sp.w = ctx.win.clientWidth;
     sp.h = ctx.win.clientHeight;
@@ -4226,11 +4235,11 @@ util.Window.prototype = {
       h = ctx.orgSizePos.h + mvY;
       if (h < ctx.computedMinH) {
         h = ctx.computedMinH;
+      } else if ((ctx.computedMaxH > 0) && (h > ctx.computedMaxH)) {
+        h = ctx.computedMaxH;
       } else {
         t = ctx.orgSizePos.t - mvY;
-        ctx.win.style.top = t + 'px';
       }
-      ctx.win.style.height = h + 'px';
     }
 
     if (ctx.uiStatus & util.Window.UI_ST_RESIZING_W) {
@@ -4238,18 +4247,20 @@ util.Window.prototype = {
       w = ctx.orgSizePos.w + mvX;
       if (w < ctx.computedMinW) {
         w = ctx.computedMinW;
-      } else {
-        l = ctx.orgSizePos.l - mvX;
-        ctx.win.style.left = l + 'px';
+      } else if ((ctx.computedMaxW > 0) && (w > ctx.computedMaxW)) {
+        w = ctx.computedMaxW;
       }
-      ctx.win.style.width = w + 'px';
+      l = ctx.orgSizePos.l - mvX;
     }
 
     if (ctx.uiStatus & util.Window.UI_ST_RESIZING_E) {
       mvX = currentX - ctx.clickedPosX;
       w = ctx.orgSizePos.w + mvX;
-      if (w < ctx.computedMinW) w = ctx.computedMinW;
-      ctx.win.style.width = w + 'px';
+      if (w < ctx.computedMinW) {
+        w = ctx.computedMinW;
+      } else if ((ctx.computedMaxW > 0) && (w > ctx.computedMaxW)) {
+        w = ctx.computedMaxW;
+      }
     }
 
     if (ctx.uiStatus & util.Window.UI_ST_RESIZING_S) {
@@ -4259,9 +4270,14 @@ util.Window.prototype = {
         if (h < ctx.initHeight) h = ctx.initHeight;
       } else if (h < ctx.computedMinH) {
         h = ctx.computedMinH;
+      } else if ((ctx.computedMaxH > 0) && (h > ctx.computedMaxH)) {
+        h = ctx.computedMaxH;
       }
-      ctx.win.style.height = h + 'px';
     }
+    if (t != undefined) ctx.win.style.top = t + 'px';
+    if (l != undefined) ctx.win.style.left = l + 'px';
+    if (w != undefined) ctx.win.style.width = w + 'px';
+    if (h != undefined) ctx.win.style.height = h + 'px';
   },
   onResize: function(ctx) {
     if (ctx.uiStatus & util.Window.UI_ST_POS_AUTO_ADJ) ctx.moveToInitPos(ctx);
@@ -4291,8 +4307,23 @@ util.Window.prototype = {
     if (y) this.win.style.top = y + 'px';
   },
   size: function(w, h) {
-    if (w) this.win.style.width = w + 'px';
-    if (h) this.win.style.height = h + 'px';
+    var ctx = this;
+    if (w) {
+      if (w < ctx.computedMinW) {
+        w = ctx.computedMinW;
+      } else if ((ctx.computedMaxW > 0) && (h > ctx.computedMaxW)) {
+        w = ctx.computedMaxW;
+      }
+      ctx.win.style.width = w + 'px';
+    }
+    if (h) {
+      if (h < ctx.computedMinH) {
+        h = ctx.computedMinH;
+      } else if ((ctx.computedMaxH > 0) && (h > ctx.computedMaxH)) {
+        h = ctx.computedMaxH;
+      }
+      ctx.win.style.height = h + 'px';
+    }
   },
   endResize: function(ctx) {
     ctx.uiStatus &= ~util.Window.UI_ST_RESIZING_ALL;
@@ -4325,6 +4356,20 @@ util.Window.prototype = {
   draw: function(v) {
     this.body.innerHTML = v;
   },
+  getSize: function() {
+    var ctx = this;
+    return {w: ctx.win.clientWidth, h: ctx.win.clientHeight};
+  },
+  getPos: function() {
+    var ctx = this;
+    var rect = ctx.win.getBoundingClientRect();
+    var rszbox = util.Window.RESIZE_BOX_SIZE;
+    var x1 = rect.left - rszbox / 2;
+    var y1 = rect.top - rszbox / 2;
+    var x2 = x1 + ctx.win.clientWidth + rszbox + util.Window.WIN_BORDER;
+    var y2 = y1 + ctx.win.clientHeight + rszbox + util.Window.WIN_BORDER;
+    return {x1: x1, y1: y1, x2: x2, y2: y2};
+  },
   close: function(ctx, f) {
     if (!ctx) ctx = this;
     if (!util.Window.isContext(ctx)) ctx = util.Window.getContext(this);
@@ -4356,12 +4401,11 @@ util.Window.UI_ST_SHOW = 1 << 9;
 util.Window.UI_ST_HIDE = 1 << 10;
 util.Window.UI_ST_POS_AUTO_ADJ = 1 << 11;
 util.Window.UI_ST_RESIZING_ALL = util.Window.UI_ST_RESIZING | util.Window.UI_ST_RESIZING_N | util.Window.UI_ST_RESIZING_E | util.Window.UI_ST_RESIZING_S | util.Window.UI_ST_RESIZING_W;
-util.Window.DFLT_WIN_W = 640;
-util.Window.DFLT_WIN_H = 400;
 util.Window.WIN_MIN_W = 100;
 util.Window.WIN_MIN_H = 25;
 util.Window.WIN_SHADOW = 8;
 util.Window.WIN_BORDER = 1;
+util.Window.RESIZE_BOX_SIZE = 6;
 util.Window.WIN_TITLE_H_MRGN = 2;
 util.Window.BASE_FONT_SIZE = 12;
 util.Window.BASE_ZINDEX = 10000;
@@ -4369,6 +4413,12 @@ util.Window.activeWinCtx = null;
 util.Window.savedFunc = null;
 util.Window.DFLT_OPT = {
   name: '',
+  width: 640,
+  height: 400,
+  minWidth: 0,
+  minHeight: 0,
+  maxWidth: 0,
+  maxHeight: 0,
   pos: 'auto',
   adjX: 0,
   adjY: 0,
