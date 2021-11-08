@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202111080003';
+util.v = '202111090001';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3831,7 +3831,7 @@ util.newWindow = function(opt) {
 util.countWindow = function() {
   return util.Window.count();
 };
-util.closeAllWindow = function() {
+util.closeAllWindows = function() {
   util.Window.closeAll();
 };
 util.Window = function(opt) {
@@ -4477,7 +4477,7 @@ util.Window.DFLT_OPT = {
     fontSize: 12,
     className: '',
     style: {
-      background: 'linear-gradient(150deg, rgba(0,80,255,0.8),rgba(0,32,255,0.8))',
+      background: 'linear-gradient(150deg, rgba(0,32,255,0.8),rgba(0,82,255,0.8))',
       color: '#fff'
     },
     buttons: {
@@ -4511,31 +4511,44 @@ util.Window.unregisterWindow = function(ctx) {
   for (var i = 0; i < util.Window.windows.length; i++) {
     var w = util.Window.windows[i];
     if (w == ctx) {
-      util.Window.windows[i] = null;
+      util.Window.windows.splice(i, 1);
       break;
     }
   }
 };
 util.Window.count = function() {
-  var c = 0;
-  for (var i = 0; i < util.Window.windows.length; i++) {
-    if (util.Window.windows[i]) c++;
-  }
-  return c;
+  return util.Window.windows.length;
 };
 util.Window.onActive = function(ctx) {
   if (util.Window.activeWinCtx == ctx) return;
   util.Window.activeWinCtx = ctx;
-  var z = util.Window.BASE_ZINDEX;
+  var o = util.Window.reorder(ctx);
+  for (var i = 0; i < o.length; i++) {
+    o[i].w.win.style.zIndex = o[i].z;
+  }
+  if (o.length >= 2) {
+    var lo = o[o.length - 2];
+    util.callFn(lo.w.opt.oninactive, lo.w);
+  }
+  util.callFn(ctx.opt.onactive, ctx);
+};
+util.Window.reorder = function(ctx) {
+  var bz = util.Window.BASE_ZINDEX;
+  var o = [];
+  var z;
   for (var i = 0; i < util.Window.windows.length; i++) {
     var w = util.Window.windows[i];
-    if (w && (w != ctx)) {
-      w.win.style.zIndex = z;
-      util.callFn(w.opt.oninactive, w);
+    if (w != ctx) {
+      z = parseInt(w.win.style.zIndex) - 1;
+      o.push({id: w.id, w: w, z: z});
     }
   }
-  ctx.win.style.zIndex = z + 1;
-  util.callFn(ctx.opt.onactive, ctx);
+  o = util.sortObj(o, 'z');
+  for (i = 0; i < o.length; i++) {
+    o[i].z = bz + i;
+  }
+  o.push({id: ctx.id, w: ctx, z: bz + i});
+  return o;
 };
 
 util.Window.disableTextSelect = function() {
@@ -4568,7 +4581,7 @@ util.Window.onPointerUp = function() {
 util.Window.onResize = function() {
   for (var i = 0; i < util.Window.windows.length; i++) {
     var ctx = util.Window.windows[i];
-    if (ctx) ctx.onResize(ctx);
+    ctx.onResize(ctx);
   }
 };
 
@@ -4585,7 +4598,7 @@ util.Window.getContext = function(el) {
 util.Window.closeAll = function() {
   for (var i = 0; i < util.Window.windows.length; i++) {
     var ctx = util.Window.windows[i];
-    if (ctx) ctx.close(ctx);
+    ctx.close(ctx);
   }
 };
 
