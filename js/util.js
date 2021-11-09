@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202111090001';
+util.v = '202111092244';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3318,6 +3318,11 @@ util._setStyle = function(el, a1, a2, a3) {
   }
 };
 
+util.getPxVal = function(v) {
+  v = v.replace('px', '');
+  return parseInt(v);
+};
+
 //---------------------------------------------------------
 // Infotip
 //---------------------------------------------------------
@@ -3828,12 +3833,28 @@ util.loader._hide = function(ctx) {
 util.newWindow = function(opt) {
   return new util.Window(opt);
 };
-util.countWindow = function() {
+util.countWindows = function() {
   return util.Window.count();
+};
+util.getWindowById = function(id) {
+  return util.Window.getById(id);
+};
+util.getWindowByName = function(n) {
+  return util.Window.getByName(n);
+};
+util.getWindowsByGroup = function(g) {
+  return util.Window.getByGroup(g);
+};
+util.getAllWindows = function() {
+  return util.Window.getAll();
 };
 util.closeAllWindows = function() {
   util.Window.closeAll();
 };
+util.closeWindowsByGroup = function(g) {
+  util.Window.closeByGroup(g);
+};
+
 util.Window = function(opt) {
   var ctx = this;
   ctx._type_ = 'WIN';
@@ -3842,6 +3863,7 @@ util.Window = function(opt) {
   opt = util.copyDefaultProps(util.Window.DFLT_OPT, opt);
   ctx.opt = opt;
   ctx.name = opt.name;
+  ctx.group = opt.group;
   ctx.zoom = opt.zoom;
   ctx.uiStatus = util.Window.UI_ST_POS_AUTO_ADJ;
   ctx.orgSizePos = {w: 0, h: 0, t: 0, l: 0};
@@ -4120,9 +4142,7 @@ util.Window.prototype = {
     ctx.uiStatus |= util.Window.UI_ST_DRAGGING;
     ctx.ptOfstY = y - ctx.win.offsetTop;
     ctx.ptOfstX = x - ctx.win.offsetLeft;
-    if (!document.all) {
-      window.getSelection().removeAllRanges();
-    }
+    if (!document.all) window.getSelection().removeAllRanges();
   },
   moveWin: function(ctx, pX, pY) {
     ctx.uiStatus &= ~util.Window.UI_ST_POS_AUTO_ADJ;
@@ -4143,9 +4163,8 @@ util.Window.prototype = {
     util.Window.enableTextSelect();
   },
   resetSize: function() {
-    var ctx = this;
-    ctx.win.style.width = ctx.initWidth + 'px';
-    ctx.win.style.height = ctx.initHeight + 'px';
+    this.win.style.width = this.initWidth + 'px';
+    this.win.style.height = this.initHeight + 'px';
   },
   resetPos: function() {
     this.moveToInitPos();
@@ -4321,6 +4340,9 @@ util.Window.prototype = {
     if (l != undefined) ctx.win.style.left = l + 'px';
     if (w != undefined) ctx.win.style.width = w + 'px';
     if (h != undefined) ctx.win.style.height = h + 'px';
+    if (w == undefined) w = util.getPxVal(ctx.win.style.width);
+    if (h == undefined) h = util.getPxVal(ctx.win.style.height);
+    util.callFn(ctx.opt.onresize, ctx, w, h);
   },
   onResize: function(ctx) {
     if (ctx.uiStatus & util.Window.UI_ST_POS_AUTO_ADJ) ctx.moveToInitPos();
@@ -4346,8 +4368,12 @@ util.Window.prototype = {
     util.callFn(ctx.opt.onhide, ctx);
   },
   move: function(x, y) {
-    if (x) this.win.style.left = x + 'px';
-    if (y) this.win.style.top = y + 'px';
+    var ctx = this;
+    if (x) ctx.win.style.left = x + 'px';
+    if (y) ctx.win.style.top = y + 'px';
+    if (x == undefined) x = util.getPxVal(ctx.win.style.left);
+    if (y == undefined) y = util.getPxVal(ctx.win.style.top);
+    util.callFn(ctx.opt.onmove, ctx, x, y);
   },
   size: function(w, h) {
     var ctx = this;
@@ -4400,8 +4426,7 @@ util.Window.prototype = {
     this.body.innerHTML = v;
   },
   getSize: function() {
-    var ctx = this;
-    return {w: ctx.win.clientWidth, h: ctx.win.clientHeight};
+    return {w: this.win.clientWidth, h: this.win.clientHeight};
   },
   getPos: function() {
     var ctx = this;
@@ -4413,10 +4438,10 @@ util.Window.prototype = {
     var y2 = y1 + ctx.win.clientHeight + rszbox + util.Window.WIN_BORDER;
     return {x1: x1, y1: y1, x2: x2, y2: y2};
   },
-  close: function(ctx, f) {
-    if (!ctx) ctx = this;
+  close: function(f) {
+    var ctx = this;
     if (!util.Window.isContext(ctx)) ctx = util.Window.getContext(this);
-    if ((f === true) || (util.callFn(ctx.opt.onbeforeclose, ctx) !== false)) {
+    if ((f == true) || (util.callFn(ctx.opt.onbeforeclose, ctx) !== false)) {
       util.fadeOut(ctx.win, 200, ctx._close, ctx);
     }
   },
@@ -4456,6 +4481,7 @@ util.Window.activeWinCtx = null;
 util.Window.savedFunc = null;
 util.Window.DFLT_OPT = {
   name: '',
+  group: '',
   width: 640,
   height: 400,
   minWidth: 0,
@@ -4499,6 +4525,8 @@ util.Window.DFLT_OPT = {
   oninactive: null,
   onbeforeclose: null,
   onclose: null,
+  onmove: null,
+  onresize: null,
   content: ''
 };
 util.Window.windows = [];
@@ -4595,10 +4623,44 @@ util.Window.getContext = function(el) {
   } while (el != null);
   return null;
 };
+util.Window.getById = function(id) {
+  for (var i = 0; i < util.Window.windows.length; i++) {
+    var w = util.Window.windows[i];
+    if (w.id == id) return w;
+  }
+  return null;
+};
+util.Window.getByName = function(n) {
+  for (var i = 0; i < util.Window.windows.length; i++) {
+    var w = util.Window.windows[i];
+    if (w.name == n) return w;
+  }
+  return null;
+};
+util.Window.getByGroup = function(g) {
+  var a = [];
+  for (var i = 0; i < util.Window.windows.length; i++) {
+    var w = util.Window.windows[i];
+    if (w.group == g) a.push(w);
+  }
+  return a;
+};
+util.Window.getAll = function() {
+  var a = [];
+  for (var i = 0; i < util.Window.windows.length; i++) {
+    a.push(util.Window.windows[i]);
+  }
+  return a;
+};
+util.Window.closeByGroup = function(g) {
+  for (var i = 0; i < util.Window.windows.length; i++) {
+    var w = util.Window.windows[i];
+    if (w.group == g) w.close(true);
+  }
+};
 util.Window.closeAll = function() {
   for (var i = 0; i < util.Window.windows.length; i++) {
-    var ctx = util.Window.windows[i];
-    ctx.close(ctx);
+    util.Window.windows[i].close(true);
   }
 };
 
