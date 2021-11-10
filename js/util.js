@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202111092244';
+util.v = '202111110039';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3866,6 +3866,7 @@ util.Window = function(opt) {
   ctx.group = opt.group;
   ctx.zoom = opt.zoom;
   ctx.uiStatus = util.Window.UI_ST_POS_AUTO_ADJ;
+  ctx.sizeStatus = 0;
   ctx.orgSizePos = {w: 0, h: 0, t: 0, l: 0};
   ctx.clickedPosX = 0;
   ctx.clickedPosY = 0;
@@ -3885,6 +3886,7 @@ util.Window = function(opt) {
 
   if (opt.draggable !== false) ctx.uiStatus |= util.Window.UI_ST_DRAGGABLE;
   if (opt.resizable !== false) ctx.uiStatus |= util.Window.UI_ST_RESIZABLE;
+  ctx.winSizeBtn = null;
   ctx.win = this.createWin(ctx, opt);
   ctx.win.ctx = ctx;
   document.body.appendChild(ctx.win);
@@ -3899,6 +3901,89 @@ util.Window = function(opt) {
     ctx.show();
   }
 };
+util.Window.UI_ST_DRAGGABLE = 1 << 1;
+util.Window.UI_ST_DRAGGING = 1 << 2;
+util.Window.UI_ST_RESIZABLE = 1 << 3;
+util.Window.UI_ST_RESIZING = 1 << 4;
+util.Window.UI_ST_RESIZING_N = 1 << 5;
+util.Window.UI_ST_RESIZING_E = 1 << 6;
+util.Window.UI_ST_RESIZING_S = 1 << 7;
+util.Window.UI_ST_RESIZING_W = 1 << 8;
+util.Window.UI_ST_SHOW = 1 << 9;
+util.Window.UI_ST_HIDE = 1 << 10;
+util.Window.UI_ST_POS_AUTO_ADJ = 1 << 11;
+util.Window.UI_ST_RESIZING_ALL = util.Window.UI_ST_RESIZING | util.Window.UI_ST_RESIZING_N | util.Window.UI_ST_RESIZING_E | util.Window.UI_ST_RESIZING_S | util.Window.UI_ST_RESIZING_W;
+util.Window.SIZE_ST_NORMAL = 0;
+util.Window.SIZE_ST_MAX = 1;
+util.Window.SIZE_ST_FULL_W = 1 << 1;
+util.Window.SIZE_ST_FULL_H = 1 << 2;
+util.Window.SIZE_ST_FULL_WH = util.Window.SIZE_ST_FULL_W | util.Window.SIZE_ST_FULL_H;
+util.Window.WIN_MIN_W = 100;
+util.Window.WIN_MIN_H = 25;
+util.Window.WIN_SHADOW = 8;
+util.Window.WIN_BORDER = 1;
+util.Window.RESIZE_BOX_SIZE = 6;
+util.Window.WIN_TITLE_H_MRGN = 4;
+util.Window.BASE_FONT_SIZE = 12;
+util.Window.BASE_ZINDEX = 10000;
+util.Window.CHR_WIN_FULL = '&#x25A1;';
+util.Window.CHR_WIN_RSTR = '&#x2750;';
+util.Window.DFLT_OPT = {
+  name: '',
+  group: '',
+  width: 640,
+  height: 400,
+  minWidth: 0,
+  minHeight: 0,
+  maxWidth: 0,
+  maxHeight: 0,
+  pos: 'auto',
+  adjX: 0,
+  adjY: 0,
+  draggable: true,
+  resizable: true,
+  maximize: true,
+  closeButton: true,
+  className: '',
+  zoom: 1,
+  hidden: false,
+  style: {},
+  title: {
+    text: '',
+    fontSize: 12,
+    className: '',
+    style: {
+      background: 'linear-gradient(150deg, rgba(0,32,255,0.8),rgba(0,82,255,0.8))',
+      color: '#fff'
+    },
+    buttons: {
+      style: {
+        color: '#ddd'
+      }
+    }
+  },
+  body: {
+    className: '',
+    style: {
+      background: 'linear-gradient(150deg, rgba(255,255,255, 0.95),rgba(255,255,255,0.6))'
+    }
+  },
+  oncreate: null,
+  onshow: null,
+  onhide: null,
+  onactive: null,
+  oninactive: null,
+  onbeforeclose: null,
+  onclose: null,
+  onmove: null,
+  onresize: null,
+  content: ''
+};
+util.Window.windows = [];
+util.Window.cnt = 0;
+util.Window.activeWinCtx = null;
+util.Window.savedFunc = null;
+
 util.Window.prototype = {
   createWin: function(ctx, opt) {
     var win = document.createElement('div');
@@ -3970,14 +4055,19 @@ util.Window.prototype = {
     e.appendChild(t);
     ctx.title = t;
 
-    if (opt.closeButton) {
-      var b = ctx.createTitleBtns(ctx, opt, fontSize);
-      e.appendChild(b);
-    }
+    var b = ctx.createTitleBtns(ctx, opt, fontSize);
+    e.appendChild(b);
+
+    if (util.Window.canMaximize(ctx)) e.ondblclick = ctx.onTitleBarDblClick;
     return e;
   },
+  onTitleBarDblClick: function(e) {
+    var ctx = util.Window.getContext(e.target);
+    var f = (util.Window.isExpanded(ctx) ? ctx.restoreWin : ctx.fullWin);
+    f(ctx);
+  },
   createTitleBtns: function(ctx, opt, fontSize) {
-    var spn = document.createElement('div');
+    var bs = document.createElement('div');
     var s = {
       display: 'table',
       position: 'absolute',
@@ -3986,15 +4076,63 @@ util.Window.prototype = {
       'vertical-align': 'middle',
       'font-size': fontSize + 'px'
     };
-    util.setStyle(spn, s);
+    util.setStyle(bs, s);
 
+    if (util.Window.canMaximize(ctx)) {
+      var b = ctx.createSizeBtn(ctx, opt, fontSize);
+      ctx.winSizeBtn = b;
+      bs.appendChild(b);
+    }
+
+    if (opt.closeButton) {
+      b = ctx.createCloseBtn(ctx, opt, fontSize);
+      bs.appendChild(b);
+    }
+    return bs;
+  },
+  createSizeBtn: function(ctx, opt) {
     var b = document.createElement('span');
-    spn.appendChild(b);
-    s = {
-      display: 'table-cell',
+    var s = {
       position: 'relative',
       'vertical-align': 'middle',
       top: (-4 * ctx.zoom) + 'px',
+      'font-size': (18 * ctx.zoom) + 'px',
+      cursor: 'pointer'
+    };
+    util.setStyle(b, s);
+    var btnStyle = opt.title.buttons.style;
+    util.setStyle(b, btnStyle);
+
+    var fn = ctx.fullWin;
+    var btn = util.Window.CHR_WIN_FULL;
+    if (util.Window.isExpanded(ctx)) {
+      fn = ctx.restoreWin;
+      btn = util.Window.CHR_WIN_RSTR;
+    }
+    b.innerHTML = btn;
+    b.onclick = fn;
+    b.className = 'win-nomove';
+    b.onmouseover = new Function('util.setStyle(this, \'color\', \'#fff\');');
+    b.onmouseout = new Function('util.setStyle(this, \'color\', \'' + btnStyle.color + '\');');
+    return b;
+  },
+  updateWinCtrlBtns: function(ctx) {
+    var fn = ctx.fullWin;
+    var btn = util.Window.CHR_WIN_FULL;
+    if (util.Window.isExpanded(ctx)) {
+      fn = ctx.restoreWin;
+      btn = util.Window.CHR_WIN_RSTR;
+    }
+    ctx.winSizeBtn.innerHTML = btn;
+    ctx.winSizeBtn.onclick = fn;
+  },
+  createCloseBtn: function(ctx, opt) {
+    var b = document.createElement('span');
+    var s = {
+      position: 'relative',
+      'vertical-align': 'middle',
+      top: (-4 * ctx.zoom) + 'px',
+      'margin-left': (4 * ctx.zoom) + 'px',
       'font-size': (18 * ctx.zoom) + 'px',
       cursor: 'pointer'
     };
@@ -4006,8 +4144,9 @@ util.Window.prototype = {
     b.onclick = ctx.close;
     b.onmouseover = new Function('util.setStyle(this, \'color\', \'#faa\');');
     b.onmouseout = new Function('util.setStyle(this, \'color\', \'' + btnStyle.color + '\');');
-    return spn;
+    return b;
   },
+
   createWinBodyBase: function(ctx, opt) {
     var e = document.createElement('div');
     var titleH = ctx.fontSize + util.Window.WIN_TITLE_H_MRGN * 2 - util.Window.WIN_BORDER * 2;
@@ -4166,6 +4305,60 @@ util.Window.prototype = {
     this.win.style.width = this.initWidth + 'px';
     this.win.style.height = this.initHeight + 'px';
   },
+  fullWin: function(ctx) {
+    if (!ctx) ctx = this;
+    if (!util.Window.isContext(ctx)) ctx = util.Window.getContext(this);
+    ctx.saveSizeAndPos(ctx);
+    ctx._fullWin(ctx);
+  },
+  _fullWin: function(ctx) {
+    var w = document.documentElement.clientWidth;
+    var h = document.documentElement.clientHeight;
+    if ((ctx.computedMaxW > 0) && (w > ctx.computedMaxW)) {
+      ctx.sizeStatus |= util.Window.SIZE_ST_MAX;
+      w = ctx.computedMaxW;
+    }
+    if ((ctx.computedMaxH > 0) && (h > ctx.computedMaxH)) {
+      ctx.sizeStatus |= util.Window.SIZE_ST_MAX;
+      h = ctx.computedMaxH;
+    }
+    ctx.setWinSize(ctx, w, h);
+
+    if (!(ctx.sizeStatus & util.Window.SIZE_ST_MAX)) {
+      ctx.setWinPos(ctx, 0, 0);
+      ctx.uiStatus &= ~util.Window.UI_ST_POS_AUTO_ADJ;
+      ctx.sizeStatus |= util.Window.SIZE_ST_FULL_WH;
+      ctx.disableDraggable(ctx);
+      ctx.disableResize(ctx);
+    }
+    ctx.updateWinCtrlBtns(ctx);
+  },
+
+  restoreWin: function(ctx) {
+    if (!ctx) ctx = this;
+    if (!util.Window.isContext(ctx)) ctx = util.Window.getContext(this);
+    ctx._restoreWin(ctx);
+  },
+  _restoreWin: function(ctx) {
+    var org = ctx.orgSizePos;
+    ctx.enableDraggable(ctx);
+    ctx.enableResize(ctx);
+    ctx.setWinSize(ctx, org.w, org.h);
+    if (!(ctx.sizeStatus & util.Window.SIZE_ST_MAX)) ctx.setWinPos(ctx, org.l, org.t);
+    ctx.sizeStatus = util.Window.SIZE_ST_NORMAL;
+    if (ctx.uiStatus & util.Window.UI_ST_POS_AUTO_ADJ) ctx.moveToInitPos(ctx);
+    ctx.updateWinCtrlBtns(ctx);
+  },
+
+  adjustWinMax: function(ctx) {
+    if (ctx.sizeStatus & util.Window.SIZE_ST_FULL_W) {
+      ctx.win.style.width = document.documentElement.clientWidth + 'px';
+    }
+    if (ctx.sizeStatus & util.Window.SIZE_ST_FULL_H) {
+      ctx.win.style.height = document.documentElement.clientHeight + 'px';
+    }
+  },
+
   resetPos: function() {
     this.moveToInitPos();
   },
@@ -4181,12 +4374,20 @@ util.Window.prototype = {
     if (pos == 'auto') {
       ctx.move(n, n);
     } else if (typeof pos == 'string') {
-      ctx.setWinPos(ctx, pos);
+      ctx.setWinPos2(ctx, pos);
     } else {
       ctx.move(pos.x, pos.y);
     }
   },
-  setWinPos: function(ctx, pos) {
+  setWinSize: function(ctx, w, h) {
+    ctx.win.style.width = w + 'px';
+    ctx.win.style.height = h + 'px';
+  },
+  setWinPos: function(ctx, x, y) {
+    ctx.win.style.top = y + 'px';
+    ctx.win.style.left = x + 'px';
+  },
+  setWinPos2: function(ctx, pos) {
     var opt = ctx.opt;
     var top = opt.adjY;
     var left = opt.adjX;
@@ -4232,8 +4433,7 @@ util.Window.prototype = {
         top = (clH / 2) - (winH / 2);
         left = opt.adjX;
     }
-    ctx.win.style.top = top + 'px';
-    ctx.win.style.left = left + 'px';
+    ctx.setWinPos(ctx, left, top);
   },
   getSelfSizePos: function(ctx) {
     var rect = ctx.win.getBoundingClientRect();
@@ -4248,21 +4448,33 @@ util.Window.prototype = {
     return sp;
   },
 
-  saveSizeAndPos: function(ctx, o) {
-    if (!o) o = ctx.orgSizePos;
+  saveSizeAndPos: function(ctx) {
+    var o = ctx.orgSizePos;
     ctx.saveSize(ctx, o);
     ctx.savePos(ctx, o);
   },
   saveSize: function(ctx, o) {
-    if (!o) o = ctx.orgSizePos;
     var shadow = util.Window.WIN_SHADOW / 2;
     o.w = (ctx.win.offsetWidth + (util.Window.WIN_BORDER * 2) - shadow);
     o.h = (ctx.win.offsetHeight + (util.Window.WIN_BORDER * 2) - shadow);
   },
   savePos: function(ctx, o) {
-    if (!o) o = ctx.orgSizePos;
     o.t = ctx.win.offsetTop;
     o.l = ctx.win.offsetLeft;
+  },
+
+  enableDraggable: function(ctx) {
+    ctx.uiStatus |= util.Window.UI_ST_DRAGGABLE;
+  },
+  disableDraggable: function(ctx) {
+    ctx.uiStatus &= ~util.Window.UI_ST_DRAGGABLE;
+  },
+
+  enableResize: function(ctx) {
+    ctx.uiStatus |= util.Window.UI_ST_RESIZABLE;
+  },
+  disableResize: function(ctx) {
+    ctx.uiStatus &= ~util.Window.UI_ST_RESIZABLE;
   },
 
   startResize: function(ctx, e) {
@@ -4274,6 +4486,11 @@ util.Window.prototype = {
   },
 
   resizeWin: function(ctx, x, y) {
+    if (ctx.sizeStatus & util.Window.SIZE_ST_MAX) {
+      ctx.sizeStatus &= ~util.Window.SIZE_ST_MAX;
+      ctx.updateWinCtrlBtns(ctx);
+    }
+
     var currentX = x;
     var currentY = y;
     var mvX, mvY, t, l, w, h;
@@ -4345,7 +4562,11 @@ util.Window.prototype = {
     util.callFn(ctx.opt.onresize, ctx, w, h);
   },
   onResize: function(ctx) {
-    if (ctx.uiStatus & util.Window.UI_ST_POS_AUTO_ADJ) ctx.moveToInitPos();
+    if (ctx.uiStatus & util.Window.UI_ST_POS_AUTO_ADJ) {
+      ctx.moveToInitPos();
+    } else {
+      ctx.adjustWinMax(ctx);
+    }
   },
   show: function() {
     var ctx = this;
@@ -4457,80 +4678,7 @@ util.Window.prototype = {
     ctx.win = null;
   }
 };
-util.Window.UI_ST_DRAGGABLE = 1 << 1;
-util.Window.UI_ST_DRAGGING = 1 << 2;
-util.Window.UI_ST_RESIZABLE = 1 << 3;
-util.Window.UI_ST_RESIZING = 1 << 4;
-util.Window.UI_ST_RESIZING_N = 1 << 5;
-util.Window.UI_ST_RESIZING_E = 1 << 6;
-util.Window.UI_ST_RESIZING_S = 1 << 7;
-util.Window.UI_ST_RESIZING_W = 1 << 8;
-util.Window.UI_ST_SHOW = 1 << 9;
-util.Window.UI_ST_HIDE = 1 << 10;
-util.Window.UI_ST_POS_AUTO_ADJ = 1 << 11;
-util.Window.UI_ST_RESIZING_ALL = util.Window.UI_ST_RESIZING | util.Window.UI_ST_RESIZING_N | util.Window.UI_ST_RESIZING_E | util.Window.UI_ST_RESIZING_S | util.Window.UI_ST_RESIZING_W;
-util.Window.WIN_MIN_W = 100;
-util.Window.WIN_MIN_H = 25;
-util.Window.WIN_SHADOW = 8;
-util.Window.WIN_BORDER = 1;
-util.Window.RESIZE_BOX_SIZE = 6;
-util.Window.WIN_TITLE_H_MRGN = 4;
-util.Window.BASE_FONT_SIZE = 12;
-util.Window.BASE_ZINDEX = 10000;
-util.Window.activeWinCtx = null;
-util.Window.savedFunc = null;
-util.Window.DFLT_OPT = {
-  name: '',
-  group: '',
-  width: 640,
-  height: 400,
-  minWidth: 0,
-  minHeight: 0,
-  maxWidth: 0,
-  maxHeight: 0,
-  pos: 'auto',
-  adjX: 0,
-  adjY: 0,
-  draggable: true,
-  resizable: true,
-  closeButton: true,
-  className: '',
-  zoom: 1,
-  hidden: false,
-  style: {},
-  title: {
-    text: '',
-    fontSize: 12,
-    className: '',
-    style: {
-      background: 'linear-gradient(150deg, rgba(0,32,255,0.8),rgba(0,82,255,0.8))',
-      color: '#fff'
-    },
-    buttons: {
-      style: {
-        color: '#ddd'
-      }
-    }
-  },
-  body: {
-    className: '',
-    style: {
-      background: 'linear-gradient(150deg, rgba(255,255,255, 0.95),rgba(255,255,255,0.6))'
-    }
-  },
-  oncreate: null,
-  onshow: null,
-  onhide: null,
-  onactive: null,
-  oninactive: null,
-  onbeforeclose: null,
-  onclose: null,
-  onmove: null,
-  onresize: null,
-  content: ''
-};
-util.Window.windows = [];
-util.Window.cnt = 0;
+
 util.Window.registerWindow = function(ctx) {
   util.Window.cnt++;
   util.Window.windows.push(ctx);
@@ -4622,6 +4770,12 @@ util.Window.getContext = function(el) {
     el = el.parentNode;
   } while (el != null);
   return null;
+};
+util.Window.canMaximize = function(ctx) {
+  return (ctx.opt.resizable && ctx.opt.maximize);
+};
+util.Window.isExpanded = function(ctx) {
+  return ((ctx.sizeStatus & util.Window.SIZE_ST_FULL_WH) || (ctx.sizeStatus & util.Window.SIZE_ST_MAX));
 };
 util.Window.getById = function(id) {
   for (var i = 0; i < util.Window.windows.length; i++) {
