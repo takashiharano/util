@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202111111950';
+util.v = '202111120000';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3876,7 +3876,7 @@ util.Window = function(opt) {
   ctx.opt = opt;
   ctx.name = opt.name;
   ctx.group = opt.group;
-  ctx.zoom = opt.zoom;
+  ctx.scale = opt.scale;
   ctx.uiStatus = util.Window.UI_ST_POS_AUTO_ADJ;
   ctx.sizeStatus = 0;
   ctx.orgSizePos = {w: 0, h: 0, t: 0, l: 0};
@@ -3884,20 +3884,23 @@ util.Window = function(opt) {
   ctx.clickedPosY = 0;
   ctx.ptOfstX = 0;
   ctx.ptOfstY = 0;
-  ctx.fontSize = util.Window.BASE_FONT_SIZE * ctx.zoom;
-
-  ctx.computedMinW = util.Window.WIN_MIN_W * ctx.zoom;
-  if (ctx.computedMinW < opt.minWidth) ctx.computedMinW = opt.minWidth;
-  ctx.computedMinH = util.Window.WIN_MIN_H * ctx.zoom;
-  if (ctx.computedMinH < opt.minHeight) ctx.computedMinH = opt.minHeight;
-
+  ctx.fontSize = util.Window.BASE_FONT_SIZE * ctx.scale;
+  ctx.computedMinW = util.Window.WIN_MIN_W * ctx.scale;
+  ctx.computedMinH = util.Window.WIN_MIN_H * ctx.scale;
   ctx.computedMaxW = 0;
-  if (ctx.computedMaxW < opt.maxWidth) ctx.computedMaxW = opt.maxWidth;
   ctx.computedMaxH = 0;
-  if (ctx.computedMaxH < opt.maxHeight) ctx.computedMaxH = opt.maxHeight;
 
-  if (opt.draggable !== false) ctx.uiStatus |= util.Window.UI_ST_DRAGGABLE;
-  if (opt.resizable !== false) ctx.uiStatus |= util.Window.UI_ST_RESIZABLE;
+  if (opt.kiosk) {
+    ctx.uiStatus |= util.Window.UI_ST_KIOSK;
+  } else {
+    if (ctx.computedMinW < opt.minWidth) ctx.computedMinW = opt.minWidth;
+    if (ctx.computedMinH < opt.minHeight) ctx.computedMinH = opt.minHeight;
+    if (ctx.computedMaxW < opt.maxWidth) ctx.computedMaxW = opt.maxWidth;
+    if (ctx.computedMaxH < opt.maxHeight) ctx.computedMaxH = opt.maxHeight;
+    if (opt.draggable !== false) ctx.uiStatus |= util.Window.UI_ST_DRAGGABLE;
+    if (opt.resizable !== false) ctx.uiStatus |= util.Window.UI_ST_RESIZABLE;
+  }
+
   ctx.winSizeBtn = null;
   ctx.win = this.createWin(ctx, opt);
   ctx.win.ctx = ctx;
@@ -3907,12 +3910,14 @@ util.Window = function(opt) {
   ctx.initHeight = ctx.win.offsetHeight - util.Window.WIN_BORDER * 2;
   ctx.setTitle(opt.title.text);
   ctx.body.innerHTML = opt.content;
+  if (util.Window.isKiosk(ctx)) ctx.kiosk();
   util.callFn(opt.oncreate, ctx);
   if (!opt.hidden) {
     ctx.active();
     ctx.show();
   }
 };
+util.Window.UI_ST_KIOSK = 1;
 util.Window.UI_ST_DRAGGABLE = 1 << 1;
 util.Window.UI_ST_DRAGGING = 1 << 2;
 util.Window.UI_ST_RESIZABLE = 1 << 3;
@@ -3926,9 +3931,10 @@ util.Window.UI_ST_HIDE = 1 << 10;
 util.Window.UI_ST_POS_AUTO_ADJ = 1 << 11;
 util.Window.UI_ST_RESIZING_ALL = util.Window.UI_ST_RESIZING | util.Window.UI_ST_RESIZING_N | util.Window.UI_ST_RESIZING_E | util.Window.UI_ST_RESIZING_S | util.Window.UI_ST_RESIZING_W;
 util.Window.SIZE_ST_NORMAL = 0;
-util.Window.SIZE_ST_MAX = 1;
 util.Window.SIZE_ST_FULL_W = 1 << 1;
 util.Window.SIZE_ST_FULL_H = 1 << 2;
+util.Window.SIZE_ST_LTD_MAX_W = 1 << 3;
+util.Window.SIZE_ST_LTD_MAX_H = 1 << 4;
 util.Window.SIZE_ST_FULL_WH = util.Window.SIZE_ST_FULL_W | util.Window.SIZE_ST_FULL_H;
 util.Window.WIN_MIN_W = 100;
 util.Window.WIN_MIN_H = 25;
@@ -3955,9 +3961,10 @@ util.Window.DFLT_OPT = {
   draggable: true,
   resizable: true,
   maximize: true,
+  kiosk: false,
   closeButton: true,
   className: '',
-  zoom: 1,
+  scale: 1,
   hidden: false,
   style: {},
   title: {
@@ -3989,6 +3996,7 @@ util.Window.DFLT_OPT = {
   onclose: null,
   onmove: null,
   onresize: null,
+  onsizechanged: null,
   content: ''
 };
 util.Window.windows = [];
@@ -4107,8 +4115,8 @@ util.Window.prototype = {
     var s = {
       position: 'relative',
       'vertical-align': 'middle',
-      top: (-4 * ctx.zoom) + 'px',
-      'font-size': (18 * ctx.zoom) + 'px',
+      top: (-4 * ctx.scale) + 'px',
+      'font-size': (18 * ctx.scale) + 'px',
       cursor: 'pointer'
     };
     util.setStyle(b, s);
@@ -4129,6 +4137,7 @@ util.Window.prototype = {
     return b;
   },
   updateWinCtrlBtns: function(ctx) {
+    if (!ctx.winSizeBtn) return;
     var fn = ctx.fullWin;
     var btn = util.Window.CHR_WIN_FULL;
     if (util.Window.isExpanded(ctx)) {
@@ -4143,9 +4152,9 @@ util.Window.prototype = {
     var s = {
       position: 'relative',
       'vertical-align': 'middle',
-      top: (-4 * ctx.zoom) + 'px',
-      'margin-left': (4 * ctx.zoom) + 'px',
-      'font-size': (18 * ctx.zoom) + 'px',
+      top: (-4 * ctx.scale) + 'px',
+      'margin-left': (4 * ctx.scale) + 'px',
+      'font-size': (18 * ctx.scale) + 'px',
       cursor: 'pointer'
     };
     util.setStyle(b, s);
@@ -4327,16 +4336,19 @@ util.Window.prototype = {
     var w = document.documentElement.clientWidth;
     var h = document.documentElement.clientHeight;
     if ((ctx.computedMaxW > 0) && (w > ctx.computedMaxW)) {
-      ctx.sizeStatus |= util.Window.SIZE_ST_MAX;
+      ctx.sizeStatus |= util.Window.SIZE_ST_LTD_MAX_W;
       w = ctx.computedMaxW;
     }
     if ((ctx.computedMaxH > 0) && (h > ctx.computedMaxH)) {
-      ctx.sizeStatus |= util.Window.SIZE_ST_MAX;
+      ctx.sizeStatus |= util.Window.SIZE_ST_LTD_MAX_H;
       h = ctx.computedMaxH;
     }
     ctx.setWinSize(ctx, w, h);
 
-    if (!(ctx.sizeStatus & util.Window.SIZE_ST_MAX)) {
+    if (util.Window.isLtdMax(ctx)) {
+      if (!(ctx.sizeStatus & util.Window.SIZE_ST_LTD_MAX_W)) ctx.win.style.left = '0px';
+      if (!(ctx.sizeStatus & util.Window.SIZE_ST_LTD_MAX_H)) ctx.win.style.top = '0px';
+    } else {
       ctx.setWinPos(ctx, 0, 0);
       ctx.uiStatus &= ~util.Window.UI_ST_POS_AUTO_ADJ;
       ctx.sizeStatus |= util.Window.SIZE_ST_FULL_WH;
@@ -4344,6 +4356,11 @@ util.Window.prototype = {
       ctx.disableResize(ctx);
     }
     ctx.updateWinCtrlBtns(ctx);
+    ctx.onSizeChanged(ctx, 'maximized');
+  },
+  kiosk: function(ctx) {
+    if (!ctx) ctx = this;
+    ctx.fullWin(ctx);
   },
 
   restoreWin: function(ctx) {
@@ -4356,10 +4373,11 @@ util.Window.prototype = {
     ctx.enableDraggable(ctx);
     ctx.enableResize(ctx);
     ctx.setWinSize(ctx, org.w, org.h);
-    if (!(ctx.sizeStatus & util.Window.SIZE_ST_MAX)) ctx.setWinPos(ctx, org.l, org.t);
+    if (!util.Window.isLtdMaxWH(ctx)) ctx.setWinPos(ctx, org.l, org.t);
     ctx.sizeStatus = util.Window.SIZE_ST_NORMAL;
     if (ctx.uiStatus & util.Window.UI_ST_POS_AUTO_ADJ) ctx.moveToInitPos(ctx);
     ctx.updateWinCtrlBtns(ctx);
+    ctx.onSizeChanged(ctx, 'restored');
   },
 
   adjustWinMax: function(ctx) {
@@ -4498,8 +4516,9 @@ util.Window.prototype = {
   },
 
   resizeWin: function(ctx, x, y) {
-    if (ctx.sizeStatus & util.Window.SIZE_ST_MAX) {
-      ctx.sizeStatus &= ~util.Window.SIZE_ST_MAX;
+    if (util.Window.isLtdMax(ctx)) {
+      ctx.sizeStatus &= ~util.Window.SIZE_ST_LTD_MAX_W;
+      ctx.sizeStatus &= ~util.Window.SIZE_ST_LTD_MAX_H;
       ctx.updateWinCtrlBtns(ctx);
     }
 
@@ -4579,6 +4598,12 @@ util.Window.prototype = {
     } else {
       ctx.adjustWinMax(ctx);
     }
+  },
+  onSizeChanged: function(ctx, st) {
+    var w = util.getPxVal(ctx.win.style.width);
+    var h = util.getPxVal(ctx.win.style.height);
+    util.callFn(ctx.opt.onsizechanged, ctx, st);
+    util.callFn(ctx.opt.onresize, ctx, w, h);
   },
   show: function() {
     var ctx = this;
@@ -4784,10 +4809,19 @@ util.Window.getContext = function(el) {
   return null;
 };
 util.Window.canMaximize = function(ctx) {
-  return (ctx.opt.resizable && ctx.opt.maximize);
+  return (ctx.opt.resizable && ctx.opt.maximize && !util.Window.isKiosk(ctx));
+};
+util.Window.isKiosk = function(ctx) {
+  return ((ctx.uiStatus & util.Window.UI_ST_KIOSK) ? true : false);
 };
 util.Window.isExpanded = function(ctx) {
-  return ((ctx.sizeStatus & util.Window.SIZE_ST_FULL_WH) || (ctx.sizeStatus & util.Window.SIZE_ST_MAX));
+  return (((ctx.sizeStatus & util.Window.SIZE_ST_FULL_WH) || util.Window.isLtdMax(ctx)) ? true : false);
+};
+util.Window.isLtdMax = function(ctx) {
+  return (((ctx.sizeStatus & util.Window.SIZE_ST_LTD_MAX_W) || (ctx.sizeStatus & util.Window.SIZE_ST_LTD_MAX_H)) ? true : false);
+};
+util.Window.isLtdMaxWH = function(ctx) {
+  return (((ctx.sizeStatus & util.Window.SIZE_ST_LTD_MAX_W) && (ctx.sizeStatus & util.Window.SIZE_ST_LTD_MAX_H)) ? true : false);
 };
 util.Window.getById = function(id) {
   for (var i = 0; i < util.Window.windows.length; i++) {
