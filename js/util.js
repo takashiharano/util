@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202111120000';
+util.v = '202111122106';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1139,6 +1139,20 @@ util.decimalPadding = function(v, scale) {
   var d = (w[1] == undefined ? '' : w[1]);
   d = util.rpad(d, '0', scale);
   return (i + '.' + d);
+};
+
+util.parseInt = function(v, d) {
+  if (d == undefined) d = 0;
+  var r = parseInt(v);
+  if (isNaN(r)) r = d;
+  return r;
+};
+
+util.parseFloat = function(v, d) {
+  if (d == undefined) d = 0;
+  var r = parseFloat(v);
+  if (isNaN(r)) r = d;
+  return r;
 };
 
 /**
