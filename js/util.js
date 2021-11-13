@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202111140021';
+util.v = '202111140053';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2221,8 +2221,8 @@ $el.fn = {
   hasClass: function(n) {
     return util.hasClass(this, n);
   },
-  isActive: function() {
-    return util.isActiveElement(this);
+  hasFocus: function() {
+    return util.hasFocus(this);
   },
   blink: function(a) {
     if (a === false) {
@@ -2357,7 +2357,7 @@ util.hasClass = function(el, n) {
   return el.classList.contains(n);
 };
 
-util.isActiveElement = function(el, idx) {
+util.hasFocus = function(el, idx) {
   if (el.toString() != '[object NodeList]') return util.getElement(el, idx) == document.activeElement;
   for (var i = 0; i < el.length; i++) {
     if (util.getElement(el[i]) == document.activeElement) return true;
