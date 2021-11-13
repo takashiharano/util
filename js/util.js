@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202111122106';
+util.v = '202111140021';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3903,6 +3903,7 @@ util.Window = function(opt) {
   ctx.computedMinH = util.Window.WIN_MIN_H * ctx.scale;
   ctx.computedMaxW = 0;
   ctx.computedMaxH = 0;
+  ctx.titleH = ctx.fontSize + (util.Window.WIN_TITLE_H_MRGN * 2 * ctx.scale) - util.Window.WIN_BORDER * 2;
 
   if (opt.kiosk) {
     ctx.uiStatus |= util.Window.UI_ST_KIOSK;
@@ -3941,8 +3942,7 @@ util.Window.UI_ST_RESIZING_E = 1 << 6;
 util.Window.UI_ST_RESIZING_S = 1 << 7;
 util.Window.UI_ST_RESIZING_W = 1 << 8;
 util.Window.UI_ST_SHOW = 1 << 9;
-util.Window.UI_ST_HIDE = 1 << 10;
-util.Window.UI_ST_POS_AUTO_ADJ = 1 << 11;
+util.Window.UI_ST_POS_AUTO_ADJ = 1 << 10;
 util.Window.UI_ST_RESIZING_ALL = util.Window.UI_ST_RESIZING | util.Window.UI_ST_RESIZING_N | util.Window.UI_ST_RESIZING_E | util.Window.UI_ST_RESIZING_S | util.Window.UI_ST_RESIZING_W;
 util.Window.SIZE_ST_NORMAL = 0;
 util.Window.SIZE_ST_FULL_W = 1 << 1;
@@ -4008,8 +4008,12 @@ util.Window.DFLT_OPT = {
   oninactive: null,
   onbeforeclose: null,
   onclose: null,
+  onstartmove: null,
   onmove: null,
+  onstopmove: null,
+  onstartresize: null,
   onresize: null,
+  onendresize: null,
   onsizechanged: null,
   content: ''
 };
@@ -4051,7 +4055,6 @@ util.Window.prototype = {
 
     win.addEventListener('mousedown', ctx.onMouseDown, {passive: true});
     win.addEventListener('touchstart', ctx.onTouchStart, true);
-
     return win;
   },
   createTitleBar: function(ctx, opt) {
@@ -4062,7 +4065,7 @@ util.Window.prototype = {
       position: 'relative',
       'box-sizing': 'content-box',
       width: '100%',
-      height: (fontSize + util.Window.WIN_TITLE_H_MRGN * 2 - util.Window.WIN_BORDER * 2) + 'px',
+      height: ctx.titleH + 'px',
       padding: 0,
       border: 'none',
       'table-layout': 'fixed',
@@ -4078,7 +4081,7 @@ util.Window.prototype = {
     s = {
       display: 'table-cell',
       position: 'relative',
-      width: '80%',
+      width: '70%',
       left: '4px',
       'vertical-align': 'middle',
       overflow: 'hidden',
@@ -4167,7 +4170,7 @@ util.Window.prototype = {
       position: 'relative',
       'vertical-align': 'middle',
       top: (-4 * ctx.scale) + 'px',
-      'margin-left': (4 * ctx.scale) + 'px',
+      'margin-left': (8 * ctx.scale) + 'px',
       'font-size': (18 * ctx.scale) + 'px',
       cursor: 'pointer'
     };
@@ -4184,12 +4187,11 @@ util.Window.prototype = {
 
   createWinBodyBase: function(ctx, opt) {
     var e = document.createElement('div');
-    var titleH = ctx.fontSize + util.Window.WIN_TITLE_H_MRGN * 2 - util.Window.WIN_BORDER * 2;
     var s = {
       position: 'relative',
       'box-sizing': 'content-box',
       width: '100%',
-      height: 'calc(100% - ' + titleH + 'px)',
+      height: 'calc(100% - ' + ctx.titleH + 'px)',
       margin: 0,
       padding: 0,
       border: 'none',
@@ -4293,9 +4295,7 @@ util.Window.prototype = {
     var y = e.clientY;
     var el = e.target;
     if (e.button != 0) return;
-    if (!(ctx.uiStatus & util.Window.UI_ST_DRAGGABLE) || !util.Window.isMovable(el)) {
-      return;
-    }
+    if (!(ctx.uiStatus & util.Window.UI_ST_DRAGGABLE) || !util.Window.isMovable(el)) return;
     ctx.startMove(ctx, x, y);
   },
   onTitleTouchStart: function(e) {
@@ -4305,9 +4305,7 @@ util.Window.prototype = {
     var x = e0.clientX;
     var y = e0.clientY;
     var el = e.target;
-    if (!(ctx.uiStatus & util.Window.UI_ST_DRAGGABLE) || !util.Window.isMovable(el)) {
-      return;
-    }
+    if (!(ctx.uiStatus & util.Window.UI_ST_DRAGGABLE) || !util.Window.isMovable(el)) return;
     ctx.startMove(ctx, x, y);
     e.preventDefault();
   },
@@ -4317,6 +4315,9 @@ util.Window.prototype = {
     ctx.ptOfstY = y - ctx.win.offsetTop;
     ctx.ptOfstX = x - ctx.win.offsetLeft;
     if (!document.all) window.getSelection().removeAllRanges();
+    x = util.getPxVal(ctx.win.style.left);
+    y = util.getPxVal(ctx.win.style.top);
+    util.callFn(ctx.opt.onstartmove, ctx, x, y);
   },
   moveWin: function(ctx, pX, pY) {
     ctx.uiStatus &= ~util.Window.UI_ST_POS_AUTO_ADJ;
@@ -4335,6 +4336,9 @@ util.Window.prototype = {
   endMove: function(ctx) {
     ctx.uiStatus &= ~util.Window.UI_ST_DRAGGING;
     util.Window.enableTextSelect();
+    var x = util.getPxVal(ctx.win.style.left);
+    var y = util.getPxVal(ctx.win.style.top);
+    util.callFn(ctx.opt.onstartmove, ctx, x, y);
   },
   resetSize: function() {
     this.win.style.width = this.initWidth + 'px';
@@ -4439,11 +4443,9 @@ util.Window.prototype = {
     var clH = document.documentElement.clientHeight;
     if (clW > window.outerWidth) clW = window.outerWidth;
     if (clH > window.outerHeight) clH = window.outerHeight;
-
     var sp = ctx.getSelfSizePos(ctx);
     var winW = sp.w;
     var winH = sp.h;
-
     switch (pos) {
       case 'se':
         top = clH - winH + opt.adjY;
@@ -4527,6 +4529,9 @@ util.Window.prototype = {
     ctx.clickedPosY = e.clientY;
     ctx.saveSizeAndPos(ctx);
     util.Window.disableTextSelect();
+    var w = util.getPxVal(ctx.win.style.width);
+    var h = util.getPxVal(ctx.win.style.height);
+    util.callFn(ctx.opt.onstartresize, ctx, w, h);
   },
 
   resizeWin: function(ctx, x, y) {
@@ -4622,7 +4627,6 @@ util.Window.prototype = {
   show: function() {
     var ctx = this;
     if (!(ctx.uiStatus & util.Window.UI_ST_SHOW)) {
-      ctx.uiStatus &= ~util.Window.UI_ST_HIDE;
       ctx.uiStatus |= util.Window.UI_ST_SHOW;
       util.fadeIn(ctx.win, 200);
       util.callFn(ctx.opt.onshow, ctx);
@@ -4630,9 +4634,8 @@ util.Window.prototype = {
   },
   hide: function() {
     var ctx = this;
-    if (!(ctx.uiStatus & util.Window.UI_ST_HIDE)) {
+    if (ctx.uiStatus & util.Window.UI_ST_SHOW) {
       ctx.uiStatus &= ~util.Window.UI_ST_SHOW;
-      ctx.uiStatus |= util.Window.UI_ST_HIDE;
       util.fadeOut(ctx.win, 200, ctx._hide, ctx);
     }
   },
@@ -4670,6 +4673,9 @@ util.Window.prototype = {
     ctx.uiStatus &= ~util.Window.UI_ST_RESIZING_ALL;
     ctx.win.style.cursor = ctx.cursor;
     util.Window.enableTextSelect(ctx);
+    var w = util.getPxVal(ctx.win.style.width);
+    var h = util.getPxVal(ctx.win.style.height);
+    util.callFn(ctx.opt.onendresize, ctx, w, h);
   },
   getElement: function() {
     return this.win;
@@ -4750,32 +4756,26 @@ util.Window.onActive = function(ctx) {
   if (util.Window.activeWinCtx == ctx) return;
   util.Window.activeWinCtx = ctx;
   var o = util.Window.reorder(ctx);
-  for (var i = 0; i < o.length; i++) {
-    o[i].w.win.style.zIndex = o[i].z;
-  }
   if (o.length >= 2) {
     var lo = o[o.length - 2];
-    util.callFn(lo.w.opt.oninactive, lo.w);
+    util.callFn(lo.opt.oninactive, lo);
   }
   util.callFn(ctx.opt.onactive, ctx);
 };
-util.Window.reorder = function(ctx) {
-  var bz = util.Window.BASE_ZINDEX;
-  var o = [];
-  var z;
+util.Window.reorder = function(topCtx) {
+  var wins = [];
   for (var i = 0; i < util.Window.windows.length; i++) {
     var w = util.Window.windows[i];
-    if (w != ctx) {
-      z = parseInt(w.win.style.zIndex) - 1;
-      o.push({id: w.id, w: w, z: z});
-    }
+    if (w != topCtx) wins.push(w);
   }
-  o = util.sortObj(o, 'z');
-  for (i = 0; i < o.length; i++) {
-    o[i].z = bz + i;
+  wins.unshift(topCtx);
+  var z = util.Window.BASE_ZINDEX + wins.length;
+  for (i = 0; i < wins.length; i++) {
+    wins[i].win.style.zIndex = z;
+    z--;
   }
-  o.push({id: ctx.id, w: ctx, z: bz + i});
-  return o;
+  util.Window.windows = wins;
+  return wins;
 };
 
 util.Window.disableTextSelect = function() {
