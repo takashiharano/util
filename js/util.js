@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202111140053';
+util.v = '202111152321';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -4540,7 +4540,6 @@ util.Window.prototype = {
       ctx.sizeStatus &= ~util.Window.SIZE_ST_LTD_MAX_H;
       ctx.updateWinCtrlBtns(ctx);
     }
-
     var currentX = x;
     var currentY = y;
     var mvX, mvY, t, l, w, h;
@@ -4563,8 +4562,10 @@ util.Window.prototype = {
       mvY = ctx.clickedPosY - currentY;
       h = ctx.orgSizePos.h + mvY;
       if (h < ctx.computedMinH) {
+        t = ctx.orgSizePos.t - (ctx.computedMinH - ctx.orgSizePos.h);
         h = ctx.computedMinH;
       } else if ((ctx.computedMaxH > 0) && (h > ctx.computedMaxH)) {
+        t = ctx.orgSizePos.t - (ctx.computedMaxH - ctx.orgSizePos.h);
         h = ctx.computedMaxH;
       } else {
         t = ctx.orgSizePos.t - mvY;
@@ -4575,11 +4576,14 @@ util.Window.prototype = {
       mvX = ctx.clickedPosX - currentX;
       w = ctx.orgSizePos.w + mvX;
       if (w < ctx.computedMinW) {
+        l = ctx.orgSizePos.l - (ctx.computedMinW - ctx.orgSizePos.w);
         w = ctx.computedMinW;
       } else if ((ctx.computedMaxW > 0) && (w > ctx.computedMaxW)) {
+        l = ctx.orgSizePos.l - (ctx.computedMaxW - ctx.orgSizePos.w);
         w = ctx.computedMaxW;
+      } else {
+        l = ctx.orgSizePos.l - mvX;
       }
-      l = ctx.orgSizePos.l - mvX;
     }
 
     if (ctx.uiStatus & util.Window.UI_ST_RESIZING_E) {
