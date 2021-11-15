@@ -5,8 +5,9 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202111010000';
+util.v = '202111152321';
 
+util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
 util.LS_AVAILABLE = false;
 util.mouseX = 0;
@@ -1140,6 +1141,20 @@ util.decimalPadding = function(v, scale) {
   return (i + '.' + d);
 };
 
+util.parseInt = function(v, d) {
+  if (d == undefined) d = 0;
+  var r = parseInt(v);
+  if (isNaN(r)) r = d;
+  return r;
+};
+
+util.parseFloat = function(v, d) {
+  if (d == undefined) d = 0;
+  var r = parseFloat(v);
+  if (isNaN(r)) r = d;
+  return r;
+};
+
 /**
  * '1'
  * '1.0'
@@ -1246,6 +1261,7 @@ util.copyProps = function(src, dst) {
 };
 
 util.copyDefaultProps = function(dflt, tgt) {
+  if (!tgt) tgt = {};
   for (var k in dflt) {
     if (!(k in tgt)) {
       tgt[k] = dflt[k];
@@ -1253,6 +1269,7 @@ util.copyDefaultProps = function(dflt, tgt) {
       util.copyDefaultProps(dflt[k], tgt[k]);
     }
   }
+  return tgt;
 };
 
 util.loadObject = function(key) {
@@ -1314,6 +1331,18 @@ util.text2list = function(s, flg) {
     a = w;
   }
   return a;
+};
+
+/**
+ * List to Text w/ newline
+ */
+util.list2text = function(l, nl) {
+  if (nl == undefined) nl = '\n';
+  var s = '';
+  for (var i = 0; i < l.length; i++) {
+    s += l[i] + nl;
+  }
+  return s;
 };
 
 /**
@@ -2192,8 +2221,8 @@ $el.fn = {
   hasClass: function(n) {
     return util.hasClass(this, n);
   },
-  isActive: function() {
-    return util.isActiveElement(this);
+  hasFocus: function() {
+    return util.hasFocus(this);
   },
   blink: function(a) {
     if (a === false) {
@@ -2328,7 +2357,7 @@ util.hasClass = function(el, n) {
   return el.classList.contains(n);
 };
 
-util.isActiveElement = function(el, idx) {
+util.hasFocus = function(el, idx) {
   if (el.toString() != '[object NodeList]') return util.getElement(el, idx) == document.activeElement;
   for (var i = 0; i < el.length; i++) {
     if (util.getElement(el[i]) == document.activeElement) return true;
@@ -2351,6 +2380,21 @@ util.hasParent = function(el, parent) {
     }
     el = el.parentNode;
   } while (el);
+  return false;
+};
+
+util.hasChild = function(el, child) {
+  el = util.getElement(el);
+  child = util.getElement(child);
+  var children = el.childNodes;
+  for (var i = 0; i < children.length; i++) {
+    var c = children[i];
+    if (c == child) {
+      return true;
+    } else if (c.childNodes.length > 0) {
+      if (util.hasChild(c, child)) return true;
+    }
+  }
   return false;
 };
 
@@ -2628,13 +2672,36 @@ util.linkUrls = function(s, attr) {
 };
 
 //---------------------------------------------------------
-util.color = {};
+/**
+ * R10, G10, B10 or 'R10,G10,B10' -> '#R16G16B16'
+ */
+util.rgb10to16 = function(r, g, b) {
+  return util.color.rgb(r, g, b);
+};
 
+/**
+ * '#R16G16B16' -> 'R10,G10,B10'
+ */
+util.rgb16to10 = function(v) {
+  var o = util.color.rgb(v);
+  return o.r + ',' + o.g + ',' + o.b;
+};
+
+util.color = {};
 /**
  * R, G, B <-> #RGB
  */
 util.color.rgb = function(r, g, b) {
-  if (typeof r == 'string') return util.color.rgb16to10(r);
+  if (typeof r == 'string') {
+    if (r.match(/,/)) {
+      var v = r.split(',');
+      r = v[0];
+      g = v[1];
+      b = v[2];
+    } else {
+      return util.color.rgb16to10(r);
+    }
+  }
   var rgb = util.color.rgb10to16(r, g, b);
   return '#' + rgb.r + rgb.g + rgb.b;
 };
@@ -3252,19 +3319,34 @@ util.setupStyle = function() {
   }
 };
 
-util.setStyle = function(el, a1, a2) {
-  util.callFn4El(util._setStyle, el, a1, a2);
+util.setStyle = function(el, a1, a2, a3) {
+  util.callFn4El(util._setStyle, el, a1, a2, a3);
 };
-util._setStyle = function(el, a1, a2) {
+util._setStyle = function(el, a1, a2, a3) {
   el = util.getElement(el);
   if (!el) return;
+  var imp = true;
+  if ((a1 === false) || (a2 === false) || (a3 === false)) imp = false;
   if (a1 instanceof Object) {
     for (var k in a1) {
-      el.style.setProperty(k, a1[k], 'important');
+      if (imp) {
+        el.style.setProperty(k, a1[k], 'important');
+      } else {
+        el.style[k] = a1[k];
+      }
     }
   } else {
-    el.style.setProperty(a1, a2, 'important');
+    if (imp) {
+      el.style.setProperty(a1, a2, 'important');
+    } else {
+      el.style[a1] = a2;
+    }
   }
+};
+
+util.getPxVal = function(v) {
+  v = v.replace('px', '');
+  return parseInt(v);
 };
 
 //---------------------------------------------------------
@@ -3772,9 +3854,1038 @@ util.loader._hide = function(ctx) {
 };
 
 //---------------------------------------------------------
+// Window
+//---------------------------------------------------------
+util.newWindow = function(opt) {
+  return new util.Window(opt);
+};
+util.countWindows = function() {
+  return util.Window.count();
+};
+util.getWindowById = function(id) {
+  return util.Window.getById(id);
+};
+util.getWindowByName = function(n) {
+  return util.Window.getByName(n);
+};
+util.getWindowsByGroup = function(g) {
+  return util.Window.getByGroup(g);
+};
+util.getAllWindows = function() {
+  return util.Window.getAll();
+};
+util.closeAllWindows = function() {
+  util.Window.closeAll();
+};
+util.closeWindowsByGroup = function(g) {
+  util.Window.closeByGroup(g);
+};
+
+util.Window = function(opt) {
+  var ctx = this;
+  ctx._type_ = 'WIN';
+  util.Window.registerWindow(ctx);
+  ctx.id = util.Window.cnt;
+  opt = util.copyDefaultProps(util.Window.DFLT_OPT, opt);
+  ctx.opt = opt;
+  ctx.name = opt.name;
+  ctx.group = opt.group;
+  ctx.scale = opt.scale;
+  ctx.uiStatus = util.Window.UI_ST_POS_AUTO_ADJ;
+  ctx.sizeStatus = 0;
+  ctx.orgSizePos = {w: 0, h: 0, t: 0, l: 0};
+  ctx.clickedPosX = 0;
+  ctx.clickedPosY = 0;
+  ctx.ptOfstX = 0;
+  ctx.ptOfstY = 0;
+  ctx.fontSize = util.Window.BASE_FONT_SIZE * ctx.scale;
+  ctx.computedMinW = util.Window.WIN_MIN_W * ctx.scale;
+  ctx.computedMinH = util.Window.WIN_MIN_H * ctx.scale;
+  ctx.computedMaxW = 0;
+  ctx.computedMaxH = 0;
+  ctx.titleH = ctx.fontSize + (util.Window.WIN_TITLE_H_MRGN * 2 * ctx.scale) - util.Window.WIN_BORDER * 2;
+
+  if (opt.kiosk) {
+    ctx.uiStatus |= util.Window.UI_ST_KIOSK;
+  } else {
+    if (ctx.computedMinW < opt.minWidth) ctx.computedMinW = opt.minWidth;
+    if (ctx.computedMinH < opt.minHeight) ctx.computedMinH = opt.minHeight;
+    if (ctx.computedMaxW < opt.maxWidth) ctx.computedMaxW = opt.maxWidth;
+    if (ctx.computedMaxH < opt.maxHeight) ctx.computedMaxH = opt.maxHeight;
+    if (opt.draggable !== false) ctx.uiStatus |= util.Window.UI_ST_DRAGGABLE;
+    if (opt.resizable !== false) ctx.uiStatus |= util.Window.UI_ST_RESIZABLE;
+  }
+
+  ctx.winSizeBtn = null;
+  ctx.win = this.createWin(ctx, opt);
+  ctx.win.ctx = ctx;
+  document.body.appendChild(ctx.win);
+  ctx.moveToInitPos();
+  ctx.initWidth = ctx.win.offsetWidth - util.Window.WIN_BORDER * 2;
+  ctx.initHeight = ctx.win.offsetHeight - util.Window.WIN_BORDER * 2;
+  ctx.setTitle(opt.title.text);
+  ctx.body.innerHTML = opt.content;
+  if (util.Window.isKiosk(ctx)) ctx.kiosk();
+  util.callFn(opt.oncreate, ctx);
+  if (!opt.hidden) {
+    ctx.active();
+    ctx.show();
+  }
+};
+util.Window.UI_ST_KIOSK = 1;
+util.Window.UI_ST_DRAGGABLE = 1 << 1;
+util.Window.UI_ST_DRAGGING = 1 << 2;
+util.Window.UI_ST_RESIZABLE = 1 << 3;
+util.Window.UI_ST_RESIZING = 1 << 4;
+util.Window.UI_ST_RESIZING_N = 1 << 5;
+util.Window.UI_ST_RESIZING_E = 1 << 6;
+util.Window.UI_ST_RESIZING_S = 1 << 7;
+util.Window.UI_ST_RESIZING_W = 1 << 8;
+util.Window.UI_ST_SHOW = 1 << 9;
+util.Window.UI_ST_POS_AUTO_ADJ = 1 << 10;
+util.Window.UI_ST_RESIZING_ALL = util.Window.UI_ST_RESIZING | util.Window.UI_ST_RESIZING_N | util.Window.UI_ST_RESIZING_E | util.Window.UI_ST_RESIZING_S | util.Window.UI_ST_RESIZING_W;
+util.Window.SIZE_ST_NORMAL = 0;
+util.Window.SIZE_ST_FULL_W = 1 << 1;
+util.Window.SIZE_ST_FULL_H = 1 << 2;
+util.Window.SIZE_ST_LTD_MAX_W = 1 << 3;
+util.Window.SIZE_ST_LTD_MAX_H = 1 << 4;
+util.Window.SIZE_ST_FULL_WH = util.Window.SIZE_ST_FULL_W | util.Window.SIZE_ST_FULL_H;
+util.Window.WIN_MIN_W = 100;
+util.Window.WIN_MIN_H = 25;
+util.Window.WIN_SHADOW = 8;
+util.Window.WIN_BORDER = 1;
+util.Window.RESIZE_BOX_SIZE = 6;
+util.Window.WIN_TITLE_H_MRGN = 4;
+util.Window.BASE_FONT_SIZE = 12;
+util.Window.BASE_ZINDEX = 10000;
+util.Window.CHR_WIN_FULL = '&#x25A1;';
+util.Window.CHR_WIN_RSTR = '&#x2750;';
+util.Window.DFLT_OPT = {
+  name: '',
+  group: '',
+  width: 640,
+  height: 400,
+  minWidth: 0,
+  minHeight: 0,
+  maxWidth: 0,
+  maxHeight: 0,
+  pos: 'auto',
+  adjX: 0,
+  adjY: 0,
+  draggable: true,
+  resizable: true,
+  maximize: true,
+  kiosk: false,
+  closeButton: true,
+  className: '',
+  scale: 1,
+  hidden: false,
+  style: {},
+  title: {
+    text: '',
+    fontSize: 12,
+    className: '',
+    style: {
+      background: 'linear-gradient(150deg, rgba(0,32,255,0.8),rgba(0,82,255,0.8))',
+      color: '#fff'
+    },
+    buttons: {
+      style: {
+        color: '#ddd'
+      }
+    }
+  },
+  body: {
+    className: '',
+    style: {
+      background: 'linear-gradient(150deg, rgba(255,255,255, 0.95),rgba(255,255,255,0.6))'
+    }
+  },
+  oncreate: null,
+  onshow: null,
+  onhide: null,
+  onactive: null,
+  oninactive: null,
+  onbeforeclose: null,
+  onclose: null,
+  onstartmove: null,
+  onmove: null,
+  onstopmove: null,
+  onstartresize: null,
+  onresize: null,
+  onendresize: null,
+  onsizechanged: null,
+  content: ''
+};
+util.Window.windows = [];
+util.Window.cnt = 0;
+util.Window.activeWinCtx = null;
+util.Window.savedFunc = null;
+
+util.Window.prototype = {
+  createWin: function(ctx, opt) {
+    var win = document.createElement('div');
+    win.className = 'fadeout';
+    var s = {
+      display: 'inline-block',
+      position: 'fixed',
+      'box-sizing': 'content-box',
+      border: '1px solid #888',
+      padding: 0,
+      'box-shadow': util.Window.WIN_SHADOW + 'px ' + util.Window.WIN_SHADOW + 'px 10px rgba(0,0,0,.2)',
+      'z-index': util.Window.BASE_ZINDEX
+    };
+    util.setStyle(win, s);
+    util.setStyle(win, {width: opt.width + 'px', height: opt.height + 'px'}, false);
+    util.setStyle(win, opt.style);
+    if (opt.className) win.className += ' ' + opt.className;
+
+    var t = ctx.createTitleBar(ctx, opt);
+    win.appendChild(t);
+
+    var bb = ctx.createWinBodyBase(ctx, opt);
+    win.appendChild(bb);
+
+    var b = ctx.createWinBody();
+    bb.appendChild(b);
+    ctx.body = b;
+
+    if (ctx.uiStatus & util.Window.UI_ST_RESIZABLE) ctx.setupResize(ctx, win);
+    if (ctx.uiStatus & util.Window.UI_ST_DRAGGABLE) ctx.setupMove(ctx, t);
+
+    win.addEventListener('mousedown', ctx.onMouseDown, {passive: true});
+    win.addEventListener('touchstart', ctx.onTouchStart, true);
+    return win;
+  },
+  createTitleBar: function(ctx, opt) {
+    var fontSize = ctx.fontSize;
+    var e = document.createElement('div');
+    var s = {
+      display: 'table',
+      position: 'relative',
+      'box-sizing': 'content-box',
+      width: '100%',
+      height: ctx.titleH + 'px',
+      padding: 0,
+      border: 'none',
+      'table-layout': 'fixed',
+      'white-space': 'nowrap',
+      'font-size': fontSize + 'px',
+      cursor: 'default'
+    };
+    util.setStyle(e, s);
+    if (opt.title.style) util.setStyle(e, opt.title.style);
+    if (opt.title.className) e.className = opt.title.className;
+
+    var t = document.createElement('span');
+    s = {
+      display: 'table-cell',
+      position: 'relative',
+      width: '70%',
+      left: '4px',
+      'vertical-align': 'middle',
+      overflow: 'hidden',
+      'text-overflow': 'ellipsis',
+      'font-size': fontSize + 'px'
+    };
+    util.setStyle(t, s);
+    e.appendChild(t);
+    ctx.title = t;
+
+    var b = ctx.createTitleBtns(ctx, opt, fontSize);
+    e.appendChild(b);
+
+    if (util.Window.canMaximize(ctx)) e.ondblclick = ctx.onTitleBarDblClick;
+    return e;
+  },
+  onTitleBarDblClick: function(e) {
+    var ctx = util.Window.getContext(e.target);
+    var f = (util.Window.isExpanded(ctx) ? ctx.restoreWin : ctx.fullWin);
+    f(ctx);
+  },
+  createTitleBtns: function(ctx, opt, fontSize) {
+    var bs = document.createElement('div');
+    var s = {
+      display: 'table',
+      position: 'absolute',
+      height: '100%',
+      right: '6px',
+      'vertical-align': 'middle',
+      'font-size': fontSize + 'px'
+    };
+    util.setStyle(bs, s);
+
+    if (util.Window.canMaximize(ctx)) {
+      var b = ctx.createSizeBtn(ctx, opt, fontSize);
+      ctx.winSizeBtn = b;
+      bs.appendChild(b);
+    }
+
+    if (opt.closeButton) {
+      b = ctx.createCloseBtn(ctx, opt, fontSize);
+      bs.appendChild(b);
+    }
+    return bs;
+  },
+  createSizeBtn: function(ctx, opt) {
+    var b = document.createElement('span');
+    var s = {
+      position: 'relative',
+      'vertical-align': 'middle',
+      top: (-4 * ctx.scale) + 'px',
+      'font-size': (18 * ctx.scale) + 'px',
+      cursor: 'pointer'
+    };
+    util.setStyle(b, s);
+    var btnStyle = opt.title.buttons.style;
+    util.setStyle(b, btnStyle);
+
+    var fn = ctx.fullWin;
+    var btn = util.Window.CHR_WIN_FULL;
+    if (util.Window.isExpanded(ctx)) {
+      fn = ctx.restoreWin;
+      btn = util.Window.CHR_WIN_RSTR;
+    }
+    b.innerHTML = btn;
+    b.onclick = fn;
+    b.className = 'win-nomove';
+    b.onmouseover = new Function('util.setStyle(this, \'color\', \'#fff\');');
+    b.onmouseout = new Function('util.setStyle(this, \'color\', \'' + btnStyle.color + '\');');
+    return b;
+  },
+  updateWinCtrlBtns: function(ctx) {
+    if (!ctx.winSizeBtn) return;
+    var fn = ctx.fullWin;
+    var btn = util.Window.CHR_WIN_FULL;
+    if (util.Window.isExpanded(ctx)) {
+      fn = ctx.restoreWin;
+      btn = util.Window.CHR_WIN_RSTR;
+    }
+    ctx.winSizeBtn.innerHTML = btn;
+    ctx.winSizeBtn.onclick = fn;
+  },
+  createCloseBtn: function(ctx, opt) {
+    var b = document.createElement('span');
+    var s = {
+      position: 'relative',
+      'vertical-align': 'middle',
+      top: (-4 * ctx.scale) + 'px',
+      'margin-left': (8 * ctx.scale) + 'px',
+      'font-size': (18 * ctx.scale) + 'px',
+      cursor: 'pointer'
+    };
+    util.setStyle(b, s);
+    var btnStyle = opt.title.buttons.style;
+    util.setStyle(b, btnStyle);
+    b.innerText = 'x';
+    b.className = 'win-nomove';
+    b.onclick = ctx.close;
+    b.onmouseover = new Function('util.setStyle(this, \'color\', \'#faa\');');
+    b.onmouseout = new Function('util.setStyle(this, \'color\', \'' + btnStyle.color + '\');');
+    return b;
+  },
+
+  createWinBodyBase: function(ctx, opt) {
+    var e = document.createElement('div');
+    var s = {
+      position: 'relative',
+      'box-sizing': 'content-box',
+      width: '100%',
+      height: 'calc(100% - ' + ctx.titleH + 'px)',
+      margin: 0,
+      padding: 0,
+      border: 'none',
+      overflow: 'auto'
+    };
+    util.setStyle(e, s);
+    if (opt.body.style) util.setStyle(e, opt.body.style);
+    if (opt.body.className) e.className = opt.body.className;
+    return e;
+  },
+  createWinBody: function() {
+    var e = document.createElement('div');
+    var s = {
+      position: 'relative',
+      width: '100%',
+      height: '100%'
+    };
+    util.setStyle(e, s);
+    return e;
+  },
+
+  setupResize: function(ctx, win) {
+    var rsN = ctx.createResizeArea(ctx, 'ns-resize', util.Window.UI_ST_RESIZING_N, '100%', '6px');
+    rsN.style.top = '-3px';
+    rsN.style.left = '0';
+    win.appendChild(rsN);
+
+    var rsE = ctx.createResizeArea(ctx, 'ew-resize', util.Window.UI_ST_RESIZING_E, '6px', '100%');
+    rsE.style.top = '0';
+    rsE.style.right = '-3px';
+    win.appendChild(rsE);
+
+    var rsS = ctx.createResizeArea(ctx, 'ns-resize', util.Window.UI_ST_RESIZING_S, '100%', '6px');
+    rsS.style.bottom = '-3px';
+    rsS.style.left = '0';
+    win.appendChild(rsS);
+
+    var rsSE = ctx.createResizeArea(ctx, 'nwse-resize', util.Window.UI_ST_RESIZING_S | util.Window.UI_ST_RESIZING_E, '6px', '6px');
+    rsSE.style.bottom = '-3px';
+    rsSE.style.right = '-3px';
+    win.appendChild(rsSE);
+
+    var rsW = ctx.createResizeArea(ctx, 'ew-resize', util.Window.UI_ST_RESIZING_W, '6px', '100%');
+    rsW.style.top = '0';
+    rsW.style.left = '-3px';
+    win.appendChild(rsW);
+
+    var rsNW = ctx.createResizeArea(ctx, 'nwse-resize', util.Window.UI_ST_RESIZING_N | util.Window.UI_ST_RESIZING_W, '6px', '6px');
+    rsNW.style.top = '-3px';
+    rsNW.style.left = '-3px';
+    win.appendChild(rsNW);
+
+    var rsNE = ctx.createResizeArea(ctx, 'nesw-resize', util.Window.UI_ST_RESIZING_N | util.Window.UI_ST_RESIZING_E, '6px', '6px');
+    rsNE.style.top = '-3px';
+    rsNE.style.right = '-3px';
+    win.appendChild(rsNE);
+
+    var rsSW = ctx.createResizeArea(ctx, 'nesw-resize', util.Window.UI_ST_RESIZING_S | util.Window.UI_ST_RESIZING_W, '6px', '6px');
+    rsSW.style.bottom = '-3px';
+    rsSW.style.left = '-3px';
+    win.appendChild(rsSW);
+  },
+
+  createResizeArea: function(ctx, cursor, state, width, height) {
+    var el = document.createElement('div');
+    var s = {
+      position: 'absolute',
+      width: width,
+      height: height,
+      background: 'rgba(0,0,0,0)',
+      cursor: cursor
+    };
+    util.setStyle(el, s);
+    el.onmousedown = function(e) {
+      util.Window.onActive(ctx);
+      if (!(ctx.uiStatus & util.Window.UI_ST_RESIZABLE)) return;
+      if (e.button != 0) return;
+      ctx.startResize(ctx, e);
+      ctx.uiStatus |= state;
+      ctx.cursor = ctx.win.style.cursor;
+      ctx.win.style.cursor = cursor;
+    };
+    return el;
+  },
+
+  setupMove: function(ctx, el) {
+    el.addEventListener('mousedown', ctx.onTitleMouseDown, {passive: true});
+    el.addEventListener('touchstart', ctx.onTitleTouchStart, true);
+  },
+
+  onMouseDown: function(e) {
+    var ctx = util.Window.getContext(e.target);
+    if (!ctx) return;
+    util.Window.onActive(ctx);
+  },
+
+  onTitleMouseDown: function(e) {
+    var ctx = util.Window.getContext(e.target);
+    if (!ctx) return;
+    var x = e.clientX;
+    var y = e.clientY;
+    var el = e.target;
+    if (e.button != 0) return;
+    if (!(ctx.uiStatus & util.Window.UI_ST_DRAGGABLE) || !util.Window.isMovable(el)) return;
+    ctx.startMove(ctx, x, y);
+  },
+  onTitleTouchStart: function(e) {
+    var ctx = util.Window.getContext(e.target);
+    if (!ctx) return;
+    var e0 = e.changedTouches[0];
+    var x = e0.clientX;
+    var y = e0.clientY;
+    var el = e.target;
+    if (!(ctx.uiStatus & util.Window.UI_ST_DRAGGABLE) || !util.Window.isMovable(el)) return;
+    ctx.startMove(ctx, x, y);
+    e.preventDefault();
+  },
+  startMove: function(ctx, x, y) {
+    util.Window.disableTextSelect();
+    ctx.uiStatus |= util.Window.UI_ST_DRAGGING;
+    ctx.ptOfstY = y - ctx.win.offsetTop;
+    ctx.ptOfstX = x - ctx.win.offsetLeft;
+    if (!document.all) window.getSelection().removeAllRanges();
+    x = util.getPxVal(ctx.win.style.left);
+    y = util.getPxVal(ctx.win.style.top);
+    util.callFn(ctx.opt.onstartmove, ctx, x, y);
+  },
+  moveWin: function(ctx, pX, pY) {
+    ctx.uiStatus &= ~util.Window.UI_ST_POS_AUTO_ADJ;
+    var clH = document.documentElement.clientHeight;
+    if (pX < 0) pX = 0;
+    if (pY < 0) pY = 0;
+    if (pY > clH) pY = clH;
+    var x = pX - ctx.ptOfstX;
+    var y = pY - ctx.ptOfstY;
+    ctx.move(x, y);
+  },
+  onPointerMove: function(ctx, x, y) {
+    if (ctx.uiStatus & util.Window.UI_ST_DRAGGING) ctx.moveWin(ctx, x, y);
+    if (ctx.uiStatus & util.Window.UI_ST_RESIZING) ctx.resizeWin(ctx, x, y);
+  },
+  endMove: function(ctx) {
+    ctx.uiStatus &= ~util.Window.UI_ST_DRAGGING;
+    util.Window.enableTextSelect();
+    var x = util.getPxVal(ctx.win.style.left);
+    var y = util.getPxVal(ctx.win.style.top);
+    util.callFn(ctx.opt.onstartmove, ctx, x, y);
+  },
+  resetSize: function() {
+    this.win.style.width = this.initWidth + 'px';
+    this.win.style.height = this.initHeight + 'px';
+  },
+  fullWin: function(ctx) {
+    if (!ctx) ctx = this;
+    if (!util.Window.isContext(ctx)) ctx = util.Window.getContext(this);
+    ctx.saveSizeAndPos(ctx);
+    ctx._fullWin(ctx);
+  },
+  _fullWin: function(ctx) {
+    var w = document.documentElement.clientWidth;
+    var h = document.documentElement.clientHeight;
+    if ((ctx.computedMaxW > 0) && (w > ctx.computedMaxW)) {
+      ctx.sizeStatus |= util.Window.SIZE_ST_LTD_MAX_W;
+      w = ctx.computedMaxW;
+    }
+    if ((ctx.computedMaxH > 0) && (h > ctx.computedMaxH)) {
+      ctx.sizeStatus |= util.Window.SIZE_ST_LTD_MAX_H;
+      h = ctx.computedMaxH;
+    }
+    ctx.setWinSize(ctx, w, h);
+
+    if (util.Window.isLtdMax(ctx)) {
+      if (!(ctx.sizeStatus & util.Window.SIZE_ST_LTD_MAX_W)) ctx.win.style.left = '0px';
+      if (!(ctx.sizeStatus & util.Window.SIZE_ST_LTD_MAX_H)) ctx.win.style.top = '0px';
+    } else {
+      ctx.setWinPos(ctx, 0, 0);
+      ctx.uiStatus &= ~util.Window.UI_ST_POS_AUTO_ADJ;
+      ctx.sizeStatus |= util.Window.SIZE_ST_FULL_WH;
+      ctx.disableDraggable(ctx);
+      ctx.disableResize(ctx);
+    }
+    ctx.updateWinCtrlBtns(ctx);
+    ctx.onSizeChanged(ctx, 'maximized');
+  },
+  kiosk: function(ctx) {
+    if (!ctx) ctx = this;
+    ctx.fullWin(ctx);
+  },
+
+  restoreWin: function(ctx) {
+    if (!ctx) ctx = this;
+    if (!util.Window.isContext(ctx)) ctx = util.Window.getContext(this);
+    ctx._restoreWin(ctx);
+  },
+  _restoreWin: function(ctx) {
+    var org = ctx.orgSizePos;
+    ctx.enableDraggable(ctx);
+    ctx.enableResize(ctx);
+    ctx.setWinSize(ctx, org.w, org.h);
+    if (!util.Window.isLtdMaxWH(ctx)) ctx.setWinPos(ctx, org.l, org.t);
+    ctx.sizeStatus = util.Window.SIZE_ST_NORMAL;
+    if (ctx.uiStatus & util.Window.UI_ST_POS_AUTO_ADJ) ctx.moveToInitPos(ctx);
+    ctx.updateWinCtrlBtns(ctx);
+    ctx.onSizeChanged(ctx, 'restored');
+  },
+
+  adjustWinMax: function(ctx) {
+    if (ctx.sizeStatus & util.Window.SIZE_ST_FULL_W) {
+      ctx.win.style.width = document.documentElement.clientWidth + 'px';
+    }
+    if (ctx.sizeStatus & util.Window.SIZE_ST_FULL_H) {
+      ctx.win.style.height = document.documentElement.clientHeight + 'px';
+    }
+  },
+
+  resetPos: function() {
+    this.moveToInitPos();
+  },
+  resetWindow: function() {
+    this.resetSize();
+    this.resetPos();
+    this.uiStatus |= util.Window.UI_ST_POS_AUTO_ADJ;
+  },
+  moveToInitPos: function() {
+    var ctx = this;
+    var n = util.Window.count() * 15;
+    var pos = ctx.opt.pos;
+    if (pos == 'auto') {
+      ctx.move(n, n);
+    } else if (typeof pos == 'string') {
+      ctx.setWinPos2(ctx, pos);
+    } else {
+      ctx.move(pos.x, pos.y);
+    }
+  },
+  setWinSize: function(ctx, w, h) {
+    ctx.win.style.width = w + 'px';
+    ctx.win.style.height = h + 'px';
+  },
+  setWinPos: function(ctx, x, y) {
+    ctx.win.style.top = y + 'px';
+    ctx.win.style.left = x + 'px';
+  },
+  setWinPos2: function(ctx, pos) {
+    var opt = ctx.opt;
+    var top = opt.adjY;
+    var left = opt.adjX;
+    var clW = document.documentElement.clientWidth;
+    var clH = document.documentElement.clientHeight;
+    if (clW > window.outerWidth) clW = window.outerWidth;
+    if (clH > window.outerHeight) clH = window.outerHeight;
+    var sp = ctx.getSelfSizePos(ctx);
+    var winW = sp.w;
+    var winH = sp.h;
+    switch (pos) {
+      case 'se':
+        top = clH - winH + opt.adjY;
+        left = clW - winW + opt.adjX;
+        break;
+      case 'ne':
+        top = opt.adjY;
+        left = clW - winW + opt.adjX;
+        break;
+      case 'c':
+        top = (clH / 2) - (winH / 2) + opt.adjY;
+        left = (clW / 2) - (winW / 2) + opt.adjX;
+        break;
+      case 'sw':
+        top = clH - winH + opt.adjY;
+        left = opt.adjX;
+        break;
+      case 'n':
+        top = opt.adjY;
+        left = (clW / 2) - (winW / 2);
+        break;
+      case 'e':
+        top = (clH / 2) - (winH / 2);
+        left = clW - winW + opt.adjX;
+        break;
+      case 's':
+        top = clH - winH + opt.adjY;
+        left = (clW / 2) - (winW / 2);
+        break;
+      case 'w':
+        top = (clH / 2) - (winH / 2);
+        left = opt.adjX;
+    }
+    ctx.setWinPos(ctx, left, top);
+  },
+  getSelfSizePos: function(ctx) {
+    var rect = ctx.win.getBoundingClientRect();
+    var resizeBoxSize = util.Window.RESIZE_BOX_SIZE;
+    var sp = {};
+    sp.w = ctx.win.clientWidth;
+    sp.h = ctx.win.clientHeight;
+    sp.x1 = rect.left - resizeBoxSize / 2;
+    sp.y1 = rect.top - resizeBoxSize / 2;
+    sp.x2 = sp.x1 + ctx.win.clientWidth + resizeBoxSize + util.Window.WIN_BORDER;
+    sp.y2 = sp.y1 + ctx.win.clientHeight + resizeBoxSize + util.Window.WIN_BORDER;
+    return sp;
+  },
+
+  saveSizeAndPos: function(ctx) {
+    var o = ctx.orgSizePos;
+    ctx.saveSize(ctx, o);
+    ctx.savePos(ctx, o);
+  },
+  saveSize: function(ctx, o) {
+    var shadow = util.Window.WIN_SHADOW / 2;
+    o.w = (ctx.win.offsetWidth + (util.Window.WIN_BORDER * 2) - shadow);
+    o.h = (ctx.win.offsetHeight + (util.Window.WIN_BORDER * 2) - shadow);
+  },
+  savePos: function(ctx, o) {
+    o.t = ctx.win.offsetTop;
+    o.l = ctx.win.offsetLeft;
+  },
+
+  enableDraggable: function(ctx) {
+    ctx.uiStatus |= util.Window.UI_ST_DRAGGABLE;
+  },
+  disableDraggable: function(ctx) {
+    ctx.uiStatus &= ~util.Window.UI_ST_DRAGGABLE;
+  },
+
+  enableResize: function(ctx) {
+    ctx.uiStatus |= util.Window.UI_ST_RESIZABLE;
+  },
+  disableResize: function(ctx) {
+    ctx.uiStatus &= ~util.Window.UI_ST_RESIZABLE;
+  },
+
+  startResize: function(ctx, e) {
+    ctx.uiStatus |= util.Window.UI_ST_RESIZING;
+    ctx.clickedPosX = e.clientX;
+    ctx.clickedPosY = e.clientY;
+    ctx.saveSizeAndPos(ctx);
+    util.Window.disableTextSelect();
+    var w = util.getPxVal(ctx.win.style.width);
+    var h = util.getPxVal(ctx.win.style.height);
+    util.callFn(ctx.opt.onstartresize, ctx, w, h);
+  },
+
+  resizeWin: function(ctx, x, y) {
+    if (util.Window.isLtdMax(ctx)) {
+      ctx.sizeStatus &= ~util.Window.SIZE_ST_LTD_MAX_W;
+      ctx.sizeStatus &= ~util.Window.SIZE_ST_LTD_MAX_H;
+      ctx.updateWinCtrlBtns(ctx);
+    }
+    var currentX = x;
+    var currentY = y;
+    var mvX, mvY, t, l, w, h;
+    var clW = document.documentElement.clientWidth;
+    var clH = document.documentElement.clientHeight;
+
+    if (currentX > clW) {
+      currentX = clW;
+    } else if (currentX < 0) {
+      currentX = 0;
+    }
+
+    if (currentY > clH) {
+      currentY = clH;
+    } else if (currentY < 0) {
+      currentY = 0;
+    }
+
+    if (ctx.uiStatus & util.Window.UI_ST_RESIZING_N) {
+      mvY = ctx.clickedPosY - currentY;
+      h = ctx.orgSizePos.h + mvY;
+      if (h < ctx.computedMinH) {
+        t = ctx.orgSizePos.t - (ctx.computedMinH - ctx.orgSizePos.h);
+        h = ctx.computedMinH;
+      } else if ((ctx.computedMaxH > 0) && (h > ctx.computedMaxH)) {
+        t = ctx.orgSizePos.t - (ctx.computedMaxH - ctx.orgSizePos.h);
+        h = ctx.computedMaxH;
+      } else {
+        t = ctx.orgSizePos.t - mvY;
+      }
+    }
+
+    if (ctx.uiStatus & util.Window.UI_ST_RESIZING_W) {
+      mvX = ctx.clickedPosX - currentX;
+      w = ctx.orgSizePos.w + mvX;
+      if (w < ctx.computedMinW) {
+        l = ctx.orgSizePos.l - (ctx.computedMinW - ctx.orgSizePos.w);
+        w = ctx.computedMinW;
+      } else if ((ctx.computedMaxW > 0) && (w > ctx.computedMaxW)) {
+        l = ctx.orgSizePos.l - (ctx.computedMaxW - ctx.orgSizePos.w);
+        w = ctx.computedMaxW;
+      } else {
+        l = ctx.orgSizePos.l - mvX;
+      }
+    }
+
+    if (ctx.uiStatus & util.Window.UI_ST_RESIZING_E) {
+      mvX = currentX - ctx.clickedPosX;
+      w = ctx.orgSizePos.w + mvX;
+      if (w < ctx.computedMinW) {
+        w = ctx.computedMinW;
+      } else if ((ctx.computedMaxW > 0) && (w > ctx.computedMaxW)) {
+        w = ctx.computedMaxW;
+      }
+    }
+
+    if (ctx.uiStatus & util.Window.UI_ST_RESIZING_S) {
+      mvY = currentY - ctx.clickedPosY;
+      h = ctx.orgSizePos.h + mvY;
+      if (ctx.initHeight < ctx.computedMinH) {
+        if (h < ctx.initHeight) h = ctx.initHeight;
+      } else if (h < ctx.computedMinH) {
+        h = ctx.computedMinH;
+      } else if ((ctx.computedMaxH > 0) && (h > ctx.computedMaxH)) {
+        h = ctx.computedMaxH;
+      }
+    }
+    if (t != undefined) ctx.win.style.top = t + 'px';
+    if (l != undefined) ctx.win.style.left = l + 'px';
+    if (w != undefined) ctx.win.style.width = w + 'px';
+    if (h != undefined) ctx.win.style.height = h + 'px';
+    if (w == undefined) w = util.getPxVal(ctx.win.style.width);
+    if (h == undefined) h = util.getPxVal(ctx.win.style.height);
+    util.callFn(ctx.opt.onresize, ctx, w, h);
+  },
+  onResize: function(ctx) {
+    if (ctx.uiStatus & util.Window.UI_ST_POS_AUTO_ADJ) {
+      ctx.moveToInitPos();
+    } else {
+      ctx.adjustWinMax(ctx);
+    }
+  },
+  onSizeChanged: function(ctx, st) {
+    var w = util.getPxVal(ctx.win.style.width);
+    var h = util.getPxVal(ctx.win.style.height);
+    util.callFn(ctx.opt.onsizechanged, ctx, st);
+    util.callFn(ctx.opt.onresize, ctx, w, h);
+  },
+  show: function() {
+    var ctx = this;
+    if (!(ctx.uiStatus & util.Window.UI_ST_SHOW)) {
+      ctx.uiStatus |= util.Window.UI_ST_SHOW;
+      util.fadeIn(ctx.win, 200);
+      util.callFn(ctx.opt.onshow, ctx);
+    }
+  },
+  hide: function() {
+    var ctx = this;
+    if (ctx.uiStatus & util.Window.UI_ST_SHOW) {
+      ctx.uiStatus &= ~util.Window.UI_ST_SHOW;
+      util.fadeOut(ctx.win, 200, ctx._hide, ctx);
+    }
+  },
+  _hide: function(ctx) {
+    util.callFn(ctx.opt.onhide, ctx);
+  },
+  move: function(x, y) {
+    var ctx = this;
+    if (x) ctx.win.style.left = x + 'px';
+    if (y) ctx.win.style.top = y + 'px';
+    if (x == undefined) x = util.getPxVal(ctx.win.style.left);
+    if (y == undefined) y = util.getPxVal(ctx.win.style.top);
+    util.callFn(ctx.opt.onmove, ctx, x, y);
+  },
+  size: function(w, h) {
+    var ctx = this;
+    if (w) {
+      if (w < ctx.computedMinW) {
+        w = ctx.computedMinW;
+      } else if ((ctx.computedMaxW > 0) && (h > ctx.computedMaxW)) {
+        w = ctx.computedMaxW;
+      }
+      ctx.win.style.width = w + 'px';
+    }
+    if (h) {
+      if (h < ctx.computedMinH) {
+        h = ctx.computedMinH;
+      } else if ((ctx.computedMaxH > 0) && (h > ctx.computedMaxH)) {
+        h = ctx.computedMaxH;
+      }
+      ctx.win.style.height = h + 'px';
+    }
+  },
+  endResize: function(ctx) {
+    ctx.uiStatus &= ~util.Window.UI_ST_RESIZING_ALL;
+    ctx.win.style.cursor = ctx.cursor;
+    util.Window.enableTextSelect(ctx);
+    var w = util.getPxVal(ctx.win.style.width);
+    var h = util.getPxVal(ctx.win.style.height);
+    util.callFn(ctx.opt.onendresize, ctx, w, h);
+  },
+  getElement: function() {
+    return this.win;
+  },
+  active: function() {
+    util.Window.onActive(this);
+  },
+  getTitle: function() {
+    return this.title.innerText;
+  },
+  setTitle: function(v) {
+    this.title.innerText = v;
+  },
+  getBodyElement: function() {
+    return this.body;
+  },
+  appendElement: function(el) {
+    el = util.getElement(el);
+    if (el) this.body.appendChild(el);
+  },
+  removeElement: function(el) {
+    el = util.getElement(el);
+    if (el && util.hasChild(this.body, el)) this.body.removeChild(el);
+  },
+  draw: function(v) {
+    this.body.innerHTML = v;
+  },
+  getSize: function() {
+    return {w: this.win.clientWidth, h: this.win.clientHeight};
+  },
+  getPos: function() {
+    var ctx = this;
+    var rect = ctx.win.getBoundingClientRect();
+    var rszbox = util.Window.RESIZE_BOX_SIZE;
+    var x1 = rect.left - rszbox / 2;
+    var y1 = rect.top - rszbox / 2;
+    var x2 = x1 + ctx.win.clientWidth + rszbox + util.Window.WIN_BORDER;
+    var y2 = y1 + ctx.win.clientHeight + rszbox + util.Window.WIN_BORDER;
+    return {x1: x1, y1: y1, x2: x2, y2: y2};
+  },
+  close: function(f) {
+    var ctx = this;
+    if (!util.Window.isContext(ctx)) ctx = util.Window.getContext(this);
+    if ((f == true) || (util.callFn(ctx.opt.onbeforeclose, ctx) !== false)) {
+      util.fadeOut(ctx.win, 200, ctx._close, ctx);
+    }
+  },
+  _close: function(ctx) {
+    util.callFn(ctx.opt.oninactive, ctx);
+    util.callFn(ctx.opt.onclose, ctx);
+    document.body.removeChild(ctx.win);
+    ctx.finalize(ctx);
+  },
+  finalize: function(ctx) {
+    util.Window.unregisterWindow(ctx);
+    ctx.win.ctx = null;
+    ctx.win = null;
+  }
+};
+
+util.Window.registerWindow = function(ctx) {
+  util.Window.cnt++;
+  util.Window.windows.push(ctx);
+};
+util.Window.unregisterWindow = function(ctx) {
+  for (var i = 0; i < util.Window.windows.length; i++) {
+    var w = util.Window.windows[i];
+    if (w == ctx) {
+      util.Window.windows.splice(i, 1);
+      break;
+    }
+  }
+};
+util.Window.count = function() {
+  return util.Window.windows.length;
+};
+util.Window.onActive = function(ctx) {
+  if (util.Window.activeWinCtx == ctx) return;
+  util.Window.activeWinCtx = ctx;
+  var o = util.Window.reorder(ctx);
+  if (o.length >= 2) {
+    var lo = o[o.length - 2];
+    util.callFn(lo.opt.oninactive, lo);
+  }
+  util.callFn(ctx.opt.onactive, ctx);
+};
+util.Window.reorder = function(topCtx) {
+  var wins = [];
+  for (var i = 0; i < util.Window.windows.length; i++) {
+    var w = util.Window.windows[i];
+    if (w != topCtx) wins.push(w);
+  }
+  wins.unshift(topCtx);
+  var z = util.Window.BASE_ZINDEX + wins.length;
+  for (i = 0; i < wins.length; i++) {
+    wins[i].win.style.zIndex = z;
+    z--;
+  }
+  util.Window.windows = wins;
+  return wins;
+};
+
+util.Window.disableTextSelect = function() {
+  util.Window.savedFunc = document.onselectstart;
+  document.onselectstart = function() {return false;};
+};
+util.Window.enableTextSelect = function() {
+  document.onselectstart = util.Window.savedFunc;
+};
+util.Window.isMovable = function(el) {
+  if (el.nodeName == 'INPUT') return false;
+  if (el.nodeName == 'TEXTAREA') return false;
+  if (util.hasClass(el, 'win-nomove')) return false;
+  return true;
+};
+
+util.Window.onMouseMove = function(x, y) {
+  var ctx = util.Window.activeWinCtx;
+  if (!ctx) return;
+  ctx.onPointerMove(ctx, x, y);
+};
+
+util.Window.onPointerUp = function() {
+  var ctx = util.Window.activeWinCtx;
+  if (!ctx) return;
+  if (ctx.uiStatus & util.Window.UI_ST_DRAGGING) ctx.endMove(ctx);
+  if (ctx.uiStatus & util.Window.UI_ST_RESIZING) ctx.endResize(ctx);
+};
+
+util.Window.onResize = function() {
+  for (var i = 0; i < util.Window.windows.length; i++) {
+    var ctx = util.Window.windows[i];
+    ctx.onResize(ctx);
+  }
+};
+
+util.Window.isContext = function(x) {
+  return ((Object.prototype.toString.call(x) == '[object Object]') && (x._type_ == 'WIN'));
+};
+util.Window.getContext = function(el) {
+  do {
+    if (el.ctx) return el.ctx;
+    el = el.parentNode;
+  } while (el != null);
+  return null;
+};
+util.Window.canMaximize = function(ctx) {
+  return (ctx.opt.resizable && ctx.opt.maximize && !util.Window.isKiosk(ctx));
+};
+util.Window.isKiosk = function(ctx) {
+  return ((ctx.uiStatus & util.Window.UI_ST_KIOSK) ? true : false);
+};
+util.Window.isExpanded = function(ctx) {
+  return (((ctx.sizeStatus & util.Window.SIZE_ST_FULL_WH) || util.Window.isLtdMax(ctx)) ? true : false);
+};
+util.Window.isLtdMax = function(ctx) {
+  return (((ctx.sizeStatus & util.Window.SIZE_ST_LTD_MAX_W) || (ctx.sizeStatus & util.Window.SIZE_ST_LTD_MAX_H)) ? true : false);
+};
+util.Window.isLtdMaxWH = function(ctx) {
+  return (((ctx.sizeStatus & util.Window.SIZE_ST_LTD_MAX_W) && (ctx.sizeStatus & util.Window.SIZE_ST_LTD_MAX_H)) ? true : false);
+};
+util.Window.getById = function(id) {
+  for (var i = 0; i < util.Window.windows.length; i++) {
+    var w = util.Window.windows[i];
+    if (w.id == id) return w;
+  }
+  return null;
+};
+util.Window.getByName = function(n) {
+  for (var i = 0; i < util.Window.windows.length; i++) {
+    var w = util.Window.windows[i];
+    if (w.name == n) return w;
+  }
+  return null;
+};
+util.Window.getByGroup = function(g) {
+  var a = [];
+  for (var i = 0; i < util.Window.windows.length; i++) {
+    var w = util.Window.windows[i];
+    if (w.group == g) a.push(w);
+  }
+  return a;
+};
+util.Window.getAll = function() {
+  var a = [];
+  for (var i = 0; i < util.Window.windows.length; i++) {
+    a.push(util.Window.windows[i]);
+  }
+  return a;
+};
+util.Window.closeByGroup = function(g) {
+  for (var i = 0; i < util.Window.windows.length; i++) {
+    var w = util.Window.windows[i];
+    if (w.group == g) w.close(true);
+  }
+};
+util.Window.closeAll = function() {
+  for (var i = 0; i < util.Window.windows.length; i++) {
+    util.Window.windows[i].close(true);
+  }
+};
+
+//---------------------------------------------------------
 // Modal
 //---------------------------------------------------------
-util.MODAL_ZINDEX = 1000;
+util.MODAL_ZINDEX = util.SYSTEM_ZINDEX_BASE;
 util.modal = function(child, addCloseHandler) {
   this.sig = 'modal';
   var el = document.createElement('div');
@@ -3833,14 +4944,14 @@ util.modal.setStyle = function(s) {
   util.modal.style = s;
 };
 util.modal.DFLT_STYLE = {
-  'position': 'fixed',
-  'top': '0',
-  'left': '0',
+  position: 'fixed',
+  top: '0',
+  left: '0',
   'min-width': '100vw',
   'min-height': '100vh',
-  'width': '100%',
-  'height': '100%',
-  'background': 'rgba(0,0,0,0.6)',
+  width: '100%',
+  height: '100%',
+  background: 'rgba(0,0,0,0.6)',
   'z-index': util.MODAL_ZINDEX
 };
 util.modal.style = null;
@@ -3906,7 +5017,7 @@ util.dialog.prototype = {
       'position': 'fixed',
       'border-radius': '3px',
       'padding': util.dialog.PADDING + 'px',
-      'z-index': '1100'
+      'z-index': util.SYSTEM_ZINDEX_BASE + 1
     };
     util.setStyle(base, style);
 
@@ -5910,6 +7021,22 @@ util.onMouseMove = function(e) {
   util.mouseY = y;
   util.infotip.onMouseMove(x, y);
   util.tooltip.onMouseMove(x, y);
+  util.Window.onMouseMove(x, y);
+};
+
+util.onMouseUp = function(e) {
+  if (e.button == 0) util.Window.onPointerUp();
+};
+
+util.onTouchMove = function(e) {
+  var e0 = e.changedTouches[0];
+  var x = e0.clientX;
+  var y = e0.clientY;
+  util.Window.onMouseMove(x, y);
+};
+
+util.onTouchEnd = function() {
+  util.Window.onPointerUp();
 };
 
 //---------------------------------------------------------
@@ -6178,6 +7305,7 @@ util.onReady = function() {
 util.onResize = function() {
   util.infotip.adjust();
   util.dialog.adjust();
+  util.Window.onResize();
 };
 
 util.$onReady = function() {
@@ -6245,6 +7373,10 @@ util.objKeys = function(o) {
   return a;
 };
 
+util.callFn = function(f, a1, a2, a3) {
+  if (f) return f(a1, a2, a3);
+};
+
 util.getElRelObj = function(objs, el) {
   if (!el) return null;
   for (var k in objs) {
@@ -6263,10 +7395,13 @@ util.init = function() {
   } catch (e) {}
   window.addEventListener('DOMContentLoaded', util.onReady, true);
   window.addEventListener('mousemove', util.onMouseMove, true);
+  window.addEventListener('mouseup', util.onMouseUp, true);
   window.addEventListener('keydown', util.onKeyDown, true);
   window.addEventListener('keypress', util.onKeyPress, true);
   window.addEventListener('keyup', util.onKeyUp, true);
   window.addEventListener('resize', util.onResize, true);
+  window.addEventListener('touchmove', util.onTouchMove, true);
+  window.addEventListener('touchend', util.onTouchEnd, true);
 
   window.addEventListener('DOMContentLoaded', util.$onReady, true);
   window.addEventListener('load', util.$onLoad, true);
