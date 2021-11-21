@@ -1,7 +1,5 @@
 package com.libutil.test;
 
-import com.libutil.test.Log;
-
 public class Main {
 
   public static void main(String args[]) {
