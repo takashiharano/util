@@ -624,8 +624,8 @@ public class FileUtil {
    *
    * @param path
    *          file path
-   * @return byte array of the file content. If the file does not exist, this
-   *         method returns null.
+   * @return byte array of the file content. Returns null if the file does not
+   *         exist, or in case of a read error.
    */
   public static byte[] read(String path) {
     File file = new File(path);
@@ -637,8 +637,8 @@ public class FileUtil {
    *
    * @param file
    *          the file object
-   * @return byte array of the file content. If the file does not exist, this
-   *         method returns null.
+   * @return byte array of the file content. Returns null if the file does not
+   *         exist, or in case of a read error.
    */
   public static byte[] read(File file) {
     if (!file.exists()) {
@@ -659,7 +659,8 @@ public class FileUtil {
    *
    * @param path
    *          file path
-   * @return text content. If the file does not exist, this method returns null.
+   * @return text content. Returns null if the file does not exist, or in case of
+   *         a read error.
    */
   public static String readText(String path) {
     return readText(path, DEFAULT_CHARSET);
@@ -670,7 +671,8 @@ public class FileUtil {
    *
    * @param file
    *          the file object to read
-   * @return text content. If the file does not exist, this method returns null.
+   * @return text content. Returns null if the file does not exist, or in case of
+   *         a read error.
    */
   public static String readText(File file) {
     return readText(file, DEFAULT_CHARSET);
@@ -683,7 +685,8 @@ public class FileUtil {
    *          file path to read
    * @param charsetName
    *          charset name. set null to auto detection
-   * @return text content. If the file does not exist, this method returns null.
+   * @return text content. Returns null if the file does not exist, or in case of
+   *         a read error.
    */
   public static String readText(String path, String charsetName) {
     File file = new File(path);
@@ -697,7 +700,8 @@ public class FileUtil {
    *          file object to read
    * @param charsetName
    *          charset name. set null to auto detection
-   * @return text content. If the file does not exist, this method returns null.
+   * @return text content. Returns null if the file does not exist, or in case of
+   *         a read error.
    */
   public static String readText(File file, String charsetName) {
     byte[] content = read(file);
@@ -724,7 +728,8 @@ public class FileUtil {
    *
    * @param path
    *          file path
-   * @return text content
+   * @return text content. Returns null if the file does not exist, or in case of
+   *         a read error.
    */
   public static String[] readTextAsArray(String path) {
     return readTextAsArray(path, DEFAULT_CHARSET);
@@ -737,7 +742,8 @@ public class FileUtil {
    *          file path to read
    * @param charsetName
    *          charset name to decode
-   * @return text content
+   * @return text content. Returns null if the file does not exist, or in case of
+   *         a read error.
    */
   public static String[] readTextAsArray(String path, String charsetName) {
     if (notExist(path)) {
@@ -763,8 +769,8 @@ public class FileUtil {
    *
    * @param path
    *          file path to read
-   * @return file content in Base64 encoded string. If the file does not exist,
-   *         this method returns null.
+   * @return file content in Base64 encoded string. Returns null if the file does
+   *         not exist, or in case of a read error.
    */
   public static String readAsBase64(String path) {
     File file = new File(path);
@@ -776,8 +782,8 @@ public class FileUtil {
    *
    * @param file
    *          the file object to read
-   * @return file content in Base64 encoded string. If the file does not exist,
-   *         this method returns null.
+   * @return file content in Base64 encoded string. Returns null if the file does
+   *         not exist, or in case of a read error.
    */
   public static String readAsBase64(File file) {
     String encoded = null;
