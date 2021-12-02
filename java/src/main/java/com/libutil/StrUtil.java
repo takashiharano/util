@@ -667,6 +667,36 @@ public class StrUtil {
   }
 
   /**
+   * Returns if the specified string contains only ASCII characters.
+   *
+   * @param s
+   *          the string to check, may be null
+   * @return true if the string is ASCII
+   */
+  public static boolean isAscii(String s) {
+    if (s == null) {
+      return false;
+    }
+    Pattern p = Pattern.compile("^[ -~]+$");
+    Matcher m = p.matcher(s);
+    return m.matches();
+  }
+
+  /**
+   * Returns if the specified string contains non ASCII characters.
+   *
+   * @param s
+   *          the string to check, may be null
+   * @return true if the string is non ASCII
+   */
+  public static boolean isNonAscii(String s) {
+    if ((s == null) || ("".equals(s))) {
+      return false;
+    }
+    return !isAscii(s);
+  }
+
+  /**
    * Returns if the specified string is empty (""), null or whitespace only.
    *
    * @param str
