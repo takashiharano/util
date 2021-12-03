@@ -750,51 +750,64 @@ public class StrUtil {
   /**
    * Returns if the given string is a float.
    *
-   * @param str
+   * @param s
    *          the string to check
    * @return true if the string is a float
    */
-  public static boolean isFloat(String str) {
-    if (str == null) {
+  public static boolean isFloat(String s) {
+    if (s == null) {
       return false;
     }
-    return match(str, "^-?\\d+\\.\\d+$", 0);
+    return match(s, "^-?\\d+\\.\\d+$", 0);
   }
 
   /**
    * Returns if the given string is an integer.
    *
-   * @param str
+   * @param s
    *          the string to check
    * @return true if the string is an integer
    */
-  public static boolean isInteger(String str) {
-    if (str == null) {
+  public static boolean isInteger(String s) {
+    if (s == null) {
       return false;
     }
-    return match(str, "^-?\\d+$", 0);
+    return match(s, "^-?\\d+$", 0);
   }
 
   /**
    * Returns if the given string is not a number.
    *
-   * @param str
+   * @param s
    *          the string to check
    * @return true if not a number
    */
-  public static boolean isNaN(String str) {
-    return !isNumber(str);
+  public static boolean isNaN(String s) {
+    return !isNumeric(s);
+  }
+
+  /**
+   * Returns if the given string is a numerical value.
+   *
+   * @param s
+   *          the string to check
+   * @return true if the string is a numerical value
+   */
+  public static boolean isNumeric(String s) {
+    return (isInteger(s) || isFloat(s));
   }
 
   /**
    * Returns if the given string is a number.
    *
-   * @param str
+   * @param s
    *          the string to check
    * @return true if the string is a number
    */
-  public static boolean isNumber(String str) {
-    return (isInteger(str) || isFloat(str));
+  public static boolean isNumber(String s) {
+    Pattern p = Pattern.compile(s);
+    Matcher m = p.matcher("^\\d+$");
+    return m.find();
   }
 
   /**
