@@ -758,7 +758,7 @@ public class StrUtil {
     if (s == null) {
       return false;
     }
-    return match(s, "^-?\\d+\\.\\d+$", 0);
+    return match(s, "^-?\\d+\\.\\d+$");
   }
 
   /**
@@ -772,7 +772,7 @@ public class StrUtil {
     if (s == null) {
       return false;
     }
-    return match(s, "^-?\\d+$", 0);
+    return match(s, "^-?\\d+$");
   }
 
   /**
@@ -805,9 +805,10 @@ public class StrUtil {
    * @return true if the string is a number
    */
   public static boolean isNumber(String s) {
-    Pattern p = Pattern.compile(s);
-    Matcher m = p.matcher("^\\d+$");
-    return m.find();
+    if (s == null) {
+      return false;
+    }
+    return match(s, "^\\d+$");
   }
 
   /**
