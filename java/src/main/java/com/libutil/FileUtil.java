@@ -795,6 +795,46 @@ public class FileUtil {
   }
 
   /**
+   * Renames the file to the dest pathname.
+   *
+   * @param src
+   *          the source path to rename
+   * @param dest
+   *          the new pathname
+   * @return true if and only if the renaming succeeded; false otherwise
+   * @throws SecurityException
+   *           If a security manager exists and its
+   *           SecurityManager.checkWrite(java.lang.String) method denies write
+   *           access to either the old or new pathnames
+   * @throws NullPointerException
+   *           If parameter dest is null
+   */
+  public static boolean rename(String src, String dest) {
+    File f1 = new File(src);
+    File f2 = new File(dest);
+    return rename(f1, f2);
+  }
+
+  /**
+   * Renames the file to the dest pathname.
+   *
+   * @param src
+   *          The source abstract pathname for the named file
+   * @param dest
+   *          The new abstract pathname for the named file
+   * @return true if and only if the renaming succeeded; false otherwise
+   * @throws SecurityException
+   *           If a security manager exists and its
+   *           SecurityManager.checkWrite(java.lang.String) method denies write
+   *           access to either the old or new pathnames
+   * @throws NullPointerException
+   *           If parameter dest is null
+   */
+  public static boolean rename(File src, File dest) {
+    return src.renameTo(dest);
+  }
+
+  /**
    * Sets line separator.
    *
    * @param sep
