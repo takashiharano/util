@@ -68,7 +68,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.3.1</version>
         <configuration>
           <author>true</author>
           <source>1.8</source>
@@ -77,6 +77,7 @@
           <charset>UTF-8</charset>
           <docencoding>UTF-8</docencoding>
           <locale>en_US</locale>
+          <sourcepath>${basedir}/src/main/java</sourcepath>
         </configuration>
         <executions>
           <execution>
