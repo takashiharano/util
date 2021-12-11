@@ -32,9 +32,11 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -603,6 +605,85 @@ public class FileUtil {
   }
 
   /**
+   * Moves the file to the destination path.
+   *
+   * @param src
+   *          the file path to move. e.g., "/path/to/file.ext"
+   * @param dest
+   *          the destination path. e.g., "path/to/destdir
+   * @return true if and only if the moving succeeded; false otherwise
+   */
+  public static boolean move(String src, String dest) {
+    return move(src, dest, false);
+  }
+
+  /**
+   * Moves the file to the destination path.
+   *
+   * @param src
+   *          the file path to move. e.g., "/path/to/file.ext"
+   * @param dest
+   *          the destination path. e.g., "path/to/destdir
+   * @param replaceExisting
+   *          if true, replaces the existing path
+   * @return true if and only if the moving succeeded; false otherwise
+   */
+  public static boolean move(String src, String dest, boolean replaceExisting) {
+    if ("".equals(getExtension(dest))) {
+      String fileName = getFileName(src);
+      dest = joinPath(dest, fileName);
+    }
+    Path from = Paths.get(src);
+    Path to = Paths.get(dest);
+
+    mkParentDir(dest);
+
+    boolean moved = false;
+    try {
+      if (replaceExisting) {
+        Files.move(from, to, StandardCopyOption.REPLACE_EXISTING);
+      } else {
+        Files.move(from, to);
+      }
+      moved = true;
+    } catch (FileAlreadyExistsException fae) {
+      // nop
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return moved;
+  }
+
+  /**
+   * Moves the file to the destination path.
+   *
+   * @param src
+   *          the file to move
+   * @param dest
+   *          the destination path. e.g., "path/to/destdir
+   * @return true if and only if the moving succeeded; false otherwise
+   */
+  public static boolean move(File src, String dest) {
+    return move(src, dest, false);
+  }
+
+  /**
+   * Moves the file to the destination path.
+   *
+   * @param src
+   *          the file to move
+   * @param dest
+   *          the destination path. e.g., "path/to/destdir
+   * @param replaceExisting
+   *          if true, replaces the existing path
+   * @return true if and only if the moving succeeded; false otherwise
+   */
+  public static boolean move(File src, String dest, boolean replaceExisting) {
+    String from = src.getAbsolutePath();
+    return move(from, dest, replaceExisting);
+  }
+
+  /**
    * Tests whether the file or directory denoted by this abstract path name does
    * not exist.
    *
@@ -810,6 +891,11 @@ public class FileUtil {
    *           If parameter dest is null
    */
   public static boolean rename(String src, String dest) {
+    String destDir = getParentPath(dest);
+    if (destDir == null) {
+      String parent = getParentPath(src);
+      dest = joinPath(parent, dest);
+    }
     File f1 = new File(src);
     File f2 = new File(dest);
     return rename(f1, f2);
