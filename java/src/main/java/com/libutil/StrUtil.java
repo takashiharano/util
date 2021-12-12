@@ -677,7 +677,7 @@ public class StrUtil {
     if (s == null) {
       return false;
     }
-    Pattern p = Pattern.compile("^\\p{ASCII}+$");
+    Pattern p = Pattern.compile("^\\p{ASCII}*$");
     Matcher m = p.matcher(s);
     return m.matches();
   }
@@ -690,7 +690,7 @@ public class StrUtil {
    * @return true if the string is non ASCII
    */
   public static boolean isNonAscii(String s) {
-    if ((s == null) || ("".equals(s))) {
+    if (s == null) {
       return false;
     }
     return !isAscii(s);
