@@ -11,7 +11,7 @@ public class IsAsciiTest {
     TestUtil.assertTrue(StrUtil
         .isAscii(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"));
     TestUtil.assertTrue(StrUtil.isAscii("\t"));
-    TestUtil.assertFalse(StrUtil.isAscii(""));
+    TestUtil.assertTrue(StrUtil.isAscii(""));
     TestUtil.assertFalse(StrUtil.isAscii(null));
     TestUtil.assertFalse(StrUtil.isAscii("あ"));
     TestUtil.assertFalse(StrUtil.isAscii("aあ"));
