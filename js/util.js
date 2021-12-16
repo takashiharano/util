@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202112150003';
+util.v = '202112170000';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3884,6 +3884,11 @@ util.closeAllWindows = function() {
 };
 util.closeWindowsByGroup = function(g) {
   util.Window.closeByGroup(g);
+};
+util.getWindowContext = function(el) {
+  el = util.getElement(el);
+  if (!el) return null;
+  return util.Window.getContext(el);
 };
 
 util.Window = function(opt) {
