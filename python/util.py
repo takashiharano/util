@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202110102104
+v = 202112172107
 
 import sys
 import os
@@ -1459,13 +1459,10 @@ def read_file_as_base64(path):
   return base64.b64encode(b).decode()
 
 # Write File
-# mode:
-#  't' = text
-#  'b' = bin
-def write_file(path, data, mode='t', encoding=DEFAULT_ENCODING, make_dir=True):
-  if mode == 't':
+def write_file(path, data, encoding=DEFAULT_ENCODING, make_dir=True):
+  if typename(data) == 'str':
     write_text_file(path, data, encoding, make_dir)
-  elif mode == 'b':
+  else:
     write_binary_file(path, data, make_dir)
 
 # Write text file
