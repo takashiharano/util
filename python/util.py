@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202112172107
+v = 202112182132
 
 import sys
 import os
@@ -439,12 +439,23 @@ def hex2bytes(h):
   h = re.sub('0x', '', h)
   return bytes.fromhex(h)
 
-# bytes -> '01AB..'
+# bytes -> '01AB...'
 def bytes2hex(b, upper=True):
   h = b.hex()
   if upper:
     h = h.upper()
   return h
+
+# '00000001 00000010 ...' -> bytes
+def bin2bytes(s):
+  s = replace(s, '\s', '')
+  s = convert_newline(s, '')
+  a = bytearray()
+  for i in range(0, len(s), 8):
+    b = s[i:i + 8]
+    v = int(b, 2)
+    a.append(v)
+  return bytes(a)
 
 #------------------------------------------------------------------------------
 # String permutation
