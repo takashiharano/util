@@ -311,6 +311,112 @@ public class BinUtil {
   }
 
   /**
+   * byte[] to "00000001 00000010 00000011 ..."
+   *
+   * @param src
+   *          the byte array to dump
+   * @return binary string
+   */
+  public static String toBinString(byte[] src) {
+    return toBinString(src, 0);
+  }
+
+  /**
+   * byte[] to "00000001 00000010 00000011 ..."
+   *
+   * @param src
+   *          the byte array to dump
+   * @param limit
+   *          limit length
+   * @return binary string
+   */
+  public static String toBinString(byte[] src, int limit) {
+    return toBinString(src, limit, 16);
+  }
+
+  /**
+   * byte[] to "00000001 00000010 00000011 ..."
+   *
+   * @param src
+   *          the byte array to dump
+   * @param limit
+   *          limit length
+   * @param lastBytes
+   *          last length
+   * @return binary string
+   */
+  public static String toBinString(byte[] src, int limit, int lastBytes) {
+    int len = src.length;
+    int dumpLen = len;
+    int lastStartPos = 0;
+    if (limit > 0) {
+      if (limit >= len) {
+        dumpLen = len;
+      } else {
+        int limitPlusLast = limit + lastBytes;
+        if (len > limitPlusLast) {
+          dumpLen = limit;
+          lastStartPos = len - lastBytes - 1;
+        } else {
+          dumpLen = len;
+        }
+      }
+    } else if (limit < 0) {
+      dumpLen = 0;
+      lastStartPos = len - lastBytes;
+      if (lastStartPos < 0) {
+        lastStartPos = 0;
+      }
+    }
+    return _toBinString(src, limit, dumpLen, lastStartPos, lastBytes, 16);
+  }
+
+  private static String _toBinString(byte[] src, int limit, int dumpLen, int lastStartPos, int lastBytes,
+      int lineBreak) {
+    StringBuilder sb = new StringBuilder();
+    int len = src.length;
+
+    int i = 0;
+    for (i = 0; i < dumpLen; i++) {
+      if ((i > 0) && (i % lineBreak == 0)) {
+        sb.append("\n");
+      } else if (i > 0) {
+        sb.append(" ");
+      }
+
+      byte b = src[i];
+      int v = b & 0xff;
+      String bin = leftPad(Integer.toBinaryString(v), "0", 8, false);
+      sb.append(bin);
+    }
+
+    if (((dumpLen > 0) && (lastStartPos > 0)) || ((limit < 0) && (len > lastBytes))) {
+      if (lineBreak == 0) {
+        sb.append(" ");
+      } else {
+        sb.append("\n");
+      }
+      sb.append("...");
+    }
+
+    if (lastStartPos > 0) {
+      for (i = lastStartPos; i < len; i++) {
+        if ((i > 0) && (i % lineBreak == 0)) {
+          sb.append("\n");
+        } else if (i > 0) {
+          sb.append(" ");
+        }
+        byte b = src[i];
+        int v = b & 0xff;
+        String bin = leftPad(Integer.toBinaryString(v), "0", 8, false);
+        sb.append(bin);
+      }
+    }
+
+    return sb.toString();
+  }
+
+  /**
    * byte[] to "01 02 03 ..."
    *
    * @param src
@@ -334,6 +440,17 @@ public class BinUtil {
     return toHexString(src, limit, 16);
   }
 
+  /**
+   * byte[] to "01 02 03 ..."
+   *
+   * @param src
+   *          the byte array to dump
+   * @param limit
+   *          limit length
+   * @param lastBytes
+   *          last length
+   * @return hex string
+   */
   public static String toHexString(byte[] src, int limit, int lastBytes) {
     int len = src.length;
     int dumpLen = len;
@@ -449,6 +566,31 @@ public class BinUtil {
       hex[i] = String.valueOf(cU) + String.valueOf(cL);
     }
     return hex;
+  }
+
+  public static String leftPad(String str, String pad, int len, boolean align) {
+    if (str == null) {
+      return null;
+    }
+    int padLen = len - str.length();
+    if (padLen <= 0) {
+      if (align) {
+        str = str.substring(0, len);
+      }
+      return str;
+    }
+    String pd = repeat(pad, padLen);
+    StringBuilder sb = new StringBuilder(pd);
+    sb.append(str);
+    return sb.toString();
+  }
+
+  private static String repeat(String str, int n) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < n; i++) {
+      sb.append(str);
+    }
+    return sb.toString();
   }
 
 }
