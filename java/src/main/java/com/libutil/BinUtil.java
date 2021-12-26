@@ -47,6 +47,17 @@ public class BinUtil {
   }
 
   /**
+   * "00000001 00000010 00000011 ..." to byte[]
+   *
+   * @param src
+   *          bin string
+   * @return the byte array
+   */
+  public static byte[] fromBinString(String src) {
+    return toBytes(src, 2, 8);
+  }
+
+  /**
    * "01 02 03 ..." to byte[]
    *
    * @param src
@@ -54,12 +65,37 @@ public class BinUtil {
    * @return the byte array
    */
   public static byte[] fromHexString(String src) {
-    src = src.trim().replaceAll("\r\n|\r|\n", "").replaceAll("\\s{2,}", " ");
-    String[] arr = src.split(" ");
-    byte[] bytes = new byte[arr.length];
-    for (int i = 0; i < arr.length; i++) {
-      int v = Integer.parseInt(arr[i], 16);
-      bytes[i] = (byte) v;
+    return toBytes(src, 16, 2);
+  }
+
+  /**
+   * String to Bytes
+   *
+   * @param src
+   *          the values to convert
+   * @param radix
+   *          the radix of values
+   * @param unitSize
+   *          the unit size of the value
+   * @return the byte array
+   */
+  public static byte[] toBytes(String src, int radix, int unitSize) {
+    src = src.trim().replaceAll("\r\n|\r|\n|\s", "");
+    int len = src.length();
+    int size = len / unitSize;
+
+    if ((len % unitSize) != 0) {
+      len = unitSize * size;
+      src = src.substring(0, len);
+    }
+
+    byte[] bytes = new byte[size];
+    int p = 0;
+    for (int i = 0; i < len; i += unitSize) {
+      String v = src.substring(i, i + unitSize);
+      int b = Integer.parseInt(v, radix);
+      bytes[p] = (byte) b;
+      p++;
     }
     return bytes;
   }
