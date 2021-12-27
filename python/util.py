@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202112182132
+v = 202112280115
 
 import sys
 import os
@@ -2492,12 +2492,12 @@ class Record:
     return r
 
 #------------------------------------------------------------------------------
-# Test Data
+# for Test Data
 #------------------------------------------------------------------------------
 # [s]234567890123...[e]
 # s: -1 -> '1'
 # e: -1 -> [0-9] of the end position
-def get_test_bytes(size, s=-1, e=-1):
+def get_seq_bytes(size, s=-1, e=-1):
   buf = []
   for i in range(1, size + 1):
     if i == 1:
