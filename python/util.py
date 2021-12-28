@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202112280115
+v = 202112282152
 
 import sys
 import os
@@ -456,6 +456,21 @@ def bin2bytes(s):
     v = int(b, 2)
     a.append(v)
   return bytes(a)
+
+# bytes -> '00000001 00000010 ...'
+def bytes2bin(b, line_break=16):
+  byte_len = len(b)
+  s = ''
+  for i in range(0, byte_len):
+    if i > 0:
+      if i % line_break == 0:
+        s += '\n'
+      else:
+        s += ' '
+    v = b[i]
+    sb = bin(v)[2:]
+    s += sb.zfill(8)
+  return s
 
 #------------------------------------------------------------------------------
 # String permutation
