@@ -32,7 +32,6 @@ import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Map.Entry;
 
 import com.libutil.Base64Util;
@@ -63,7 +62,7 @@ public class HttpRequest {
   /**
    * Send an HTTP request without parameters.
    *
-   * @return HttpResponse objecy
+   * @return HttpResponse object
    */
   public HttpResponse send() {
     return send((String) null);
@@ -92,7 +91,7 @@ public class HttpRequest {
   public HttpResponse send(RequestParameters params, String encoding) {
     String data;
     try {
-      data = _buildQueryString(params, encoding);
+      data = params.buildQueryString(encoding);
     } catch (UnsupportedEncodingException e) {
       HttpResponse response = new HttpResponse();
       response.setStatus(0);
@@ -209,46 +208,6 @@ public class HttpRequest {
     conn.disconnect();
 
     return response;
-  }
-
-  /**
-   * Build a query string from hash table.
-   *
-   * @param params
-   *          parameter hash map
-   * @param encoding
-   *          encoding
-   * @return the query string
-   */
-  public static String buildQueryString(RequestParameters params, String encoding) {
-    try {
-      return _buildQueryString(params, encoding);
-    } catch (UnsupportedEncodingException e) {
-      return null;
-    }
-  }
-
-  private static String _buildQueryString(RequestParameters params, String encoding)
-      throws UnsupportedEncodingException {
-    if (encoding == null) {
-      encoding = "UTF-8";
-    }
-    StringBuilder sb = new StringBuilder();
-    int i = 0;
-    for (Entry<String, String> entry : params.entrySet()) {
-      String key = entry.getKey();
-      String value = entry.getValue();
-      String endKey = URLEncoder.encode(key, encoding);
-      String endVal = URLEncoder.encode(value, encoding);
-      if (i > 0) {
-        sb.append("&");
-      }
-      sb.append(endKey);
-      sb.append("=");
-      sb.append(endVal);
-      i++;
-    }
-    return sb.toString();
   }
 
   /**

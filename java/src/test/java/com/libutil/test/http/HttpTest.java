@@ -1,6 +1,7 @@
 package com.libutil.test.http;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.SocketAddress;
@@ -54,11 +55,21 @@ public class HttpTest {
     params.put("あいう", "えお");
     params.put("A&B", "%987");
 
-    String param1 = HttpRequest.buildQueryString(params, "Shift_JIS");
+    String param1 = null;
+    try {
+      param1 = params.buildQueryString("Shift_JIS");
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    }
     http(url, "GET", param1, reqHeaders, proxy);
     System.out.println("\n\n");
 
-    String param2 = HttpRequest.buildQueryString(params, "UTF-8");
+    String param2 = null;
+    try {
+      param2 = params.buildQueryString("UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    }
     http(url, "POST", param2, reqHeaders, proxy);
   }
 

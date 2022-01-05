@@ -23,6 +23,8 @@
  */
 package com.libutil.http;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 
 /**
@@ -34,6 +36,49 @@ public class RequestParameters extends HashMap<String, String> {
 
   public RequestParameters() {
     super();
+  }
+
+  /**
+   * Build a query string from hash table with default encoding UTF-8.
+   *
+   * @return the query string
+   */
+  public String buildQueryString() {
+    String data = null;
+    try {
+      data = buildQueryString("UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      // never reached
+    }
+    return data;
+  }
+
+  /**
+   * Build a query string from hash table.
+   *
+   * @param encoding
+   *          encoding
+   * @return the query string
+   * @throws UnsupportedEncodingException
+   *           If the named encoding is not supported
+   */
+  public String buildQueryString(String encoding) throws UnsupportedEncodingException {
+    StringBuilder sb = new StringBuilder();
+    int i = 0;
+    for (Entry<String, String> entry : this.entrySet()) {
+      String key = entry.getKey();
+      String value = entry.getValue();
+      String endKey = URLEncoder.encode(key, encoding);
+      String endVal = URLEncoder.encode(value, encoding);
+      if (i > 0) {
+        sb.append("&");
+      }
+      sb.append(endKey);
+      sb.append("=");
+      sb.append(endVal);
+      i++;
+    }
+    return sb.toString();
   }
 
 }
