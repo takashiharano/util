@@ -23,12 +23,12 @@
  */
 package com.libutil.http;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * The class RequestHeaders represents a HTTP request headers.
  */
-public class RequestHeaders extends HashMap<String, String> {
+public class RequestHeaders extends LinkedHashMap<String, String> {
 
   private static final long serialVersionUID = -7331346952226491145L;
 

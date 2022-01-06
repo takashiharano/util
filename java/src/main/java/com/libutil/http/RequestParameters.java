@@ -25,12 +25,13 @@ package com.libutil.http;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 
 /**
  * The class RequestParameters represents a HTTP request parameters.
  */
-public class RequestParameters extends HashMap<String, String> {
+public class RequestParameters extends LinkedHashMap<String, String> {
 
   private static final long serialVersionUID = -7713124708514108249L;
 
