@@ -33,7 +33,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class CommandExecutor {
 
-  public static final String DEFAULT_CHARSET = "UTF-8";
+  private static final String DEFAULT_CHARSET_LINUX = "UTF-8";
+  private static final String DEFAULT_CHARSET_WINDOWS = "SJIS";
 
   private Process process;
 
@@ -41,46 +42,243 @@ public class CommandExecutor {
    * Execute a command.
    *
    * @param command
-   *          a string array containing the program and its arguments
+   *          the command string
    * @return command result
    * @throws Exception
    *           an exceptions that occurred during execution
    */
-  public String exec(String[] command) throws Exception {
-    return exec(command, 0, DEFAULT_CHARSET, null);
+  public static String exec(String command) throws Exception {
+    return exec(command, null, 0, null);
   }
 
   /**
    * Execute a command.
    *
    * @param command
-   *          a string array containing the program and its arguments
+   *          the command string
    * @param charset
    *          charset name
    * @return command result
    * @throws Exception
    *           If an error occurs
    */
-  public String exec(String[] command, String charset) throws Exception {
-    return exec(command, 0, charset, null);
+  public static String exec(String command, String charset) throws Exception {
+    return exec(command, charset, 0, null);
   }
 
   /**
    * Execute a command.
    *
    * @param command
-   *          a string array containing the program and its arguments
+   *          the command string
    * @param timeout
    *          the maximum time to wait
+   * @return command result
+   * @throws Exception
+   *           If an error occurs
+   */
+  public static String exec(String command, long timeout) throws Exception {
+    return exec(command, null, timeout, null);
+  }
+
+  /**
+   * Execute a command.
+   *
+   * @param command
+   *          the command string
    * @param charset
    *          charset name
+   * @param timeout
+   *          the maximum time to wait
    * @param dir
    *          the new working directory
    * @return command result
    * @throws Exception
    *           If an error occurs
    */
-  public String exec(String[] command, long timeout, String charset, File dir) throws Exception {
+  public static String exec(String command, String charset, long timeout, File dir) throws Exception {
+    String osName = System.getProperty("os.name");
+    if (osName == null) {
+      throw new Exception("Unknown OS. The system property os.name is null. Use exec(String[])");
+    }
+
+    String interpreter;
+    String option;
+    if (osName.startsWith("Windows")) {
+      interpreter = "cmd";
+      option = "/c";
+      if (charset == null) {
+        charset = DEFAULT_CHARSET_WINDOWS;
+      }
+    } else if ("Linux".equals(osName)) {
+      interpreter = "/bin/sh";
+      option = "-c";
+      charset = DEFAULT_CHARSET_LINUX;
+    } else {
+      throw new Exception("Unknown OS. os.name = " + osName);
+    }
+
+    String[] cmds = { interpreter, option, command };
+    String result = exec(cmds, charset, timeout, dir);
+
+    return result;
+  }
+
+  /**
+   * Execute a command.
+   *
+   * @param command
+   *          a string array containing the program and its arguments
+   * @return command result
+   * @throws Exception
+   *           If an error occurs
+   */
+  public static String exec(String[] command) throws Exception {
+    return exec(command, null);
+  }
+
+  /**
+   * Execute a command.
+   *
+   * @param command
+   *          a string array containing the program and its arguments
+   * @param charset
+   *          charset name
+   * @return command result
+   * @throws Exception
+   *           If an error occurs
+   */
+  public static String exec(String[] command, String charset) throws Exception {
+    return exec(command, charset, 0, null);
+  }
+
+  /**
+   * Execute a command.
+   *
+   * @param command
+   *          a string array containing the program and its arguments
+   * @param charset
+   *          charset name
+   * @param timeout
+   *          the maximum time to wait
+   * @param dir
+   *          the new working directory
+   * @return command result
+   * @throws Exception
+   *           If an error occurs
+   */
+  public static String exec(String[] command, String charset, long timeout, File dir) throws Exception {
+    CommandExecutor executor = new CommandExecutor();
+    return executor.execCommand(command, charset, timeout, dir);
+  }
+
+  /**
+   * Execute Linux command.
+   *
+   * @param command
+   *          the command string
+   * @return command result
+   * @throws Exception
+   *           If an error occurs
+   */
+  public static String execLinuxCommand(String command) throws Exception {
+    return execLinuxCommand(command, DEFAULT_CHARSET_LINUX, 0, null);
+  }
+
+  /**
+   * Execute Linux command.
+   *
+   * @param command
+   *          the command string
+   * @param charset
+   *          charset name
+   * @param timeout
+   *          the maximum time to wait
+   * @param dir
+   *          the new working directory
+   * @return command result
+   * @throws Exception
+   *           If an error occurs
+   */
+  public static String execLinuxCommand(String command, String charset, long timeout, File dir) throws Exception {
+    String osName = System.getProperty("os.name");
+    if ("Linux".equals(osName)) {
+      String[] cmds = { "/bin/sh", "-c", command };
+      return exec(cmds, charset, timeout, dir);
+    } else {
+      throw new Exception("Linux command is not available on " + osName);
+    }
+  }
+
+  /**
+   * Execute Windows command.
+   *
+   * @param command
+   *          the command string
+   * @return command result
+   * @throws Exception
+   *           If an error occurs
+   */
+  public static String execWindowsCommand(String command) throws Exception {
+    return execWindowsCommand(command, DEFAULT_CHARSET_WINDOWS);
+  }
+
+  /**
+   * Execute Windows command.
+   *
+   * @param command
+   *          the command string
+   * @param charset
+   *          charset name
+   * @return command result
+   * @throws Exception
+   *           If an error occurs
+   */
+  public static String execWindowsCommand(String command, String charset) throws Exception {
+    return execWindowsCommand(command, charset, 0, null);
+  }
+
+  /**
+   * Execute Windows command.
+   *
+   * @param command
+   *          the command string
+   * @param charset
+   *          charset name
+   * @param timeout
+   *          the maximum time to wait
+   * @param dir
+   *          the new working directory
+   * @return command result
+   * @throws Exception
+   *           If an error occurs
+   */
+  public static String execWindowsCommand(String command, String charset, long timeout, File dir) throws Exception {
+    String osName = System.getProperty("os.name");
+    if ((osName != null) && osName.startsWith("Windows")) {
+      String[] cmds = { "cmd", "/c", command };
+      return exec(cmds, charset, timeout, dir);
+    } else {
+      throw new Exception("Windows command is not available on " + osName);
+    }
+  }
+
+  /**
+   * Execute a command.
+   *
+   * @param command
+   *          a string array containing the program and its arguments
+   * @param charset
+   *          charset name
+   * @param timeout
+   *          the maximum time to wait
+   * @param dir
+   *          the new working directory
+   * @return command result
+   * @throws Exception
+   *           If an error occurs
+   */
+  public String execCommand(String[] command, String charset, long timeout, File dir) throws Exception {
     InputStream inpStream = null;
     InputStream errStream = null;
     OutputStream outStream = null;
@@ -149,105 +347,6 @@ public class CommandExecutor {
    */
   public int getExitStatus() {
     return process.exitValue();
-  }
-
-  // -----
-
-  /**
-   * Execute a command.
-   *
-   * @param command
-   *          a string array containing the program and its arguments
-   * @return command result
-   * @throws Exception
-   *           If an error occurs
-   */
-  public static String execCommand(String[] command) throws Exception {
-    return execCommand(command, DEFAULT_CHARSET);
-  }
-
-  /**
-   * Execute a command.
-   *
-   * @param command
-   *          a string array containing the program and its arguments
-   * @param charset
-   *          charset name
-   * @return command result
-   * @throws Exception
-   *           If an error occurs
-   */
-  public static String execCommand(String[] command, String charset) throws Exception {
-    CommandExecutor executor = new CommandExecutor();
-    return executor.exec(command, 0, charset, null);
-  }
-
-  /**
-   * Execute Linux command.
-   *
-   * @param command
-   *          command string
-   * @return command result
-   * @throws Exception
-   *           If an error occurs
-   */
-  public static String execLinuxCommand(String command) throws Exception {
-    return execLinuxCommand(command, "UTF-8");
-  }
-
-  /**
-   * Execute Linux command.
-   *
-   * @param command
-   *          command string
-   * @param charset
-   *          charset name
-   * @return command result
-   * @throws Exception
-   *           If an error occurs
-   */
-  public static String execLinuxCommand(String command, String charset) throws Exception {
-    String osName = System.getProperty("os.name");
-    if ("Linux".equals(osName)) {
-      String[] cmds = { "/bin/sh", "-c", command };
-      return execCommand(cmds, charset);
-    } else {
-      throw new Exception("Linux command is not available on " + osName);
-    }
-  }
-
-  /**
-   * Execute Windows command.
-   *
-   * @param command
-   *          command string
-   * @return command result
-   * @throws Exception
-   *           If an error occurs
-   */
-  public static String execWindowsCommand(String command) throws Exception {
-    return execWindowsCommand(command, "SJIS");
-  }
-
-  /**
-   * Execute Windows command.
-   *
-   * @param command
-   *          command string
-   * @param charset
-   *          charset name
-   * @return command result
-   * @throws Exception
-   *           If an error occurs
-   */
-  public static String execWindowsCommand(String command, String charset) throws Exception {
-    String osName = System.getProperty("os.name");
-    if ((osName != null) && osName.startsWith("Windows")) {
-      String[] cmds = { "cmd", "/c", command };
-      return execCommand(cmds, charset);
-    } else {
-      throw new Exception("Windows command is not available on " + osName);
-    }
   }
 
 }

@@ -1,5 +1,7 @@
 package com.libutil.test.system;
 
+import java.io.File;
+
 import com.libutil.CommandExecutor;
 import com.libutil.test.Log;
 
@@ -10,20 +12,41 @@ public class ExecCommandTest {
   }
 
   private static void execCommandTest() {
-    for (int i = 0; i < 1; i++) {
-      _execCommandTest();
+    execTest();
+
+    Log.i("-- execWindowsCommand --------------");
+    execWindowsCommandTest();
+  }
+
+  private static void execTest() {
+    String command = "dir c:\\tmp";
+    try {
+      Log.i("----------------");
+      String result = CommandExecutor.exec(command);
+      Log.d(result);
+
+      Log.i("----------------");
+      result = CommandExecutor.exec(command, "UTF-8");
+      Log.d(result);
+
+      Log.i("----------------");
+      result = CommandExecutor.exec("dir");
+      Log.d(result);
+
+      Log.i("----------------");
+      File dir = new File("C:/tmp");
+      result = CommandExecutor.exec("dir", "UTF-8", 0, dir);
+      Log.d(result);
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 
-  private static void _execCommandTest() {
-    String[] command = { "cmd", "/c", "dir c:\\tmp" };
+  private static void execWindowsCommandTest() {
+    String command = "dir c:\\tmp";
     try {
-      String result = CommandExecutor.execCommand(command);
+      String result = CommandExecutor.execWindowsCommand(command);
       Log.d(result);
-
-      result = CommandExecutor.execCommand(command, "SJIS");
-      Log.d(result);
-
     } catch (Exception e) {
       e.printStackTrace();
     }
