@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202112282152
+v = 202201091840
 
 import sys
 import os
@@ -436,15 +436,27 @@ def plural(s, n):
 # '01AB' or '01 AB' or '0x12 0xAB'
 # -> bytes
 def hex2bytes(h):
-  h = re.sub('0x', '', h)
+  h = replace(h, '\s', '')
+  h = replace(h, '0x', '')
   return bytes.fromhex(h)
 
-# bytes -> '01AB...'
-def bytes2hex(b, upper=True):
-  h = b.hex()
+# bytes -> '01 AB ...'
+def bytes2hex(b, upper=True, line_break=16):
+  byte_len = len(b)
+  s = ''
+  for i in range(0, byte_len):
+    if i > 0:
+      if i % line_break == 0:
+        s += '\n'
+      else:
+        s += ' '
+    v = b[i]
+    sb = hex(v)[2:]
+    s += sb.zfill(2)
+
   if upper:
-    h = h.upper()
-  return h
+    s = s.upper()
+  return s
 
 # '00000001 00000010 ...' -> bytes
 def bin2bytes(s):
