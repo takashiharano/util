@@ -80,7 +80,7 @@ public class BinUtil {
    * @return the byte array
    */
   public static byte[] toBytes(String src, int radix, int unitSize) {
-    src = src.trim().replaceAll("\r\n|\r|\n|\s", "");
+    src = src.trim().replaceAll("\\r\\n|\\r|\\n|\\s", "");
     int len = src.length();
     int size = len / unitSize;
 
