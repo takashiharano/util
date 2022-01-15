@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202201091840
+v = 202201152023
 
 import sys
 import os
@@ -675,7 +675,7 @@ def next_list_val(arr, val, offset=1):
 #   datetime.timezone(offset, name=None)
 #     offset: datetime.timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
 class DateTime:
-  def __init__(self, src=None, fmt='%Y-%m-%d %H:%M:%S.%f', tz=None):
+  def __init__(self, src=None, fmt=None, tz=None):
     if typename(src) == 'datetime':
       dt = src
     else:
@@ -736,13 +736,17 @@ def timestamp_in_millis():
 
 # 1546400096.123456 (float)    -> datetime
 # '2019-01-02 12:34:56.123456' -> datetime
-def get_datetime(src=None, fmt='%Y-%m-%d %H:%M:%S.%f', tz=None):
+# fmt='%Y-%m-%d %H:%M:%S.%f'
+def get_datetime(src=None, fmt=None, tz=None):
   if src is None:
     dt = datetime.datetime.today()
     if tz is not None:
       ts = dt.timestamp()
       dt = datetime.datetime.fromtimestamp(ts, tz)
   elif typename(src) == 'str':
+    if fmt is None:
+      src = serialize_datetime(src)
+      fmt = '%Y%m%d%H%M%S%f'
     dt = datetime.datetime.strptime(src, fmt)
   else:
     dt = datetime.datetime.fromtimestamp(src, tz)
