@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202201152350';
+util.v = '202201160107';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -45,6 +45,10 @@ util.DateTime = function(src, tzOffset) {
   if (!src && (src !== 0)) {
     dt = new Date();
   } else if (typeof src == 'string') {
+    if (tzOffset != undefined) {
+      src += tzOffset;
+      tzOffset = undefined;
+    }
     st = util.datetime2struct(src);
     dt = new Date(st.year, st.month - 1, st.day, st.hour, st.minute, st.second);
   } else if (src instanceof Date) {
@@ -55,7 +59,7 @@ util.DateTime = function(src, tzOffset) {
   var timestamp = dt.getTime();
 
   if (tzOffset == undefined) {
-    tzOffset = util.getTZ();
+    tzOffset = ((st && st.tz) ? st.tz : util.getTZ());
   } else {
     var os = tzOffset;
     if (typeof os == 'string') os = util.getOffsetFromLocalTz(os);
@@ -63,12 +67,14 @@ util.DateTime = function(src, tzOffset) {
     timestamp = dt.getTime();
   }
 
+  this.tz = '';
   if (st) {
     timestamp += st.millisecond;
     if (st.tz != '') {
       var tzdf = util.getOffsetFromLocalTz(st.tz);
       timestamp -= tzdf;
     }
+    this.tz = st.tz;
   }
 
   var tzOffsetMin = tzOffset;
@@ -286,20 +292,30 @@ util.getTimestampOfDay = function(timeString, offset) {
 
 /**
  * Returns timestamp at 00:00 from specified timestamp.
- * ms: timestamp in millis
+ * dt: timestamp in millis
  * offset: timezone offset. '-1200' to '+1400' (abs) / -12 to 14 (rel)
  * 1628679929040 -> 1628640000000 (offset=0)
  */
-util.getTimestampOfMidnight = function(ms, offset) {
+util.getTimestampOfMidnight = function(dt, offset) {
+  var ms = dt;
+  var f = 0;
+  if (typeof dt == 'string') {
+    dt = util.getDateTime(dt);
+    ms = dt.timestamp;
+    if ((offset == undefined) && dt.tz) offset = 0;
+    f = 1;
+  }
   if (offset == undefined) offset = 0;
-  if (typeof tz == 'string') {
+  if (typeof offset == 'string') {
     var os = util.getOffsetFromLocalTz(offset);
   } else {
     os = offset * 3600000;
   }
-  var t = util.getDateTime(ms - os);
-  var dt = new Date(t.year, t.month - 1, t.day);
-  return new util.DateTime(dt).timestamp;
+  var t = (f ? dt : util.getDateTime(ms - os));
+  var d = new Date(t.year, t.month - 1, t.day);
+  var r = new util.DateTime(d).timestamp;
+  if (f) f -= os;
+  return r;
 };
 
 /**
