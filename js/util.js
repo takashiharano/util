@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202112170000';
+util.v = '202201152350';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -287,14 +287,19 @@ util.getTimestampOfDay = function(timeString, offset) {
 /**
  * Returns timestamp at 00:00 from specified timestamp.
  * ms: timestamp in millis
- * offset: timezone offset. -12 or '-1200' to 14 or '+1400'
+ * offset: timezone offset. '-1200' to '+1400' (abs) / -12 to 14 (rel)
  * 1628679929040 -> 1628640000000 (offset=0)
  */
 util.getTimestampOfMidnight = function(ms, offset) {
-  var t = util.getDateTime(ms);
+  if (offset == undefined) offset = 0;
+  if (typeof tz == 'string') {
+    var os = util.getOffsetFromLocalTz(offset);
+  } else {
+    os = offset * 3600000;
+  }
+  var t = util.getDateTime(ms - os);
   var dt = new Date(t.year, t.month - 1, t.day);
-  var os = util.getOffsetFromLocalTz(offset);
-  return new util.DateTime(dt).timestamp - os;
+  return new util.DateTime(dt).timestamp;
 };
 
 /**
@@ -456,13 +461,18 @@ util.difftime = function(t0, t1) {
 };
 
 /**
- * baseline, comparisonValue, abs(opt)
+ * ms1: baseline timestamp
+ * ms2: comparison timestamp
+ * offset: timezone offset. -12 or '-1200' to 14 or '+1400'
+ * abs: absolute(opt)
  * 1581217200000, 1581066000000 -> -1 (abs=true: 1)
  * 1581217200000, 1581217200000 ->  0
  * 1581217200000, 1581318000000 ->  1
  */
-util.diffDays = function(ms1, ms2, abs) {
+util.diffDays = function(ms1, ms2, offset, abs) {
   var sign = 1;
+  ms1 = util.getTimestampOfMidnight(ms1, offset);
+  ms2 = util.getTimestampOfMidnight(ms2, offset);
   var d = ms2 - ms1;
   if (d < 0) {
     d *= -1;
