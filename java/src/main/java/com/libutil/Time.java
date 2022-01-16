@@ -288,11 +288,13 @@ public class Time {
    * @return milliseconds
    */
   public static long clockToMillis(String str) {
+    String day = "0";
     String hour;
     String min;
     String sec;
     String msec = "000";
     String wk = str;
+    String[] prt;
     boolean sign = false;
     if (wk.charAt(0) == '+') {
       wk = wk.substring(1);
@@ -301,8 +303,14 @@ public class Time {
       wk = wk.substring(1);
     }
 
+    if (wk.indexOf("d") != -1) {
+      prt = wk.split("d");
+      day = prt[0];
+      wk = prt[1];
+    }
+
     if (wk.indexOf(".") != -1) {
-      String[] prt = wk.split("\\.");
+      prt = wk.split("\\.");
       wk = prt[0];
       msec = (prt[1] + "000").substring(0, 3);
     }
@@ -320,12 +328,13 @@ public class Time {
     min = wk.substring(0, 2);
     sec = wk.substring(2, 4);
 
+    int days = Integer.parseInt(day);
     int hours = Integer.parseInt(hour);
     int minutes = Integer.parseInt(min);
     int seconds = Integer.parseInt(sec);
     int milliseconds = Integer.parseInt(msec);
 
-    long ms = (hours * HOUR) + (minutes * MINUTE) + seconds * SECOND + milliseconds;
+    long ms = (days * DAY) + (hours * HOUR) + (minutes * MINUTE) + seconds * SECOND + milliseconds;
     if (sign) {
       ms *= (-1);
     }
