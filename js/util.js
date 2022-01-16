@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202201160107';
+util.v = '202201162307';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -331,7 +331,7 @@ util.getTimeString = function(ms, fmt) {
 
 /**
  * millis to struct
- * -> {'millis': millis, 'days': 1, 'hrs': 0, 'hours': 24, 'minutes': 34, 'seconds': 56, 'milliseconds': 123}
+ * -> {'millis': millis, 'days': 1, 'hours': 24, 'hours24': 0, 'minutes': 34, 'seconds': 56, 'milliseconds': 123}
  */
 util.ms2struct = function(millis) {
   var wk = millis;
@@ -352,8 +352,8 @@ util.ms2struct = function(millis) {
   var tm = {
     millis: millis,
     days: d,
-    hrs: hh - d * 24,
     hours: hh,
+    hours24: hh - d * 24,
     minutes: mi,
     seconds: ss,
     milliseconds: sss
@@ -531,8 +531,8 @@ util.Time = function(t) {
   var tm = util.ms2struct(t);
   this.millis = t;
   this.days = tm.days;
-  this.hrs = tm.hrs;
   this.hours = tm.hours;
+  this.hours24 = tm.hours24;
   this.minutes = tm.minutes;
   this.seconds = tm.seconds;
   this.milliseconds = tm.milliseconds;
@@ -554,9 +554,9 @@ util.Time.prototype = {
     var ms = ctx.milliseconds;
 
     if (fmt.match(/%d/)) {
-      if (d > 0) h = ctx.hrs;
+      if (d > 0) h = ctx.hours24;
     } else if (fmt.match(/%D/)) {
-      h = ctx.hrs;
+      h = ctx.hours24;
     }
     if (!fmt.match(/%H/)) m += h * 60;
     if (!fmt.match(/%m/)) s += m * 60;
@@ -607,9 +607,9 @@ util.Time.prototype = {
     if (h && (ctx.hours > 0)) {
       d = 1;
       r += ctx.hours + 'h ';
-    } else if (d || (ctx.hrs > 0)) {
+    } else if (d || (ctx.hours24 > 0)) {
       d = 1;
-      r += ctx.hrs + 'h ';
+      r += ctx.hours24 + 'h ';
     }
     if (d || (ctx.minutes > 0)) {
       d = 1;
@@ -937,7 +937,7 @@ util.ClockTime.prototype = {
   },
   toHrString: function(byTheDay) {
     if (byTheDay === undefined) byTheDay = false;
-    var h = (byTheDay ? this.clockTm['hrs'] : this.tm['hours']);
+    var h = (byTheDay ? this.clockTm['hours24'] : this.tm['hours']);
     var hh = ((h < 10) ? ('0' + h).slice(-2) : h + '');
     return hh;
   },
@@ -1032,7 +1032,7 @@ util.timecmp = function(t1, t2) {
   return 1;
 };
 
-// str: '[+|-]HH:MI:SS.sss'
+// str: '[+|-][Dd]HH:MI:SS.sss'
 // '01:00'         ->   3600000
 // '01:00:30'      ->   3630000
 // '01:00:30.123'  ->   3630123
@@ -1042,7 +1042,10 @@ util.timecmp = function(t1, t2) {
 // '100:30:45.789' -> 361845789
 // '+01:00'        ->   3600000
 // '-01:00'        ->  -3600000
+// '1d23:45:56.789' -> 171956789
 util.clock2ms = function(str) {
+  var prt;
+  var d;
   var hour;
   var msec;
   var wk = str;
@@ -1054,8 +1057,14 @@ util.clock2ms = function(str) {
     wk = wk.substr(1);
   }
 
+  if (wk.match(/d/)) {
+    prt = wk.split('d');
+    d = prt[0];
+    wk = prt[1];
+  }
+
   if (wk.match(/\./)) {
-    var prt = wk.split('.');
+    prt = wk.split('.');
     wk = prt[0];
     msec = (prt[1] + '000').substr(0, 3);
   }
@@ -1070,11 +1079,12 @@ util.clock2ms = function(str) {
   }
   wk = (wk + '00').substr(0, 4);
 
+  d |= 0;
   hour |= 0;
   var min = wk.substr(0, 2) | 0;
   var sec = wk.substr(2, 2) | 0;
   msec |= 0;
-  var ms = (hour * util.HOUR) + (min * util.MINUTE) + sec * 1000 + msec;
+  var ms = (d * 24 * util.HOUR) + (hour * util.HOUR) + (min * util.MINUTE) + sec * 1000 + msec;
   if (sn) ms *= (-1);
   return ms;
 };
