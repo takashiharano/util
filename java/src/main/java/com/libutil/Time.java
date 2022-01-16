@@ -70,8 +70,8 @@ public class Time {
 
     this.millis = millis;
     this.days = d;
-    this.hours24 = hh - d * 24;
     this.hours = hh;
+    this.hours24 = hh - d * 24;
     this.minutes = mi;
     this.seconds = ss;
     this.milliseconds = sss;
@@ -85,7 +85,7 @@ public class Time {
    *          clock format string. "12:34", "12:34:56", "12:34:56.789"
    */
   public Time(String clock) {
-    this(clock2ms(clock));
+    this(clockToMillis(clock));
   }
 
   public long getMillis() {
@@ -104,20 +104,20 @@ public class Time {
     this.days = days;
   }
 
-  public int getHours24() {
-    return hours24;
-  }
-
-  public void setHours24(int hours24) {
-    this.hours24 = hours24;
-  }
-
   public int getHours() {
     return hours;
   }
 
   public void setHours(int hours) {
     this.hours = hours;
+  }
+
+  public int getHours24() {
+    return hours24;
+  }
+
+  public void setHours24(int hours24) {
+    this.hours24 = hours24;
   }
 
   public int getMinutes() {
@@ -244,11 +244,11 @@ public class Time {
    *          milliseconds
    * @return time string
    */
-  public static String ms2str(long millis) {
-    return ms2str(millis, 0);
+  public static String millisToString(long millis) {
+    return millisToString(millis, 0);
   }
 
-  public static String ms2str(long millis, int mode) {
+  public static String millisToString(long millis, int mode) {
     Time t = new Time(millis);
     if (mode == 1) {
       return t.toString(false, true);
@@ -287,7 +287,7 @@ public class Time {
    *          [+|-]HH:MI:SS.sss
    * @return milliseconds
    */
-  public static long clock2ms(String str) {
+  public static long clockToMillis(String str) {
     String hour;
     String min;
     String sec;
