@@ -36,8 +36,8 @@ public class Time {
 
   private long millis;
   private int days;
-  private int hrs;
   private int hours;
+  private int hours24;
   private int minutes;
   private int seconds;
   private int milliseconds;
@@ -70,7 +70,7 @@ public class Time {
 
     this.millis = millis;
     this.days = d;
-    this.hrs = hh - d * 24;
+    this.hours24 = hh - d * 24;
     this.hours = hh;
     this.minutes = mi;
     this.seconds = ss;
@@ -104,12 +104,12 @@ public class Time {
     this.days = days;
   }
 
-  public int getHrs() {
-    return hrs;
+  public int getHours24() {
+    return hours24;
   }
 
-  public void setHrs(int hrs) {
-    this.hrs = hrs;
+  public void setHours24(int hours24) {
+    this.hours24 = hours24;
   }
 
   public int getHours() {
@@ -166,9 +166,9 @@ public class Time {
     if (h && (this.hours > 0)) {
       d = true;
       sb.append(this.hours + "h ");
-    } else if (d || (this.hrs > 0)) {
+    } else if (d || (this.hours24 > 0)) {
       d = true;
-      sb.append(this.hrs + "h ");
+      sb.append(this.hours24 + "h ");
     }
     if (d || (this.minutes > 0)) {
       d = true;
@@ -194,7 +194,7 @@ public class Time {
    * To string the time.
    *
    * @param format
-   *          "Dd HH:mm:ss.SSS"
+   *          "Dd HH:mm:ss.SSS", "H24:mm:ss.SSS", "HR:mm:ss.SSS"
    * @return the formatted time string
    */
   public String toString(String format) {
@@ -203,11 +203,17 @@ public class Time {
       sn = "-";
     }
 
-    String dd = days + "";
+    String d = days + "";
 
-    String sHrs = "00" + hours;
-    sHrs = sHrs.substring(sHrs.length() - 2);
-    String hh = ((hrs < 10) ? "0" + hrs : hrs + "");
+    String hr = ((hours < 10) ? "0" + hours : hours + "");
+
+    String hh = "00" + hours24;
+    hh = hh.substring(hh.length() - 2);
+
+    String h24 = hh;
+    if (hours >= 24) {
+      h24 = d + "d" + hh;
+    }
 
     String mm = "00" + minutes;
     mm = mm.substring(mm.length() - 2);
@@ -219,9 +225,10 @@ public class Time {
     f3 = f3.substring(f3.length() - 3);
 
     String r = format;
-    r = r.replace("D", dd);
+    r = r.replace("D", d);
     r = r.replace("sn", sn);
-    r = r.replace("HR", sHrs);
+    r = r.replace("HR", hr);
+    r = r.replace("H24", h24);
     r = r.replace("HH", hh);
     r = r.replace("mm", mm);
     r = r.replace("ss", ss);

@@ -18,7 +18,8 @@ public class FormatTimeTest {
   }
 
   public static void test(long t) {
-    Log.i(t + " = " + DateTime.formatTime(t, "DdHH:mm:ss.SSS"));
+    Log.i(t + " = " + DateTime.formatTime(t, "HH:mm:ss.SSS"));
+    Log.i(t + " = " + DateTime.formatTime(t, "DdH24:mm:ss.SSS"));
   }
 
 }

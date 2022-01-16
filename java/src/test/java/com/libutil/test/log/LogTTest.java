@@ -17,7 +17,7 @@ public class LogTTest {
     sleep(1000);
     Log.t("STRONGBACK RETRACT");
     sleep(1000);
-    Log.t("STARTUP");
+    Log.t("STARTUP", 86399900);
     sleep(1000);
     Log.t("LIFTOFF");
     sleep(1000);

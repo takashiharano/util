@@ -521,10 +521,10 @@ public class DateTime {
    *
    * @param millis
    *          milliseconds to format
-   * @return the formatted time string
+   * @return the formatted time string like "12:34:56.789", "1d12:34:56.789"
    */
   public static String formatTime(long millis) {
-    return formatTime(millis, "HH:mm:ss.SSS");
+    return formatTime(millis, "H24:mm:ss.SSS");
   }
 
   /**
@@ -532,56 +532,65 @@ public class DateTime {
    * <br>
    * e.g.,<br>
    * (1234, "HH:mm:ss.SSS") to "00:00:01.234"<br>
+   * (171954123, "HR:mm:ss.SSS") to "47:45:54.123"<br>
+   * (171954123, "H24:mm:ss.SSS") to "1d23:45:54.123"<br>
    * (171954123, "Dd HH:mm:ss.SSS") to "1d 23:45:54.123"<br>
    *
    * @param millis
    *          milliseconds to format
    * @param format
-   *          "HH:mm:ss.SSS"
+   *          "Dd HH:mm:ss.SSS", "H24:mm:ss.SSS", "HR:mm:ss.SSS"
    * @return the formatted time string
    */
   public static String formatTime(long millis, String format) {
     long v = millis;
-    String sn = "+";
+    String sign = "+";
     if (millis < 0) {
       v *= (-1);
-      sn = "-";
+      sign = "-";
     }
 
-    long d = v / 86400000;
-    long hr = 0;
+    long days = v / 86400000;
+    long hours = 0;
     if (v >= 3600000) {
-      hr = v / 3600000;
-      v -= hr * 3600000;
+      hours = v / 3600000;
+      v -= hours * 3600000;
     }
-    long m = 0;
+    long minutes = 0;
     if (v >= 60000) {
-      m = v / 60000;
-      v -= (m * 60000);
+      minutes = v / 60000;
+      v -= (minutes * 60000);
     }
-    long s = v / 1000;
-    long f = v - s * 1000;
-    long h = hr - d * 24;
+    long seconds = v / 1000;
+    long f = v - seconds * 1000;
+    long hours24 = hours - days * 24;
 
-    String dd = d + "";
+    String d = days + "";
 
-    String hh = "00" + h;
+    String hr = ((hours < 10) ? "0" + hours : hours + "");
+
+    String hh = "0" + hours24;
     hh = hh.substring(hh.length() - 2);
-    String hrs = ((hr < 10) ? "0" + hr : hr + "");
 
-    String mm = "00" + m;
+    String h24 = hh;
+    if (hours >= 24) {
+      h24 = d + "d" + hh;
+    }
+
+    String mm = "0" + minutes;
     mm = mm.substring(mm.length() - 2);
 
-    String ss = "00" + s;
+    String ss = "0" + seconds;
     ss = ss.substring(ss.length() - 2);
 
-    String f3 = "000" + f;
+    String f3 = "00" + f;
     f3 = f3.substring(f3.length() - 3);
 
     String r = format;
-    r = r.replace("D", dd);
-    r = r.replace("sn", sn);
-    r = r.replace("HR", hrs);
+    r = r.replace("D", d);
+    r = r.replace("sn", sign);
+    r = r.replace("HR", hr);
+    r = r.replace("H24", h24);
     r = r.replace("HH", hh);
     r = r.replace("mm", mm);
     r = r.replace("ss", ss);
