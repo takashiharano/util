@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202201162307';
+util.v = '202201170000';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1084,7 +1084,7 @@ util.clock2ms = function(str) {
   var min = wk.substr(0, 2) | 0;
   var sec = wk.substr(2, 2) | 0;
   msec |= 0;
-  var ms = (d * 24 * util.HOUR) + (hour * util.HOUR) + (min * util.MINUTE) + sec * 1000 + msec;
+  var ms = (d * util.DAY) + (hour * util.HOUR) + (min * util.MINUTE) + sec * 1000 + msec;
   if (sn) ms *= (-1);
   return ms;
 };
