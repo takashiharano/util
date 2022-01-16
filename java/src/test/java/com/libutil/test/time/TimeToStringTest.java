@@ -20,9 +20,9 @@ public class TimeToStringTest {
 
   public static void test(long t) {
     Time time = new Time(t);
+    Log.i(t + " = " + time.toString("HH:mm:ss.SSS"));
     Log.i(t + " = " + time.toString("HR:mm:ss.SSS"));
-    Log.i(t + " = " + time.toString("H24:mm:ss.SSS"));
-    Log.i(t + " = " + time.toString("Dd HH:mm:ss.SSS"));
+    Log.i(t + " = " + time.toString("Dd H24:mm:ss.SSS"));
     Log.i("");
   }
 

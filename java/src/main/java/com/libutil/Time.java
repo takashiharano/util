@@ -194,7 +194,7 @@ public class Time {
    * To string the time.
    *
    * @param format
-   *          "Dd HH:mm:ss.SSS", "H24:mm:ss.SSS", "HR:mm:ss.SSS"
+   *          "H2H:mm:ss.SSS", "HR:mm:ss.SSS", "Dd H24:mm:ss.SSS"
    * @return the formatted time string
    */
   public String toString(String format) {
@@ -207,12 +207,12 @@ public class Time {
 
     String hr = ((hours < 10) ? "0" + hours : hours + "");
 
-    String hh = "00" + hours24;
-    hh = hh.substring(hh.length() - 2);
+    String h24 = "00" + hours24;
+    h24 = h24.substring(h24.length() - 2);
 
-    String h24 = hh;
+    String hh = h24;
     if (hours >= 24) {
-      h24 = d + "d" + hh;
+      hh = d + "d" + h24;
     }
 
     String mm = "00" + minutes;

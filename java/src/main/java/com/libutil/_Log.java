@@ -402,7 +402,7 @@ public class _Log {
       self.logT0 = t0;
     }
     long delta = t1 - t0;
-    String m = "[" + DateTime.formatTime(delta, "TsnH24:mm:ss.SSS") + "] " + msg;
+    String m = "[" + DateTime.formatTime(delta, "TsnHH:mm:ss.SSS") + "] " + msg;
     i(m);
     return delta;
   }

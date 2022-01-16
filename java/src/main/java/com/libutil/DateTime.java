@@ -524,7 +524,7 @@ public class DateTime {
    * @return the formatted time string like "12:34:56.789", "1d12:34:56.789"
    */
   public static String formatTime(long millis) {
-    return formatTime(millis, "H24:mm:ss.SSS");
+    return formatTime(millis, "HH:mm:ss.SSS");
   }
 
   /**
@@ -533,13 +533,13 @@ public class DateTime {
    * e.g.,<br>
    * (1234, "HH:mm:ss.SSS") to "00:00:01.234"<br>
    * (171954123, "HR:mm:ss.SSS") to "47:45:54.123"<br>
-   * (171954123, "H24:mm:ss.SSS") to "1d23:45:54.123"<br>
-   * (171954123, "Dd HH:mm:ss.SSS") to "1d 23:45:54.123"<br>
+   * (171954123, "HH:mm:ss.SSS") to "1d23:45:54.123"<br>
+   * (171954123, "Dd H24:mm:ss.SSS") to "1d 23:45:54.123"<br>
    *
    * @param millis
    *          milliseconds to format
    * @param format
-   *          "Dd HH:mm:ss.SSS", "H24:mm:ss.SSS", "HR:mm:ss.SSS"
+   *          "HH:mm:ss.SSS", "HR:mm:ss.SSS", "Dd H24:mm:ss.SSS"
    * @return the formatted time string
    */
   public static String formatTime(long millis, String format) {
@@ -569,12 +569,12 @@ public class DateTime {
 
     String hr = ((hours < 10) ? "0" + hours : hours + "");
 
-    String hh = "0" + hours24;
-    hh = hh.substring(hh.length() - 2);
+    String h24 = "0" + hours24;
+    h24 = h24.substring(h24.length() - 2);
 
-    String h24 = hh;
+    String hh = h24;
     if (hours >= 24) {
-      h24 = d + "d" + hh;
+      hh = d + "d" + h24;
     }
 
     String mm = "0" + minutes;
