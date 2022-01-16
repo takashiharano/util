@@ -194,7 +194,7 @@ public class Time {
    * To string the time.
    *
    * @param format
-   *          "H2H:mm:ss.SSS", "HR:mm:ss.SSS", "Dd H24:mm:ss.SSS"
+   *          "HH:mm:ss.SSS", "HR:mm:ss.SSS", "Dd H24:mm:ss.SSS"
    * @return the formatted time string
    */
   public String toString(String format) {
