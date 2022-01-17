@@ -599,6 +599,94 @@ public class DateTime {
   }
 
   /**
+   * Formats time zone offset string.
+   *
+   * @param s
+   *          "-0800", "Z", "+00:00", "+5.5", "+9"
+   * @return time zone offset string like "+0900"
+   */
+  public static String formatTimeZone(String s) {
+    if (s == null) {
+      return null;
+    }
+    if (s.equals("Z")) {
+      return "+0000";
+    }
+    s = s.replace(":", "");
+
+    Pattern p = Pattern.compile("^[+-].+", 0);
+    Matcher m = p.matcher(s);
+    if (!m.find()) {
+      return null;
+    }
+
+    String sn = s.substring(0, 1);
+    s = s.substring(1);
+
+    p = Pattern.compile("\\.", 0);
+    m = p.matcher(s);
+    if (m.find()) {
+      s = floatToClock(s);
+    }
+
+    int len = s.length();
+    if (len == 1) {
+      s = "0" + s + "00";
+    } else if (len == 2) {
+      s = s + "00";
+    } else if (len == 3) {
+      s = "0" + s;
+    }
+    String tz = sn + s;
+
+    if (tz.equals("-0000")) {
+      return "+0000";
+    }
+
+    return tz;
+  }
+
+  /**
+   * Float to clock-like string.
+   *
+   * @param time
+   *          hours
+   * @return clock-like string like "0930"
+   */
+  public static String floatToClock(float time) {
+    String s = Float.toString(time);
+    return floatToClock(s);
+  }
+
+  /**
+   * Converts float value to clock-like string.
+   *
+   * @param time
+   *          a float value like [+|-]9.0
+   * @return [+|-]0900
+   */
+  public static String floatToClock(String time) {
+    String sn = "";
+    Pattern pt = Pattern.compile("^[+-]", 0);
+    Matcher mt = pt.matcher(time);
+    if (mt.find()) {
+      sn = time.substring(0, 1);
+      time = time.substring(1);
+    }
+    String[] w = time.split("\\.");
+    int h = Integer.parseInt(w[0]);
+    float fM = 0.0f;
+    if (w.length >= 2) {
+      fM = Float.parseFloat("0." + w[1]);
+    }
+    int m = (int) (60 * fM);
+    String hh = ((h < 10) ? "0" + Integer.toString(h) : Integer.toString(h));
+    String mm = ((m < 10) ? "0" + Integer.toString(m) : Integer.toString(m));
+    String clock = sn + hh + mm;
+    return clock;
+  }
+
+  /**
    * Converts a date time string to UnixMillis.
    *
    * @param datetime
@@ -766,7 +854,11 @@ public class DateTime {
   }
 
   private static String _serializeDateTime(String src) {
-    String w = src;
+    String[] dttz = splitDateTimeAndTimezone(src);
+    String sdt = dttz[0];
+    String tzId = dttz[1];
+
+    String w = sdt;
     w = w.trim();
     w = w.replaceAll("\\s{2,}", " ");
     w = w.replaceAll("T", " ");
@@ -774,7 +866,7 @@ public class DateTime {
     Pattern p = Pattern.compile("[-/:]");
     Matcher m = p.matcher(w);
     if (!m.find()) {
-      return __serializeDateTime(w);
+      return __serializeDateTime(w, tzId);
     }
 
     String[] prt = w.split(" ");
@@ -812,12 +904,15 @@ public class DateTime {
     }
 
     time = hh + mi + ss + f;
-    return __serializeDateTime(date + time);
+    return __serializeDateTime(date + time, tzId);
   }
 
-  private static String __serializeDateTime(String s) {
+  private static String __serializeDateTime(String s, String tz) {
     s = s.replaceAll("[-\\s:\\.]", "");
     s = (s + "000000000").substring(0, 17);
+    if (tz != null) {
+      s += tz;
+    }
     return s;
   }
 
