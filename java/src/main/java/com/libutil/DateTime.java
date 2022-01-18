@@ -626,7 +626,7 @@ public class DateTime {
     p = Pattern.compile("\\.", 0);
     m = p.matcher(s);
     if (m.find()) {
-      s = floatToClock(s);
+      s = Time.hoursToClockString(s, "");
     }
 
     int len = s.length();
@@ -644,46 +644,6 @@ public class DateTime {
     }
 
     return tz;
-  }
-
-  /**
-   * Float to clock-like string.
-   *
-   * @param time
-   *          hours
-   * @return clock-like string like "0930"
-   */
-  public static String floatToClock(float time) {
-    String s = Float.toString(time);
-    return floatToClock(s);
-  }
-
-  /**
-   * Converts float value to clock-like string.
-   *
-   * @param time
-   *          a float value like [+|-]9.0
-   * @return [+|-]0900
-   */
-  public static String floatToClock(String time) {
-    String sn = "";
-    Pattern pt = Pattern.compile("^[+-]", 0);
-    Matcher mt = pt.matcher(time);
-    if (mt.find()) {
-      sn = time.substring(0, 1);
-      time = time.substring(1);
-    }
-    String[] w = time.split("\\.");
-    int h = Integer.parseInt(w[0]);
-    float fM = 0.0f;
-    if (w.length >= 2) {
-      fM = Float.parseFloat("0." + w[1]);
-    }
-    int m = (int) (60 * fM);
-    String hh = ((h < 10) ? "0" + Integer.toString(h) : Integer.toString(h));
-    String mm = ((m < 10) ? "0" + Integer.toString(m) : Integer.toString(m));
-    String clock = sn + hh + mm;
-    return clock;
   }
 
   /**

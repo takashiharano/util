@@ -23,6 +23,9 @@
  */
 package com.libutil;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * The class Time represents a specific instant in time, with millisecond
  * precision.
@@ -234,6 +237,72 @@ public class Time {
     r = r.replace("ss", ss);
     r = r.replace("SSS", f3);
     return r;
+  }
+
+  /**
+   * Converts a decimal hours into a clock-like string.
+   *
+   * @param hours
+   *          hours (e.g., -8.0, 9.5)
+   * @return clock-like string like "-0800", "0930"
+   */
+  public static String hoursToClockString(float hours) {
+    return hoursToClockString(hours, ":");
+  }
+
+  /**
+   * Converts a decimal hours into a clock-like string.
+   *
+   * @param hours
+   *          hours (e.g., -8.0, 9.5)
+   * @param separator
+   *          separator of the hours and the minutes
+   * @return clock-like string like "-0800", "0930"
+   */
+  public static String hoursToClockString(float hours, String separator) {
+    String s = Float.toString(hours);
+    return hoursToClockString(s, separator);
+  }
+
+  /**
+   * Converts a decimal hours into a clock-like string.
+   *
+   * @param hours
+   *          a float value (e.g., "-8.0", "9.0", "+9.5")
+   * @return clock-like string (e.g., "-0800", "0900", "+0930")
+   */
+  public static String hoursToClockString(String hours) {
+    return hoursToClockString(hours, ":");
+  }
+
+  /**
+   * Converts a decimal hours into a clock-like string.
+   *
+   * @param hours
+   *          a float value (e.g., "-8.0", "9.0", "+9.5")
+   * @param separator
+   *          separator of the hours and the minutes
+   * @return clock-like string (e.g., "-0800", "0900", "+0930")
+   */
+  public static String hoursToClockString(String hours, String separator) {
+    String sn = "";
+    Pattern pt = Pattern.compile("^[+-]", 0);
+    Matcher mt = pt.matcher(hours);
+    if (mt.find()) {
+      sn = hours.substring(0, 1);
+      hours = hours.substring(1);
+    }
+    String[] w = hours.split("\\.");
+    int h = Integer.parseInt(w[0]);
+    float fM = 0.0f;
+    if (w.length >= 2) {
+      fM = Float.parseFloat("0." + w[1]);
+    }
+    int m = (int) (60 * fM);
+    String hh = ((h < 10) ? "0" + Integer.toString(h) : Integer.toString(h));
+    String mm = ((m < 10) ? "0" + Integer.toString(m) : Integer.toString(m));
+    String clock = sn + hh + separator + mm;
+    return clock;
   }
 
   /**
