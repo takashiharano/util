@@ -3,7 +3,7 @@ package com.libutil.test.datetime;
 import com.libutil.DateTime;
 import com.libutil.test.Log;
 
-public class FormatTimeZoneTest {
+public class NormalizeTimeZoneTest {
 
   public static void main(String args[]) {
     test();
@@ -19,7 +19,7 @@ public class FormatTimeZoneTest {
       String data_in = data[0];
       String data_expected = data[1];
 
-      String out = DateTime.formatTimeZone(data_in);
+      String out = DateTime.normalizeTimeZone(data_in);
       String ret;
       if (out.equals(data_expected)) {
         ret = "OK";

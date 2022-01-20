@@ -605,13 +605,13 @@ public class DateTime {
   }
 
   /**
-   * Formats time zone offset string.
+   * Normalizes the time zone offset string.
    *
    * @param s
    *          "-0800", "Z", "+00:00", "+5.5", "+9"
-   * @return time zone offset string like "+0900"
+   * @return the time zone offset string like "+0900"
    */
-  public static String formatTimeZone(String s) {
+  public static String normalizeTimeZone(String s) {
     if (s == null) {
       return null;
     }
