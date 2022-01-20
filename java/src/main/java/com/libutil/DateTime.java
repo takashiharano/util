@@ -54,7 +54,7 @@ public class DateTime {
   private int minute;
   private int second;
   private int millisecond;
-  private TimeZone timeZone;
+  private TimeZone timezone;
 
   /**
    * Allocates a DateTime object and initializes it so that it represents the time
@@ -77,17 +77,23 @@ public class DateTime {
     _init(date, null);
   }
 
-  public DateTime(long timestamp, TimeZone timeZone) {
+  public DateTime(long timestamp, TimeZone timezone) {
     Date date = new Date(timestamp);
-    _init(date, timeZone);
+    _init(date, timezone);
+  }
+
+  public DateTime(long timestamp, String timezoneId) {
+    Date date = new Date(timestamp);
+    TimeZone tz = getTimezoneFromId(timezoneId);
+    _init(date, tz);
   }
 
   public DateTime(Date date) {
     _init(date);
   }
 
-  public DateTime(Date date, String timeZoneId) {
-    TimeZone tz = getTimezoneFromId(timeZoneId);
+  public DateTime(Date date, String timezoneId) {
+    TimeZone tz = getTimezoneFromId(timezoneId);
     _init(date, tz);
   }
 
@@ -135,24 +141,24 @@ public class DateTime {
     this(year, month, day, 0, 0, 0, 0, null);
   }
 
-  public DateTime(int year, int month, int day, String timeZoneId) {
-    this(year, month, day, 0, 0, 0, 0, timeZoneId);
+  public DateTime(int year, int month, int day, String timezoneId) {
+    this(year, month, day, 0, 0, 0, 0, timezoneId);
   }
 
   public DateTime(int year, int month, int day, int hour, int minute) {
     this(year, month, day, hour, minute, 0, 0, null);
   }
 
-  public DateTime(int year, int month, int day, int hour, int minute, String timeZoneId) {
-    this(year, month, day, hour, minute, 0, 0, timeZoneId);
+  public DateTime(int year, int month, int day, int hour, int minute, String timezoneId) {
+    this(year, month, day, hour, minute, 0, 0, timezoneId);
   }
 
   public DateTime(int year, int month, int day, int hour, int minute, int second) {
     this(year, month, day, hour, minute, second, 0, null);
   }
 
-  public DateTime(int year, int month, int day, int hour, int minute, int second, String timeZoneId) {
-    this(year, month, day, hour, minute, second, 0, timeZoneId);
+  public DateTime(int year, int month, int day, int hour, int minute, int second, String timezoneId) {
+    this(year, month, day, hour, minute, second, 0, timezoneId);
   }
 
   public DateTime(int year, int month, int day, int hour, int minute, int second, int millisecond) {
@@ -176,11 +182,11 @@ public class DateTime {
    *          Second (0-59)
    * @param millisecond
    *          Millisecond (0-999)
-   * @param timeZoneId
+   * @param timezoneId
    *          the ID for a TimeZone, such as "PST", "America/Los_Angeles",
    *          "GMT-8:00"
    */
-  public DateTime(int year, int month, int day, int hour, int minute, int second, int millisecond, String timeZoneId) {
+  public DateTime(int year, int month, int day, int hour, int minute, int second, int millisecond, String timezoneId) {
     String yyyy = year + "";
     String mm = intToStr2(month);
     String dd = intToStr2(day);
@@ -196,7 +202,7 @@ public class DateTime {
     } catch (ParseException e) {
       throw new RuntimeException(e);
     }
-    TimeZone tz = getTimezoneFromId(timeZoneId);
+    TimeZone tz = getTimezoneFromId(timezoneId);
     int tzdiff = getTimezoneOffsetDiff(tz);
     long ts = date.getTime() - tzdiff;
     date = new Date(ts);
@@ -217,7 +223,7 @@ public class DateTime {
       tz = TimeZone.getDefault();
     }
     calendar.setTimeZone(tz);
-    this.timeZone = tz;
+    this.timezone = tz;
     this.date = date;
     this.timestamp = date.getTime();
     this.year = calendar.get(Calendar.YEAR);
@@ -242,9 +248,9 @@ public class DateTime {
   public DateTime addDays(int days) {
     long ts = timestamp + (86400000L * days);
     Date date = new Date(ts);
-    TimeZone tz = timeZone;
-    String timeZoneId = tz.getID();
-    return new DateTime(date, timeZoneId);
+    TimeZone tz = timezone;
+    String timezoneId = tz.getID();
+    return new DateTime(date, timezoneId);
   }
 
   /**
@@ -338,22 +344,22 @@ public class DateTime {
   }
 
   public TimeZone getTimeZone() {
-    return timeZone;
+    return timezone;
   }
 
-  public void setTimeZone(TimeZone timeZone) {
-    _init(date, timeZone);
+  public void setTimeZone(TimeZone timezone) {
+    _init(date, timezone);
   }
 
   /**
    * Sets time zone by id.
    *
-   * @param timeZoneId
+   * @param timezoneId
    *          the ID for a TimeZone, such as "PST", "America/Los_Angeles",
    *          "GMT-8:00"
    */
-  public void setTimeZone(String timeZoneId) {
-    TimeZone tz = TimeZone.getTimeZone(timeZoneId);
+  public void setTimeZone(String timezoneId) {
+    TimeZone tz = TimeZone.getTimeZone(timezoneId);
     _init(date, tz);
   }
 
@@ -363,10 +369,10 @@ public class DateTime {
    * @return the ID of this time zone such as "America/Los_Angeles".
    */
   public String getTimeZoneId() {
-    if (timeZone == null) {
+    if (timezone == null) {
       return "";
     }
-    ZoneId zoneId = timeZone.toZoneId();
+    ZoneId zoneId = timezone.toZoneId();
     return zoneId.getId();
   }
 
@@ -377,10 +383,10 @@ public class DateTime {
    * @return the name such as "Pacific Standard Time.", "日本標準時", etc.
    */
   public String getTimeZoneDisplayName() {
-    if (timeZone == null) {
+    if (timezone == null) {
       return "";
     }
-    return timeZone.getDisplayName();
+    return timezone.getDisplayName();
   }
 
   /**
@@ -424,10 +430,10 @@ public class DateTime {
    * @return true if this TimeZone uses Daylight Saving Time, false, otherwise.
    */
   public boolean useDaylightTime() {
-    if (timeZone == null) {
+    if (timezone == null) {
       return false;
     }
-    return timeZone.useDaylightTime();
+    return timezone.useDaylightTime();
   }
 
   /**
@@ -437,10 +443,10 @@ public class DateTime {
    * @return true if the given date is in Daylight Saving Time, false, otherwise.
    */
   public boolean inDaylightTime() {
-    if (timeZone == null) {
+    if (timezone == null) {
       return false;
     }
-    return timeZone.inDaylightTime(date);
+    return timezone.inDaylightTime(date);
   }
 
   /**
@@ -462,8 +468,8 @@ public class DateTime {
    */
   public String toString(String format) {
     SimpleDateFormat sdf = new SimpleDateFormat(format);
-    if (timeZone != null) {
-      sdf.setTimeZone(timeZone);
+    if (timezone != null) {
+      sdf.setTimeZone(timezone);
     }
     return sdf.format(date);
   }
@@ -658,6 +664,55 @@ public class DateTime {
   }
 
   /**
+   * Returns the midnight timestamp for the given moment.
+   *
+   * @param timestamp
+   *          the moment (e.g., "20220120T1234546.789",
+   *          "20220120T1234546.789+0900")
+   * @return the midnight timestamp
+   */
+  public static long getTimestampOfMidnight(String moment) {
+    DateTime dt = new DateTime(moment);
+    int year = dt.getYear();
+    int month = dt.getMonth();
+    int day = dt.getDay();
+    String timezoneId = dt.getTimeZoneId();
+    DateTime dt0 = new DateTime(year, month, day, timezoneId);
+    long midnight = dt0.getTimestamp();
+    return midnight;
+  }
+
+  /**
+   * Returns the midnight timestamp for the given moment.
+   *
+   * @param timestamp
+   *          the moment
+   * @return the midnight timestamp
+   */
+  public static long getTimestampOfMidnight(long timestamp) {
+    return getTimestampOfMidnight(timestamp, null);
+  }
+
+  /**
+   * Returns the midnight timestamp for the given moment.
+   *
+   * @param timestamp
+   *          the moment
+   * @param timezone
+   *          the timezone. (e.g., "+0900") if null, treated as the local time.
+   * @return the midnight timestamp
+   */
+  public static long getTimestampOfMidnight(long timestamp, String timezone) {
+    DateTime dt = new DateTime(timestamp, timezone);
+    int year = dt.getYear();
+    int month = dt.getMonth();
+    int day = dt.getDay();
+    DateTime dt0 = new DateTime(year, month, day, timezone);
+    long midnight = dt0.getTimestamp();
+    return midnight;
+  }
+
+  /**
    * Returns the TimeZone for the given ID.
    *
    * @param id
@@ -666,7 +721,7 @@ public class DateTime {
    *         null, otherwise (the ID cannot be understood) the GMT zone.
    */
   public static TimeZone getTimezoneFromId(String id) {
-    TimeZone timeZone;
+    TimeZone timezone;
     if (id == null) {
       return TimeZone.getDefault();
     }
@@ -676,21 +731,21 @@ public class DateTime {
     if (m.find()) {
       id = "GMT" + id;
     }
-    timeZone = TimeZone.getTimeZone(id);
-    return timeZone;
+    timezone = TimeZone.getTimeZone(id);
+    return timezone;
   }
 
   /**
    * Returns the difference in time zone offset of time zone id with respect to
    * local time in milliseconds.
    *
-   * @param timeZoneId
+   * @param timezoneId
    *          time zone id to compare
    * @return the difference in milliseconds
    */
-  public static int getTimezoneOffsetDiff(String timeZoneId) {
+  public static int getTimezoneOffsetDiff(String timezoneId) {
     TimeZone tz0 = TimeZone.getDefault();
-    TimeZone tz1 = TimeZone.getTimeZone(timeZoneId);
+    TimeZone tz1 = TimeZone.getTimeZone(timezoneId);
     return getTimezoneOffsetDiff(tz0, tz1);
   }
 
@@ -698,15 +753,15 @@ public class DateTime {
    * Returns the difference in time zone offset of tz1 with respect to tz0 in
    * milliseconds.
    *
-   * @param timeZoneId0
+   * @param timezoneId0
    *          origin time zone id
-   * @param timeZoneId1
+   * @param timezoneId1
    *          time zone id to compare
    * @return the difference in milliseconds
    */
-  public static int getTimezoneOffsetDiff(String timeZoneId0, String timeZoneId1) {
-    TimeZone tz0 = TimeZone.getTimeZone(timeZoneId0);
-    TimeZone tz1 = TimeZone.getTimeZone(timeZoneId1);
+  public static int getTimezoneOffsetDiff(String timezoneId0, String timezoneId1) {
+    TimeZone tz0 = TimeZone.getTimeZone(timezoneId0);
+    TimeZone tz1 = TimeZone.getTimeZone(timezoneId1);
     return getTimezoneOffsetDiff(tz0, tz1);
   }
 
