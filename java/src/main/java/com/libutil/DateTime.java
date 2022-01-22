@@ -523,6 +523,118 @@ public class DateTime {
   }
 
   /**
+   * Returns the date difference between the two specified times.
+   *
+   * @param t1
+   *          timestamp1
+   * @param t2
+   *          timestamp2
+   * @return the difference days
+   */
+  public static int diffDays(long t1, long t2) {
+    return diffDays(t1, t2, null, false);
+  }
+
+  /**
+   * Returns the date difference between the two specified times.
+   *
+   * @param t1
+   *          timestamp1
+   * @param t2
+   *          timestamp2
+   * @param timezone
+   *          the timezone. (e.g., "+0900") if null, it will be treated as local
+   *          time.
+   * @return the difference days
+   */
+  public static int diffDays(long t1, long t2, String timezone) {
+    return diffDays(t1, t2, timezone, false);
+  }
+
+  /**
+   * Returns the date difference between the two specified times.
+   *
+   * @param t1
+   *          timestamp1
+   * @param t2
+   *          timestamp2
+   * @param abs
+   *          If true, returns the result as an absolute value
+   * @return the difference days
+   */
+  public static int diffDays(long t1, long t2, boolean abs) {
+    return diffDays(t1, t2, null, abs);
+  }
+
+  /**
+   * Returns the date difference between the two specified times.
+   *
+   * @param t1
+   *          timestamp1
+   * @param t2
+   *          timestamp2
+   * @param timezone
+   *          the timezone. (e.g., "+0900") if null, it will be treated as local
+   *          time.
+   * @param abs
+   *          If true, returns the result as an absolute value
+   * @return the difference days
+   */
+  public static int diffDays(long t1, long t2, String timezone, boolean abs) {
+    long d1 = getTimestampOfMidnight(t1, timezone);
+    long d2 = getTimestampOfMidnight(t2, timezone);
+    long d = d2 - d1;
+    int sign = 1;
+    if (d < 0) {
+      d *= -1;
+      if (!abs)
+        sign = -1;
+    }
+    int days = (int) Math.floor(d / 86400000) * sign;
+    return days;
+  }
+
+  /**
+   * Returns the date difference between the two specified times. See
+   * getTimestamp(String) for the acceptable date time formats.
+   *
+   * @param t1
+   *          the date time string1
+   * @param t2
+   *          the date time string2
+   * @return the difference days
+   */
+  public static int diffDays(String t1, String t2) {
+    return diffDays(t1, t2, false);
+  }
+
+  /**
+   * Returns the date difference between the two specified times.<br>
+   * See getTimestamp(String) for the acceptable date time formats.
+   *
+   * @param t1
+   *          the date time string1
+   * @param t2
+   *          the date time string2
+   * @param abs
+   *          If true, returns the result as an absolute value
+   * @return the difference days
+   */
+  public static int diffDays(String t1, String t2, boolean abs) {
+    long d1 = getTimestampOfMidnight(t1);
+    long d2 = getTimestampOfMidnight(t2);
+    long d = d2 - d1;
+    int sign = 1;
+    if (d < 0) {
+      d *= -1;
+      if (!abs)
+        sign = -1;
+    }
+    int days = (int) Math.floor(d / 86400000) * sign;
+    return days;
+  }
+
+  /**
    * Convert milliseconds to a time string.<br>
    *
    * @param millis
@@ -656,7 +768,25 @@ public class DateTime {
    * Converts a date time string to UnixMillis.
    *
    * @param datetime
-   *          the date time string
+   *          The date time string.<br>
+   *          The acceptable formats are:
+   *
+   *          <pre>
+   * 20210102
+   * 20210102T1234
+   * 20210102T123456.789
+   * 20210102T123456.789+0900
+   * 2021-01-02
+   * 2021-01-02 12:34
+   * 2021-01-02 12:34:56
+   * 2021-01-02 12:34:56.789
+   * 2021-01-02 12:34:56.789 +09:00
+   * 2021/1/2 12:34
+   * 2021/1/2 12:34:56
+   * 2021/1/2 12:34:56.789
+   * 2021/1/2 12:34:56.789 +09:00
+   *          </pre>
+   *
    * @return the number of milliseconds since January 1, 1970, 00:00:00 GMT
    */
   public static long getTimestamp(String datetime) {
