@@ -157,16 +157,19 @@ public class StrUtil {
    *          matcher pattern
    *
    *          <pre>
-   *          aaaa
+   *          target="aaaa"
+   *          regex="aa"
   
    *          false:
    *          aa
    *            aa
+   *            = 2
    *
    *          true:
    *          aa
    *           aa
    *            aa
+   *            = 3
    *          </pre>
    * 
    * @return count matched count
@@ -195,10 +198,10 @@ public class StrUtil {
    * @param str
    *          the string to check
    * @param pattern
-   *          the pattern to count
+   *          the pattern (regex) to count
    * @return count matched count
    */
-  public static int countStrPattern(String str, String pattern) {
+  public static int countPattern(String str, String pattern) {
     Pattern p = Pattern.compile(pattern);
     Matcher m = p.matcher(str);
     int count = 0;

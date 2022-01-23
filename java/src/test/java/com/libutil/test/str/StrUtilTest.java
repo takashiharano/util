@@ -8,7 +8,7 @@ public class StrUtilTest {
 
   public static void main(String args[]) {
     text2arrayTest();
-    countStrPatternTest();
+    countPatternTest();
     quoteTest();
     intnum2decimalTest();
     trimZerosTest();
@@ -25,10 +25,10 @@ public class StrUtilTest {
     }
   }
 
-  private static void countStrPatternTest() {
+  private static void countPatternTest() {
     String str = "abc123abc456xyz";
-    Log.d("bc=" + StrUtil.countStrPattern(str, "bc"));
-    Log.d("\\d\\d=" + StrUtil.countStrPattern(str, "\\d\\d"));
+    Log.d("bc=" + StrUtil.countPattern(str, "bc"));
+    Log.d("\\d\\d=" + StrUtil.countPattern(str, "\\d\\d"));
   }
 
   private static void quoteTest() {
