@@ -1056,7 +1056,7 @@ public class DateTime {
     s = s.replaceAll("[-\\s:\\.]", "");
     s = (s + "000000000").substring(0, 17);
     if (tz != null) {
-      s += tz;
+      s += normalizeTimeZone(tz);
     }
     return s;
   }
@@ -1118,10 +1118,10 @@ public class DateTime {
     String w = s;
     String tz = null;
     if (w.length() > 10) {
-      int zPos = getTzPos(w);
-      if (zPos != -1) {
-        tz = w.substring(zPos);
-        w = w.substring(0, zPos);
+      int tzPos = getTzPos(w);
+      if (tzPos != -1) {
+        tz = w.substring(tzPos);
+        w = w.substring(0, tzPos);
       }
     }
     String[] ret = { w, tz };
@@ -1133,26 +1133,16 @@ public class DateTime {
     if (p != -1) {
       return p;
     }
-    int tzSnCnt = countMatcher(s, "\\+");
+    int tzSnCnt = StrUtil.countPattern(s, "\\+");
     if (tzSnCnt == 1) {
       return s.indexOf("+");
     }
-    tzSnCnt = countMatcher(s, "-");
+    tzSnCnt = StrUtil.countPattern(s, "-");
     if (tzSnCnt > 0) {
       return s.indexOf("-", s.length() - 6);
     }
     return -1;
   };
-
-  private static int countMatcher(String target, String regex) {
-    Pattern p = Pattern.compile(regex);
-    Matcher m = p.matcher(target);
-    int count = 0;
-    while (m.find()) {
-      count++;
-    }
-    return count;
-  }
 
   private static String intToStr2(int v) {
     String s = v + "";
