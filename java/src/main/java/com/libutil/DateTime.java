@@ -1062,6 +1062,43 @@ public class DateTime {
   }
 
   /**
+   * Splits the date-time and timezone.
+   *
+   * @param s
+   *          the source string
+   * @return [date-time, timezone]
+   */
+  public static String[] splitDateTimeAndTimezone(String s) {
+    String w = s;
+    String tz = null;
+
+    int tzPos = getTzPos(w);
+    if (tzPos != -1) {
+      tz = w.substring(tzPos);
+      w = w.substring(0, tzPos);
+    }
+
+    String[] ret = { w, tz };
+    return ret;
+  }
+
+  private static int getTzPos(String s) {
+    int p = s.indexOf("Z");
+    if (p != -1) {
+      return p;
+    }
+    int cnt = StrUtil.countPattern(s, "\\+");
+    if (cnt == 1) {
+      return s.lastIndexOf("+");
+    }
+    cnt = StrUtil.countPattern(s, "-");
+    if (cnt == 2) {
+      return -1;
+    }
+    return s.lastIndexOf("-");
+  };
+
+  /**
    * Returns the date-time string represented by the time-stamp in the specified
    * format.
    *
@@ -1113,36 +1150,6 @@ public class DateTime {
     dt = new DateTime(datetime);
     return dt.toString(format);
   }
-
-  private static String[] splitDateTimeAndTimezone(String s) {
-    String w = s;
-    String tz = null;
-    if (w.length() > 10) {
-      int tzPos = getTzPos(w);
-      if (tzPos != -1) {
-        tz = w.substring(tzPos);
-        w = w.substring(0, tzPos);
-      }
-    }
-    String[] ret = { w, tz };
-    return ret;
-  }
-
-  private static int getTzPos(String s) {
-    int p = s.indexOf("Z");
-    if (p != -1) {
-      return p;
-    }
-    int tzSnCnt = StrUtil.countPattern(s, "\\+");
-    if (tzSnCnt == 1) {
-      return s.indexOf("+");
-    }
-    tzSnCnt = StrUtil.countPattern(s, "-");
-    if (tzSnCnt > 0) {
-      return s.indexOf("-", s.length() - 6);
-    }
-    return -1;
-  };
 
   private static String intToStr2(int v) {
     String s = v + "";
