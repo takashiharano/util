@@ -994,7 +994,7 @@ public class DateTime {
     try {
       return _serializeDateTime(src);
     } catch (Exception e) {
-      throw new RuntimeException("PARSE_ERROR: " + src);
+      throw new RuntimeException("PARSE_ERROR: " + src, e);
     }
   }
 
@@ -1008,7 +1008,7 @@ public class DateTime {
     w = w.replaceAll("\\s{2,}", " ");
     w = w.replaceAll("T", " ");
 
-    Pattern p = Pattern.compile("[-/:]");
+    Pattern p = Pattern.compile("[-/]");
     Matcher m = p.matcher(w);
     if (!m.find()) {
       return __serializeDateTime(w, tzId);
