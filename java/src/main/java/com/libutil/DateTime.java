@@ -44,6 +44,10 @@ public class DateTime {
   public static final String DATE_FORMAT_ISO8601EXTZ = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"; // "2019-12-01T12:34:56.987+09:00"
   public static final String DEFAULT_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS XXX";
 
+  public static final long MINUTE = 60000;
+  public static final long HOUR = 3600000;
+  public static final long DAY = 86400000;
+
   private Date date;
   private long timestamp;
   private int year;
@@ -97,30 +101,45 @@ public class DateTime {
     _init(date, tz);
   }
 
+  /**
+   * Allocates a DateTime object and initializes it to represent the specified
+   * date-time string.
+   *
+   * @param source
+   *          The date time string.<br>
+   *          The acceptable formats are:
+   *
+   *          <pre>
+   * 20210102
+   * 20210102T1234
+   * 20210102T123456.789
+   * 20210102T123456.789+0900
+   * 2021-01-02
+   * 2021-01-02 12:34
+   * 2021-01-02 12:34:56
+   * 2021-01-02 12:34:56.789
+   * 2021-01-02 12:34:56.789 +09:00
+   * 2021/1/2 12:34
+   * 2021/1/2 12:34:56
+   * 2021/1/2 12:34:56.789
+   * 2021/1/2 12:34:56.789 +09:00
+   *          </pre>
+   */
   public DateTime(String source) {
     if (source == null) {
       _init(null, null);
       return;
     }
-    String[] w = splitDateTimeAndTimezone(source);
-    String sdt = w[0];
+    String s = serializeDateTime(source);
+    String[] w = splitDateTimeAndTimezone(s);
     String tzId = w[1];
-    String s = serializeDateTime(sdt);
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+    String fmt = ((tzId == null) ? "yyyyMMddHHmmssSSS" : "yyyyMMddHHmmssSSSXX");
+    SimpleDateFormat sdf = new SimpleDateFormat(fmt);
     Date date;
     try {
       date = sdf.parse(s);
     } catch (ParseException e) {
       throw new RuntimeException(e);
-    }
-    if (tzId != null) {
-      if (tzId.equals("Z")) {
-        tzId = "+0000";
-      }
-      tzId = "GMT" + tzId;
-      int tzdiff = getTimezoneOffsetDiff(tzId);
-      long timestamp = date.getTime() - tzdiff;
-      date = new Date(timestamp);
     }
     TimeZone tz = getTimezoneFromId(tzId);
     _init(date, tz);
@@ -791,6 +810,35 @@ public class DateTime {
    */
   public static long getTimestamp(String datetime) {
     return new DateTime(datetime).getTimestamp();
+  }
+
+  /**
+   * Returns today's timestamp for the specified time.
+   *
+   * @param time
+   *          the time
+   * @return the timestamp
+   */
+  public static long getTimestampOfDay(String time) {
+    return getTimestampOfDay(time, 0);
+  }
+
+  /**
+   * Returns the timestamp of the day for the specified time.
+   *
+   * @param time
+   *          the time
+   * @param offset
+   *          offset (-1=yesterday / 0=today / 1=tomorrow)
+   * @return the timestamp
+   */
+  public static long getTimestampOfDay(String time, int offset) {
+    DateTime dt = new DateTime();
+    String date = dt.toString("yyyyMMdd");
+    String s = date + "T" + time;
+    long timestamp = new DateTime(s).getTimestamp();
+    timestamp += (offset * DAY);
+    return timestamp;
   }
 
   /**
