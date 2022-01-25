@@ -1652,6 +1652,20 @@ public class StrUtil {
   }
 
   /**
+   * Replaces multiple spaces with a single space
+   *
+   * @param s
+   *          the source string
+   * @return the replaced string
+   */
+  public static String toSingleSpace(String s) {
+    if (s == null) {
+      return null;
+    }
+    return s.replaceAll(" {2,}", " ");
+  }
+
+  /**
    * Returns a string representation of the object.
    *
    * @param o
