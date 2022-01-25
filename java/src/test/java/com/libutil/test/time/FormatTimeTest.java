@@ -1,6 +1,6 @@
-package com.libutil.test.datetime;
+package com.libutil.test.time;
 
-import com.libutil.DateTime;
+import com.libutil.Time;
 import com.libutil.test.Log;
 
 public class FormatTimeTest {
@@ -18,8 +18,8 @@ public class FormatTimeTest {
   }
 
   public static void test(long t) {
-    Log.i(t + " = " + DateTime.formatTime(t, "HH:mm:ss.SSS"));
-    Log.i(t + " = " + DateTime.formatTime(t, "DdH24:mm:ss.SSS"));
+    Log.i(t + " = " + Time.formatTime(t, "HH:mm:ss.SSS"));
+    Log.i(t + " = " + Time.formatTime(t, "DdH24:mm:ss.SSS"));
   }
 
 }

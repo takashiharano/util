@@ -65,8 +65,6 @@ public class DateTimeTest {
     } catch (Exception e) {
       Log.e(e);
     }
-
-    formatTimeTest();
   }
 
   private static void test(DateTime datetime) {
@@ -82,11 +80,6 @@ public class DateTimeTest {
     Log.i("TimeZoneId = " + datetime.getTimeZoneId());
     Log.i("timestamp = " + datetime.getTimestamp());
     Log.i("");
-  }
-
-  private static void formatTimeTest() {
-    long t = 1234;
-    Log.i(t + " = " + DateTime.formatTime(t, "HH:mm:ss.SSS"));
   }
 
 }
