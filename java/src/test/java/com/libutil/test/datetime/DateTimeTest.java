@@ -36,6 +36,7 @@ public class DateTimeTest {
     datetime = new DateTime(src);
     test(datetime);
 
+    Log.i("--------------------------------------------------");
     try {
       Log.i("DateTime(\"\")");
       src = "";
@@ -45,6 +46,7 @@ public class DateTimeTest {
       Log.e(e);
     }
 
+    Log.i("--------------------------------------------------");
     try {
       Log.i("DateTime(\"aaa\")");
       src = "aaa";
@@ -54,6 +56,7 @@ public class DateTimeTest {
       Log.e(e);
     }
 
+    Log.i("--------------------------------------------------");
     try {
       Log.i("DateTime(null)");
       src = null;
