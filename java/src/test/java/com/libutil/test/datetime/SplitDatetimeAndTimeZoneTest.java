@@ -4,7 +4,7 @@ import com.libutil.DateTime;
 import com.libutil.StrUtil;
 import com.libutil.test.Log;
 
-public class SplitDatetimeAndTimezoneTest {
+public class SplitDatetimeAndTimeZoneTest {
 
   public static void main(String args[]) {
     test();
@@ -29,7 +29,7 @@ public class SplitDatetimeAndTimezoneTest {
       String data_expected0 = data[1];
       String data_expected1 = data[2];
 
-      String[] out = DateTime.splitDateTimeAndTimezone(data_in);
+      String[] out = DateTime.splitDateTimeAndTimeZone(data_in);
       String ret;
       if (StrUtil.equals(out[0], data_expected0) && StrUtil.equals(out[1], data_expected1)) {
         ret = "OK";
