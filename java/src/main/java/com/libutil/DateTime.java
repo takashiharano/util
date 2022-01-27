@@ -714,7 +714,7 @@ public class DateTime {
   /**
    * Returns the midnight timestamp for the given moment.
    *
-   * @param timestamp
+   * @param moment
    *          the moment (e.g., "20220120T1234546.789",
    *          "20220120T1234546.789+0900")
    * @return the midnight timestamp

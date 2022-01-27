@@ -502,6 +502,8 @@ public class Time {
   /**
    * To string the time.
    *
+   * @param millis
+   *          milliseconds
    * @param format
    *          "HH:mm:ss.SSS", "HR:mm:ss.SSS", "Dd H24:mm:ss.SSS"
    * @return the formatted time string
