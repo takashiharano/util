@@ -148,7 +148,7 @@ public class Time {
   }
 
   /**
-   * To string the time.
+   * To human readable string the time.
    *
    * @param h
    *          -ge 24h instead of days. true: 47h 45m 59s
@@ -156,7 +156,7 @@ public class Time {
    *          to display millis. true: 1d 23h 45m 59s 123
    * @return the time string
    */
-  public String toString(boolean h, boolean f) {
+  public String toReadableString(boolean h, boolean f) {
     StringBuilder sb = new StringBuilder();
     if (this.millis < 0) {
       sb.append("-");
@@ -197,13 +197,16 @@ public class Time {
    * To string the time.
    *
    * @param format
-   *          "HH:mm:ss.SSS", "HR:mm:ss.SSS", "Dd H24:mm:ss.SSS"
+   *          "[+-]HH:mm:ss.SSS", "[+-]HR:mm:ss.SSS", "[+-]Dd H24:mm:ss.SSS"
    * @return the formatted time string
    */
   public String toString(String format) {
-    String sn = "+";
+    int snType = getSignType(format);
+    String sign = "";
     if (millis < 0) {
-      sn = "-";
+      sign = "-";
+    } else if (snType == 1) {
+      sign = "+";
     }
 
     String d = days + "";
@@ -228,8 +231,12 @@ public class Time {
     f3 = f3.substring(f3.length() - 3);
 
     String r = format;
+    if (snType == 0) {
+      r = sign + r;
+    }
     r = r.replace("D", d);
-    r = r.replace("sn", sn);
+    r = r.replace("-", sign);
+    r = r.replace("+", sign);
     r = r.replace("HR", hr);
     r = r.replace("H24", h24);
     r = r.replace("HH", hh);
@@ -367,11 +374,11 @@ public class Time {
    * @return clock-like string (e.g., "-0800", "0900", "+0930")
    */
   public static String hoursToClockString(String hours, String separator) {
-    String sn = "";
+    String sign = "";
     Pattern pt = Pattern.compile("^[+-]", 0);
     Matcher mt = pt.matcher(hours);
     if (mt.find()) {
-      sn = hours.substring(0, 1);
+      sign = hours.substring(0, 1);
       hours = hours.substring(1);
     }
     String[] w = hours.split("\\.");
@@ -383,7 +390,7 @@ public class Time {
     int m = (int) (60 * fM);
     String hh = ((h < 10) ? "0" + Integer.toString(h) : Integer.toString(h));
     String mm = ((m < 10) ? "0" + Integer.toString(m) : Integer.toString(m));
-    String clock = sn + hh + separator + mm;
+    String clock = sign + hh + separator + mm;
     return clock;
   }
 
@@ -395,17 +402,17 @@ public class Time {
    *          milliseconds
    * @return time string
    */
-  public static String millisToString(long millis) {
-    return millisToString(millis, 0);
+  public static String millisToReadableString(long millis) {
+    return millisToReadableString(millis, 0);
   }
 
-  public static String millisToString(long millis, int mode) {
+  public static String millisToReadableString(long millis, int mode) {
     Time t = new Time(millis);
     if (mode == 1) {
-      return t.toString(false, true);
+      return t.toReadableString(false, true);
     }
     if ((mode == 2) || (millis >= 60000)) {
-      return t.toString(false, false);
+      return t.toReadableString(false, false);
     }
 
     int ss = t.seconds;
@@ -490,6 +497,31 @@ public class Time {
       ms *= (-1);
     }
     return ms;
+  }
+
+  /**
+   * To string the time.
+   *
+   * @param format
+   *          "HH:mm:ss.SSS", "HR:mm:ss.SSS", "Dd H24:mm:ss.SSS"
+   * @return the formatted time string
+   */
+  public static String toString(long millis, String format) {
+    return (new Time(millis)).toString(format);
+  }
+
+  private static int getSignType(String s) {
+    Pattern p = Pattern.compile("\\+");
+    Matcher m = p.matcher(s);
+    if (m.find()) {
+      return 1;
+    }
+    p = Pattern.compile("\\-");
+    m = p.matcher(s);
+    if (m.find()) {
+      return -1;
+    }
+    return 0;
   }
 
 }
