@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202201291806';
+util.v = '202201292001';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -496,43 +496,55 @@ util.Time = function(t) {
 };
 util.Time.prototype = {
   /**
-   * To clock format
-   *
    * fmt
-   *  '%H:%m:%S.%s'
-   *  '%Dd%H:%m:%S.%s'
+   *  '%HH:%mm:%SS.%sss'
+   *  '%dd %HH:%mm:%SS.%sss'
+   *  '%HR:%mm:%SS.%sss'
    *  '%HR:%m:%S.%s'
    */
   toString: function(fmt) {
     var ctx = this;
-    if (!fmt) fmt = '%H:%m:%S.%s';
-    var d = ctx.days;
-    var hr = ctx.hours;
-    var h = ctx.hours24;
-    var m = ctx.minutes;
-    var s = ctx.seconds;
-    var ms = ctx.milliseconds;
+    if (!fmt) fmt = '%HH:%mm:%SS.%sss';
 
-    if (!fmt.match(/%H/)) m += h * 60;
-    if (!fmt.match(/%m/)) s += m * 60;
-    if (!fmt.match(/%S/)) ms += s * 1000;
+    var vH = ctx.hours;
+    var vM = ctx.minutes;
+    var vS = ctx.seconds;
+    var vMS = ctx.milliseconds;
 
-    d += '';
-    h += '';
-    m += '';
-    s += '';
-    ms += '';
+    if (!fmt.match(/%H/)) vM += vH * 60;
+    if (!fmt.match(/%m/)) vS += vM * 60;
+    if (!fmt.match(/%S/)) vMS += vS * 1000;
 
-    if (h < 10) h = '0' + h;
-    if (hr < 10) hr = '0' + hr;
-    m = ('0' + m).slice(-2);
-    s = ('0' + s).slice(-2);
-    ms = ('00' + ms).slice(-3);
+    var d = '' + ctx.days;
+    var hr = '' + vH;
+    var h = '' + ctx.hours24;
+    var m = '' + vM;
+    var mm = m;
+    var S = '' + vS;
+    var SS = S;
+    var s = vMS;
 
-    if (!fmt.match(/%D/) && (d > 0)) h = d + 'd' + h;
+    var hh = ('0' + h).slice(-2);
+    if (vM < 10) mm = '0' + m;
+    if (vS < 10) SS = '0' + S;
+    var sss = ('00' + s).slice(-3);
+
+    if (!fmt.match(/%d/) && (d > 0)) {
+      h = d + 'd' + h;
+      hh = d + 'd' + hh;
+    }
 
     var r = fmt;
-    r = r.replace(/%D/i, d).replace(/%HR/, hr).replace(/%H/, h).replace(/%m/, m).replace(/%S/, s).replace(/%s/, ms);
+    r = r.replace(/%d/g, d);
+    r = r.replace(/%HR/g, hr);
+    r = r.replace(/%HH/g, hh);
+    r = r.replace(/%H/g, h);
+    r = r.replace(/%mm/g, mm);
+    r = r.replace(/%m/g, m);
+    r = r.replace(/%SS/g, SS);
+    r = r.replace(/%S/g, S);
+    r = r.replace(/%sss/g, sss);
+    r = r.replace(/%s/g, s);
     if (ctx.millis < 0) r = '-' + r;
     return r;
   },
@@ -588,8 +600,7 @@ util.Time.prototype = {
  * Milliseconds to string.
  *
  * fmt
- *  '%Dd %H:%m:%S.%s' = '1d 12:34:56.789'
- *  days=auto: '%d%H:%m:%S.%s'
+ *  '%HH:%mm:%SS.%sss' = '1d12:34:56.789'
  */
 util.ms2str = function(ms, fmt) {
   return (new util.Time(ms)).toString(fmt);
