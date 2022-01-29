@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202201292001';
+util.v = '202201292040';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -941,23 +941,34 @@ util.ClockTime = function(millis) {
   this.clockTm = util.ms2struct(clockMillis); // -00:01=23:59
 };
 util.ClockTime.prototype = {
-  // %H:%m            '25:00'
-  // %H:%m:%S         '25:00:00'
-  // %H:%m:%S.%s      '25:00:00.000'
-  // %H:%m:%S.%s (%d) '01:00:00.000 (+1 Day)'
+  // %HH:%mm               '25:00'
+  // %HH:%mm:%SS           '25:00:00'
+  // %HH:%mm:%SS.%sss      '25:00:00.000'
+  // %HH:%mm:%SS.%sss (%d) '01:00:00.000 (+1 Day)'
   toString: function(fmt) {
-    if (!fmt) fmt = '%H:%m:%S.%s';
+    if (!fmt) fmt = '%HH:%mm:%SS.%sss';
     var byTheDay = fmt.match(/%d/) != null;
-    var hr = this.toHrString(byTheDay);
-    var mi = this.toMinString(byTheDay);
-    var ss = this.toSecString(byTheDay);
-    var ms = this.toMilliSecString(byTheDay);
-    if ((this.millis < 0) && !byTheDay) hr = '-' + hr;
+    var h = this.toHrString(byTheDay);
+    var m = this.toMinString(byTheDay);
+    var S = this.toSecString(byTheDay);
+    var s = this.toMilliSecString(byTheDay);
+    var hh = (h < 10 ? ('0' + h) : h);
+    var mm = (m < 10 ? ('0' + m) : m);
+    var SS = (S < 10 ? ('0' + S) : S);
+    var sss = ('00' + s).slice(-3);
+    if ((this.millis < 0) && !byTheDay) {
+      h = '-' + h;
+      hh = '-' + hh;
+    }
     var r = fmt;
-    r = r.replace(/%H/, hr);
-    r = r.replace(/%m/, mi);
-    r = r.replace(/%S/, ss);
-    r = r.replace(/%s/, ms);
+    r = r.replace(/%HH/g, hh);
+    r = r.replace(/%H/g, h);
+    r = r.replace(/%mm/g, mm);
+    r = r.replace(/%m/g, m);
+    r = r.replace(/%SS/g, SS);
+    r = r.replace(/%S/g, S);
+    r = r.replace(/%sss/g, sss);
+    r = r.replace(/%s/g, s);
     if (byTheDay) {
       var d = this.toDaysString();
       r = r.replace(/%d/, d);
@@ -971,21 +982,19 @@ util.ClockTime.prototype = {
   },
   toHrString: function(byTheDay) {
     if (byTheDay === undefined) byTheDay = false;
-    var h = (byTheDay ? this.clockTm['hours24'] : this.tm['hours']);
-    var hh = ((h < 10) ? ('0' + h).slice(-2) : h + '');
-    return hh;
+    return (byTheDay ? this.clockTm['hours24'] : this.tm['hours']) + '';
   },
   toMinString: function(byTheDay) {
     var st = (byTheDay ? this.clockTm : this.tm);
-    return ('0' + st['minutes']).slice(-2);
+    return '' + st['minutes'];
   },
   toSecString: function(byTheDay) {
     var st = (byTheDay ? this.clockTm : this.tm);
-    return ('0' + st['seconds']).slice(-2);
+    return '' + st['seconds'];
   },
   toMilliSecString: function(byTheDay) {
     var st = (byTheDay ? this.clockTm : this.tm);
-    return ('00' + (st['milliseconds'] | 0)).slice(-3);
+    return '' + st['milliseconds'];
   }
 };
 
@@ -994,11 +1003,11 @@ util.ClockTime.prototype = {
  * '12:00' + '01:30' -> '13:30'
  * '12:00' + '13:00' -> '25:00' / '01:00 (+1 Day)'
  * fmt:
- *  '%H:%m:%S.%s (%d)'
+ *  '%HH:%mm:%SS.%sss (%d)'
  *  -> '12:34:56.789 (+1 Day)'
  */
 util.addTime = function(t1, t2, fmt) {
-  if (!fmt) fmt = '%H:%m';
+  if (!fmt) fmt = '%HH:%mm';
   var ms1 = util.clock2ms(t1);
   var ms2 = util.clock2ms(t2);
   var c = new util.ClockTime(ms1 + ms2);
@@ -1010,11 +1019,11 @@ util.addTime = function(t1, t2, fmt) {
  * '12:00' - '01:30' -> '10:30'
  * '12:00' - '13:00' -> '-01:00' / '23:00 (-1 Day)'
  * fmt:
- *  '%H:%m:%S.%s (%d)'
+ *  '%HH:%mm:%SS.%sss (%d)'
  *  -> '12:34:56.789 (-1 Day)'
  */
 util.subTime = function(t1, t2, fmt) {
-  if (!fmt) fmt = '%H:%m';
+  if (!fmt) fmt = '%HH:%mm';
   var ms1 = util.clock2ms(t1);
   var ms2 = util.clock2ms(t2);
   var c = new util.ClockTime(ms1 - ms2);
@@ -1026,11 +1035,11 @@ util.subTime = function(t1, t2, fmt) {
  * '01:30' * 2 -> '03:00'
  * '12:00' * 3 -> '36:00' / '12:00 (+1 Day)'
  * fmt:
- *  '%H:%m:%S.%s (%d)'
+ *  '%HH:%mm:%SS.%sss (%d)'
  *  -> '12:34:56.789 (+1 Day)'
  */
 util.multiTime = function(t, v, fmt) {
-  if (!fmt) fmt = '%H:%m';
+  if (!fmt) fmt = '%HH:%mm';
   var ms = util.clock2ms(t);
   var c = new util.ClockTime(ms * v);
   return c.toString(fmt);
@@ -1041,11 +1050,11 @@ util.multiTime = function(t, v, fmt) {
  * '03:00' / 2 -> '01:30'
  * '72:00' / 3 -> '24:00' / '00:00 (+1 Day)'
  * fmt:
- *  '%H:%m:%S.%s (%d)'
+ *  '%HH:%mm:%SS.%sss (%d)'
  *  -> '12:34:56.789 (+1 Day)'
  */
 util.divTime = function(t, v, fmt) {
-  if (!fmt) fmt = '%H:%m';
+  if (!fmt) fmt = '%HH:%mm';
   var ms = util.clock2ms(t);
   var c = new util.ClockTime(ms / v);
   return c.toString(fmt);
