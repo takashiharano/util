@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202201291414';
+util.v = '202201291806';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -32,6 +32,7 @@ util.THURSDAY = 4;
 util.FRIDAY = 5;
 util.SATURDAY = 6;
 util.WDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+util.MONTH = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
 /**
  * DateTime class
@@ -97,14 +98,6 @@ util.DateTime = function(src, tzOffset) {
   this.millisecond = millisecond;
   this.tzOffset = tzOffset;
   this.tzOffsetMin = tzOffsetMin;
-
-  this.yyyy = year + '';
-  this.mm = ('0' + month).slice(-2);
-  this.dd = ('0' + day).slice(-2);
-  this.hh = ('0' + hour).slice(-2);
-  this.mi = ('0' + minute).slice(-2);
-  this.ss = ('0' + second).slice(-2);
-  this.sss = ('00' + millisecond).slice(-3);
   this.wday = dt.getDay(); // Sunday - Saturday : 0 - 6
   this.WDAYS = util.WDAYS;
 };
@@ -117,20 +110,55 @@ util.DateTime.prototype = {
     return util.formatTZ(this.tzOffsetMin, ext);
   },
   toString: function(fmt) {
-    if (!fmt) fmt = '%Y-%M-%D %H:%m:%S.%s %Z';
-    var s = fmt;
-    s = s.replace(/%Y/, this.yyyy);
-    s = s.replace(/%M/, this.mm);
-    s = s.replace(/%D/, this.dd);
-    s = s.replace(/%W/, this.WDAYS[this.wday]);
-    s = s.replace(/%H/, this.hh);
-    s = s.replace(/%m/, this.mi);
-    s = s.replace(/%S/, this.ss);
-    s = s.replace(/%s/, this.sss);
-    s = s.replace(/%z/, this.getTZ());
-    s = s.replace(/%Z/, this.getTZ(true));
-    s = s.replace(/%N/, util.getTzName());
-    return s;
+    if (!fmt) fmt = '%YYYY-%MM-%DD %HH:%mm:%SS.%sss %Z';
+
+    var yyyy = this.year + '';
+    var yy = yyyy.substr(2);
+    var M = this.month + '';
+    var MM = ('0' + M).slice(-2);
+    var mName = util.MONTH[this.month - 1];
+    var d = this.day;
+    var dd = ('0' + d).slice(-2);
+    var h = '' + this.hour;
+    var hh = ('0' + h).slice(-2);
+    var m = '' + this.minute;
+    var mm = ('0' + m).slice(-2);
+    var S = '' + this.second;
+    var SS = ('0' + S).slice(-2);
+    var sss = ('00' + this.millisecond).slice(-3);
+    var s = util.trimTrailingZeros(sss);
+    var ampm = 'AM';
+    var h12 = '' + this.hour;
+    if (this.hour >= 12) {
+      ampm = 'PM';
+      h12 = (this.hour - 12) + '';
+    }
+    var hh12 = ('0' + h12).slice(-2);
+
+    var r = fmt;
+    r = r.replace(/%YYYY/g, yyyy);
+    r = r.replace(/%YY/g, yy);
+    r = r.replace(/%MMM/g, mName);
+    r = r.replace(/%MM/g, MM);
+    r = r.replace(/%M/g, M);
+    r = r.replace(/%DD/g, dd);
+    r = r.replace(/%D/g, d);
+    r = r.replace(/%W/g, this.WDAYS[this.wday]);
+    r = r.replace(/%AMPM/g, ampm);
+    r = r.replace(/%H12/g, h12);
+    r = r.replace(/%HH12/g, hh12);
+    r = r.replace(/%HH/g, hh);
+    r = r.replace(/%H/g, h);
+    r = r.replace(/%mm/g, mm);
+    r = r.replace(/%m/g, m);
+    r = r.replace(/%SS/g, SS);
+    r = r.replace(/%S/g, S);
+    r = r.replace(/%sss/g, sss);
+    r = r.replace(/%s/g, s);
+    r = r.replace(/%z/g, this.getTZ());
+    r = r.replace(/%Z/g, this.getTZ(true));
+    r = r.replace(/%N/g, util.getTzName());
+    return r;
   }
 };
 
@@ -254,7 +282,7 @@ util.getDateTime = function(dt, ofst) {
 /**
  * Returns Date-Time string
  * t: timestamp / Date object
- * fmt: '%Y-%M-%D %H:%m:%S.%s %Z'
+ * fmt: '%YYYY-%MM-%DD %HH:%mm:%SS.%sss %Z'
  */
 util.getDateTimeString = function(t, fmt) {
   return (new util.DateTime(t)).toString(fmt);
@@ -874,7 +902,7 @@ util.Clock.prototype = {
     }
   }
 };
-util.Clock.DFLT_OPT = {interval: 500, fmt: '%Y-%M-%D %W %H:%m:%S', offset: 0, tz: util.getTZ()};
+util.Clock.DFLT_OPT = {interval: 500, fmt: '%YYYY-%MM-%DD %W %HH:%mm:%SS', offset: 0, tz: util.getTZ()};
 
 //---------------------------------------------------------
 // Time calculation
@@ -1613,12 +1641,10 @@ util.separateDigits = function(v) {
 };
 
 /**
- * '-0102.3040'
- * -> '-102.304'
+ * '-0102.3040' -> '-102.304'
  */
 util.trimZeros = function(v) {
-  v += '';
-  v = v.trim();
+  v = (v + '').trim();
   var s = '';
   if (v.charAt(0) == '-') {
     s = '-';
@@ -1626,15 +1652,21 @@ util.trimZeros = function(v) {
   }
   var p = v.split('.');
   var i = p[0];
-  var d = '';
-  if (p.length > 1) d = p[1];
-  i = i.replace(/^0+/, '');
-  d = d.replace(/0+$/, '');
-  if (i == '') i = '0';
+  var d = ((p.length > 1) ? p[1] : '');
+  i = util.trimLeadingZeros(i);
+  d = util.trimTrailingZeros(d);
   var r = i;
   if (d != '') r += '.' + d;
   if (r != '0') r = s + r;
   return r;
+};
+util.trimLeadingZeros = function(s) {
+  if (!s) return s;
+  return (s + '').replace(/^0+(.+)$/, '$1');
+};
+util.trimTrailingZeros = function(s) {
+  if (!s) return s;
+  return (s + '').replace(/(.+?)0*$/, '$1');
 };
 
 /**
