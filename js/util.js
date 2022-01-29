@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202201252032';
+util.v = '202201291414';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -319,77 +319,6 @@ util.getTimestampOfMidnight = function(dt, offset) {
 };
 
 /**
- * Millis to clock format '1d 12:34:56.789'.
- *
- * fmt
- *  '%Dd %H:%m:%S.%s'
- *  days=auto: '%d%H:%m:%S.%s'
- */
-util.getTimeString = function(ms, fmt) {
-  return (new util.Time(ms)).toClock(fmt);
-};
-
-/**
- * millis to struct
- * -> {'millis': millis, 'days': 1, 'hours': 24, 'hours24': 0, 'minutes': 34, 'seconds': 56, 'milliseconds': 123}
- */
-util.ms2struct = function(millis) {
-  var wk = millis;
-  if (millis < 0) wk *= (-1);
-  var d = (wk / 86400000) | 0;
-  var hh = 0;
-  if (wk >= 3600000) {
-    hh = (wk / 3600000) | 0;
-    wk -= (hh * 3600000);
-  }
-  var mi = 0;
-  if (wk >= 60000) {
-    mi = (wk / 60000) | 0;
-    wk -= (mi * 60000);
-  }
-  var ss = (wk / 1000) | 0;
-  var sss = wk - (ss * 1000);
-  var tm = {
-    millis: millis,
-    days: d,
-    hours: hh,
-    hours24: hh - d * 24,
-    minutes: mi,
-    seconds: ss,
-    milliseconds: sss
-  };
-  return tm;
-};
-
-/**
- *  123456.789
- * '123456.789'
- * -> 123456789
- */
-util.sec2ms = function(sec) {
-  return parseFloat(sec) * 1000;
-};
-
-/**
- *  1200
- * '1200'
- * -> 1.2
- * -> '1.200' (toString=true)
- */
-util.ms2sec = function(ms, toString) {
-  ms += '';
-  var len = ms.length;
-  var s;
-  if (len <= 3) {
-    s = '0.' + ('00' + ms).slice(-3);
-  } else {
-    s = ms.substr(0, len - 3) + '.' + ms.substr(len - 3);
-  }
-  if (!toString) s = parseFloat(s);
-  return s;
-};
-
-/**
  * Returns time zone offset string from minutes
  * -480       -> -0800
  *  540       -> +0900
@@ -542,22 +471,20 @@ util.Time.prototype = {
    * To clock format
    *
    * fmt
-   *  '%Dd %H:%m:%S.%s'
+   *  '%H:%m:%S.%s'
+   *  '%Dd%H:%m:%S.%s'
+   *  '%HR:%m:%S.%s'
    */
-  toClock: function(fmt) {
+  toString: function(fmt) {
     var ctx = this;
-    if (!fmt) fmt = '%d%H:%m:%S.%s';
+    if (!fmt) fmt = '%H:%m:%S.%s';
     var d = ctx.days;
-    var h = ctx.hours;
+    var hr = ctx.hours;
+    var h = ctx.hours24;
     var m = ctx.minutes;
     var s = ctx.seconds;
     var ms = ctx.milliseconds;
 
-    if (fmt.match(/%d/)) {
-      if (d > 0) h = ctx.hours24;
-    } else if (fmt.match(/%D/)) {
-      h = ctx.hours24;
-    }
     if (!fmt.match(/%H/)) m += h * 60;
     if (!fmt.match(/%m/)) s += m * 60;
     if (!fmt.match(/%S/)) ms += s * 1000;
@@ -569,24 +496,21 @@ util.Time.prototype = {
     ms += '';
 
     if (h < 10) h = '0' + h;
+    if (hr < 10) hr = '0' + hr;
     m = ('0' + m).slice(-2);
     s = ('0' + s).slice(-2);
     ms = ('00' + ms).slice(-3);
 
+    if (!fmt.match(/%D/) && (d > 0)) h = d + 'd' + h;
+
     var r = fmt;
-    var ds = '';
-    if (fmt.match(/%d/) && (d > 0)) {
-      ds = d + 'd ';
-    } else if (fmt.match(/%D/)) {
-      ds = d;
-    }
-    r = r.replace(/%D/i, ds).replace(/%H/, h).replace(/%m/, m).replace(/%S/, s).replace(/%s/, ms);
+    r = r.replace(/%D/i, d).replace(/%HR/, hr).replace(/%H/, h).replace(/%m/, m).replace(/%S/, s).replace(/%s/, ms);
     if (ctx.millis < 0) r = '-' + r;
     return r;
   },
 
   /**
-   * Returns a string representation of the object.
+   * Returns a human-readable string representation of the object.
    *
    * 1d 23h 45m 59s
    * h:
@@ -596,7 +520,7 @@ util.Time.prototype = {
    *   to display millis
    *   true: 1d 23h 45m 59s 123
    */
-  toString: function(h, f) {
+  toReadableString: function(h, f) {
     var ctx = this;
     var r = (ctx.millis < 0 ? '-' : '');
     var d = 0;
@@ -633,6 +557,17 @@ util.Time.prototype = {
 };
 
 /**
+ * Milliseconds to string.
+ *
+ * fmt
+ *  '%Dd %H:%m:%S.%s' = '1d 12:34:56.789'
+ *  days=auto: '%d%H:%m:%S.%s'
+ */
+util.ms2str = function(ms, fmt) {
+  return (new util.Time(ms)).toString(fmt);
+};
+
+/**
  * Millis to a string (171959000 -> '1d 23h 45m 59s')
  *
  * mode:
@@ -640,7 +575,7 @@ util.Time.prototype = {
  *   1: s
  *   2: ms
  */
-util.ms2str = function(ms, mode, unsigned) {
+util.msToReadableString = function(ms, mode, unsigned) {
   var t = new util.Time(ms);
   var r = '';
   var sn = 0;
@@ -649,12 +584,12 @@ util.ms2str = function(ms, mode, unsigned) {
     ms *= (-1);
   }
   if (mode == 2) {
-    r = t.toString(false, true);
+    r = t.toReadableString(false, true);
     if (unsigned) r = r.replace('-', '');
     return r;
   }
   if ((mode == 1) || (ms >= 60000)) {
-    r = t.toString(false, false);
+    r = t.toReadableString(false, false);
     if (unsigned) r = r.replace('-', '');
     return r;
   }
@@ -679,6 +614,66 @@ util.ms2str = function(ms, mode, unsigned) {
   }
   if (!unsigned) r = (sn ? '-' : '') + r;
   return r;
+};
+
+/**
+ * millis to struct
+ * -> {'millis': millis, 'days': 1, 'hours': 24, 'hours24': 0, 'minutes': 34, 'seconds': 56, 'milliseconds': 123}
+ */
+util.ms2struct = function(millis) {
+  var wk = millis;
+  if (millis < 0) wk *= (-1);
+  var d = (wk / 86400000) | 0;
+  var hh = 0;
+  if (wk >= 3600000) {
+    hh = (wk / 3600000) | 0;
+    wk -= (hh * 3600000);
+  }
+  var mi = 0;
+  if (wk >= 60000) {
+    mi = (wk / 60000) | 0;
+    wk -= (mi * 60000);
+  }
+  var ss = (wk / 1000) | 0;
+  var sss = wk - (ss * 1000);
+  var tm = {
+    millis: millis,
+    days: d,
+    hours: hh,
+    hours24: hh - d * 24,
+    minutes: mi,
+    seconds: ss,
+    milliseconds: sss
+  };
+  return tm;
+};
+
+/**
+ *  123456.789
+ * '123456.789'
+ * -> 123456789
+ */
+util.sec2ms = function(sec) {
+  return parseFloat(sec) * 1000;
+};
+
+/**
+ *  1200
+ * '1200'
+ * -> 1.2
+ * -> '1.200' (toString=true)
+ */
+util.ms2sec = function(ms, toString) {
+  ms += '';
+  var len = ms.length;
+  var s;
+  if (len <= 3) {
+    s = '0.' + ('00' + ms).slice(-3);
+  } else {
+    s = ms.substr(0, len - 3) + '.' + ms.substr(len - 3);
+  }
+  if (!toString) s = parseFloat(s);
+  return s;
 };
 
 //---------------------------------------------------------
@@ -740,7 +735,7 @@ util.timecounter.stop = function(el) {
  */
 util.timecounter.delta = function(t0, t1, mode, unsigned) {
   var ms = util.difftime(t0, t1);
-  return util.ms2str(ms, mode, unsigned);
+  return util.msToReadableString(ms, mode, unsigned);
 };
 
 /**
@@ -762,7 +757,7 @@ util.timecounter.getText = function(el) {
   var o = util.timecounter.getObj(el);
   if (o) {
     v = o.update(o);
-    s = util.ms2str(v, o.mode, o.unsigned);
+    s = util.msToReadableString(v, o.mode, o.unsigned);
   }
   return s;
 };
@@ -799,7 +794,7 @@ util.TimeCounter.prototype = {
   update: function(ctx) {
     var v = Date.now() - ctx.t0;
     var el = util.getElement(ctx.el);
-    if (el) el.innerHTML = util.ms2str(v, ctx.mode, ctx.unsigned);
+    if (el) el.innerHTML = util.msToReadableString(v, ctx.mode, ctx.unsigned);
     if (ctx.cb) ctx.cb(v);
     return v;
   },
