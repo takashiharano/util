@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202201292040';
+util.v = '202201292235';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -111,7 +111,6 @@ util.DateTime.prototype = {
   },
   toString: function(fmt) {
     if (!fmt) fmt = '%YYYY-%MM-%DD %HH:%mm:%SS.%sss %Z';
-
     var yyyy = this.year + '';
     var yy = yyyy.substr(2);
     var M = this.month + '';
@@ -134,7 +133,6 @@ util.DateTime.prototype = {
       h12 = (this.hour - 12) + '';
     }
     var hh12 = ('0' + h12).slice(-2);
-
     var r = fmt;
     r = r.replace(/%YYYY/g, yyyy);
     r = r.replace(/%YY/g, yy);
@@ -163,16 +161,10 @@ util.DateTime.prototype = {
 };
 
 util.datetime2struct = function(s) {
-  var w = s;
-  var tz = '';
-  if (w.length > 10) {
-    var zPos = util._getTzPos(w);
-    if (zPos != -1) {
-      tz = w.substr(zPos);
-      w = w.substr(0, zPos);
-    }
-  }
-  w = util.serializeDateTime(w);
+  var w = util.serializeDateTime(s);
+  var a = util.splitDateTimeAndTZ(w);
+  w = a[0];
+  var tz = a[1];
   var yyyy = w.substr(0, 4) | 0;
   var mm = w.substr(4, 2) | 0;
   var dd = w.substr(6, 2) | 0;
@@ -192,16 +184,24 @@ util.datetime2struct = function(s) {
   };
   return st;
 };
+util.splitDateTimeAndTZ = function(s) {
+  var w = s;
+  var tz = '';
+  var tzPos = util._getTzPos(w);
+  if (tzPos != -1) {
+    tz = w.substr(tzPos);
+    w = w.substr(0, tzPos);
+  }
+  return [w, tz];
+};
 util._getTzPos = function(s) {
   var p = s.indexOf('Z');
   if (p != -1) return p;
-  var tzSign = '+';
-  var tzSnCnt = util.countStr(s, tzSign);
-  if (tzSnCnt == 1) return s.indexOf(tzSign);
-  tzSign = '-';
-  tzSnCnt = util.countStr(s, tzSign);
-  if (tzSnCnt > 0) return s.indexOf(tzSign, s.length - 6);
-  return -1;
+  var cnt = util.countStr(s, '+');
+  if (cnt == 1) return s.lastIndexOf('+');
+  cnt = util.countStr(s, '-');
+  if (cnt == 2) return -1;
+  return s.lastIndexOf('-');
 };
 
 /**
@@ -213,8 +213,11 @@ util._getTzPos = function(s) {
  * 2020/9/3 12:34:56.789   -> 20200903123456789
  */
 util.serializeDateTime = function(s) {
-  var w = s.trim().replace(/\s{2,}/g, ' ').replace(/T/, ' ').replace(/,/, '.');
-  if (!w.match(/[-/:]/)) return util._serializeDateTime(w);
+  var a = util.splitDateTimeAndTZ(s);
+  var w = a[0];
+  var tz = a[1];
+  w = w.trim().replace(/\s{2,}/g, ' ').replace(/T/, ' ').replace(/,/, '.');
+  if (!w.match(/[-/:]/)) return util._serializeDateTime(w, tz);
   var prt = w.split(' ');
   var date = prt[0];
   var time = (prt[1] ? prt[1] : '');
@@ -238,11 +241,12 @@ util.serializeDateTime = function(s) {
   mi = util.lpad(mi, '0', 2);
   ss = util.lpad(ss, '0', 2);
   time = hh + mi + ss + ms;
-  return util._serializeDateTime(date + time);
+  return util._serializeDateTime(date + time, tz);
 };
-util._serializeDateTime = function(s) {
+util._serializeDateTime = function(s, tz) {
   s = s.replace(/-/g, '').replace(/\s/g, '').replace(/:/g, '').replace(/\./g, '');
-  return (s + '000000000').substr(0, 17);
+  tz = util.normalizeTZ(tz);
+  return (s + '000000000').substr(0, 17) + tz;
 };
 
 util.now = function() {
@@ -364,6 +368,50 @@ util.formatTZ = function(v, e) {
   var str = s + ('0' + h).slice(-2) + ('0' + m).slice(-2);
   if (e) str = str.substr(0, 3) + ':' + str.substr(3, 2);
   return str;
+};
+
+/**
+ * '+00:00', '+0000', 'Z' -> '+0000'
+ */
+util.normalizeTZ = function(s) {
+  if (!s) return s;
+  if (s == 'Z') return '+0000';
+  s = s.replace(/:/, '');
+  if (!s.match(/^[+-].+/)) return null;
+  var sn = s.substr(0, 1);
+  s = s.substr(1);
+  if (s.match(/\./)) s = util.hours2clock(s, '');
+  var len = s.length;
+  if (len == 1) {
+    s = '0' + s + '00';
+  } else if (len == 2) {
+    s = s + '00';
+  } else if (len == 3) {
+    s = '0' + s;
+  }
+  var tz = sn + s;
+  if (tz == '-0000') tz = '+0000';
+  return tz;
+};
+
+/**
+ * 9.5, ':' -> '09:30'
+ */
+util.hours2clock = function(s, sep) {
+  s += '';
+  var sign = '';
+  if (s.match(/^[+-]/)) {
+    sign = s.substr(0, 1);
+    s = s.substr(1);
+  }
+  var w = s.split('.');
+  var h = w[0] | 0;
+  var fM = 0;
+  if (w.length >= 2) fM = parseFloat('0.' + w[1]);
+  var m = (60 * fM) | 0;
+  var hh = ((h < 10) ? '0' + h : h);
+  var mm = ((m < 10) ? '0' + m : m);
+  return (sign + hh + sep + mm);
 };
 
 /**
@@ -505,16 +553,13 @@ util.Time.prototype = {
   toString: function(fmt) {
     var ctx = this;
     if (!fmt) fmt = '%HH:%mm:%SS.%sss';
-
     var vH = ctx.hours;
     var vM = ctx.minutes;
     var vS = ctx.seconds;
     var vMS = ctx.milliseconds;
-
     if (!fmt.match(/%H/)) vM += vH * 60;
     if (!fmt.match(/%m/)) vS += vM * 60;
     if (!fmt.match(/%S/)) vMS += vS * 1000;
-
     var d = '' + ctx.days;
     var hr = '' + vH;
     var h = '' + ctx.hours24;
@@ -523,17 +568,14 @@ util.Time.prototype = {
     var S = '' + vS;
     var SS = S;
     var s = vMS;
-
     var hh = ('0' + h).slice(-2);
     if (vM < 10) mm = '0' + m;
     if (vS < 10) SS = '0' + S;
     var sss = ('00' + s).slice(-3);
-
     if (!fmt.match(/%d/) && (d > 0)) {
       h = d + 'd' + h;
       hh = d + 'd' + hh;
     }
-
     var r = fmt;
     r = r.replace(/%d/g, d);
     r = r.replace(/%HR/g, hr);
