@@ -892,10 +892,10 @@ public class DateTime {
     } else if (len == 3) {
       s = "0" + s;
     }
-    String tz = sn + s;
 
+    String tz = sn + s;
     if (tz.equals("-0000")) {
-      return "+0000";
+      tz = "+0000";
     }
 
     return tz;
