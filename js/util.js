@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202201311415';
+util.v = '202201311437';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -156,6 +156,7 @@ util.DateTime.prototype = {
     r = r.replace(/%z/g, this.getTZ());
     r = r.replace(/%Z/g, this.getTZ(true));
     r = r.replace(/%N/g, util.getTzName());
+    r = r.replace(/\\/g, '');
     return r;
   }
 };
@@ -548,7 +549,7 @@ util.Time.prototype = {
    *  '%HH:%mm:%SS.%sss'
    *  '%dd %HH:%mm:%SS.%sss'
    *  '%HR:%mm:%SS.%sss'
-   *  '%HR:%m:%S.%s'
+   *  '%HRh %m\\m %Ss %sms'
    */
   toString: function(fmt) {
     var ctx = this;
@@ -587,6 +588,7 @@ util.Time.prototype = {
     r = r.replace(/%S/g, S);
     r = r.replace(/%sss/g, sss);
     r = r.replace(/%s/g, s);
+    r = r.replace(/\\/g, '');
     if (ctx.millis < 0) r = '-' + r;
     return r;
   },
@@ -1013,13 +1015,16 @@ util.ClockTime.prototype = {
     r = r.replace(/%s/g, s);
     if (byTheDay) {
       var d = this.toDaysString();
+      var dd = this.toDaysString(1);
+      r = r.replace(/%dd/, dd);
       r = r.replace(/%d/, d);
     }
+    r = r.replace(/\\/g, '');
     return r;
   },
-  toDaysString: function() {
-    var days = ((this.millis < 0) ? '-' : '+');
-    days += this.days + ' ' + util.plural('Day', this.days, true);
+  toDaysString: function(f) {
+    var days = ((this.millis < 0) ? '-' : '+') + this.days;
+    if (f) days += ' ' + util.plural('Day', this.days, true);
     return days;
   },
   toHrString: function(byTheDay) {
