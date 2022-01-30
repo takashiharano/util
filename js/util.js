@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202201311437';
+util.v = '202201301505';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -50,7 +50,7 @@ util.DateTime = function(src, tzOffset) {
       src += tzOffset;
       tzOffset = undefined;
     }
-    st = util.datetime2struct(src);
+    st = util.str2datestruct(src);
     dt = new Date(st.year, st.month - 1, st.day, st.hour, st.minute, st.second);
   } else if (src instanceof Date) {
     dt = src;
@@ -98,7 +98,7 @@ util.DateTime = function(src, tzOffset) {
   this.millisecond = millisecond;
   this.tzOffset = tzOffset;
   this.tzOffsetMin = tzOffsetMin;
-  this.wday = dt.getDay(); // Sunday - Saturday : 0 - 6
+  this.wday = dt.getDay(); // Sunday=0 - Saturday=6
   this.WDAYS = util.WDAYS;
 };
 util.DateTime.prototype = {
@@ -161,7 +161,7 @@ util.DateTime.prototype = {
   }
 };
 
-util.datetime2struct = function(s) {
+util.str2datestruct = function(s) {
   var w = util.serializeDateTime(s);
   var a = util.splitDateTimeAndTZ(w);
   w = a[0];
@@ -267,8 +267,6 @@ util.now = function() {
  * 2020-09-20 12:34:56 +09:00
  * 2020-09-20 12:34:56.789
  * 2020-09-20 12:34:56.789 +09:00
- * 2020/09/20 12:34:56
- * 2020/09/20 12:34:56.789
  * 2020/09/20 12:34:56.789 +09:00
  * -> millis from 19700101T0000Z
  */
