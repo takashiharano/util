@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202201301505';
+util.v = '202201302037';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -286,9 +286,10 @@ util.getDateTime = function(dt, ofst) {
  * Returns Date-Time string
  * t: timestamp / Date object
  * fmt: '%YYYY-%MM-%DD %HH:%mm:%SS.%sss %Z'
+ * tz: '+0000'
  */
-util.getDateTimeString = function(t, fmt) {
-  return (new util.DateTime(t)).toString(fmt);
+util.toDateTimeString = function(t, fmt, tz) {
+  return (new util.DateTime(t, tz)).toString(fmt);
 };
 
 /**
@@ -1048,8 +1049,7 @@ util.ClockTime.prototype = {
  * '12:00' + '01:30' -> '13:30'
  * '12:00' + '13:00' -> '25:00' / '01:00 (+1 Day)'
  * fmt:
- *  '%HH:%mm:%SS.%sss (%d)'
- *  -> '12:34:56.789 (+1 Day)'
+ *  '%HH:%mm:%SS.%sss (%d)' -> '12:34:56.789 (+1 Day)'
  */
 util.addTime = function(t1, t2, fmt) {
   if (!fmt) fmt = '%HH:%mm';
@@ -1064,8 +1064,7 @@ util.addTime = function(t1, t2, fmt) {
  * '12:00' - '01:30' -> '10:30'
  * '12:00' - '13:00' -> '-01:00' / '23:00 (-1 Day)'
  * fmt:
- *  '%HH:%mm:%SS.%sss (%d)'
- *  -> '12:34:56.789 (-1 Day)'
+ *  '%HH:%mm:%SS.%sss (%d)' -> '12:34:56.789 (-1 Day)'
  */
 util.subTime = function(t1, t2, fmt) {
   if (!fmt) fmt = '%HH:%mm';
@@ -1080,8 +1079,7 @@ util.subTime = function(t1, t2, fmt) {
  * '01:30' * 2 -> '03:00'
  * '12:00' * 3 -> '36:00' / '12:00 (+1 Day)'
  * fmt:
- *  '%HH:%mm:%SS.%sss (%d)'
- *  -> '12:34:56.789 (+1 Day)'
+ *  '%HH:%mm:%SS.%sss (%d)' -> '12:34:56.789 (+1 Day)'
  */
 util.multiTime = function(t, v, fmt) {
   if (!fmt) fmt = '%HH:%mm';
@@ -1095,8 +1093,7 @@ util.multiTime = function(t, v, fmt) {
  * '03:00' / 2 -> '01:30'
  * '72:00' / 3 -> '24:00' / '00:00 (+1 Day)'
  * fmt:
- *  '%HH:%mm:%SS.%sss (%d)'
- *  -> '12:34:56.789 (+1 Day)'
+ *  '%HH:%mm:%SS.%sss (%d)' -> '12:34:56.789 (+1 Day)'
  */
 util.divTime = function(t, v, fmt) {
   if (!fmt) fmt = '%HH:%mm';
@@ -1684,8 +1681,7 @@ util.formatHex = function(hex, uc, d, pFix) {
 };
 
 /**
- * -1234.98765
- * -> '-1,234.98765'
+ * -1234.98765 -> '-1,234.98765'
  */
 util.formatNumber = function(v) {
   v += '';
@@ -1905,14 +1901,9 @@ util.strpTotal = function(tbl, d) {
 //---------------------------------------------------------
 util.arr = {};
 /**
- * ['A', 'B', 'C', '1', 1], 'A'
- * -> 0
- *
- * ['A', 'B', 'C', '1', 1], 1, false
- * -> 3
- *
- * ['A', 'B', 'C', '1', 1], 1, true
- * -> 4
+ * ['A', 'B', 'C', '1', 1], 'A' -> 0
+ * ['A', 'B', 'C', '1', 1], 1, false -> 3
+ * ['A', 'B', 'C', '1', 1], 1, true -> 4
  */
 util.arr.pos = function(a, v, f) {
   var r = -1;
@@ -1926,11 +1917,8 @@ util.arr.pos = function(a, v, f) {
 };
 
 /**
- * ['A', 'B', 'A'], 'A'
- * -> 2
- *
- * ['A', 'B', 'A'], 'Z'
- * -> 0
+ * ['A', 'B', 'A'], 'A' -> 2
+ * ['A', 'B', 'A'], 'Z' -> 0
  */
 util.arr.count = function(a, v, f) {
   var c = 0;
@@ -1955,8 +1943,7 @@ util.arr.countByValue = function(arr) {
 };
 
 /**
- * ['A', 'B', 'C'], 'B'
- * -> ['A', 'C']
+ * ['A', 'B', 'C'], 'B' -> ['A', 'C']
  */
 util.arr.del = function(arr, v) {
   for (var i = 0; i < arr.length; i++) {
@@ -1965,19 +1952,16 @@ util.arr.del = function(arr, v) {
 };
 
 /**
- * ['A', 'B', 'C'], 'A'
- * -> true
+ * ['A', 'B', 'C'], 'A' -> true
  *
- * ['A', 'B', 'C'], 'Z'
- * -> false
+ * ['A', 'B', 'C'], 'Z' -> false
  */
 util.arr.hasValue = function(a, v, f) {
   return (util.arr.pos(a, v, f) >= 0);
 };
 
 /**
- * ['A', 'B', 'C'], 'A'
- * -> 'B'
+ * ['A', 'B', 'C'], 'A' -> 'B'
  */
 util.arr.next = function(a, v) {
   var r = a[0];
@@ -1990,8 +1974,7 @@ util.arr.next = function(a, v) {
 };
 
 /**
- * ['A', 'B', 'C'], 'A'
- * -> 'C'
+ * ['A', 'B', 'C'], 'A' -> 'C'
  */
 util.arr.prev = function(a, v) {
   var r = a[a.length - 1];
@@ -2004,8 +1987,7 @@ util.arr.prev = function(a, v) {
 };
 
 /**
- * ['A', 'B', 'C', 'B', 'A', 'A']
- * -> ['A', 'B', 'C']
+ * ['A', 'B', 'C', 'B', 'A', 'A'] -> ['A', 'B', 'C']
  */
 util.arr2set = function(arr, srt) {
   var o = util.arr.countByValue(arr, srt);
@@ -3111,7 +3093,7 @@ util.__writeHTML = function(cbData) {
 };
 
 /**
- * Fade out and Clear
+ * Fade out and clear
  */
 util.clearHTML = function(target, speed) {
   var DFLT_SPEED = 200;
@@ -3892,7 +3874,7 @@ util.createFadeScreenEl = function(bg) {
 };
 
 //---------------------------------------------------------
-// Loader Indication
+// Loading indicator
 //---------------------------------------------------------
 util.loader = {};
 util.loader.DFLTOPT = {
