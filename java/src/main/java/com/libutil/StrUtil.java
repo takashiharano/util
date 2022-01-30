@@ -1681,43 +1681,55 @@ public class StrUtil {
    * <br>
    * e.g., 0123.450 to 123.45
    *
-   * @param value
+   * @param s
    *          numeric string
    * @return trimmed value
    */
-  public static String trimZeros(String value) {
-    value = value.trim();
-    String sign = "";
-    if (value.charAt(0) == '-') {
-      sign = "-";
-      value = value.substring(1);
+  public static String trimZeros(String s) {
+    if (s == null) {
+      return s;
     }
-
-    String[] p = value.split("\\.");
-    String i = p[0];
+    String[] p = s.trim().split("\\.");
+    String i = trimLeadingZeros(p[0]);
     String d = "";
     if (p.length >= 2) {
       d = p[1];
     }
-
-    i = i.replaceAll("^0+", "");
-    if (i.equals("")) {
-      i = "0";
-    }
-
+    d = trimTrailingZeros(d);
     String r = i;
-
-    d = d.replaceAll("0+$", "");
     if (!d.equals("")) {
       r += "." + d;
     }
-
-    if (!r.equals("0")) {
-      r = sign + r;
-    }
-
     return r;
   }
+
+  /**
+   * Strip leading zeros.
+   *
+   * @param s
+   *          numeric string
+   * @return trimmed value
+   */
+  public static String trimLeadingZeros(String s) {
+    if (s == null) {
+      return s;
+    }
+    return (s + "").replaceAll("^([^0]*)0+(.+)$", "$1$2");
+  }
+
+  /**
+   * Strip trailing zeros.
+   *
+   * @param s
+   *          numeric string
+   * @return trimmed value
+   */
+  public static String trimTrailingZeros(String s) {
+    if (s == null) {
+      return s;
+    }
+    return (s + "").replaceAll("(.+?)0*$", "$1");
+  };
 
   /**
    * Converts the Excel column letter to a numeric index.<br>
