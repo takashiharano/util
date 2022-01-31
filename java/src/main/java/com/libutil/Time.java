@@ -84,11 +84,11 @@ public class Time {
    * Allocates a Time object and initializes it to represent the specified clock
    * format string.
    *
-   * @param clock
+   * @param str
    *          clock format string. "12:34", "12:34:56", "12:34:56.789"
    */
-  public Time(String clock) {
-    this(clockToMillis(clock));
+  public Time(String str) {
+    this(parseMillis(str));
   }
 
   public long getMillis() {
@@ -197,7 +197,7 @@ public class Time {
    * To string the time.
    *
    * @param format
-   *          "[+-]HH:mm:ss.SSS", "[+-]HR:mm:ss.SSS", "[+-]Dd H24:mm:ss.SSS"
+   *          "[+-]HH:mm:ss.SSS", "[+-]HR:mm:ss.SSS", "[+-]Dd HH24:mm:ss.SSS"
    * @return the formatted time string
    */
   public String toString(String format) {
@@ -213,12 +213,12 @@ public class Time {
 
     String hr = ((hours < 10) ? "0" + hours : hours + "");
 
-    String h24 = "00" + hours24;
-    h24 = h24.substring(h24.length() - 2);
+    String hh24 = "00" + hours24;
+    hh24 = hh24.substring(hh24.length() - 2);
 
-    String hh = h24;
+    String hh = hh24;
     if (hours >= 24) {
-      hh = d + "d" + h24;
+      hh = d + "d" + hh24;
     }
 
     String mm = "00" + minutes;
@@ -238,7 +238,7 @@ public class Time {
     r = r.replace("-", sign);
     r = r.replace("+", sign);
     r = r.replace("HR", hr);
-    r = r.replace("H24", h24);
+    r = r.replace("HH24", hh24);
     r = r.replace("HH", hh);
     r = r.replace("mm", mm);
     r = r.replace("ss", ss);
@@ -264,12 +264,12 @@ public class Time {
    * (1234, "HH:mm:ss.SSS") to "00:00:01.234"<br>
    * (171954123, "HR:mm:ss.SSS") to "47:45:54.123"<br>
    * (171954123, "HH:mm:ss.SSS") to "1d23:45:54.123"<br>
-   * (171954123, "Dd H24:mm:ss.SSS") to "1d 23:45:54.123"<br>
+   * (171954123, "Dd HH24:mm:ss.SSS") to "1d 23:45:54.123"<br>
    *
    * @param millis
    *          milliseconds to format
    * @param format
-   *          "HH:mm:ss.SSS", "HR:mm:ss.SSS", "Dd H24:mm:ss.SSS"
+   *          "HH:mm:ss.SSS", "HR:mm:ss.SSS", "Dd HH24:mm:ss.SSS"
    * @return the formatted time string
    */
   public static String formatTime(long millis, String format) {
@@ -299,12 +299,12 @@ public class Time {
 
     String hr = ((hours < 10) ? "0" + hours : hours + "");
 
-    String h24 = "0" + hours24;
-    h24 = h24.substring(h24.length() - 2);
+    String hh24 = "0" + hours24;
+    hh24 = hh24.substring(hh24.length() - 2);
 
-    String hh = h24;
+    String hh = hh24;
     if (hours >= 24) {
-      hh = d + "d" + h24;
+      hh = d + "d" + hh24;
     }
 
     String mm = "0" + minutes;
@@ -320,7 +320,7 @@ public class Time {
     r = r.replace("D", d);
     r = r.replace("sn", sign);
     r = r.replace("HR", hr);
-    r = r.replace("H24", h24);
+    r = r.replace("HH24", hh24);
     r = r.replace("HH", hh);
     r = r.replace("mm", mm);
     r = r.replace("ss", ss);
@@ -395,57 +395,13 @@ public class Time {
   }
 
   /**
-   * Returns human-readable time string.<br>
-   * 171959000 to "1d 23h 45m 59s"
-   *
-   * @param millis
-   *          milliseconds
-   * @return time string
-   */
-  public static String millisToReadableString(long millis) {
-    return millisToReadableString(millis, 0);
-  }
-
-  public static String millisToReadableString(long millis, int mode) {
-    Time t = new Time(millis);
-    if (mode == 1) {
-      return t.toReadableString(false, true);
-    }
-    if ((mode == 2) || (millis >= 60000)) {
-      return t.toReadableString(false, false);
-    }
-
-    int ss = t.seconds;
-    int sss = t.milliseconds;
-    StringBuilder sb = new StringBuilder();
-    if (millis < 1000) {
-      sb.append(sss + "ms");
-    } else {
-      if (millis < 10000) {
-        sss = sss - sss % 10;
-      } else {
-        sss = sss - sss % 100;
-      }
-      String msec = (sss + "").replaceAll("0+$", "");
-      if (sss == 0) {
-        sb.append(ss + "s");
-      } else if (sss < 100) {
-        sb.append(ss + ".0" + msec + "s");
-      } else {
-        sb.append(ss + "." + msec + "s");
-      }
-    }
-    return sb.toString();
-  }
-
-  /**
    * Converts clock format string to milliseconds.
    *
    * @param str
    *          [+|-]HH:MI:SS.sss
    * @return milliseconds
    */
-  public static long clockToMillis(String str) {
+  public static long parseMillis(String str) {
     String day = "0";
     String hour;
     String min;
@@ -500,12 +456,66 @@ public class Time {
   }
 
   /**
+   * Returns human-readable time string.<br>
+   * 171959000 to "1d 23h 45m 59s"
+   *
+   * @param millis
+   *          milliseconds
+   * @return human-readable time string
+   */
+  public static String toReadableString(long millis) {
+    return toReadableString(millis, 0);
+  }
+
+  /**
+   * Returns human-readable time string.<br>
+   * 171959000 to "1d 23h 45m 59s"
+   *
+   * @param millis
+   *          milliseconds
+   * @param mode
+   *          resolution. 0=auto / 1=millis / 2=secs if gt 60s
+   * @return human-readable time string
+   */
+  public static String toReadableString(long millis, int mode) {
+    Time t = new Time(millis);
+    if (mode == 1) {
+      return t.toReadableString(false, true);
+    }
+    if ((mode == 2) || (millis >= 60000)) {
+      return t.toReadableString(false, false);
+    }
+
+    int ss = t.seconds;
+    int sss = t.milliseconds;
+    StringBuilder sb = new StringBuilder();
+    if (millis < 1000) {
+      sb.append(sss + "ms");
+    } else {
+      if (millis < 10000) {
+        sss = sss - sss % 10;
+      } else {
+        sss = sss - sss % 100;
+      }
+      String msec = (sss + "").replaceAll("0+$", "");
+      if (sss == 0) {
+        sb.append(ss + "s");
+      } else if (sss < 100) {
+        sb.append(ss + ".0" + msec + "s");
+      } else {
+        sb.append(ss + "." + msec + "s");
+      }
+    }
+    return sb.toString();
+  }
+
+  /**
    * To string the time.
    *
    * @param millis
    *          milliseconds
    * @param format
-   *          "HH:mm:ss.SSS", "HR:mm:ss.SSS", "Dd H24:mm:ss.SSS"
+   *          "HH:mm:ss.SSS", "HR:mm:ss.SSS", "Dd HH24:mm:ss.SSS"
    * @return the formatted time string
    */
   public static String toString(long millis, String format) {

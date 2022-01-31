@@ -44,7 +44,7 @@ public class SystemUtil {
     Runtime.getRuntime().gc();
     long t1 = System.currentTimeMillis();
     HeapInfo info1 = new HeapInfo();
-    String elapsed = Time.millisToReadableString(t1 - t0);
+    String elapsed = Time.toReadableString(t1 - t0);
     String details = "GC: " + info0.getPercent() + "% -> " + info1.getPercent() + "% (" + elapsed + ")";
     return details;
   }

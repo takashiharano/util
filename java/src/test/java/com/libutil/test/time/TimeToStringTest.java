@@ -6,23 +6,29 @@ import com.libutil.test.Log;
 public class TimeToStringTest {
 
   public static void main(String args[]) {
-    test(0);
-    test(1);
-    test(100);
-    test(1000);
-    test(1234);
-    test(60000);
-    test(3600000);
-    test(86400000);
-    test(171954123);
-    test(1719541230);
+    long[] testData = { 0, 1, 100, 1234, 60000, 3600000, 86400000, 171954123, 1719541230, -1719541230 };
+    for (int i = 0; i < testData.length; i++) {
+      test(testData[i]);
+    }
+
+    Log.i("-- static ----------");
+    for (int i = 0; i < testData.length; i++) {
+      test2(testData[i]);
+    }
   }
 
   public static void test(long t) {
     Time time = new Time(t);
     Log.i(t + " = " + time.toString("HH:mm:ss.SSS"));
     Log.i(t + " = " + time.toString("HR:mm:ss.SSS"));
-    Log.i(t + " = " + time.toString("Dd H24:mm:ss.SSS"));
+    Log.i(t + " = " + time.toString("Dd HH24:mm:ss.SSS"));
+    Log.i("");
+  }
+
+  public static void test2(long t) {
+    Log.i(t + " = " + Time.toString(t, "HH:mm:ss.SSS"));
+    Log.i(t + " = " + Time.toString(t, "HR:mm:ss.SSS"));
+    Log.i(t + " = " + Time.toString(t, "Dd HH24:mm:ss.SSS"));
     Log.i("");
   }
 
