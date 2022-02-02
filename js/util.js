@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202201302037';
+util.v = '202202030123';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -288,7 +288,15 @@ util.getDateTime = function(dt, ofst) {
  * fmt: '%YYYY-%MM-%DD %HH:%mm:%SS.%sss %Z'
  * tz: '+0000'
  */
-util.toDateTimeString = function(t, fmt, tz) {
+util.getDateTimeString = function(a1, a2, a3) {
+  var t = a1;
+  var fmt = a2;
+  var tz = a3;
+  if (typeof t == 'string') {
+    fmt = t;
+    t = null;
+    tz = a2;
+  }
   return (new util.DateTime(t, tz)).toString(fmt);
 };
 
