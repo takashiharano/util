@@ -456,6 +456,23 @@ public class Time {
   }
 
   /**
+   * Converts a clock-like string into a decimal hours.
+   *
+   * @param s
+   *          clock-like string (e.g., "09:30")
+   * @return decimal hours (e.g., 9.5)
+   */
+  public static float toHours(String s) {
+    s = s.replace(":", "");
+    int p = s.length() - 2;
+    String hh = s.substring(0, p);
+    String mm = s.substring(p);
+    float h = Float.parseFloat(hh);
+    float m = Float.parseFloat(mm);
+    return h + (m / 60);
+  }
+
+  /**
    * Returns human-readable time string.<br>
    * 171959000 to "1d 23h 45m 59s"
    *
