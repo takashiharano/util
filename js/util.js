@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202202072153';
+util.v = '202202082336';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -331,30 +331,30 @@ util.getTimestampOfDay = function(timeString, offset) {
 };
 
 /**
- * Returns timestamp at 00:00 from specified timestamp.
- * dt: timestamp in millis
- * offset: timezone offset. '-1200' to '+1400' (abs) / -12 to 14 (rel)
- * 1628679929040 -> 1628640000000 (offset=0)
+ * Returns the midnight timestamp of the date-time.
+ * dt: date-time string or timestamp in millis
+ * offset: TZ offset. '-1200' to '+1400' (abs) / -12 to 14 (rel)
+ * 1628679929040 -> 1628640000000 (offset='+0000')
  */
 util.getTimestampOfMidnight = function(dt, offset) {
   var ms = dt;
-  var f = 0;
+  var os = 0;
   if (typeof dt == 'string') {
     dt = util.getDateTime(dt);
     ms = dt.timestamp;
-    if ((offset == undefined) && dt.tz) offset = 0;
-    f = 1;
+    if ((offset == undefined) && dt.tz) os = util.getOffsetFromLocalTz(dt.tz);
   }
-  if (offset == undefined) offset = 0;
-  if (typeof offset == 'string') {
-    var os = util.getOffsetFromLocalTz(offset);
-  } else {
-    os = offset * 3600000;
+  if (offset != undefined) {
+    if (typeof offset == 'string') {
+      os = util.getOffsetFromLocalTz(offset);
+    } else {
+      os = offset * 3600000;
+    }
   }
-  var t = (f ? dt : util.getDateTime(ms - os));
+  var t = ((typeof dt == 'number') ? util.getDateTime(ms) : dt);
   var d = new Date(t.year, t.month - 1, t.day);
   var r = new util.DateTime(d).timestamp;
-  if (f) f -= os;
+  r -= os;
   return r;
 };
 
