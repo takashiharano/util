@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202202082336';
+util.v = '202202092215';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -345,11 +345,7 @@ util.getTimestampOfMidnight = function(dt, offset) {
     if ((offset == undefined) && dt.tz) os = util.getOffsetFromLocalTz(dt.tz);
   }
   if (offset != undefined) {
-    if (typeof offset == 'string') {
-      os = util.getOffsetFromLocalTz(offset);
-    } else {
-      os = offset * 3600000;
-    }
+    os = ((typeof offset == 'string') ? util.getOffsetFromLocalTz(offset) : offset * 3600000);
   }
   var t = ((typeof dt == 'number') ? util.getDateTime(ms) : dt);
   var d = new Date(t.year, t.month - 1, t.day);
@@ -1725,11 +1721,6 @@ util.separateDigits = function(v) {
  */
 util.trimZeros = function(v) {
   v = (v + '').trim();
-  var s = '';
-  if (v.charAt(0) == '-') {
-    s = '-';
-    v = v.substr(1);
-  }
   var p = v.split('.');
   var i = p[0];
   var d = ((p.length > 1) ? p[1] : '');
@@ -1737,7 +1728,6 @@ util.trimZeros = function(v) {
   d = util.trimTrailingZeros(d);
   var r = i;
   if (d != '') r += '.' + d;
-  if (r != '0') r = s + r;
   return r;
 };
 util.trimLeadingZeros = function(s) {
