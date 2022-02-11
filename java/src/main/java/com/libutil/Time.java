@@ -247,6 +247,68 @@ public class Time {
   }
 
   /**
+   * Adds t2 to t1 and returns the result.
+   *
+   * @param t1
+   *          the time 1. e.g., "12:34"
+   * @param t2
+   *          the time 2. e.g., "01:30"
+   * @return the calculated Time object
+   */
+  public static Time addTime(String t1, String t2) {
+    long ms1 = parseMillis(t1);
+    long ms2 = parseMillis(t2);
+    Time time = new Time(ms1 + ms2);
+    return time;
+  }
+
+  /**
+   * Subtracts t2 from t1 and returns the result.
+   *
+   * @param t1
+   *          the time 1. e.g., "12:34"
+   * @param t2
+   *          the time 2. e.g., "01:30"
+   * @return the calculated Time object
+   */
+  public static Time subTime(String t1, String t2) {
+    long ms1 = parseMillis(t1);
+    long ms2 = parseMillis(t2);
+    Time time = new Time(ms1 - ms2);
+    return time;
+  }
+
+  /**
+   * Multiplies t by v and returns the result.
+   *
+   * @param t
+   *          the time. e.g., "12:34"
+   * @param v
+   *          number to multiply
+   * @return the calculated Time object
+   */
+  public static Time multiTime(String t, int v) {
+    long ms = parseMillis(t);
+    Time time = new Time(ms * v);
+    return time;
+  }
+
+  /**
+   * Divides t by v and return the result.
+   *
+   * @param t
+   *          the time. e.g., "12:34"
+   * @param v
+   *          number to divide
+   * @return the calculated Time object
+   */
+  public static Time divTime(String t, int v) {
+    long ms = parseMillis(t);
+    Time time = new Time(ms / v);
+    return time;
+  }
+
+  /**
    * Convert milliseconds to a time string.<br>
    *
    * @param millis
