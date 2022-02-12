@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202201152023
+v = 202202121750
 
 import sys
 import os
@@ -141,6 +141,11 @@ def match(string, pattern, flags=0):
 # r'(?P<g1>pattern)', r'\g<g1>'
 def replace(s, pattern, repl, count=0, flags=0):
   return re.sub(pattern, repl, s, count, flags)
+
+# 'abc123abc', 'abc' -> 2
+def count_str_pattern(string, pattern, flags=0):
+  m = re.findall(pattern, string, flags)
+  return len(m)
 
 # 'abc123xyz', 'abc(\d+).*'
 # -> '123'
@@ -808,7 +813,7 @@ def is_leap_year(year):
     return True
   return False
 
-# Format the date-time string in YYYYMMDDHHMISSffffff format
+# Normalize the date-time string in YYYYMMDDHHMISSffffff format
 # 20200920                   -> 20200920000000000000
 # 20200920T1234              -> 20200920123400000000
 # 20200920T123456.789        -> 20200920123456789000
@@ -817,14 +822,19 @@ def is_leap_year(year):
 # 2020-09-20 12:34:56.789123 -> 20200920123456789123
 # 2020/9/3 12:34:56.789      -> 20200903123456789000
 # 2020/9/3 12:34:56.789123   -> 20200903123456789123
+# 20200920T123456.789123+0900-> 20200920123456789123+0900
 def serialize_datetime(s):
   w = s
   w = w.strip()
   w = re.sub('\s{2,}', ' ', w)
   w = re.sub('T', ' ', w)
 
+  wk = _split_datetime_and_timezone(w)
+  w = wk[0]
+  tz = wk[1]
+
   if re.search('[-/:]', w) is None:
-    return _serialize_datetime(w)
+    return _serialize_datetime(w, tz)
 
   prt = w.split(' ')
   date = prt[0]
@@ -855,12 +865,41 @@ def serialize_datetime(s):
     ss = ('0' + prt[2])[-2:]
 
   time = hh + mi + ss + f
-  return _serialize_datetime(date + time)
+  return _serialize_datetime(date + time, tz)
 
-def _serialize_datetime(s):
+def _serialize_datetime(s, tz):
   s = re.sub('[-\s:\.]', '', s)
   s = (s + '000000000000')[0:20]
+  s += tz
   return s
+
+# '20220123T123456+0900'
+# -> ['20220123T123456', '+0900']
+#
+# '20220123T123456'
+# -> ['20220123T123456', None]
+def _split_datetime_and_timezone(s):
+  w = s
+  tz = ''
+  if len(w) > 10:
+    tz_pos = _get_tz_pos(w)
+    if tz_pos != -1:
+      tz = w[tz_pos:]
+      w = w[0:tz_pos]
+  ret = [w, tz]
+  return ret
+
+def _get_tz_pos(s):
+  p = s.find('Z')
+  if p != -1:
+    return p
+  tz_sn_cnt = count_str_pattern(s, '\\+')
+  if (tz_sn_cnt == 1):
+    return s.find('+')
+  tz_sn_cnt = count_str_pattern(s, '-')
+  if (tz_sn_cnt > 0):
+    return s.find('-', len(s) - 6)
+  return -1
 
 # ('2021-01-01', 1, '%Y-%m-%d') -> '2021-01-02'
 # (datetime, 1, '%Y-%m-%d') -> '2021-01-02'
