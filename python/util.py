@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202202121750
+v = 202202130005
 
 import sys
 import os
@@ -794,6 +794,14 @@ def get_timestamp_of_day(timestr='00:00:00.000000', fmt='%H:%M:%S.%f', offset=0)
   dt = get_datetime_of_day(timestr, fmt, offset)
   ts = dt.timestamp()
   return ts
+
+# Returns the midnight timestamp for the given moment.
+def get_timestamp_of_midnight(dt=None):
+  dt1 = DateTime(dt)
+  s = dt1.to_str('%Y%m%d')
+  dt0 = DateTime(s)
+  midnight = dt0.timestamp
+  return midnight
 
 # Last day of month
 # 2019, 1 -> 31
