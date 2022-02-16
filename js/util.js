@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202202092215';
+util.v = '202202162012';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -324,7 +324,7 @@ util.getTimestampOfDay = function(timeString, offset) {
   var ss = tm.substr(4, 2);
   var sss = tm.substr(6, 3);
   var d = util.getDateTime();
-  var d1 = new Date(d.yyyy, (d.mm | 0) - 1, d.dd, hh, mi, ss, sss);
+  var d1 = new Date(d.year, d.month - 1, d.day, hh, mi, ss, sss);
   var ts = d1.getTime();
   if (offset != undefined) ts += (offset * util.DAY);
   return ts;
