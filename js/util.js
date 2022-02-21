@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202202212210';
+util.v = '202202212244';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -4059,6 +4059,8 @@ util.Window = function(opt) {
   ctx.initHeight = ctx.win.offsetHeight - util.Window.WIN_BORDER * 2;
   ctx.setTitle(opt.title.text);
   ctx.body.innerHTML = opt.content;
+  ctx.modal = null;
+  if (opt.modal) ctx.modal = util.modal.show(ctx.win);
   if (util.Window.isKiosk(ctx)) ctx.kiosk();
   util.callFn(opt.oncreate, ctx);
   if (!opt.hidden) {
@@ -4114,6 +4116,7 @@ util.Window.DFLT_OPT = {
   className: '',
   scale: 1,
   hidden: false,
+  modal: false,
   style: {},
   title: {
     text: '',
@@ -4858,13 +4861,16 @@ util.Window.prototype = {
     var ctx = this;
     if (!util.Window.isContext(ctx)) ctx = util.Window.getContext(this);
     if ((f == true) || (util.callFn(ctx.opt.onbeforeclose, ctx) !== false)) {
+      util.modal.hide(ctx.modal);
       util.fadeOut(ctx.win, 200, ctx._close, ctx);
     }
   },
   _close: function(ctx) {
     util.callFn(ctx.opt.oninactive, ctx);
     util.callFn(ctx.opt.onclose, ctx);
-    document.body.removeChild(ctx.win);
+    try {
+      document.body.removeChild(ctx.win);
+    } catch (e) {}
     ctx.finalize(ctx);
   },
   finalize: function(ctx) {
