@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202202130005
+v = 202202230101
 
 import sys
 import os
@@ -220,6 +220,30 @@ def delete_patterns(s, patterns):
 # '', ' ', None
 def is_empty(s):
   return s is None or s.strip() == ''
+
+# '1' -> True
+# '1.2' -> False
+# 'a' -> False
+def is_int(s):
+  if s is None:
+    return False
+  return match(s.strip(), '^-?\\d+$')
+
+# '1.2' -> True
+# '1' -> False
+# 'a' -> False
+def is_float(s):
+  if s is None:
+    return False
+  return match(s.strip(), '^-?\\d+\\.\\d+$')
+
+# '1' -> True
+# '1.2' -> True
+# 'a' -> False
+def is_num(s):
+  if s is None:
+    return False
+  return is_int(s) or is_float(s)
 
 # '-0102.3040'
 # -> '-102.304'
