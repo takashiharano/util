@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202202220136';
+util.v = '202202221233';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -7219,9 +7219,9 @@ util.keyHandlers = {down: [], press: [], up: []};
 /**
  * fn = function(e) {};
  * combination = {ctrl: true, shift: false, alt: false, meta: false};
- * addKeyHandler('down', 83, fn, combination);
+ * addKeyHandler(83, 'down', fn, combination);
  */
-util.addKeyHandler = function(type, keyCode, fn, combination) {
+util.addKeyHandler = function(keyCode, type, fn, combination) {
   if ((type != 'down') && (type != 'press') && (type != 'up')) return;
   var handler = {keyCode: keyCode, combination: combination, fn: fn};
   util.keyHandlers[type].push(handler);
@@ -7264,17 +7264,17 @@ util.isTargetKey = function(e, handler) {
 };
 
 util.addEnterKeyHandler = function(fn) {
-  util.addKeyHandler('down', 13, fn);
+  util.addKeyHandler(13, 'down', fn);
 };
 
 util.addEscKeyHandler = function(fn) {
-  util.addKeyHandler('down', 27, fn);
+  util.addKeyHandler(27, 'down', fn);
 };
 
 // k: keyCode or 'A-Za-z0-9'
 util.addCtrlKeyHandler = function(k, fn) {
   if (typeof k == 'string') k = k.toUpperCase().charCodeAt(0);
-  util.addKeyHandler('down', k, fn, {ctrl: true, shift: false, alt: false, meta: false});
+  util.addKeyHandler(k, 'down', fn, {ctrl: true, shift: false, alt: false, meta: false});
 };
 
 //---------------------------------------------------------
