@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202202221233';
+util.v = '202202222326';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -5064,7 +5064,6 @@ util.modal.prototype = {
     util.fadeIn(el, 200);
     return this;
   },
-
   hide: function() {
     var el = this.el;
     var ctx = el.ctx;
@@ -5076,19 +5075,15 @@ util.modal.prototype = {
   _hide: function(el) {
     document.body.removeChild(el);
   },
-
   appendChild: function(el) {
     this.el.appendChild(el);
   },
-
   removeChild: function(el) {
     this.el.removeChild(el);
   },
-
   getElement: function() {
     return this.el;
   },
-
   onClick: function(e) {
     var el = e.target;
     if (el.ctx && (el.ctx.sig == 'modal')) el.ctx.hide();
@@ -5396,9 +5391,7 @@ util.dialog.count = function() {
  *   focus: 'yes'|'no',
  *   data: object,
  *   style: {
- *     message: {
- *       ...
- *     }
+ *     ...
  *   }
  * };
  *
@@ -5438,9 +5431,9 @@ util.dialog.info = function(a1, a2, a3, a4) {
   msg = util.convertNewLine(msg, '<br>');
   var content = document.createElement('div');
   content.style.display = 'inline-block';
-  if (opt.style && opt.style.message) {
-    for (var key in opt.style.message) {
-      util.setStyle(content, key, opt.style.message[key]);
+  if (opt.style && opt.style) {
+    for (var key in opt.style) {
+      util.setStyle(content, key, opt.style[key]);
     }
   }
   content.innerHTML = msg;
@@ -5462,9 +5455,7 @@ util.dialog.info = function(a1, a2, a3, a4) {
  *   focus: 'yes'|'no',
  *   data: object,
  *   style: {
- *     message: {
- *       ...
- *     }
+ *     ...
  *   }
  * };
  *
@@ -5512,9 +5503,9 @@ util.dialog.confirm = function(a1, a2, a3, a4, a5) {
   msg = util.convertNewLine(msg + '', '<br>');
   var content = document.createElement('div');
   content.style.display = 'inline-block';
-  if (opt.style && opt.style.message) {
-    for (var key in opt.style.message) {
-      util.setStyle(content, key, opt.style.message[key]);
+  if (opt.style && opt.style) {
+    for (var key in opt.style) {
+      util.setStyle(content, key, opt.style[key]);
     }
   }
   content.innerHTML = msg;
@@ -7217,8 +7208,10 @@ util.onTouchEnd = function() {
 util.keyHandlers = {down: [], press: [], up: []};
 
 /**
- * fn = function(e) {};
- * combination = {ctrl: true, shift: false, alt: false, meta: false};
+ * keyCode: code
+ * type: down / press / up
+ * fn: function(e) {};
+ * combination: {ctrl: true, shift: false, alt: false, meta: false};
  * addKeyHandler(83, 'down', fn, combination);
  */
 util.addKeyHandler = function(keyCode, type, fn, combination) {
