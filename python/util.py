@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202202230101
+v = 202202262106
 
 import sys
 import os
@@ -761,7 +761,7 @@ def now():
   return get_timestamp()
 
 def timestamp_in_millis():
-  return int(math.floor(time.time() * 1000))
+  return micro_to_milli(time.time())
 
 # 1546400096.123456 (float)    -> datetime
 # '2019-01-02 12:34:56.123456' -> datetime
@@ -795,10 +795,14 @@ def get_datetime_str(dt=None, fmt='%Y-%m-%d %H:%M:%S.%f', tz=None):
 # POSIX timestamp (float)
 # datetime                     -> 1546400096.123456
 # '2019-01-02 12:34:56.123456' -> 1546400096.123456
-def get_timestamp(dt=None, fmt='%Y-%m-%d %H:%M:%S.%f'):
+# fmt='%Y-%m-%d %H:%M:%S.%f'
+def get_timestamp(dt=None, fmt=None):
   if dt is None:
     dt = datetime.datetime.today()
   elif typename(dt) == 'str':
+    if fmt is None:
+      dt = serialize_datetime(dt)
+      fmt = '%Y%m%d%H%M%S%f'
     dt = datetime.datetime.strptime(dt, fmt)
   ts = dt.timestamp()
   return ts
@@ -1095,6 +1099,12 @@ def format_tz(v, ext=False):
 # Local time zone offset string
 def get_tz(ext=None):
   return format_tz(LOCAL_TZ_OFFSET, ext)
+
+def micro_to_milli(v):
+  return math.floor(v * 1000)
+
+def milli_to_micro(v):
+  return v / 1000
 
 #------------------------------------------------
 # Time calculation
