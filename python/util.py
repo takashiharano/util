@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202202271441
+v = 202202272108
 
 import sys
 import os
@@ -2570,6 +2570,13 @@ def write_csv(file_path, data, delimiter=',', quotechar='"', quoting=csv.QUOTE_M
     spamwriter = csv.writer(csvfile, delimiter=delimiter, quotechar=quotechar, quoting=quoting)
     for row in data:
       spamwriter.writerow(row)
+
+def quote_csv_field(value, quot='"', esc=None):
+  if esc is None:
+    esc = quot
+  s = replace(value, quot, esc + quot);
+  s = quot + s + quot
+  return s
 
 #------------------------------------------------------------------------------
 # Record Data
