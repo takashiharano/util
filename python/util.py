@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202202262106
+v = 202202271441
 
 import sys
 import os
@@ -2366,7 +2366,7 @@ def get_status_message(status):
   if st in HTTP_STATUS:
     msg = st + ' ' + HTTP_STATUS[st]
   else:
-    msg = None
+    msg = st
   return msg
 
 # headers = [
