@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202202222326';
+util.v = '202203012135';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -292,7 +292,7 @@ util.getDateTimeString = function(a1, a2, a3) {
   var t = a1;
   var fmt = a2;
   var tz = a3;
-  if (typeof t == 'string') {
+  if ((typeof t == 'string') && (t.match(/%/))) {
     fmt = t;
     t = null;
     tz = a2;
