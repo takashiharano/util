@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202202272108
+v = 202203022242
 
 import sys
 import os
@@ -2557,6 +2557,12 @@ def round_angle(v):
 #------------------------------------------------------------------------------
 # CSV
 #------------------------------------------------------------------------------
+# return:
+# [
+#  [COL1, COL2, ..., COLn],
+#  [COL1, COL2, ..., COLn],
+#  ...
+# ]
 def read_csv(file_path, newline='', encoding='utf-8', delimiter=',', quotechar='"'):
   csv_data = []
   with open(file_path, newline=newline, encoding=encoding) as csvfile:
@@ -2565,17 +2571,29 @@ def read_csv(file_path, newline='', encoding='utf-8', delimiter=',', quotechar='
       csv_data.append(row)
   return csv_data
 
+# data:
+# [
+#  [COL1, COL2, ..., COLn],
+#  [COL1, COL2, ..., COLn],
+#  ...
+# ]
+#
+# quoting:
+# csv.QUOTE_ALL
+# csv.QUOTE_MINIMAL
+# csv.QUOTE_NONNUMERIC
+# csv.QUOTE_NON
 def write_csv(file_path, data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL):
   with open(file_path, 'w', newline='') as csvfile:
     spamwriter = csv.writer(csvfile, delimiter=delimiter, quotechar=quotechar, quoting=quoting)
     for row in data:
       spamwriter.writerow(row)
 
-def quote_csv_field(value, quot='"', esc=None):
+def quote_csv_field(value, quotechar='"', esc=None):
   if esc is None:
-    esc = quot
-  s = replace(value, quot, esc + quot);
-  s = quot + s + quot
+    esc = quotechar
+  s = replace(value, quotechar, esc + quotechar);
+  s = quotechar + s + quotechar
   return s
 
 #------------------------------------------------------------------------------
