@@ -924,23 +924,6 @@ public class DateTime {
   }
 
   /**
-   * Parses text from the beginning of the given string to produce a date.
-   *
-   * @param pattern
-   *          the pattern describing the date and time format like "yyyy-MM-dd"
-   * @param str
-   *          A String whose beginning should be parsed
-   * @return A Date parsed from the string
-   * @throws ParseException
-   *           If failed to parse
-   */
-  public static Date parseDate(String pattern, String str) throws ParseException {
-    SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-    Date date = sdf.parse(str);
-    return date;
-  }
-
-  /**
    * Format the date-time string in YYYYMMDDHHMISSfff format<br>
    * <br>
    * 20200920 to 20200920000000000000<br>
@@ -1063,6 +1046,41 @@ public class DateTime {
     }
     return s.lastIndexOf("-");
   };
+
+  /**
+   * Parses text from the beginning of the given string to produce a date.
+   *
+   * @param str
+   *          A String whose beginning should be parsed
+   * @param pattern
+   *          the pattern describing the date and time format like "yyyy-MM-dd"
+   * @return A Date parsed from the string
+   * @throws ParseException
+   *           If failed to parse
+   */
+  public static Date toDate(String str, String pattern) throws ParseException {
+    return toDate(str, pattern, false);
+  }
+
+  /**
+   * Parses text from the beginning of the given string to produce a date.
+   *
+   * @param str
+   *          A String whose beginning should be parsed
+   * @param pattern
+   *          the pattern describing the date and time format like "yyyy-MM-dd"
+   * @param lenient
+   *          when true, parsing is lenient
+   * @return A Date parsed from the string
+   * @throws ParseException
+   *           If failed to parse
+   */
+  public static Date toDate(String str, String pattern, boolean lenient) throws ParseException {
+    SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+    sdf.setLenient(lenient);
+    Date date = sdf.parse(str);
+    return date;
+  }
 
   /**
    * Returns the date-time string represented by the time-stamp in the specified
