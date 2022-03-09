@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202203012135';
+util.v = '202203092225';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -7274,7 +7274,7 @@ util.addCtrlKeyHandler = function(k, fn) {
 /**
  * cb = function(data, file)
  * opt = {
- *   mode: 'txt'|'b64'|'data'|'bin'|'blob'([object ArrayBuffer])
+ *   mode: 'txt'|'b64'|'data'(Data URL)|'bin'(Uint8Array)|'blob'([object ArrayBuffer])|'evt'([object DragEvent])
  *   onloadstart: function(file),
  *   onprogress: function(e, loaded, total, pct),
  *   onload: function(data, file),
@@ -7301,7 +7301,7 @@ util.DndHandler = function(el, cb, opt) {
   if (!opt) opt = {};
   this.el = el;
   this.cb = cb;
-  this.mode = opt.mode;
+  this.mode = (opt.mode ? opt.mode : 'txt');
   this.onloadstart = opt.onloadstart;
   this.onprogress = opt.onprogress;
   this.onload = opt.onload;
@@ -7333,11 +7333,15 @@ util.dnd.onDrop = function(e) {
   }
   if (i == handlers) return;
   var cb = handler.cb;
-  var d = e.dataTransfer.getData('text');
-  if (d) {
-    if (cb) cb(d);
+  if (handler.mode == 'evt') {
+    if (cb) cb(e);
   } else {
-    util.dnd.handleDroppedFile(e, handler);
+    var d = e.dataTransfer.getData('text');
+    if (d) {
+      if (cb) cb(d);
+    } else {
+      util.dnd.handleDroppedFile(e, handler);
+    }
   }
 };
 
@@ -7350,7 +7354,7 @@ util.dnd.handleDroppedFile = function(e, handler) {
     } else {
       if (handler.cb) handler.cb('');
     }
-  } catch (e) {}
+  } catch (x) {}
 };
 
 util.loadFile = function(file, handler) {
