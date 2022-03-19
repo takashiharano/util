@@ -115,6 +115,144 @@ public class FileUtil {
   }
 
   /**
+   * Copies the file to the destination path.
+   *
+   * @param src
+   *          the file path to copy. e.g., "/path/to/file.ext"
+   * @param dest
+   *          the destination path. e.g., "/path/to/destdir/
+   * @return true if and only if the copying succeeded; false otherwise
+   */
+  public static boolean copy(File src, String dest) {
+    String from = src.getAbsolutePath();
+    return copy(from, dest, false);
+  }
+
+  /**
+   * Copies the file to the destination path.
+   *
+   * @param src
+   *          the file path to copy. e.g., "/path/to/file.ext"
+   * @param dest
+   *          the destination path. e.g., "/path/to/destdir/
+   * @param replaceExisting
+   *          if true, replaces the existing path
+   * @return true if and only if the copying succeeded; false otherwise
+   */
+  public static boolean copy(File src, String dest, boolean replaceExisting) {
+    String from = src.getAbsolutePath();
+    return copy(from, dest, replaceExisting);
+  }
+
+  /**
+   * Copies the file to the destination path.
+   *
+   * @param src
+   *          the file path to copy. e.g., "/path/to/file.ext"
+   * @param dest
+   *          the destination path. e.g., "/path/to/destdir/
+   * @return true if and only if the copying succeeded; false otherwise
+   */
+  public static boolean copy(String src, String dest) {
+    return copy(src, dest, false);
+  }
+
+  /**
+   * Copies the file to the destination path.
+   *
+   * @param src
+   *          the file path to copy. e.g., "/path/to/file.ext"
+   * @param dest
+   *          the destination path. e.g., "/path/to/destdir/
+   * @param replaceExisting
+   *          if true, replaces the existing path
+   * @return true if and only if the copying succeeded; false otherwise
+   */
+  public static boolean copy(String src, String dest, boolean replaceExisting) {
+    File srcFile = new File(src);
+    File destFile = new File(dest);
+
+    if (srcFile.isDirectory()) {
+      dest = dest.replace("\\", "/");
+      if (destFile.isDirectory() || dest.endsWith("/")) {
+        dest = joinPath(dest, srcFile.getName());
+        mkParentDir(dest);
+      }
+    }
+
+    return _copy(src, dest, replaceExisting);
+  }
+
+  private static boolean _copy(String src, String dest, boolean replaceExisting) {
+    File srcFile = new File(src);
+    File destFile = new File(dest);
+
+    boolean hasError = false;
+
+    if (srcFile.isDirectory()) {
+      if (destFile.isFile()) {
+        return false;
+      }
+
+      String srcDirAbsPath = srcFile.getAbsolutePath();
+
+      String[] fileNameList = listDirFileNames(src);
+      for (int i = 0; i < fileNameList.length; i++) {
+        String fileName = fileNameList[i];
+        String srcFilePath = joinPath(srcDirAbsPath, fileName);
+        String destFilePath = joinPath(dest, fileName);
+        boolean copied = _copy(srcFilePath, destFilePath, replaceExisting);
+        if (!copied) {
+          hasError = true;
+        }
+      }
+
+      return (hasError ? false : true);
+    } else {
+      return copyOne(src, dest, replaceExisting);
+    }
+  }
+
+  private static boolean copyOne(String src, String dest, boolean replaceExisting) {
+    File srcFile = new File(src);
+    File destFile = new File(dest);
+
+    boolean hasError = false;
+    dest = dest.replace("\\", "/");
+    if (destFile.isDirectory() || dest.endsWith("/")) {
+      String srcFileName = srcFile.getName();
+      dest = joinPath(dest, srcFileName);
+    }
+
+    Path from = Paths.get(src);
+    Path to = Paths.get(dest);
+
+    mkParentDir(dest);
+    boolean copied = copyFile(from, to, replaceExisting);
+    boolean ret = false;
+    if (copied && !hasError) {
+      ret = true;
+    }
+
+    return ret;
+  }
+
+  private static boolean copyFile(Path from, Path to, boolean replaceExisting) {
+    try {
+      if (replaceExisting) {
+        Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
+      } else {
+        Files.copy(from, to);
+      }
+    } catch (FileAlreadyExistsException fae) {
+      return false;
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return true;
+  }
+
+  /**
    * Creates a new empty file.
    *
    * @param path
