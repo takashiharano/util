@@ -64,6 +64,42 @@ public class SystemUtil {
   }
 
   /**
+   * Returns the current operating system name.
+   *
+   * @return the OS name (Linux, Windows 10, etc.)
+   */
+  public static String getOsName() {
+    String osName = System.getProperty("os.name");
+    return osName;
+  }
+
+  /**
+   * Returns whether the currently running OS is Linux.
+   *
+   * @return true if the currently running OS is Linux.
+   */
+  public static boolean isLinux() {
+    String osName = getOsName();
+    if ("Linux".equals(osName)) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Returns whether the currently running OS is Windows.
+   *
+   * @return true if the currently running OS is Windows.
+   */
+  public static boolean isWindows() {
+    String osName = getOsName();
+    if ((osName != null) && osName.startsWith("Windows")) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Returns the heap information string.
    *
    * @return the heap info
