@@ -18,7 +18,8 @@ public class TrimZerosTest {
 
   private static void testTrimZeros() {
     String[][] testData = { { "01.0", "1.0" }, { "01.01", "1.01" }, { "01.010", "1.01" }, { "01.010", "1.01" },
-        { "010.0", "10.0" }, { "010.01", "10.01" }, { "010.010", "10.01" }, { "", "" }, { null, null } };
+        { "010.0", "10.0" }, { "010.01", "10.01" }, { "010.010", "10.01" }, { "-010.010", "-10.01" }, { "-00", "-0" },
+        { "-00.00", "-0.0" }, { "", "" }, { null, null } };
     for (int i = 0; i < testData.length; i++) {
       String[] data = testData[i];
       String data_in = data[0];
