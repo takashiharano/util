@@ -654,6 +654,27 @@ public class DateTime {
   }
 
   /**
+   * Returns the current date-time object.
+   *
+   * @return the current date-time object
+   */
+  public static DateTime getCurrentDateTime() {
+    return new DateTime();
+  }
+
+  /**
+   * Returns the current date-time string in the specified format.
+   *
+   * @param format
+   *          the pattern describing the date and time format
+   * @return the current date-time string.
+   */
+  public static String getCurrentDateTime(String format) {
+    DateTime dt = new DateTime();
+    return dt.toString(format);
+  }
+
+  /**
    * Converts a date time string to UnixMillis.
    *
    * @param datetime
@@ -909,18 +930,6 @@ public class DateTime {
    */
   public static long now() {
     return System.currentTimeMillis();
-  }
-
-  /**
-   * Returns the current date-time string in the specified format.
-   *
-   * @param format
-   *          the pattern describing the date and time format
-   * @return the current date-time string.
-   */
-  public static String now(String format) {
-    DateTime dt = new DateTime();
-    return dt.toString(format);
   }
 
   /**
