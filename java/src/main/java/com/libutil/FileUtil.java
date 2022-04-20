@@ -385,15 +385,17 @@ public class FileUtil {
   }
 
   private static String insertNewLine(String str, int pos) {
-    StringBuilder sb = new StringBuilder(str);
+    StringBuilder sb = new StringBuilder();
     int p = 0;
-    while (p < sb.length()) {
-      p += pos;
-      if (p >= sb.length()) {
-        break;
+    while (p < str.length()) {
+      int endIndex = p + pos;
+      if (endIndex >= str.length()) {
+        endIndex = str.length();
       }
-      sb.insert(p, "\r\n");
-      p += 2;
+      String s = str.substring(p, endIndex);
+      sb.append(s);
+      sb.append("\r\n");
+      p += pos;
     }
     return sb.toString();
   }
