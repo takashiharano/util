@@ -326,7 +326,7 @@ public class FileUtil {
   public static void decodeBase64FileToFile(String srcPath, String destPath) throws IOException {
     String b64 = FileUtil.readText(srcPath);
     if (b64 != null) {
-      b64 = b64.replaceAll("\r\n", "\n").replaceAll("\r", "\n").replaceAll("\n", "");
+      b64 = b64.replaceAll("\r\n", "").replaceAll("\r", "").replaceAll("\n", "");
       FileUtil.writeFromBase64(destPath, b64);
     }
   }
