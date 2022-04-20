@@ -382,6 +382,23 @@ public class BinUtil {
    * @return binary string
    */
   public static String toBinString(byte[] src, int limit, int lastBytes) {
+    return toBinString(src, limit, lastBytes, 16);
+  }
+
+  /**
+   * byte[] to "00000001 00000010 00000011 ..."
+   *
+   * @param src
+   *          the byte array to dump
+   * @param limit
+   *          limit length
+   * @param lastBytes
+   *          last length
+   * @param lineBreakPos
+   *          line break position
+   * @return binary string
+   */
+  public static String toBinString(byte[] src, int limit, int lastBytes, int lineBreakPos) {
     int len = src.length;
     int dumpLen = len;
     int lastStartPos = 0;
@@ -404,17 +421,17 @@ public class BinUtil {
         lastStartPos = 0;
       }
     }
-    return _toBinString(src, limit, dumpLen, lastStartPos, lastBytes, 16);
+    return _toBinString(src, limit, dumpLen, lastStartPos, lastBytes, lineBreakPos);
   }
 
   private static String _toBinString(byte[] src, int limit, int dumpLen, int lastStartPos, int lastBytes,
-      int lineBreak) {
+      int lineBreakPos) {
     StringBuilder sb = new StringBuilder();
     int len = src.length;
 
     int i = 0;
     for (i = 0; i < dumpLen; i++) {
-      if ((i > 0) && (i % lineBreak == 0)) {
+      if ((i > 0) && (i % lineBreakPos == 0)) {
         sb.append("\n");
       } else if (i > 0) {
         sb.append(" ");
@@ -427,7 +444,7 @@ public class BinUtil {
     }
 
     if (((dumpLen > 0) && (lastStartPos > 0)) || ((limit < 0) && (len > lastBytes))) {
-      if (lineBreak == 0) {
+      if (lineBreakPos == 0) {
         sb.append(" ");
       } else {
         sb.append("\n");
@@ -437,7 +454,7 @@ public class BinUtil {
 
     if (lastStartPos > 0) {
       for (i = lastStartPos; i < len; i++) {
-        if ((i > 0) && (i % lineBreak == 0)) {
+        if ((i > 0) && (i % lineBreakPos == 0)) {
           sb.append("\n");
         } else if (i > 0) {
           sb.append(" ");
@@ -473,7 +490,7 @@ public class BinUtil {
    * @return hex string
    */
   public static String toHexString(byte[] src, int limit) {
-    return toHexString(src, limit, 16);
+    return toHexString(src, limit, 16, 0);
   }
 
   /**
@@ -485,9 +502,11 @@ public class BinUtil {
    *          limit length
    * @param lastBytes
    *          last length
+   * @param lineBreakPos
+   *          line break position
    * @return hex string
    */
-  public static String toHexString(byte[] src, int limit, int lastBytes) {
+  public static String toHexString(byte[] src, int limit, int lastBytes, int lineBreakPos) {
     int len = src.length;
     int dumpLen = len;
     int lastStartPos = 0;
@@ -510,15 +529,17 @@ public class BinUtil {
         lastStartPos = 0;
       }
     }
-    return _toHexString(src, limit, dumpLen, lastStartPos, lastBytes);
+    return _toHexString(src, limit, dumpLen, lastStartPos, lastBytes, lineBreakPos);
   }
 
-  private static String _toHexString(byte[] src, int limit, int dumpLen, int lastStartPos, int lastBytes) {
+  private static String _toHexString(byte[] src, int limit, int dumpLen, int lastStartPos, int lastBytes,
+      int lineBreakPos) {
     StringBuilder sb = new StringBuilder();
     int len = src.length;
 
+    int col = 0;
     for (int i = 0; i < dumpLen; i++) {
-      if (i > 0) {
+      if (col > 0) {
         sb.append(' ');
       }
 
@@ -538,6 +559,13 @@ public class BinUtil {
         offset = '7';
       }
       sb.append((char) (offset + lowerBits));
+
+      if ((lineBreakPos > 0) && (((i + 1) % lineBreakPos) == 0)) {
+        sb.append("\n");
+        col = 0;
+      } else {
+        col++;
+      }
     }
 
     if (((dumpLen > 0) && (lastStartPos > 0)) || ((limit < 0) && (len > lastBytes))) {
@@ -545,8 +573,11 @@ public class BinUtil {
     }
 
     if (lastStartPos > 0) {
+      col = 0;
       for (int i = lastStartPos; i < len; i++) {
-        sb.append(' ');
+        if (col > 0) {
+          sb.append(' ');
+        }
 
         byte b = src[i];
         int upperBits = (b >>> 4) & 0xF;
@@ -564,7 +595,18 @@ public class BinUtil {
           offset = '7';
         }
         sb.append((char) (offset + lowerBits));
+
+        if ((lineBreakPos > 0) && (((i + 1) % lineBreakPos) == 0)) {
+          sb.append("\n");
+          col = 0;
+        } else {
+          col++;
+        }
       }
+    }
+
+    if (col > 0) {
+      sb.append("\n");
     }
 
     return sb.toString();
