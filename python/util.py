@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202203092351
+v = 202204220018
 
 import sys
 import os
@@ -2086,7 +2086,7 @@ def get_file_hash(path, algorithm='SHA-256'):
 #  {} = disable auto-detection
 #  {'http': 'http://localhost:8080', 'https': 'https://localhost:8080', 'ftp': 'ftp://localhost:8080'}
 #
-def http(url, method='GET', params=None, user=None, password=None,
+def http(url, method='GET', params=None, data=None, user=None, password=None,
          headers=None, proxies=None, encoding=DEFAULT_ENCODING,
          timeout=DEFAULT_HTTP_TIMEOUT, cafile=None, capath=None,
          cadefault=False, context=None, verifycert=True):
@@ -2130,18 +2130,21 @@ def http(url, method='GET', params=None, user=None, password=None,
 #  debuglevel   - A debugging hook. If debuglevel is greater than zero,
 #                 messages will be printed to stdout as the response is read and parsed.
 #  closed       - Is True if the stream is closed.
-def http_request(url, method='GET', params=None, user=None, password=None,
+def http_request(url, method='GET', params=None, data=None, user=None, password=None,
                  headers=None, proxies=None, encoding=DEFAULT_ENCODING,
                  timeout=DEFAULT_HTTP_TIMEOUT, cafile=None,
                  capath=None, cadefault=False, context=None, verifycert=True):
-  data = None
 
-  if params is not None:
-    q = urllib.parse.urlencode(params, doseq=True)
-    if method == 'POST':
-      data = q.encode(encoding)
-    else:
-      url += '?' + q
+  if data is None:
+    if params is not None:
+      q = urllib.parse.urlencode(params, doseq=True)
+      if method == 'POST':
+        data = q.encode(encoding)
+      else:
+        url += '?' + q
+  else:
+    if typename(data) == 'str':
+      data = data.encode()
 
   if headers is None:
     headers = {}
