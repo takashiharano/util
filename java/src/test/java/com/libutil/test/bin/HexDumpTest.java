@@ -110,7 +110,7 @@ public class HexDumpTest {
     Log.d(d);
     Log.d("elapsed=" + (t2 - t1));
 
-    d = BinUtil.toHexString(b, 3, 4);
+    d = BinUtil.toHexString(b, 3, 4, 0);
     Log.d("toHex(b, 4)");
     Log.d(d);
 
