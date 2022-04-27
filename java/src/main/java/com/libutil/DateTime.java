@@ -669,7 +669,7 @@ public class DateTime {
    *          the pattern describing the date and time format
    * @return the current date-time string.
    */
-  public static String getCurrentDateTime(String format) {
+  public static String getCurrentDateTimeString(String format) {
     DateTime dt = new DateTime();
     return dt.toString(format);
   }
