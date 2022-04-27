@@ -421,6 +421,13 @@ public class StrBuilder {
   }
 
   /**
+   * Appends a line feed to this sequence.
+   */
+  public void newLine() {
+    buf.append(lineseparator);
+  }
+
+  /**
    * Sets line separator string for this character sequence.
    *
    * @param sep
