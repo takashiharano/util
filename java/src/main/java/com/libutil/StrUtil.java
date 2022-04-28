@@ -1763,7 +1763,7 @@ public class StrUtil {
    * e.g., ("A", 1) = "B", ("B", -1) = "A"
    *
    * @param s
-   *          the letter to convert ("A"-"XFD")
+   *          the origin column letter ("A"-"XFD")
    * @param offset
    *          offset
    * @return the letter corresponding to the index ("A-"XFD")
