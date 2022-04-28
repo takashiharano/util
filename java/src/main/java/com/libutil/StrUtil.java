@@ -1741,22 +1741,7 @@ public class StrUtil {
    * @return Index corresponding to a character (1-16384)
    */
   public static int xlscol(String s) {
-    return xlscol(s, 0);
-  }
-
-  /**
-   * Converts the Excel column letter to a numeric index.<br>
-   * <br>
-   * e.g., "A"=1, "B"=2, ... "Z"=26, "AA"=27, ... "XFD"=16384
-   *
-   * @param s
-   *          the letter to convert ("A"-"XFD")
-   * @param offset
-   *          offset
-   * @return Index corresponding to a character (1-16384)
-   */
-  public static int xlscol(String s, int offset) {
-    return (int) Permutation.getIndex("ABCDEFGHIJKLMNOPQRSTUVWXYZ", s.toUpperCase()) + offset;
+    return (int) Permutation.getIndex("ABCDEFGHIJKLMNOPQRSTUVWXYZ", s.toUpperCase());
   }
 
   /**
@@ -1770,6 +1755,26 @@ public class StrUtil {
    */
   public static String xlscol(int n) {
     return Permutation.getString("ABCDEFGHIJKLMNOPQRSTUVWXYZ", n);
+  }
+
+  /**
+   * Returns the Excel column letter at the position moved by offset.<br>
+   * <br>
+   * e.g., ("A", 1) = "B", ("B", -1) = "A"
+   *
+   * @param s
+   *          the letter to convert ("A"-"XFD")
+   * @param offset
+   *          offset
+   * @return the letter corresponding to the index ("A-"XFD")
+   */
+  public static String xlscol(String s, int offset) {
+    int n = xlscol(s);
+    if (n == 0) {
+      return "";
+    }
+    n += offset;
+    return xlscol(n);
   }
 
   /**

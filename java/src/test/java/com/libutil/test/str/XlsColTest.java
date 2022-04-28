@@ -26,18 +26,20 @@ public class XlsColTest {
     testA2N("XFC");
     testA2N("XFD"); // max
     testA2N("XFE");
+    // testA2N(null); // NullPointerException
 
-    testA2N("", 1);
-    testA2N("A", -2);
-    testA2N("A", -1);
-    testA2N("A", 0);
-    testA2N("A", 1);
-    testA2N("A", 2);
-    testA2N("B", -2);
-    testA2N("B", -1);
-    testA2N("B", 0);
-    testA2N("B", 1);
-    testA2N("B", 2);
+    testOffset("", 1);
+    testOffset("A", -2);
+    testOffset("A", -1);
+    testOffset("A", 0);
+    testOffset("A", 1);
+    testOffset("A", 2);
+    testOffset("B", -2);
+    testOffset("B", -1);
+    testOffset("B", 0);
+    testOffset("B", 1);
+    testOffset("B", 2);
+    // testOffset(null, 0); // NullPointerException
   }
 
   public static void testN2A(int n) {
@@ -49,7 +51,7 @@ public class XlsColTest {
 
   }
 
-  public static void testA2N(String s, int offset) {
+  public static void testOffset(String s, int offset) {
     Log.i(s + "+" + offset + " = " + StrUtil.xlscol(s, offset));
   }
 
