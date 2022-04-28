@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202203092225';
+util.v = '202204290005';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1833,23 +1833,27 @@ util.A2Z = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
  *   1  -> 'A'
  *   2  -> 'B'
  *  26  -> 'Z'
- *  27  -> 'AA'
  * 'A'  ->  1
  * 'B'  ->  2
  * 'Z'  -> 26
- * 'AA' -> 27
  */
-util.xlsCol = function(c) {
-  var f = (isNaN(c) ? util.xlsColA2N : util.xlsColN2A);
+util.xlscol = function(c, o) {
+  if (o != undefined) return util.xlscolShift(c, o);
+  var f = (isNaN(c) ? util.xlscolA2N : util.xlscolN2A);
   return f(c);
 };
-util.xlsColA2N = function(c) {
+util.xlscolA2N = function(c) {
   return util.strpIndex(util.A2Z, c.trim().toUpperCase());
 };
-util.xlsColN2A = function(n) {
+util.xlscolN2A = function(n) {
   var a = util.strp(util.A2Z, n);
   if (n <= 0) a = '';
   return a;
+};
+util.xlscolShift = function(c, o) {
+  var n = util.xlscolA2N(c);
+  if (n == 0) return '';
+  return util.xlscolN2A(n + o);
 };
 
 /**
