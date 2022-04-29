@@ -469,8 +469,9 @@ public class DateTime {
   }
 
   /**
-   * Returns the date-time string of the instance in the default format
-   * "yyyy-MM-dd HH:mm:ss.SSS XXX".
+   * Returns the date-time string of the instance in the default format.
+   *
+   * @return the string. e.g., "2022-04-29 12:34:56.789 +09:00"
    */
   public String toString() {
     return toString(DEFAULT_FORMAT);
