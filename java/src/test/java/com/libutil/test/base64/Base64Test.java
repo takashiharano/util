@@ -1,4 +1,4 @@
-package com.libutil.test.util;
+package com.libutil.test.base64;
 
 import com.libutil.Base64Util;
 import com.libutil.test.Log;
@@ -34,30 +34,30 @@ public class Base64Test {
 
   private static void decodeTest() {
     String str = "YWJj";
-    Log.d("decode(\"" + str + "\")");
-    String decoded = Base64Util.decode(str);
+    Log.d("decodeToString(\"" + str + "\")");
+    String decoded = Base64Util.decodeToString(str);
     Log.d(decoded);
 
     str = "";
-    Log.d("decode(\"" + str + "\")");
-    decoded = Base64Util.decode(str);
+    Log.d("decodeToString(\"" + str + "\")");
+    decoded = Base64Util.decodeToString(str);
     Log.d(decoded);
 
     str = null;
-    Log.d("decode(null)");
-    decoded = Base64Util.decode(str);
+    Log.d("decodeToString(null)");
+    decoded = Base64Util.decodeToString(str);
     Log.d(decoded);
 
     str = "YWJj";
-    Log.d("decodeB(\"" + str + "\")");
-    byte[] d = Base64Util.decodeB(str);
+    Log.d("decode(\"" + str + "\")");
+    byte[] d = Base64Util.decode(str);
     for (int i = 0; i < d.length; i++) {
       Log.d(d[i]);
     }
 
     str = null;
-    Log.d("decodeB(\"" + str + "\")");
-    d = Base64Util.decodeB(str);
+    Log.d("decode(null)");
+    d = Base64Util.decode(str);
     Log.d(d);
   }
 

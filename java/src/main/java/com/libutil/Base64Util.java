@@ -34,14 +34,30 @@ public class Base64Util {
   public static final String DEFAULT_CHARSET = "UTF-8";
 
   /**
+   * Decodes a Base64 encoded String into a newly-allocated byte array.
+   *
+   * @param src
+   *          the string to decode
+   * @return A newly-allocated byte array containing the decoded bytes. Returns
+   *         null for null input.
+   */
+  public static byte[] decode(String src) {
+    if (src == null) {
+      return null;
+    }
+    byte[] decoded = Base64.getDecoder().decode(src);
+    return decoded;
+  }
+
+  /**
    * Decodes a Base64 encoded String into a string.
    *
    * @param src
    *          the string to decode
    * @return The decoded string. Returns null for null input.
    */
-  public static String decode(String src) {
-    return decode(src, DEFAULT_CHARSET);
+  public static String decodeToString(String src) {
+    return decodeToString(src, DEFAULT_CHARSET);
   }
 
   /**
@@ -53,7 +69,7 @@ public class Base64Util {
    *          charset name
    * @return The decoded string. Returns null for null input.
    */
-  public static String decode(String src, String charsetName) {
+  public static String decodeToString(String src, String charsetName) {
     if (src == null) {
       return null;
     }
@@ -68,19 +84,20 @@ public class Base64Util {
   }
 
   /**
-   * Decodes a Base64 encoded String into a newly-allocated byte array.
+   * Encodes the specified byte array into a String using the Base64 encoding
+   * scheme.
    *
    * @param src
-   *          the string to decode
-   * @return A newly-allocated byte array containing the decoded bytes. Returns
+   *          the byte array to encode
+   * @return A String containing the resulting Base64 encoded characters. Returns
    *         null for null input.
    */
-  public static byte[] decodeB(String src) {
+  public static String encode(byte[] src) {
     if (src == null) {
       return null;
     }
-    byte[] decoded = Base64.getDecoder().decode(src);
-    return decoded;
+    String encoded = Base64.getEncoder().encodeToString(src);
+    return encoded;
   }
 
   /**
@@ -118,23 +135,6 @@ public class Base64Util {
     } catch (UnsupportedEncodingException e) {
       throw new RuntimeException(e);
     }
-    return encoded;
-  }
-
-  /**
-   * Encodes the specified byte array into a String using the Base64 encoding
-   * scheme.
-   *
-   * @param src
-   *          the byte array to encode
-   * @return A String containing the resulting Base64 encoded characters. Returns
-   *         null for null input.
-   */
-  public static String encode(byte[] src) {
-    if (src == null) {
-      return null;
-    }
-    String encoded = Base64.getEncoder().encodeToString(src);
     return encoded;
   }
 
