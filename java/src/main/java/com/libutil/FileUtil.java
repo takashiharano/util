@@ -738,7 +738,7 @@ public class FileUtil {
   public static boolean mkParentDir(File file) {
     boolean created = false;
     String parent = getParentPath(file);
-    if (!exists(parent)) {
+    if ((parent != null) && !exists(parent)) {
       created = mkdir(parent);
     }
     return created;
