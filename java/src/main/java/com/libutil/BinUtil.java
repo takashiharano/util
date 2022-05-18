@@ -195,19 +195,19 @@ public class BinUtil {
    *          the byte array
    * @return the dumped string
    */
-  public static String dump(byte[] src) {
-    return dump(src, 0, 0);
+  public static String dumpHex(byte[] src) {
+    return dumpHex(src, 0, 0);
   }
 
-  public static String dump(byte[] src, int limit) {
-    return dump(src, limit, 16);
+  public static String dumpHex(byte[] src, int limit) {
+    return dumpHex(src, limit, 16);
   }
 
-  public static String dump(byte[] src, int limit, int lastRows) {
-    return dump(src, limit, lastRows, true, true, true);
+  public static String dumpHex(byte[] src, int limit, int lastRows) {
+    return dumpHex(src, limit, lastRows, true, true, true);
   }
 
-  public static String dump(byte[] src, int limit, int lastRows, boolean header, boolean address, boolean ascii) {
+  public static String dumpHex(byte[] src, int limit, int lastRows, boolean header, boolean address, boolean ascii) {
     int byteLength = src.length;
     if (limit == 0) {
       limit = byteLength;
@@ -240,7 +240,7 @@ public class BinUtil {
       if (address) {
         sb.append(dumpAddr(addr));
       }
-      sb.append(dump16Bytes(src, addr));
+      sb.append(dump16BytesHex(src, addr));
       if (ascii) {
         sb.append("  ");
         sb.append(dumpAscii(src, addr));
@@ -265,7 +265,80 @@ public class BinUtil {
           if (address) {
             sb.append(dumpAddr(addr));
           }
-          sb.append(dump16Bytes(src, addr));
+          sb.append(dump16BytesHex(src, addr));
+          if (ascii) {
+            sb.append("  ");
+            sb.append(dumpAscii(src, addr));
+          }
+          sb.append('\n');
+        }
+      }
+    }
+
+    return sb.toString();
+  }
+
+  public static String dumpBin(byte[] src, int limit, int lastRows, boolean header, boolean address, boolean ascii) {
+    int byteLength = src.length;
+    if (limit == 0) {
+      limit = byteLength;
+    }
+    int dumpLen = ((byteLength > limit) ? limit : byteLength);
+    if (dumpLen % 0x10 != 0) {
+      dumpLen = (((dumpLen / 0x10) + 1) | 0) * 0x10;
+    }
+    int lastPartLen = 0x10 * lastRows;
+
+    StringBuilder sb = new StringBuilder();
+    if (header) {
+      if (address) {
+        sb.append("Address    ");
+      }
+      sb.append(
+          "+0       +1       +2       +3       +4       +5       +6       +7        +8       +9       +A       +B       +C       +D       +E       +F      ");
+      if (ascii) {
+        sb.append("  ASCII");
+      }
+      sb.append('\n');
+      sb.append(
+          "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+      if (ascii) {
+        sb.append("------------------");
+      }
+      sb.append('\n');
+    }
+
+    int addr = 0;
+    for (; addr < dumpLen; addr += 16) {
+      if (address) {
+        sb.append(dumpAddr(addr));
+      }
+      sb.append(dump16BytesBin(src, addr));
+      if (ascii) {
+        sb.append("  ");
+        sb.append(dumpAscii(src, addr));
+      }
+      sb.append('\n');
+    }
+
+    if (byteLength > limit) {
+      if (byteLength - limit > (0x10 * lastRows)) {
+        sb.append("...\n");
+      }
+      if (lastRows > 0) {
+        int rem = (byteLength % 0x10);
+        int startAddr = (rem == 0 ? (byteLength - lastPartLen) : ((byteLength - rem) - (0x10 * (lastRows - 1))));
+        if (startAddr < dumpLen) {
+          rem = ((dumpLen - startAddr) % 0x10);
+          startAddr = dumpLen + rem;
+        }
+        int endAddr = byteLength + (rem == 0 ? 0 : (0x10 - rem));
+
+        for (addr = startAddr; addr < endAddr; addr += 16) {
+          if (address) {
+            sb.append(dumpAddr(addr));
+          }
+          sb.append(dump16BytesBin(src, addr));
           if (ascii) {
             sb.append("  ");
             sb.append(dumpAscii(src, addr));
@@ -285,7 +358,7 @@ public class BinUtil {
     return baseAdddr + " : ";
   }
 
-  private static String dump16Bytes(byte[] buf, int startAddr) {
+  private static String dump16BytesHex(byte[] buf, int startAddr) {
     int addr = startAddr;
     StringBuilder sb = new StringBuilder();
 
@@ -315,6 +388,31 @@ public class BinUtil {
         sb.append((char) (offset + lowerBits));
       } else {
         sb.append("  ");
+      }
+      addr++;
+    }
+
+    return sb.toString();
+  }
+
+  private static String dump16BytesBin(byte[] buf, int startAddr) {
+    int addr = startAddr;
+    StringBuilder sb = new StringBuilder();
+
+    for (int i = 0; i < 16; i++) {
+      if (i == 8) {
+        sb.append("  ");
+      } else if (i > 0) {
+        sb.append(" ");
+      }
+
+      if (addr < buf.length) {
+        byte b = buf[addr];
+        int v = b & 0xff;
+        String bin = leftPad(Integer.toBinaryString(v), "0", 8, false);
+        sb.append(bin);
+      } else {
+        sb.append("        ");
       }
       addr++;
     }
@@ -464,6 +562,10 @@ public class BinUtil {
         String bin = leftPad(Integer.toBinaryString(v), "0", 8, false);
         sb.append(bin);
       }
+    }
+
+    if (lineBreakPos > 0) {
+      sb.append("\n");
     }
 
     return sb.toString();

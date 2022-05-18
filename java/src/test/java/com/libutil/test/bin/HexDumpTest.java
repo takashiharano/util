@@ -69,7 +69,7 @@ public class HexDumpTest {
     for (int i = 0; i < len; i++) {
       b[i] = (byte) i;
     }
-    String d = BinUtil.dump(b, limit, lastRows);
+    String d = BinUtil.dumpHex(b, limit, lastRows);
     Log.d("");
     Log.d("\n" + d);
   }
@@ -80,7 +80,7 @@ public class HexDumpTest {
     String d = null;
     long t1 = System.currentTimeMillis();
     for (int i = 0; i < 1000000; i++) {
-      d = BinUtil.dump(b);
+      d = BinUtil.dumpHex(b);
     }
     long t2 = System.currentTimeMillis();
     Log.d(d);
@@ -88,7 +88,7 @@ public class HexDumpTest {
 
     t1 = System.currentTimeMillis();
     for (int i = 0; i < 100000; i++) {
-      d = BinUtil.dump(b);
+      d = BinUtil.dumpHex(b);
     }
     t2 = System.currentTimeMillis();
     Log.d(d);
@@ -96,7 +96,7 @@ public class HexDumpTest {
 
     t1 = System.currentTimeMillis();
     for (int i = 0; i < 100000; i++) {
-      d = BinUtil.dump(b, 2);
+      d = BinUtil.dumpHex(b, 2);
     }
     t2 = System.currentTimeMillis();
     Log.d(d);
@@ -104,7 +104,7 @@ public class HexDumpTest {
 
     t1 = System.currentTimeMillis();
     for (int i = 0; i < 100000; i++) {
-      d = BinUtil.dump(b, 4);
+      d = BinUtil.dumpHex(b, 4);
     }
     t2 = System.currentTimeMillis();
     Log.d(d);
