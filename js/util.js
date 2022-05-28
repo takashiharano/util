@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202204290005';
+util.v = '202205281410';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1664,6 +1664,38 @@ util.shift2full = function(w) {
 util.toSingleSP = function(s) {
   if (!s) return s;
   return s.replace(/ {2,}/g, ' ');
+};
+
+util.alignFields = function(s, dlmt, n) {
+  var a = util.text2list(s);
+  if (!n) n = 1;
+  var d = ' ';
+  var c = [];
+  for (var i = 0; i < a.length; i++) {
+    var l = a[i].split(dlmt);
+    for (var j = 0; j < l.length; j++) {
+      var b = util.lenW(l[j]);
+      if ((c[j] | 0) < b) c[j] = b;
+    }
+  }
+  var r = '';
+  for (i = 0; i < a.length; i++) {
+    l = a[i].split(dlmt);
+    for (j = 0; j < l.length - 1; j++) {
+      r += util.rpad(l[j], d, c[j] + n);
+    }
+    r += l[j] + '\n';
+  }
+  return r;
+};
+util.lenW = function(s) {
+  var n = 0;
+  for (var i = 0; i < s.length; i++) {
+    var p = String.prototype.codePointAt ? s.codePointAt(i) : s.charCodeAt(i);
+    n += ((p <= 0x7F) || ((p >= 0xFF61) && (p <= 0xFF9F))) ? 1 : 2;
+    if (p >= 0x10000) i++;
+  }
+  return n;
 };
 
 util.getUnicodePoints = function(str) {
