@@ -171,7 +171,7 @@ public class CsvBuilder {
    *          the list to append
    */
   public void append(List<String> values) {
-    for (int i = 0; i < values.size(); i++) {
+    for (int i = 0, size = values.size(); i < size; i++) {
       append(values.get(i));
     }
   }

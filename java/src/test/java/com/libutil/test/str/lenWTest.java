@@ -23,6 +23,7 @@ public class lenWTest {
     Log.i(StrUtil.lenW("あいう"));
     Log.i(StrUtil.lenW("abcあいう"));
     Log.i(StrUtil.lenW("aあ🍺"));
+    Log.i(StrUtil.lenW("aあ🍺🌀"));
   }
 
 }

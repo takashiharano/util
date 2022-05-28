@@ -456,7 +456,7 @@ public class _Log {
       i("[]");
     } else {
       StringBuilder sb = new StringBuilder();
-      for (int i = 0; i < s.length(); i++) {
+      for (int i = 0, len = s.length(); i < len; i++) {
         sb.append("[");
         sb.append(Integer.toString(s.codePointAt(i), 16).toUpperCase());
         sb.append("]");

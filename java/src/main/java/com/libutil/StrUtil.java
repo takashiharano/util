@@ -932,9 +932,10 @@ public class StrUtil {
    */
   public static int lenW(String str) {
     int n = 0;
-    for (int i = 0; i < str.length(); i++) {
+    for (int i = 0, len = str.length(); i < len; i++) {
       int p = str.codePointAt(i);
       if ((p <= 0x7F) || ((p >= 0xFF61) && (p <= 0xFF9F))) {
+        // ASCII, half-width Kana
         n++;
       } else {
         n += 2;
@@ -1345,7 +1346,8 @@ public class StrUtil {
     int paren = 0;
     char ch;
     String str = "";
-    for (int i = 0; i < src.length(); i++) {
+    int size = src.length();
+    for (int i = 0; i < size; i++) {
       len++;
       ch = src.charAt(i);
       switch (ch) {
@@ -1357,9 +1359,9 @@ public class StrUtil {
             str = src.substring(start, start + len);
             keywords.add(str);
             if (keywords.size() + 1 == limit) {
-              if (i < src.length() - 1) {
+              if (i < size - 1) {
                 start = i + 1;
-                len = src.length() - start;
+                len = size - start;
                 str = src.substring(start, start + len);
                 keywords.add(str);
                 i = src.length();
@@ -1542,7 +1544,7 @@ public class StrUtil {
    */
   public static String toFullWidth(String s) {
     StringBuffer sb = new StringBuffer(s);
-    for (int i = 0; i < sb.length(); i++) {
+    for (int i = 0, len = sb.length(); i < len; i++) {
       char c = sb.charAt(i);
       if (c >= '!' && c <= '~') {
         sb.setCharAt(i, (char) (c + 65248));
@@ -1562,7 +1564,7 @@ public class StrUtil {
    */
   public static String toHalfWidth(String s) {
     StringBuffer sb = new StringBuffer(s);
-    for (int i = 0; i < sb.length(); i++) {
+    for (int i = 0, len = sb.length(); i < len; i++) {
       char c = sb.charAt(i);
       if (c >= '！' && c <= '～') {
         sb.setCharAt(i, (char) (c - 65248));

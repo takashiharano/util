@@ -139,7 +139,8 @@ public class CsvParser {
     }
 
     String[][] arrRows = new String[rows.size()][cols.size()];
-    for (i = 0; i < rows.size(); i++) {
+    int size = rows.size();
+    for (i = 0; i < size; i++) {
       List<String> row = rows.get(i);
       String[] aCols = new String[row.size()];
       row.toArray(aCols);
