@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202204220018
+v = 202205282344
 
 import sys
 import os
@@ -1541,7 +1541,7 @@ def get_datetime_filename(suffix='', fmt='%Y%m%dT%H%M%S', prefix=''):
 # mode:
 #  't' = text
 #  'b' = bin
-def read_file(path, mode='t', default=None, encoding=DEFAULT_ENCODING):
+def read_file(path, mode='b', default=None, encoding=DEFAULT_ENCODING):
   if not path_exists(path):
     return default
   if mode == 't':
