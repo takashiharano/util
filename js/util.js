@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202205281410';
+util.v = '202205281440';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1253,20 +1253,20 @@ util._shift = function(num, scale, reverseShift) {
 // 123.45, 1 -> '123.5'
 // type: 0=floor / 1=round / 2=ceil
 // zero: true=0 / false=0.0
-util.decimalAlignment = function(v, scale, type, zero) {
+util.alignDecimal = function(v, scale, type, zero) {
   var F = [util.floor, util.round, util.ceil];
   var f = F[type | 0];
   if (!f) f = F[0];
   v = f(v, scale);
   if (zero && v == 0) return 0;
-  return util.decimalPadding(v, scale);
+  return util.alignDecimalZero(v, scale);
 };
 
 // 123  , 1 -> '123.0'
 // 123  , 2 -> '123.00'
 // 123.4, 1 -> '123.4'
 // 123.4, 2 -> '123.40'
-util.decimalPadding = function(v, scale) {
+util.alignDecimalZero = function(v, scale) {
   var r = v + '';
   if (scale == undefined) scale = 1;
   if (scale <= 0) return r;
@@ -6878,7 +6878,7 @@ util.Counter.prototype = {
     if (ctx.scale == 0) {
       v++;
     } else {
-      v = util.decimalAlignment(v, ctx.scale).replace('.', '');
+      v = util.alignDecimal(v, ctx.scale).replace('.', '');
       v = parseInt(v) + 1;
       var s = v + '';
       v = s.substr(0, s.length - ctx.scale) + '.' + s.slice(ctx.scale * (-1));
@@ -6891,7 +6891,7 @@ util.Counter.prototype = {
     if (ctx.scale == 0) {
       v--;
     } else {
-      v = util.decimalAlignment(v, ctx.scale).replace('.', '');
+      v = util.alignDecimal(v, ctx.scale).replace('.', '');
       v = parseInt(v);
       if (v <= 0) {
         v = v * (-1) + 1;
@@ -6925,7 +6925,7 @@ util.Counter.prototype = {
   },
   print: function(ctx, v) {
     var s = v;
-    if (ctx.scale > 0) s = util.decimalPadding(s, ctx.scale);
+    if (ctx.scale > 0) s = util.alignDecimalZero(s, ctx.scale);
     if (ctx.fmt && ((v >= 1000) || (v <= 1000))) s = util.formatNumber(s);
     ctx._print(ctx, ctx.pfx + s + ctx.sfx);
     if (ctx.cb) ctx.cb(v);
