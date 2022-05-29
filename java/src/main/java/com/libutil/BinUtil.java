@@ -529,7 +529,7 @@ public class BinUtil {
 
     int i = 0;
     for (i = 0; i < dumpLen; i++) {
-      if ((i > 0) && (i % lineBreakPos == 0)) {
+      if ((i > 0) && (lineBreakPos > 0) && (i % lineBreakPos == 0)) {
         sb.append("\n");
       } else if (i > 0) {
         sb.append(" ");
@@ -552,7 +552,7 @@ public class BinUtil {
 
     if (lastStartPos > 0) {
       for (i = lastStartPos; i < len; i++) {
-        if ((i > 0) && (i % lineBreakPos == 0)) {
+        if ((i > 0) && (lineBreakPos > 0) && (i % lineBreakPos == 0)) {
           sb.append("\n");
         } else if (i > 0) {
           sb.append(" ");
