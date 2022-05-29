@@ -32,6 +32,7 @@ public class FileUtilTest {
     Log.d(str);
   }
 
+  @SuppressWarnings("unused")
   private static void readTextFileTest10000() {
     String path = "C:/test/100000lines.txt";
     long t1 = System.currentTimeMillis();
@@ -41,6 +42,7 @@ public class FileUtilTest {
     Log.d("t=" + (t2 - t1));
   }
 
+  @SuppressWarnings("unused")
   private static void readTextFileTest10000AsArray() {
     String path = "C:/test/100000lines.txt";
     long t1 = System.currentTimeMillis();
@@ -49,6 +51,7 @@ public class FileUtilTest {
     Log.d("t=" + (t2 - t1));
   }
 
+  @SuppressWarnings("unused")
   private static void readFileArrayTest() {
     Log.i("UTF-8");
     _readFileArrayTest("C:/test/a.txt");
@@ -112,11 +115,13 @@ public class FileUtilTest {
     Log.d(str);
   }
 
+  @SuppressWarnings("unused")
   private static void mkdirTest() {
     boolean created = FileUtil.mkdir("C:/test/a/b/c/x.txt");
     Log.d(created);
   }
 
+  @SuppressWarnings("unused")
   private static void getParentPathTest() {
     String parent = FileUtil.getParentPath("C:/test/a/b/c/x.txt");
     Log.d(parent);
@@ -146,10 +151,12 @@ public class FileUtilTest {
     }
   }
 
+  @SuppressWarnings("unused")
   private static void getFileNameTest() {
     Log.d(FileUtil.getFileName("C:/test/abc.txt"));
   }
 
+  @SuppressWarnings("unused")
   private static void getExtensionTest() {
     Log.d(FileUtil.getExtension("abc.txt"));
     Log.d(FileUtil.getExtension("C:/test/abc.txt"));

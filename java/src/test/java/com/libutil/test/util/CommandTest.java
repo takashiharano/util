@@ -28,6 +28,7 @@ public class CommandTest {
   private static void _execCommandTest(String[] command, String charset) {
     CommandExecutor executor = new CommandExecutor();
     try {
+      @SuppressWarnings("static-access")
       String result = executor.exec(command, charset);
       Log.d(result);
 
