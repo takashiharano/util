@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202205282344
+v = 202206082109
 
 import sys
 import os
@@ -15,7 +15,6 @@ import re
 import datetime
 import time
 import shutil
-from distutils import dir_util
 import base64
 import json
 import random
@@ -1878,12 +1877,9 @@ def copy_file(src, dst):
   shutil.copy2(src, dst)
 
 # Copy DIR recursively
-# FileExistsError will be thrown if dst exists and overwrite=False
-def copy_dir(src, dst, overwrite=False):
-  if overwrite:
-    dir_util.copy_tree(src, dst)
-  else:
-    shutil.copytree(src, dst)
+# FileExistsError will be thrown if dst exists
+def copy_dir(src, dst):
+  shutil.copytree(src, dst)
 
 # Move a file or DIR
 def move(src, dst, force=False):
