@@ -540,7 +540,7 @@ def strp_index(chars, pattern):
 # Returns a String pattern at the specified position
 def strp(chars, idx):
   tbl = list(chars)
-  tblLen = len(tbl)
+  tbl_len = len(tbl)
   a = [-1]
   for i in range(idx):
     j = 0
@@ -548,7 +548,7 @@ def strp(chars, idx):
     while j < len(a):
       if carry_flag:
         a[j] += 1
-        if a[j] > tblLen - 1:
+        if a[j] > tbl_len - 1:
           a[j] = 0
           if len(a) <= j + 1:
             a.append(-1)
