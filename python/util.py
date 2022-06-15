@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202206152240
+v = 202206152320
 
 import sys
 import os
@@ -542,6 +542,13 @@ def strp(chars, idx):
   return _strp(chars, idx)['s']
 
 def _strp(chars, idx, a=None):
+  if idx <= 0:
+    r = {
+      's': '',
+      'a': None
+    }
+    return r
+
   tbl = list(chars)
   tbl_len = len(tbl)
   if a is None:
