@@ -1836,14 +1836,28 @@ public class StrUtil {
      * @return the string
      */
     public static String getString(String chars, long index) {
+      StrPermResult r = _getString(chars, index, null);
+      return r.s;
+    }
+
+    public static StrPermResult _getString(String chars, long index, List<Integer> a) {
       if (index <= 0) {
-        return "";
+        StrPermResult r = new StrPermResult("", null);
+        return r;
       }
+
       String[] tbl = chars.split("");
       int len = tbl.length;
-      ArrayList<Integer> a = new ArrayList<>();
-      a.add(-1);
-      for (int i = 0; i < index; i++) {
+      long st;
+      if (a == null) {
+        a = new ArrayList<>();
+        a.add(-1);
+        st = 0;
+      } else {
+        st = index - 1;
+      }
+
+      for (long i = st; i < index; i++) {
         int j = 0;
         boolean cb = true;
         while (j < a.size()) {
@@ -1861,12 +1875,25 @@ public class StrUtil {
           j++;
         }
       }
+
       int strLen = a.size();
       StringBuilder sb = new StringBuilder(strLen);
       for (int i = strLen - 1; i >= 0; i--) {
         sb.append(tbl[a.get(i)]);
       }
-      return sb.toString();
+
+      StrPermResult r = new StrPermResult(sb.toString(), a);
+      return r;
+    }
+  }
+
+  public static class StrPermResult {
+    public String s;
+    public List<Integer> a;
+
+    public StrPermResult(String s, List<Integer> a) {
+      this.s = s;
+      this.a = a;
     }
   }
 
