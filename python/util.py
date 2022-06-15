@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python >= 3.4
-v = 202206121935
+v = 202206152022
 
 import sys
 import os
@@ -557,7 +557,7 @@ def strp(chars, idx):
       j += 1
   s = ''
   for i in range(len(a)):
-    s += tbl[a[len(a)  - 1 - i]]
+    s += tbl[a[len(a) - 1 - i]]
   return s
 
 #------------------------------------------------------------------------------
@@ -680,7 +680,7 @@ def next_list_val(arr, val, offset=1):
   for i in range(len(arr)):
     if arr[i] == val:
       n = (i + offset) % len(arr)
-      if n  <= last_index:
+      if n <= last_index:
         r = arr[n]
       else:
         r = arr[n - last_index]
