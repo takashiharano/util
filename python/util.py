@@ -2,8 +2,8 @@
 # Copyright 2018 Takashi Harano
 # Released under the MIT license
 # https://libutil.com/
-# Python >= 3.4
-v = 202206152022
+# Python 3.4+
+v = 202206152240
 
 import sys
 import os
@@ -539,10 +539,18 @@ def strp_index(chars, pattern):
 
 # Returns a String pattern at the specified position
 def strp(chars, idx):
+  return _strp(chars, idx)['s']
+
+def _strp(chars, idx, a=None):
   tbl = list(chars)
   tbl_len = len(tbl)
-  a = [-1]
-  for i in range(idx):
+  if a is None:
+    a = [-1]
+    st = 0
+  else:
+    st = idx - 1
+
+  for i in range(st, idx):
     j = 0
     carry_flag = True
     while j < len(a):
@@ -556,9 +564,16 @@ def strp(chars, idx):
           carry_flag = False
       j += 1
   s = ''
-  for i in range(len(a)):
-    s += tbl[a[len(a) - 1 - i]]
-  return s
+  len_a = len(a)
+  last_idx = len_a - 1
+  for i in range(len_a):
+    s += tbl[a[last_idx - i]]
+
+  r = {
+    's': s,
+    'a': a
+  }
+  return r
 
 #------------------------------------------------------------------------------
 # Dict/JSON
@@ -2050,7 +2065,7 @@ def hash(src, algorithm='SHA-256'):
     m = hashlib.sha1()
   elif algorithm == 'MD5':
     m = hashlib.md5()
-  # Python >= 3.6
+  # Python 3.6+
   elif algorithm == 'SHA3-256':
     m = hashlib.sha3_256()
   elif algorithm == 'SHA3-512':

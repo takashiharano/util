@@ -15,18 +15,23 @@ def test(target_pattern, chars='abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKL
     start = datetime.datetime.today().timestamp()
     print('start: ' + datetime.datetime.fromtimestamp(start).strftime('%Y-%m-%d %H:%M:%S.%f') + '\n')
     elapsed = 0
+    a = None
     found = False
     for i in range(1, last_index - 1):
-        s = util.strp(chars, i)
+        r = util._strp(chars, i, a)
+
+        s = r['s']
         if s == target_pattern:
             found = True
 
-        if i % 1000 == 0 or found:
+        if i % 10000 == 0 or found:
             elapsed = datetime.datetime.today().timestamp() - start
             print(str(i) + ': ' + s + ' T+' + str(elapsed) + 's')
 
         if found:
             break
+
+        a = r['a']
 
     end = datetime.datetime.today().timestamp()
     elapsed = end - start
@@ -39,8 +44,6 @@ def test(target_pattern, chars='abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKL
     speed = int(i / elapsed)
     print(str(elapsed) + 's ' + str(speed) + '/s')
 
-# main
-#
 # start: 2019-03-24 00:05:18.377915
 #
 # 1000: all 0.21622419357299805s
@@ -67,6 +70,7 @@ def test(target_pattern, chars='abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKL
 # Found! 18279: aaaa
 # 66.2117931842804s 276/s
 
+# >python bf.py
 # chars : abcdefghijklmnopqrstuvwxyz
 # target: ffff
 #
@@ -89,9 +93,10 @@ def test(target_pattern, chars='abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKL
 #
 # 2206.5861020088196s 49/s
 
+#------------------------------------
 # Python 3.10.5
 # start: 2022-06-15 22:25:19.853071
-#
+# 
 # 1000: all T+0.12021803855895996s
 # 2000: bxx T+0.4987490177154541s
 # 3000: dkj T+1.2030229568481445s
@@ -102,8 +107,27 @@ def test(target_pattern, chars='abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKL
 # 8000: kur T+8.735297918319702s
 # 9000: mhd T+11.058709144592285s
 # 10000: ntp T+13.658288955688477s
+
+#------------------------------------
+# start: 2022-06-15 22:38:30.745769
+#
+# 10000: ntp T+0.018663883209228516s
+# 20000: acof T+0.03361988067626953s
+# 30000: ariv T+0.05160093307495117s
+# 40000: bgdl T+0.06955289840698242s
+# 50000: buyb T+0.08562088012695312s
+# 60000: cjsr T+0.10362505912780762s
+# 70000: cynh T+0.11955094337463379s
+# 80000: dnhx T+0.1365358829498291s
+# 90000: eccn T+0.15429306030273438s
+# 100000: eqxd T+0.17121601104736328s
+# 109674: ffff T+0.18717288970947266s
+#
+# Found! 109674: ffff
+# end  : 2022-06-15 22:38:30.932942
+#
+# 0.18717288970947266s 585950/s
 def main():
     test('ffff', chars='abcdefghijklmnopqrstuvwxyz', max_digit=8)
 
 main()
-
