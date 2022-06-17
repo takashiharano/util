@@ -6,18 +6,23 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 import util
 
 # Test
-def test(target_pattern, chars='abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~', max_digit=8):
+def test(target_pattern, chars='abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~', min_digit=1, max_digit=8):
     last_index = util.strp_total(chars, max_digit)
+
+    first_str = chars[0] * min_digit
+    first_index = util.strp_index(chars, first_str)
 
     print('chars : ' + chars)
     print('target: ' + target_pattern)
+    print('first_str: ' + first_str)
+    print('first_index: ' + str(first_index))
     print()
     start = datetime.datetime.today().timestamp()
     print('start: ' + datetime.datetime.fromtimestamp(start).strftime('%Y-%m-%d %H:%M:%S.%f') + '\n')
     elapsed = 0
     a = None
     found = False
-    for i in range(1, last_index - 1):
+    for i in range(first_index, last_index - 1):
         r = util._strp(chars, i, a)
 
         s = r['s']
@@ -128,6 +133,10 @@ def test(target_pattern, chars='abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKL
 #
 # 0.18717288970947266s 585950/s
 def main():
-    test('ffff', chars='abcdefghijklmnopqrstuvwxyz', max_digit=8)
+    target = 'ffff'
+    args = util.get_args()
+    if len(args) >= 2:
+      target = args[1]
+    test(target, chars='abcdefghijklmnopqrstuvwxyz', min_digit=1, max_digit=8)
 
 main()
