@@ -326,6 +326,37 @@ public class CsvBuilder {
   }
 
   /**
+   * Quotes the string.
+   *
+   * @param src
+   *          the source string
+   * @return the quoted string
+   */
+  public String quoteString(String src) {
+    return quoteString(src, quotation, escape);
+  }
+
+  /**
+   * Quotes the string.
+   *
+   * @param src
+   *          the source string
+   * @param quot
+   *          quotation char
+   * @param esc
+   *          escape car
+   * @return the quoted string
+   */
+  public String quoteString(String src, String quot, String esc) {
+    String s = src.replace(quot, esc + quot);
+    StringBuilder sb = new StringBuilder();
+    sb.append(quot);
+    sb.append(s);
+    sb.append(quot);
+    return sb.toString();
+  }
+
+  /**
    * Returns the CSV string representation of this sequence.
    *
    * @return the CSV string
@@ -334,27 +365,49 @@ public class CsvBuilder {
     return buffer.toString();
   }
 
-  private void _append(String value, boolean shouldQuote) {
-    if (colCount > 0) {
-      buffer.append(separator);
-    }
-    if (shouldQuote) {
-      value = quote(value, quotation, escape);
-    } else if (value.contains("\r\n") || value.contains("\n") || value.contains("\r") || value.contains(quotation)
-        || value.contains(separator)) {
-      value = quote(value, quotation, escape);
-    }
-    buffer.append(value);
-    colCount++;
+  /**
+   * Quotes the string.
+   *
+   * @param src
+   *          the source string
+   * @return the quoted string
+   */
+  public static String quote(String src) {
+    return quote(src, DEFAULT_QUOTATION, DEFAULT_ESCAPE_CHAR);
   }
 
-  private String quote(String src, String quot, String esc) {
+  /**
+   * Quotes the string.
+   *
+   * @param src
+   *          the source string
+   * @param quot
+   *          quotation char
+   * @param esc
+   *          escape car
+   * @return the quoted string
+   */
+  public static String quote(String src, String quot, String esc) {
     String s = src.replace(quot, esc + quot);
     StringBuilder sb = new StringBuilder();
     sb.append(quot);
     sb.append(s);
     sb.append(quot);
     return sb.toString();
+  }
+
+  private void _append(String value, boolean shouldQuote) {
+    if (colCount > 0) {
+      buffer.append(separator);
+    }
+    if (shouldQuote) {
+      value = quoteString(value, quotation, escape);
+    } else if (value.contains("\r\n") || value.contains("\n") || value.contains("\r") || value.contains(quotation)
+        || value.contains(separator)) {
+      value = quoteString(value, quotation, escape);
+    }
+    buffer.append(value);
+    colCount++;
   }
 
 }

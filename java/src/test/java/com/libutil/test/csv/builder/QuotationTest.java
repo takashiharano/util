@@ -6,19 +6,24 @@ import com.libutil.test.Log;
 public class QuotationTest {
 
   public static void main(String args[]) {
-    test();
+    test("abc");
+    test("abc\"1\"xyz");
+    test("abc\"1");
+
+    test2("abc");
+    test2("abc\"1\"xyz");
+    test2("abc\"1");
+    test2("abc'1");
   }
 
-  private static void test() {
-    CsvBuilder builder;
+  private static void test(String s) {
+    String q = CsvBuilder.quote(s);
+    Log.i(q);
+  }
 
-    builder = new CsvBuilder();
-    builder.append("abc\"123\"xyz");
-    Log.i(builder);
-
-    builder = new CsvBuilder(true);
-    builder.append("abc\"123\"xyz");
-    Log.i(builder);
+  private static void test2(String s) {
+    String q = CsvBuilder.quote(s, "'", "!");
+    Log.i(q);
   }
 
 }
