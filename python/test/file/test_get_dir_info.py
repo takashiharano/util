@@ -7,71 +7,71 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 import util
 
 def test_get_dir_info():
-  s = '\n'
+    s = '\n'
 
-  path = util.get_relative_path(__file__, 'a.txt')
-  s += 'get_dir_info(\'' + path + '\') = ' + util.to_json(util.get_dir_info(path)) + '\n'
+    path = util.get_relative_path(__file__, 'a.txt')
+    s += 'get_dir_info(\'' + path + '\') = ' + util.to_json(util.get_dir_info(path)) + '\n'
 
-  s += '\n'
-  path = util.get_relative_path(__file__, 'dir1')
-  s += 'get_dir_info(\'' + path + '\') = ' + util.to_json(util.get_dir_info(path)) + '\n'
+    s += '\n'
+    path = util.get_relative_path(__file__, 'dir1')
+    s += 'get_dir_info(\'' + path + '\') = ' + util.to_json(util.get_dir_info(path)) + '\n'
 
-  s += '\n'
-  path = util.get_relative_path(__file__, 'dir2')
-  s += 'get_dir_info(\'' + path + '\') = ' + util.to_json(util.get_dir_info(path)) + '\n'
+    s += '\n'
+    path = util.get_relative_path(__file__, 'dir2')
+    s += 'get_dir_info(\'' + path + '\') = ' + util.to_json(util.get_dir_info(path)) + '\n'
 
-  s += '\n'
-  path = util.get_relative_path(__file__, 'dir2')
-  s += 'get_dir_info(\'' + path + '\', recursive=0) = ' + util.to_json(util.get_dir_info(path, recursive=0)) + '\n'
+    s += '\n'
+    path = util.get_relative_path(__file__, 'dir2')
+    s += 'get_dir_info(\'' + path + '\', recursive=0) = ' + util.to_json(util.get_dir_info(path, recursive=0)) + '\n'
 
-  s += '\n'
-  path = util.get_relative_path(__file__, 'dir2')
-  s += 'get_dir_info(\'' + path + '\', recursive=2) = ' + util.to_json(util.get_dir_info(path, recursive=2)) + '\n'
+    s += '\n'
+    path = util.get_relative_path(__file__, 'dir2')
+    s += 'get_dir_info(\'' + path + '\', recursive=2) = ' + util.to_json(util.get_dir_info(path, recursive=2)) + '\n'
 
-  s += '\n'
-  path = util.get_relative_path(__file__, 'dir2')
-  s += 'get_dir_info(\'' + path + '\', True, pattern=r\'.+\.log\', recursive=0) = ' + util.to_json(util.get_dir_info(path, pattern=r'.+\.log', recursive=0)) + '\n'
+    s += '\n'
+    path = util.get_relative_path(__file__, 'dir2')
+    s += 'get_dir_info(\'' + path + '\', True, pattern=r\'.+\.log\', recursive=0) = ' + util.to_json(util.get_dir_info(path, pattern=r'.+\.log', recursive=0)) + '\n'
 
-  s += '\n'
-  path = util.get_relative_path(__file__, 'dir2')
-  s += 'get_dir_info(\'' + path + '\', pattern=r\'.*log.*\', recursive=0) = ' + util.to_json(util.get_dir_info(path, pattern=r'.*log.*', recursive=0)) + '\n'
+    s += '\n'
+    path = util.get_relative_path(__file__, 'dir2')
+    s += 'get_dir_info(\'' + path + '\', pattern=r\'.*log.*\', recursive=0) = ' + util.to_json(util.get_dir_info(path, pattern=r'.*log.*', recursive=0)) + '\n'
 
-  s += '\n'
-  path = util.get_relative_path(__file__, 'dir2')
-  s += 'get_dir_info(\'' + path + '\', recursive=0, depth=1) = ' + util.to_json(util.get_dir_info(path, recursive=0, depth=1)) + '\n'
-
-  s += '\n'
-  path = util.get_relative_path(__file__, 'dir2')
-  s += 'get_dir_info(\'' + path + '\', recursive=0, depth=2) = ' + util.to_json(util.get_dir_info(path, recursive=0, depth=2)) + '\n'
-
-  s += '\n'
-  path = util.get_relative_path(__file__, 'dir2/')
-  s += 'get_dir_info(\'' + path + '\', recursive=0, depth=2) = ' + util.to_json(util.get_dir_info(path, recursive=0, depth=2)) + '\n'
-
-  s += '\n'
-  path = util.get_relative_path(__file__, 'dir2/aaa.txt')
-  s += 'get_dir_info(\'' + path + '\') = ' + util.to_json(util.get_dir_info(path)) + '\n'
-
-  #s += '\n'
-  #path ='C:/Program Files/'
-  #s += 'get_dir_info(\'' + path + '\', recursive=0, depth=1) = ' + util.to_json(util.get_dir_info(path, recursive=0, depth=1)) + '\n'
-
-  s += '\n'
-  path ='C:/notexist/'
-  try:
+    s += '\n'
+    path = util.get_relative_path(__file__, 'dir2')
     s += 'get_dir_info(\'' + path + '\', recursive=0, depth=1) = ' + util.to_json(util.get_dir_info(path, recursive=0, depth=1)) + '\n'
-  except FileNotFoundError as e:
-    s += str(e)
 
-  return s
+    s += '\n'
+    path = util.get_relative_path(__file__, 'dir2')
+    s += 'get_dir_info(\'' + path + '\', recursive=0, depth=2) = ' + util.to_json(util.get_dir_info(path, recursive=0, depth=2)) + '\n'
+
+    s += '\n'
+    path = util.get_relative_path(__file__, 'dir2/')
+    s += 'get_dir_info(\'' + path + '\', recursive=0, depth=2) = ' + util.to_json(util.get_dir_info(path, recursive=0, depth=2)) + '\n'
+
+    s += '\n'
+    path = util.get_relative_path(__file__, 'dir2/aaa.txt')
+    s += 'get_dir_info(\'' + path + '\') = ' + util.to_json(util.get_dir_info(path)) + '\n'
+
+    #s += '\n'
+    #path ='C:/Program Files/'
+    #s += 'get_dir_info(\'' + path + '\', recursive=0, depth=1) = ' + util.to_json(util.get_dir_info(path, recursive=0, depth=1)) + '\n'
+
+    s += '\n'
+    path ='C:/notexist/'
+    try:
+        s += 'get_dir_info(\'' + path + '\', recursive=0, depth=1) = ' + util.to_json(util.get_dir_info(path, recursive=0, depth=1)) + '\n'
+    except FileNotFoundError as e:
+        s += str(e)
+
+    return s
 
 def test_file():
-  s = '\n'
-  s += 'test_get_dir_info() = ' + test_get_dir_info() + '\n'
-  return s
+    s = '\n'
+    s += 'test_get_dir_info() = ' + test_get_dir_info() + '\n'
+    return s
 
 def main():
-  s = test_file()
-  util.send_response('text', s)
+    s = test_file()
+    util.send_response('text', s)
 
 main()

@@ -9,33 +9,33 @@ import util
 util.debug()
 
 def test():
-  util.log('test')
-  s = ''
+    util.log('test')
+    s = ''
 
-  
+    
 
-  return s
+    return s
 
 def loop_test():
-  util.log('loop test')
-  s = ''
-  util.start_timetest()
+    util.log('loop test')
+    s = ''
+    util.start_timetest()
 
-  for i in range(10000000):
-    pass
+    for i in range(10000000):
+      pass
 
-  util.log('time: ' + util.end_timetest())
-  return s
+    util.log('time: ' + util.end_timetest())
+    return s
 
 def main():
-  try:
-    ret = test()
-  except Exception as e:
-    ret = str(e)
+    try:
+      ret = test()
+    except Exception as e:
+        ret = str(e)
 
-  if ret == '':
-    ret = 'OK'
+    if ret == '':
+        ret = 'OK'
 
-  util.send_response('text', ret)
+    util.send_response('text', ret)
 
 main()

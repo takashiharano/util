@@ -7,13 +7,13 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 import util
 
 def test():
-  ret = 'data=' + util.get_post_data()
-  return ret
+    ret = 'data=' + util.get_post_data()
+    return ret
 
 def main():
-  ret = test()
-  print('Content-Type: text/plain')
-  print()
-  print(ret)
+    ret = test()
+    print('Content-Type: text/plain')
+    print()
+    print(ret)
 
 main()

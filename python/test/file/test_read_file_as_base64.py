@@ -7,14 +7,14 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 import util
 
 def test1():
-  s = '\n'
-  s += util.read_file_as_base64('./dir1/a.txt') + '\n'
-  s += '\n'
-  s += util.read_file_as_base64('C:/test/img.jpg') + '\n'
-  return s
+    s = '\n'
+    s += util.read_file_as_base64('./dir1/a.txt') + '\n'
+    s += '\n'
+    s += util.read_file_as_base64('C:/test/img.jpg') + '\n'
+    return s
 
 def main():
-  s = test1()
-  util.send_response('text', s)
+    s = test1()
+    util.send_response('text', s)
 
 main()
