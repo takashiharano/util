@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202206192223
+v = 202206220200
 
 import sys
 import os
@@ -586,7 +586,7 @@ def _strp(chars, idx, a=None):
 # Dict/JSON
 #------------------------------------------------------------------------------
 # Object -> JSON
-def to_json(obj, skipkeys=False, ensure_ascii=False, check_circular=True,
+def to_json(obj, skipkeys=False, ensure_ascii=True, check_circular=True,
             allow_nan=True, cls=None, indent=None, separators=None,
             default=None, sort_keys=False):
     return json.dumps(obj, skipkeys=skipkeys, ensure_ascii=ensure_ascii,
@@ -615,7 +615,7 @@ def load_dict(path, default=None, encoding=None, cls=None, object_hook=None,
     return default
 
 # Save Dict
-def save_dict(path, obj, skipkeys=False, ensure_ascii=False, check_circular=True,
+def save_dict(path, obj, skipkeys=False, ensure_ascii=True, check_circular=True,
               allow_nan=True, cls=None, indent=1, separators=None,
               default=None, sort_keys=False):
     s = json.dumps(obj, skipkeys=skipkeys, ensure_ascii=ensure_ascii,
@@ -631,7 +631,7 @@ def make_parent_dir(path):
         mkdir(parent_path)
 
 # Append Dict
-def append_dict(path, obj, skipkeys=False, ensure_ascii=False, check_circular=True,
+def append_dict(path, obj, skipkeys=False, ensure_ascii=True, check_circular=True,
                 allow_nan=True, cls=None, indent=1, separators=None,
                 default=None, sort_keys=False, max=0, reverse=False):
     d = load_dict(path, default=[])
