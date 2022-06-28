@@ -16,8 +16,7 @@ public class TestUtil {
       ok = true;
       op = "==";
     }
-    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + strExpected + " "
-        + op + " ACTUAL=" + strActual);
+    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + strExpected + " " + op + " ACTUAL=" + strActual);
     return ok;
   }
 
@@ -35,8 +34,7 @@ public class TestUtil {
       ok = true;
       op = "!=";
     }
-    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + strExpected + " "
-        + op + " ACTUAL=" + strActual);
+    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + strExpected + " " + op + " ACTUAL=" + strActual);
     return ok;
   }
 
@@ -60,8 +58,7 @@ public class TestUtil {
       ok = true;
       op = ">";
     }
-    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + expected + " " + op
-        + " ACTUAL=" + actual);
+    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + expected + " " + op + " ACTUAL=" + actual);
     return ok;
   }
 
@@ -84,8 +81,7 @@ public class TestUtil {
       ok = true;
       op = ">";
     }
-    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + expected + " " + op
-        + " ACTUAL=" + actual);
+    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + expected + " " + op + " ACTUAL=" + actual);
     return ok;
   }
 
@@ -109,8 +105,7 @@ public class TestUtil {
       ok = true;
       op = ">=";
     }
-    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + expected + " " + op
-        + " ACTUAL=" + actual);
+    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + expected + " " + op + " ACTUAL=" + actual);
     return ok;
   }
 
@@ -133,8 +128,7 @@ public class TestUtil {
       ok = true;
       op = ">=";
     }
-    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + expected + " " + op
-        + " ACTUAL=" + actual);
+    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + expected + " " + op + " ACTUAL=" + actual);
     return ok;
   }
 
@@ -158,8 +152,7 @@ public class TestUtil {
       ok = true;
       op = "<";
     }
-    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + expected + " " + op
-        + " ACTUAL=" + actual);
+    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + expected + " " + op + " ACTUAL=" + actual);
     return ok;
   }
 
@@ -182,8 +175,7 @@ public class TestUtil {
       ok = true;
       op = "<";
     }
-    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + expected + " " + op
-        + " ACTUAL=" + actual);
+    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + expected + " " + op + " ACTUAL=" + actual);
     return ok;
   }
 
@@ -207,8 +199,7 @@ public class TestUtil {
       ok = true;
       op = "<=";
     }
-    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + expected + " " + op
-        + " ACTUAL=" + actual);
+    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + expected + " " + op + " ACTUAL=" + actual);
     return ok;
   }
 
@@ -231,8 +222,7 @@ public class TestUtil {
       ok = true;
       op = "<=";
     }
-    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + expected + " " + op
-        + " ACTUAL=" + actual);
+    _Log.i("[" + (ok ? "OK" : "NG") + "] " + message + ("".equals(message) ? "" : ": ") + "EXP=" + expected + " " + op + " ACTUAL=" + actual);
     return ok;
   }
 

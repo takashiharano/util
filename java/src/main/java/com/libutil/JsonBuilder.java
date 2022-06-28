@@ -802,8 +802,7 @@ public class JsonBuilder {
   }
 
   private static String _quoteAndEscape(String value) {
-    value = value.replace("\\", "\\\\").replace("\r\n", "\\r\\n").replace("\n", "\\n").replace("\r", "\\r")
-        .replace("\t", "\\t");
+    value = value.replace("\\", "\\\\").replace("\r\n", "\\r\\n").replace("\n", "\\n").replace("\r", "\\r").replace("\t", "\\t");
     value = StrUtil.quote(value);
     return value;
   }

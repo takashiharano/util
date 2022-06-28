@@ -294,14 +294,12 @@ public class BinUtil {
       if (address) {
         sb.append("Address    ");
       }
-      sb.append(
-          "+0       +1       +2       +3       +4       +5       +6       +7        +8       +9       +A       +B       +C       +D       +E       +F      ");
+      sb.append("+0       +1       +2       +3       +4       +5       +6       +7        +8       +9       +A       +B       +C       +D       +E       +F      ");
       if (ascii) {
         sb.append("  ASCII");
       }
       sb.append('\n');
-      sb.append(
-          "-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+      sb.append("-----------------------------------------------------------------------------------------------------------------------------------------------------------");
       if (ascii) {
         sb.append("------------------");
       }
@@ -522,8 +520,7 @@ public class BinUtil {
     return _toBinString(src, limit, dumpLen, lastStartPos, lastBytes, lineBreakPos);
   }
 
-  private static String _toBinString(byte[] src, int limit, int dumpLen, int lastStartPos, int lastBytes,
-      int lineBreakPos) {
+  private static String _toBinString(byte[] src, int limit, int dumpLen, int lastStartPos, int lastBytes, int lineBreakPos) {
     StringBuilder sb = new StringBuilder();
     int len = src.length;
 
@@ -634,8 +631,7 @@ public class BinUtil {
     return _toHexString(src, limit, dumpLen, lastStartPos, lastBytes, lineBreakPos);
   }
 
-  private static String _toHexString(byte[] src, int limit, int dumpLen, int lastStartPos, int lastBytes,
-      int lineBreakPos) {
+  private static String _toHexString(byte[] src, int limit, int dumpLen, int lastStartPos, int lastBytes, int lineBreakPos) {
     StringBuilder sb = new StringBuilder();
     int len = src.length;
 

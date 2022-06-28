@@ -397,7 +397,7 @@ public class DateTime {
 
   /**
    * Returns a long standard time name of this TimeZone suitable for presentation
-   * to the user in the default locale.<br>
+   * to the user in the default locale.
    *
    * @return the name such as "Pacific Standard Time.", "日本標準時", etc.
    */
