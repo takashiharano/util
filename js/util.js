@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202205281440';
+util.v = '202206282121';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1644,8 +1644,8 @@ util.convertNewLine = function(s, nl) {
 };
 
 util.toHalfWidth = function(s) {
-  var h = s.replace(/　/g, ' ').replace(/”/g, '"').replace(/’/g, '\'').replace(/‘/g, '`').replace(/￥/g, '\\');
-  h = h.replace(/[！-～]/g, util.shift2half);
+  var h = s.replace(/\u3000/g, ' ').replace(/\u201D/g, '"').replace(/\u2019/g, '\'').replace(/\u2018/g, '`').replace(/\uFFE5/g, '\\');
+  h = h.replace(/[\uFF01-\uFF5E]/g, util.shift2half);
   return h;
 };
 util.shift2half = function(w) {
@@ -1653,7 +1653,7 @@ util.shift2half = function(w) {
 };
 
 util.toFullWidth = function(s) {
-  var f = s.replace(/ /g, '　').replace(/"/g, '”').replace(/'/g, '’').replace(/`/g, '‘').replace(/\\/g, '￥');
+  var f = s.replace(/ /g, '\u3000').replace(/"/g, '\u201D').replace(/'/g, '\u2019').replace(/`/g, '\u2018').replace(/\\/g, '\uFFE5');
   f = f.replace(/[!-~]/g, util.shift2full);
   return f;
 };
