@@ -54,6 +54,12 @@ public class FileUtil {
   public static final String DEFAULT_CHARSET = "UTF-8";
   public static String LINE_SEPARATOR = "\n";
 
+  public static final byte[] BOM_UTF8 = { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF };
+  public static final byte[] BOM_UTF16BE = { (byte) 0xFE, (byte) 0xFF };
+  public static final byte[] BOM_UTF16LE = { (byte) 0xFF, (byte) 0xFE };
+  public static final byte[] BOM_UTF32BE = { (byte) 0x00, (byte) 0x00, (byte) 0xFE, (byte) 0xFF };
+  public static final byte[] BOM_UTF32LE = { (byte) 0xFF, (byte) 0xFE, (byte) 0x00, (byte) 0x00 };
+
   /**
    * Append a line to text file.
    *
@@ -1111,7 +1117,7 @@ public class FileUtil {
    * @param path
    *          file path
    * @param content
-   *          the string content to write
+   *          the text content to write
    * @throws IOException
    *           If an I/O error occurs
    */
@@ -1125,7 +1131,7 @@ public class FileUtil {
    * @param path
    *          file path
    * @param content
-   *          the string content to write
+   *          the text content to write
    * @param charsetName
    *          charset name
    * @throws IOException
@@ -1142,7 +1148,7 @@ public class FileUtil {
    * @param file
    *          the file object
    * @param content
-   *          the string content to write
+   *          the text content to write
    * @throws IOException
    *           If an I/O error occurs
    */
@@ -1157,7 +1163,7 @@ public class FileUtil {
    * @param file
    *          the file object
    * @param content
-   *          the string content to write
+   *          the text content to write
    * @param charsetName
    *          charset name. e.g., "UTF-8", "Shift_JIS"
    * @throws IOException
@@ -1200,6 +1206,83 @@ public class FileUtil {
   public static void writeFromBase64(File file, String base64) throws IOException {
     byte[] content = Base64.getDecoder().decode(base64);
     write(file, content);
+  }
+
+  /**
+   * Write a text with BOM into a file.
+   *
+   * @param path
+   *          the file path
+   * @param content
+   *          the text content to write
+   * @throws IOException
+   *           If an I/O error occurs
+   */
+  public static void writeWithBom(String path, String content) throws IOException {
+    writeWithBom(path, content, DEFAULT_CHARSET);
+  }
+
+  /**
+   * Write a text with BOM into a file.
+   *
+   * @param path
+   *          the file path
+   * @param content
+   *          the text content to write
+   * @param charsetName
+   *          charset name (UTF-8 / UTF-16BE / UTF-16LE)
+   * @throws IOException
+   *           If an I/O error occurs
+   */
+  public static void writeWithBom(String path, String content, String charsetName) throws IOException {
+    File file = new File(path);
+    writeWithBom(file, content, charsetName);
+  }
+
+  /**
+   * Write a text with BOM into a file.
+   *
+   * @param file
+   *          the file object
+   * @param content
+   *          the text content to write
+   * @throws IOException
+   *           If an I/O error occurs
+   */
+  public static void writeWithBom(File file, String content) throws IOException {
+    writeWithBom(file, content, DEFAULT_CHARSET);
+  }
+
+  /**
+   * Write a text with BOM into a file.
+   *
+   * @param file
+   *          the file object
+   * @param content
+   *          the text content to write
+   * @param charsetName
+   *          charset name (UTF-8 / UTF-16BE / UTF-16LE)
+   * @throws IOException
+   *           If an I/O error occurs
+   */
+  public static void writeWithBom(File file, String content, String charsetName) throws IOException {
+    mkParentDir(file);
+    try (FileOutputStream fos = new FileOutputStream(file); BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos, charsetName))) {
+      byte[] bom = null;
+      if ("UTF-8".equals(charsetName)) {
+        bom = BOM_UTF8;
+      } else if ("UTF-16BE".equals(charsetName)) {
+        bom = BOM_UTF16BE;
+      } else if ("UTF-16LE".equals(charsetName)) {
+        bom = BOM_UTF16LE;
+      }
+      if (bom != null) {
+        fos.write(bom);
+      }
+      bw.write(content);
+    } catch (IOException e) {
+      throw e;
+    }
   }
 
 }
