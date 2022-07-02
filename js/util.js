@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202206282121';
+util.v = '202207022315';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1720,6 +1720,15 @@ util.getCodePoint = function(c, hex) {
   return p;
 };
 
+util.countLineBreak = function(s) {
+  return (s.match(/\n/g) || []).length;
+};
+util.clipTextLine = function(s, p) {
+  var n = s.indexOf('\n', p);
+  if (n > 0) s = s.substr(0, n);
+  return s.replace(/.*\n/g, '');
+};
+
 util.toBin = function(v, uc, d, pFix) {
   var bin = parseInt(v).toString(2);
   return util.formatBin(bin, uc, d, pFix);
@@ -3070,25 +3079,41 @@ util.updateTextAreaInfo = function(textarea) {
   var txt = textarea.value;
   var len = txt.length;
   var lenB = util.lenB(txt);
-  var lfCnt = (txt.match(/\n/g) || []).length;
+  var lfCnt = util.countLineBreak(txt);
   var lenWoLf = len - lfCnt;
+  var ln = (len == 0 ? 0 : lfCnt + 1);
   var st = textarea.selectionStart;
   var ed = textarea.selectionEnd;
   var sl = ed - st;
   var ch = util.divideChars(txt)[st] || '';
-  var cd = util.getCodePoint(ch);
-  var cd16 = util.getUnicodePoints(ch, true);
-  var cp = '';
-  if (cd) cp = (cd == 10 ? 'LF' : ch) + ':' + cd16 + '(' + cd + ')';
-  var slct = (sl ? 'Selected=' + sl : '');
+  var u10 = util.getCodePoint(ch);
+  var u16 = util.getUnicodePoints(ch, true);
+  var CTCH = {9: 'TAB', 10: 'LF', 11: 'ESC', 32: 'SP', '12288': 'emSP'};
+  if (u10) {
+    if (CTCH[u10]) {
+      ch = CTCH[u10];
+    }
+  } else {
+    ch = '&nbsp;';
+    u16 = 'U+----';
+  }
+  var cp = ch + '&nbsp;' + u16 + (u10 ? '(' + u10 + ')' : '');
+  var t = txt.substr(0, st);
+  var l = (t.match(/\n/g) || []).length + 1;
+  var c = t.replace(/.*\n/g, '').length + 1;
+  var cl = util.clipTextLine(txt, st).length;
+  var slT = txt.substring(st, ed);
+  var slL = util.countLineBreak(slT) + 1;
+  var slct = (sl ? ' SEL:' + ('LEN=' + sl + '/L=' + slL) : '');
   if (textarea.infoarea) {
-    textarea.infoarea.innerText = 'LEN=' + lenWoLf + ' (w/RET=' + len + ') ' + lenB + ' bytes ' + cp + ' ' + slct;
+    textarea.infoarea.innerHTML = l + ':' + c + ' ' + cp + ' LEN=' + len + ' (w/o LF=' + lenWoLf + ') ' + lenB + ' bytes L=' + ln + ' C=' + cl + slct;
   }
   var listener = textarea.listener;
   if (listener) {
     var data = {
-      codePoint: cd,
-      chr: ch,
+      cp10: u10,
+      cp16: u10,
+      ch: ch,
       len: len,
       lenB: lenB,
       start: st,
