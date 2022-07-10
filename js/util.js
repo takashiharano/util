@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202207022315';
+util.v = '202207102035';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3081,32 +3081,38 @@ util.updateTextAreaInfo = function(textarea) {
   var lenB = util.lenB(txt);
   var lfCnt = util.countLineBreak(txt);
   var lenWoLf = len - lfCnt;
-  var ln = (len == 0 ? 0 : lfCnt + 1);
+  var tl = (len == 0 ? 0 : lfCnt + 1);
   var st = textarea.selectionStart;
   var ed = textarea.selectionEnd;
   var sl = ed - st;
   var ch = util.divideChars(txt)[st] || '';
   var u10 = util.getCodePoint(ch);
   var u16 = util.getUnicodePoints(ch, true);
-  var CTCH = {9: 'TAB', 10: 'LF', 11: 'ESC', 32: 'SP', '12288': 'emSP'};
-  if (u10) {
+  var CTCH = {0: 'NUL', 9: 'TAB', 10: 'LF', 11: 'ESC', 32: 'SP', 127: 'DEL', 12288: 'emSP'};
+  if (u10 == undefined) {
+    ch = '[END]';
+    u16 = 'U+----';
+  } else {
     if (CTCH[u10]) {
       ch = CTCH[u10];
     }
-  } else {
-    ch = '&nbsp;';
-    u16 = 'U+----';
   }
-  var cp = ch + '&nbsp;' + u16 + (u10 ? '(' + u10 + ')' : '');
-  var t = txt.substr(0, st);
-  var l = (t.match(/\n/g) || []).length + 1;
-  var c = t.replace(/.*\n/g, '').length + 1;
-  var cl = util.clipTextLine(txt, st).length;
-  var slT = txt.substring(st, ed);
-  var slL = util.countLineBreak(slT) + 1;
-  var slct = (sl ? ' SEL:' + ('LEN=' + sl + '/L=' + slL) : '');
   if (textarea.infoarea) {
-    textarea.infoarea.innerHTML = l + ':' + c + ' ' + cp + ' LEN=' + len + ' (w/o LF=' + lenWoLf + ') ' + lenB + ' bytes L=' + ln + ' C=' + cl + slct;
+    var cp = ch + '&nbsp;' + u16 + (u10 ? '(' + u10 + ')' : '');
+    var t = txt.substr(0, st);
+    var l = (t.match(/\n/g) || []).length + 1;
+    var c = t.replace(/.*\n/g, '').length + 1;
+    var tc = util.clipTextLine(txt, st).length;
+    var slT = txt.substring(st, ed);
+    var slL = util.countLineBreak(slT) + 1;
+    var slct = (sl ? ' SEL:' + ('LEN=' + sl + '/L=' + slL) : '');
+    var s = cp;
+    s += ' ' + l + ':' + c + ' ';
+    s += ' C=' + tc + ' L=' + tl;
+    s += ' LEN=' + len;
+    s += ' (w/o LF=' + lenWoLf + ')';
+    s += ' bytes=' + lenB;
+    textarea.infoarea.innerHTML = s + slct;
   }
   var listener = textarea.listener;
   if (listener) {
