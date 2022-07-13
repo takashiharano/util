@@ -686,6 +686,96 @@ public class StrUtil {
   }
 
   /**
+   * Returns if the given string is alphabetic.
+   *
+   * @param s
+   *          the string
+   * @return true if the all characters are alphabetic
+   */
+  public static boolean isAlphabetic(String s) {
+    for (int i = 0; i < s.length(); i++) {
+      if (!isAlphabetic(s, i)) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  /**
+   * Returns if the specified character is alphabetic.
+   *
+   * @param s
+   *          the string
+   * @param p
+   *          position to check
+   * @return true if the character is alphabetic
+   */
+  public static boolean isAlphabetic(String s, int p) {
+    int cp = s.codePointAt(p);
+    return (((cp >= 0x41) && (cp <= 0x5A)) || ((cp >= 0x61) && (cp <= 0x7A)));
+  };
+
+  /**
+   * Returns if the given string is upper case.
+   *
+   * @param s
+   *          the string
+   * @return true if the all characters are upper case
+   */
+  public static boolean isUpperCase(String s) {
+    for (int i = 0; i < s.length(); i++) {
+      if (!isUpperCase(s, i)) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  /**
+   * Returns if the specified character is upper case.
+   *
+   * @param s
+   *          the string
+   * @param p
+   *          position to check
+   * @return true if the character is upper case
+   */
+  public static boolean isUpperCase(String s, int p) {
+    int cp = s.codePointAt(p);
+    return ((cp >= 0x41) && (cp <= 0x5A));
+  };
+
+  /**
+   * Returns if the given string is lower case.
+   *
+   * @param s
+   *          the string
+   * @return true if the all characters are lower case
+   */
+  public static boolean isLowerCase(String s) {
+    for (int i = 0; i < s.length(); i++) {
+      if (!isLowerCase(s, i)) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  /**
+   * Returns if the specified character is lower case.
+   *
+   * @param s
+   *          the string
+   * @param p
+   *          position to check
+   * @return true if the character is lower case
+   */
+  public static boolean isLowerCase(String s, int p) {
+    int cp = s.codePointAt(p);
+    return ((cp >= 0x61) && (cp <= 0x7A));
+  };
+
+  /**
    * Returns if the specified string contains non ASCII characters.
    *
    * @param s
@@ -1291,6 +1381,60 @@ public class StrUtil {
     String pd = repeat(pad, padLen);
     StringBuilder sb = new StringBuilder(str);
     sb.append(pd);
+    return sb.toString();
+  }
+
+  public static String rot13(String s) {
+    return rot13(s, 13);
+  }
+
+  /**
+   * Returns a letter replaced by ROT13.<br>
+   * <br>
+   * ROT13 (ROTate by 13 places) replaces each letter by its partner 13 characters
+   * further along the alphabet. For example, HELLO becomes URYYB (or, conversely,
+   * URYYB becomes HELLO again). <br>
+   * <br>
+   * ABCDEFGHIJKLM<br>
+   * NOPQRSTUVWXYZ<br>
+   * <br>
+   * HELLO<br>
+   * URYYB
+   *
+   * @param s
+   *          the source string
+   * @param n
+   *          number to shift
+   * @return the rotated string
+   */
+  public static String rot13(String s, int n) {
+    if (s == null) {
+      return null;
+    }
+    if ((n < -25) || (n > 25)) {
+      n = n % 26;
+    }
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < s.length(); i++) {
+      int cp = s.codePointAt(i);
+      if (isAlphabetic(s, i)) {
+        cp += n;
+        if (isUpperCase(s, i)) {
+          if (cp > 0x5A) {
+            cp = 0x40 + (cp - 0x5A);
+          } else if (cp < 0x41) {
+            cp = 0x5B - (0x41 - cp);
+          }
+        } else if (isLowerCase(s, i)) {
+          if (cp > 0x7A) {
+            cp = 0x60 + (cp - 0x7A);
+          } else if (cp < 0x61) {
+            cp = 0x7B - (0x61 - cp);
+          }
+        }
+      }
+      sb.append((char) cp);
+    }
     return sb.toString();
   }
 
