@@ -1506,6 +1506,42 @@ public class StrUtil {
   }
 
   /**
+   * Returns a letter replaced by ROT18.<br>
+   * <br>
+   * ROT18 is ROT13 + ROT5 (18 = 13 + 5). Also known as ROT13.5.
+   *
+   * @param s
+   *          the source string
+   * @return the rotated string
+   */
+  public static String rot18(String s) {
+    if (s == null) {
+      return null;
+    }
+    s = rot13(s);
+    s = rot5(s);
+    return s;
+  }
+
+  /**
+   * Returns a letter replaced by ROT18.
+   *
+   * @param s
+   *          the source string
+   * @param n
+   *          number to shift
+   * @return the rotated string
+   */
+  public static String rot18(String s, int n) {
+    if (s == null) {
+      return null;
+    }
+    s = rot13(s, n);
+    s = rot5(s, n);
+    return s;
+  }
+
+  /**
    * Returns a letter replaced by ROT47.<br>
    * <br>
    * ROT47 is a derivative of ROT13 which, in addition to scrambling the basic
