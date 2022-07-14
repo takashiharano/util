@@ -905,6 +905,20 @@ public class StrUtil {
   }
 
   /**
+   * Returns if the specified character is a number.
+   *
+   * @param s
+   *          the string
+   * @param p
+   *          position to check
+   * @return true if the character is a number
+   */
+  public static boolean isNumber(String s, int p) {
+    int cp = s.codePointAt(p);
+    return ((cp >= 0x30) && (cp <= 0x39));
+  };
+
+  /**
    * Returns if the given string represents true.<br>
    *
    * @param s
@@ -1381,6 +1395,52 @@ public class StrUtil {
     String pd = repeat(pad, padLen);
     StringBuilder sb = new StringBuilder(str);
     sb.append(pd);
+    return sb.toString();
+  }
+
+  /**
+   * Returns a letter replaced by ROT5.<br>
+   * <br>
+   * ROT5 is a practice similar to ROT13 that applies to numeric digits (0 to 9).
+   *
+   * @param s
+   *          the source string
+   * @return the rotated string
+   */
+  public static String rot5(String s) {
+    return rot5(s, 5);
+  }
+
+  /**
+   * Returns a letter replaced by ROT5.<br>
+   *
+   * @param s
+   *          the source string
+   * @param n
+   *          number to shift
+   * @return the rotated string
+   */
+  public static String rot5(String s, int n) {
+    if (s == null) {
+      return null;
+    }
+    if ((n < -9) || (n > 9)) {
+      n = n % 10;
+    }
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < s.length(); i++) {
+      int cp = s.codePointAt(i);
+      if (isNumber(s, i)) {
+        cp += n;
+        if (cp > 0x39) {
+          cp = 0x2F + (cp - 0x39);
+        } else if (cp < 0x30) {
+          cp = 0x3A - (0x30 - cp);
+        }
+
+      }
+      sb.append((char) cp);
+    }
     return sb.toString();
   }
 
