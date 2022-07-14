@@ -1384,10 +1384,6 @@ public class StrUtil {
     return sb.toString();
   }
 
-  public static String rot13(String s) {
-    return rot13(s, 13);
-  }
-
   /**
    * Returns a letter replaced by ROT13.<br>
    * <br>
@@ -1400,6 +1396,17 @@ public class StrUtil {
    * <br>
    * HELLO<br>
    * URYYB
+   *
+   * @param s
+   *          the source string
+   * @return the rotated string
+   */
+  public static String rot13(String s) {
+    return rot13(s, 13);
+  }
+
+  /**
+   * Returns a letter replaced by ROT13.<br>
    *
    * @param s
    *          the source string
@@ -1431,6 +1438,62 @@ public class StrUtil {
           } else if (cp < 0x61) {
             cp = 0x7B - (0x61 - cp);
           }
+        }
+      }
+      sb.append((char) cp);
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Returns a letter replaced by ROT47.<br>
+   * <br>
+   * ROT47 is a derivative of ROT13 which, in addition to scrambling the basic
+   * letters, treats numbers and common symbols. Instead of using the sequence A–Z
+   * as the alphabet, ROT47 uses a larger set of characters from the common
+   * character encoding known as ASCII. Specifically, the 7-bit printable
+   * characters, excluding space, from decimal 33 '!' through 126 '~', 94 in
+   * total.<br>
+   * <br>
+   * Example:<br>
+   * The Quick Brown Fox Jumps Over The Lazy Dog.<br>
+   * enciphers to<br>
+   * %96 "F:4< qC@H? u@I yF>AD ~G6C %96 {2KJ s@8]
+   *
+   * @param s
+   *          the source string
+   * @return the rotated string
+   */
+  public static String rot47(String s) {
+    return rot47(s, 47);
+  }
+
+  /**
+   * Returns a letter replaced by ROT47.<br>
+   *
+   * @param s
+   *          the source string
+   * @param n
+   *          number to shift
+   * @return the rotated string
+   */
+  public static String rot47(String s, int n) {
+    if (s == null) {
+      return null;
+    }
+    if ((n < -93) || (n > 93)) {
+      n = n % 94;
+    }
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < s.length(); i++) {
+      int cp = s.codePointAt(i);
+      if ((cp >= 0x21) && (cp <= 0x7E)) {
+        if (n < 0) {
+          cp += n;
+          if (cp < 0x21)
+            cp = 0x7F - (0x21 - cp);
+        } else {
+          cp = ((cp - 0x21 + n) % 94) + 0x21;
         }
       }
       sb.append((char) cp);
