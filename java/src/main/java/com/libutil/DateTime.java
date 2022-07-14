@@ -278,8 +278,8 @@ public class DateTime {
    * @param datetime
    *          DateTime object to compare
    * @return a long value indicating the result of the comparison, as follows:<br>
-   *         0, if the instance and the datetime are equal;<br>
    *         -1 if the instance is less than the datetime;<br>
+   *         0, if the instance and the datetime are equal;<br>
    *         1 value if the instance is greater than the datetime.
    */
   public long compareTo(DateTime datetime) {
