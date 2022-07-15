@@ -1,15 +1,15 @@
 package com.libutil.test.str;
 
-import com.libutil.StrBuilder;
+import com.libutil.TextBuffer;
 import com.libutil.test.Log;
 
-public class StrBuilder_substrTest {
+public class TextBuffer_substrTest {
 
   public static void main(String args[]) {
-    StrBuilder tb;
+    TextBuffer tb;
 
     Log.d("---");
-    tb = new StrBuilder();
+    tb = new TextBuffer();
     tb.append("0123456789");
     Log.d(tb.substr(0, 3));
     Log.d(tb.substr(0, 0));

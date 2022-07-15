@@ -24,9 +24,9 @@
 package com.libutil;
 
 /**
- * A mutable sequence of characters.
+ * A buffer for building text.
  */
-public class StrBuilder {
+public class TextBuffer {
 
   private StringBuilder buf;
   private String lineseparator = "\n";
@@ -35,7 +35,7 @@ public class StrBuilder {
    * Constructs a string builder with no characters in it and an initial capacity
    * of 16 characters.
    */
-  public StrBuilder() {
+  public TextBuffer() {
     this.buf = new StringBuilder();
   }
 
@@ -46,7 +46,7 @@ public class StrBuilder {
    * @param capacity
    *          the initial capacity
    */
-  public StrBuilder(int capacity) {
+  public TextBuffer(int capacity) {
     this.buf = new StringBuilder(capacity);
   }
 
@@ -59,7 +59,7 @@ public class StrBuilder {
    * @param lineseparator
    *          line separator
    */
-  public StrBuilder(int capacity, String lineseparator) {
+  public TextBuffer(int capacity, String lineseparator) {
     this.buf = new StringBuilder(capacity);
     this.lineseparator = lineseparator;
   }
@@ -71,7 +71,7 @@ public class StrBuilder {
    * @param str
    *          the initial contents of the buffer
    */
-  public StrBuilder(String str) {
+  public TextBuffer(String str) {
     this.buf = new StringBuilder(str);
   }
 
@@ -84,7 +84,7 @@ public class StrBuilder {
    * @param lineseparator
    *          line separator
    */
-  public StrBuilder(String str, String lineseparator) {
+  public TextBuffer(String str, String lineseparator) {
     this.buf = new StringBuilder(str);
     this.lineseparator = lineseparator;
   }
