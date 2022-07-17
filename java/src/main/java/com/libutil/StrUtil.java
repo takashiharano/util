@@ -1554,7 +1554,7 @@ public class StrUtil {
    * Example:<br>
    * The Quick Brown Fox Jumps Over The Lazy Dog.<br>
    * enciphers to<br>
-   * %96 "F:4< qC@H? u@I yF>AD ~G6C %96 {2KJ s@8]
+   * %96 "F:4&lt; qC@H? u@I yF&gt;AD ~G6C %96 {2KJ s@8]
    *
    * @param s
    *          the source string
