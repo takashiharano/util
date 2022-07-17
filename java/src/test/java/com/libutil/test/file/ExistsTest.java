@@ -7,8 +7,6 @@ public class ExistsTest {
 
   public static void main(String args[]) {
     test1();
-    Log.i("----------");
-    test2();
   }
 
   private static void test1() {
@@ -23,20 +21,6 @@ public class ExistsTest {
 
     path = null;
     Log.i(path + ": " + FileUtil.exists(path));
-  }
-
-  private static void test2() {
-    String path = "C:/test/200.txt";
-    Log.i(path + ": " + FileUtil.notExist(path));
-
-    path = "C:/test/404.txt";
-    Log.i(path + ": " + FileUtil.notExist(path));
-
-    path = "";
-    Log.i(path + ": " + FileUtil.notExist(path));
-
-    path = null;
-    Log.i(path + ": " + FileUtil.notExist(path));
   }
 
 }

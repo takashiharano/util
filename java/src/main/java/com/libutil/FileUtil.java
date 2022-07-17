@@ -830,23 +830,6 @@ public class FileUtil {
   }
 
   /**
-   * Tests whether the file or directory denoted by this abstract path name does
-   * not exist.
-   *
-   * @param path
-   *          the path of file or directory
-   * @return true if the file or directory denoted by this abstract pathname does
-   *         not exists or the path is null; false otherwise
-   */
-  public static boolean notExist(String path) {
-    if (path == null) {
-      return true;
-    }
-    File file = new File(path);
-    return !file.exists();
-  }
-
-  /**
    * Read a binary file.
    *
    * @param path
@@ -973,7 +956,7 @@ public class FileUtil {
    *         a read error.
    */
   public static String[] readTextAsArray(String path, String charsetName) {
-    if (notExist(path)) {
+    if (!exists(path)) {
       return null;
     }
     if (charsetName == null) {
