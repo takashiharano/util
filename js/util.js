@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202207140012';
+util.v = '202207171720';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1326,7 +1326,6 @@ util.isNumeric = function(s) {
   return (util.isInteger(s) || util.isFloat(s));
 };
 
-
 /**
  * 360 -> 0
  * 361 -> 1
@@ -1336,6 +1335,23 @@ util.roundAngle = function(v) {
   if (v < 0) v = 360 + (v % 360);
   if (v >= 360) v = v % 360;
   return v;
+};
+
+util.isNumber = function(ch) {
+  var c = ch.charCodeAt(0);
+  return ((c >= 0x30) && (c <= 0x39));
+};
+util.isAlphabet = function(ch) {
+  var c = ch.charCodeAt(0);
+  return (((c >= 0x41) && (c <= 0x5A)) || ((c >= 0x61) && (c <= 0x7A)));
+};
+util.isUpperCase = function(ch) {
+  var c = ch.charCodeAt(0);
+  return ((c >= 0x41) && (c <= 0x5A));
+};
+util.isLowerCase = function(ch) {
+  var c = ch.charCodeAt(0);
+  return ((c >= 0x61) && (c <= 0x7A));
 };
 
 //---------------------------------------------------------
@@ -6404,6 +6420,80 @@ util.getColoredBrowserName = function(n, dark) {
       if (b.name) s = util.getColoredBrowserName(b.name);
   }
   return s;
+};
+
+//---------------------------------------------------------
+// ROTx
+//---------------------------------------------------------
+util.rot5 = function(s, n) {
+  if (n == null) n = 5;
+  n |= 0;
+  if ((n < -9) || (n > 9)) n = n % 10;
+  var r = '';
+  for (var i = 0; i < s.length; i++) {
+    var c = s.charAt(i);
+    var cc = c.charCodeAt(0);
+    if (util.isNumber(c)) {
+      cc += n;
+      if (cc > 0x39) {
+        cc = 0x2F + (cc - 0x39);
+      } else if (cc < 0x30) {
+        cc = 0x3A - (0x30 - cc);
+      }
+    }
+    r += String.fromCharCode(cc);
+  }
+  return r;
+};
+util.rot13 = function(s, n) {
+  if (n == null) n = 13;
+  n |= 0;
+  if ((n < -25) || (n > 25)) n = n % 26;
+  var r = '';
+  for (var i = 0; i < s.length; i++) {
+    var c = s.charAt(i);
+    var cc = c.charCodeAt(0);
+    if (util.isAlphabet(c)) {
+      cc += n;
+      if (util.isUpperCase(c)) {
+        if (cc > 0x5A) {
+          cc = 0x40 + (cc - 0x5A);
+        } else if (cc < 0x41) {
+          cc = 0x5B - (0x41 - cc);
+        }
+      } else if (util.isLowerCase(c)) {
+        if (cc > 0x7A) {
+          cc = 0x60 + (cc - 0x7A);
+        } else if (cc < 0x61) {
+          cc = 0x7B - (0x61 - cc);
+        }
+      }
+    }
+    r += String.fromCharCode(cc);
+  }
+  return r;
+};
+util.rot18 = function(s, n) {
+  return util.rot5(util.rot13(s, n), n);
+};
+util.rot47 = function(s, n) {
+  if (n == null) n = 47;
+  n |= 0;
+  if ((n < -93) || (n > 93)) n = n % 94;
+  var r = '';
+  for (var i = 0; i < s.length; i++) {
+    var cc = s.charCodeAt(i);
+    if ((cc >= 0x21) && (cc <= 0x7E)) {
+      if (n < 0) {
+        cc += n;
+        if (cc < 0x21) cc = 0x7F - (0x21 - cc);
+      } else {
+        cc = ((cc - 0x21 + n) % 94) + 0x21;
+      }
+    }
+    r += String.fromCharCode(cc);
+  }
+  return r;
 };
 
 //---------------------------------------------------------
