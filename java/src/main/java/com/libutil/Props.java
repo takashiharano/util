@@ -355,7 +355,7 @@ public class Props {
    * @return A zero value, "false", "", null, are converted to false; any other
    *         value is converted to true. The value is case-insensitive.
    */
-  public boolean getBooleanValue(String key) {
+  public boolean isTrue(String key) {
     String v = getValue(key);
     if (v == null) {
       return false;
@@ -377,7 +377,7 @@ public class Props {
    * @return true if the value in this property list with the specified key value
    *         equals valueAsTrue.
    */
-  public boolean getBooleanValue(String key, String valueAsTrue) {
+  public boolean isTrue(String key, String valueAsTrue) {
     String value = getValue(key);
     return valueAsTrue.equals(value);
   }
@@ -392,7 +392,7 @@ public class Props {
    * @return true if the value in this property list with the specified key value
    *         equals one of valuesAsTrue.
    */
-  public boolean getBooleanValue(String key, String[] valuesAsTrue) {
+  public boolean isTrue(String key, String[] valuesAsTrue) {
     String value = getValue(key);
     for (int i = 0; i < valuesAsTrue.length; i++) {
       String v = valuesAsTrue[i];

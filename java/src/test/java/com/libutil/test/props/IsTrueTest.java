@@ -3,7 +3,7 @@ package com.libutil.test.props;
 import com.libutil.Props;
 import com.libutil.test.Log;
 
-public class GetBooleanValueTest {
+public class IsTrueTest {
 
   public static void main(String args[]) {
     Props props = new Props("C:/test/prop-bool.properties");
@@ -32,7 +32,7 @@ public class GetBooleanValueTest {
   public static void test1t(Props props) {
     for (int i = 1; i <= 8; i++) {
       String key = "key" + i + "t";
-      boolean value = props.getBooleanValue(key);
+      boolean value = props.isTrue(key);
       Log.i(key + "=" + value);
     }
   }
@@ -40,7 +40,7 @@ public class GetBooleanValueTest {
   public static void test1f(Props props) {
     for (int i = 1; i <= 8; i++) {
       String key = "key" + i + "f";
-      boolean value = props.getBooleanValue(key);
+      boolean value = props.isTrue(key);
       Log.i(key + "=" + value);
     }
   }
@@ -48,7 +48,7 @@ public class GetBooleanValueTest {
   public static void test2t(Props props) {
     for (int i = 1; i <= 8; i++) {
       String key = "key" + i + "t";
-      boolean value = props.getBooleanValue(key, "1");
+      boolean value = props.isTrue(key, "1");
       Log.i(key + "=" + value);
     }
   }
@@ -56,7 +56,7 @@ public class GetBooleanValueTest {
   public static void test2f(Props props) {
     for (int i = 1; i <= 8; i++) {
       String key = "key" + i + "f";
-      boolean value = props.getBooleanValue(key, "1");
+      boolean value = props.isTrue(key, "1");
       Log.i(key + "=" + value);
     }
   }
@@ -65,7 +65,7 @@ public class GetBooleanValueTest {
     String[] tvalues = { "true", "1" };
     for (int i = 1; i <= 8; i++) {
       String key = "key" + i + "t";
-      boolean value = props.getBooleanValue(key, tvalues);
+      boolean value = props.isTrue(key, tvalues);
       Log.i(key + "=" + value);
     }
   }
@@ -74,7 +74,7 @@ public class GetBooleanValueTest {
     String[] tvalues = { "true", "1" };
     for (int i = 1; i <= 8; i++) {
       String key = "key" + i + "f";
-      boolean value = props.getBooleanValue(key, tvalues);
+      boolean value = props.isTrue(key, tvalues);
       Log.i(key + "=" + value);
     }
   }
@@ -83,7 +83,7 @@ public class GetBooleanValueTest {
     String[] tvalues = { null, "", "false" };
     for (int i = 1; i <= 8; i++) {
       String key = "key" + i + "f";
-      boolean value = props.getBooleanValue(key, tvalues);
+      boolean value = props.isTrue(key, tvalues);
       Log.i(key + "=" + value);
     }
   }
