@@ -411,24 +411,6 @@ public class Props {
   }
 
   /**
-   * Returns all properties as a key = value pair.
-   *
-   * @return properties
-   */
-  public String getAllProperties() {
-    StringBuilder sb = new StringBuilder();
-    for (Entry<String, String> entry : properties.entrySet()) {
-      String key = entry.getKey();
-      String value = entry.getValue();
-      sb.append(key);
-      sb.append("=");
-      sb.append(value);
-      sb.append(LINE_SEPARATOR);
-    }
-    return sb.toString();
-  }
-
-  /**
    * Returns the keys of the properties.
    *
    * @return keys
@@ -521,22 +503,43 @@ public class Props {
   }
 
   /**
-   * Removes the value for the key from this map if present.
-   *
-   * @param key
-   *          the key to remove
-   */
-  public void removeValue(String key) {
-    properties.remove(key);
-  }
-
-  /**
    * Returns the number of keys in this hash table.
    *
    * @return the number of keys in this hash table
    */
   public int size() {
     return properties.size();
+  }
+
+  /**
+   * Removes the value for the key from this map if present.
+   *
+   * @param key
+   *          the key to remove
+   * @return the previous value associated with key, or null if there was no
+   *         mapping for key. (A null return can also indicate that the map
+   *         previously associated null with key.)
+   */
+  public String removeValue(String key) {
+    return properties.remove(key);
+  }
+
+  /**
+   * Returns all properties as a string like key=value pair.
+   *
+   * @return properties
+   */
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    for (Entry<String, String> entry : properties.entrySet()) {
+      String key = entry.getKey();
+      String value = entry.getValue();
+      sb.append(key);
+      sb.append("=");
+      sb.append(value);
+      sb.append(LINE_SEPARATOR);
+    }
+    return sb.toString();
   }
 
 }

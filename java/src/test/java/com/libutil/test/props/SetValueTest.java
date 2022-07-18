@@ -20,14 +20,14 @@ public class SetValueTest {
   private void test() {
     Props props = new Props();
     props.setValue("key1", "ABC");
-    String values = props.getAllProperties();
+    String values = props.toString();
     Log.i(values);
   }
 
   private void test1() {
     Props props = new Props("C:/test/prop1.properties");
     props.setValue("keyA", "AAA");
-    String values = props.getAllProperties();
+    String values = props.toString();
     Log.i(values);
   }
 
@@ -35,7 +35,7 @@ public class SetValueTest {
     int v = 1;
     Props props = new Props("C:/test/prop1.properties");
     props.setValue("keyInt", v);
-    String values = props.getAllProperties();
+    String values = props.toString();
     Log.i(values);
   }
 
@@ -43,7 +43,7 @@ public class SetValueTest {
     long v = 1;
     Props props = new Props("C:/test/prop1.properties");
     props.setValue("keyLong", v);
-    String values = props.getAllProperties();
+    String values = props.toString();
     Log.i(values);
   }
 
@@ -51,7 +51,7 @@ public class SetValueTest {
     float v = 1.5f;
     Props props = new Props("C:/test/prop1.properties");
     props.setValue("keyFloat", v);
-    String values = props.getAllProperties();
+    String values = props.toString();
     Log.i(values);
   }
 
@@ -59,7 +59,7 @@ public class SetValueTest {
     double v = 1.5;
     Props props = new Props("C:/test/prop1.properties");
     props.setValue("keyDouble", v);
-    String values = props.getAllProperties();
+    String values = props.toString();
     Log.i(values);
   }
 
@@ -67,7 +67,7 @@ public class SetValueTest {
     boolean v = true;
     Props props = new Props("C:/test/prop1.properties");
     props.setValue("keyBoolean", v);
-    String values = props.getAllProperties();
+    String values = props.toString();
     Log.i(values);
   }
 
@@ -75,7 +75,7 @@ public class SetValueTest {
     String v = null;
     Props props = new Props("C:/test/prop1.properties");
     props.setValue("keyNull", v);
-    String values = props.getAllProperties();
+    String values = props.toString();
     Log.i(values);
   }
 

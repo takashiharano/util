@@ -13,15 +13,16 @@ public class RemoveValueTest {
   private void test1() {
     Props props = new Props("C:/test/prop.properties");
     props.removeValue("key1");
-    String values = props.getAllProperties();
+    String values = props.toString();
     Log.i(values);
   }
 
   private void test2() {
     Props props = new Props("C:/test/prop.properties");
-    props.removeValue("xxxx");
-    String values = props.getAllProperties();
+    String removed = props.removeValue("xxxx");
+    String values = props.toString();
     Log.i(values);
+    Log.i("removed=" + removed);
   }
 
 }
