@@ -94,9 +94,11 @@ public class TextBuffer {
    *
    * @param b
    *          a boolean
+   * @return a reference to this object.
    */
-  public void append(boolean b) {
+  public TextBuffer append(boolean b) {
     buf.append(b);
+    return this;
   }
 
   /**
@@ -104,9 +106,11 @@ public class TextBuffer {
    *
    * @param c
    *          a char
+   * @return a reference to this object.
    */
-  public void append(char c) {
+  public TextBuffer append(char c) {
     buf.append(c);
+    return this;
   }
 
   /**
@@ -115,9 +119,11 @@ public class TextBuffer {
    *
    * @param str
    *          the characters to be appended.
+   * @return a reference to this object.
    */
-  public void append(char[] str) {
+  public TextBuffer append(char[] str) {
     buf.append(str);
+    return this;
   }
 
   /**
@@ -125,9 +131,11 @@ public class TextBuffer {
    *
    * @param d
    *          a double
+   * @return a reference to this object.
    */
-  public void append(double d) {
+  public TextBuffer append(double d) {
     buf.append(d);
+    return this;
   }
 
   /**
@@ -135,9 +143,11 @@ public class TextBuffer {
    *
    * @param f
    *          a float
+   * @return a reference to this object.
    */
-  public void append(float f) {
+  public TextBuffer append(float f) {
     buf.append(f);
+    return this;
   }
 
   /**
@@ -145,9 +155,11 @@ public class TextBuffer {
    *
    * @param i
    *          an int
+   * @return a reference to this object.
    */
-  public void append(int i) {
+  public TextBuffer append(int i) {
     buf.append(i);
+    return this;
   }
 
   /**
@@ -155,9 +167,11 @@ public class TextBuffer {
    *
    * @param lng
    *          a long
+   * @return a reference to this object.
    */
-  public void append(long lng) {
+  public TextBuffer append(long lng) {
     buf.append(lng);
+    return this;
   }
 
   /**
@@ -168,9 +182,11 @@ public class TextBuffer {
    *
    * @param obj
    *          an Object
+   * @return a reference to this object.
    */
-  public void append(Object obj) {
+  public TextBuffer append(Object obj) {
     buf.append(obj);
+    return this;
   }
 
   /**
@@ -178,26 +194,21 @@ public class TextBuffer {
    *
    * @param str
    *          a string
+   * @return a reference to this object.
    */
-  public void append(String str) {
+  public TextBuffer append(String str) {
     buf.append(str);
-  }
-
-  /**
-   * Appends the specified StringBuffer to this sequence.
-   *
-   * @param sb
-   *          the StringBuffer to append
-   */
-  public void append(StringBuilder sb) {
-    buf.append(sb);
+    return this;
   }
 
   /**
    * Appends a line separator to the sequence.
+   * 
+   * @return a reference to this object.
    */
-  public void appendln() {
+  public TextBuffer appendln() {
     buf.append(lineseparator);
+    return this;
   }
 
   /**
@@ -206,10 +217,12 @@ public class TextBuffer {
    *
    * @param b
    *          a boolean
+   * @return a reference to this object.
    */
-  public void appendln(boolean b) {
+  public TextBuffer appendln(boolean b) {
     buf.append(b);
     buf.append(lineseparator);
+    return this;
   }
 
   /**
@@ -218,10 +231,12 @@ public class TextBuffer {
    *
    * @param c
    *          a char
+   * @return a reference to this object.
    */
-  public void appendln(char c) {
+  public TextBuffer appendln(char c) {
     buf.append(c);
     buf.append(lineseparator);
+    return this;
   }
 
   /**
@@ -230,10 +245,12 @@ public class TextBuffer {
    *
    * @param str
    *          the characters to be appended
+   * @return a reference to this object.
    */
-  public void appendln(char[] str) {
+  public TextBuffer appendln(char[] str) {
     buf.append(str);
     buf.append(lineseparator);
+    return this;
   }
 
   /**
@@ -242,10 +259,12 @@ public class TextBuffer {
    *
    * @param d
    *          a double
+   * @return a reference to this object.
    */
-  public void appendln(double d) {
+  public TextBuffer appendln(double d) {
     buf.append(d);
     buf.append(lineseparator);
+    return this;
   }
 
   /**
@@ -254,10 +273,12 @@ public class TextBuffer {
    *
    * @param f
    *          a float
+   * @return a reference to this object.
    */
-  public void appendln(float f) {
+  public TextBuffer appendln(float f) {
     buf.append(f);
     buf.append(lineseparator);
+    return this;
   }
 
   /**
@@ -266,10 +287,12 @@ public class TextBuffer {
    *
    * @param lng
    *          a long
+   * @return a reference to this object.
    */
-  public void appendln(long lng) {
+  public TextBuffer appendln(long lng) {
     buf.append(lng);
     buf.append(lineseparator);
+    return this;
   }
 
   /**
@@ -277,10 +300,12 @@ public class TextBuffer {
    *
    * @param obj
    *          an Object
+   * @return a reference to this object.
    */
-  public void appendln(Object obj) {
+  public TextBuffer appendln(Object obj) {
     buf.append(obj);
     buf.append(lineseparator);
+    return this;
   }
 
   /**
@@ -288,21 +313,12 @@ public class TextBuffer {
    *
    * @param str
    *          a string
+   * @return a reference to this object.
    */
-  public void appendln(String str) {
+  public TextBuffer appendln(String str) {
     buf.append(str);
     buf.append(lineseparator);
-  }
-
-  /**
-   * Appends the specified StringBuffer and line separator to this sequence.
-   *
-   * @param sb
-   *          the StringBuffer to append
-   */
-  public void appendln(StringBuilder sb) {
-    buf.append(sb);
-    buf.append(lineseparator);
+    return this;
   }
 
   /**
@@ -325,11 +341,13 @@ public class TextBuffer {
    *          The beginning index, inclusive
    * @param end
    *          The ending index, exclusive
+   * @return a reference to this object.
    * @throws StringIndexOutOfBoundsException
    *           if start is negative, greater than length(), or greater than end.
    */
-  public void delete(int start, int end) {
+  public TextBuffer delete(int start, int end) {
     buf.delete(start, end);
+    return this;
   }
 
   /**
@@ -422,9 +440,12 @@ public class TextBuffer {
 
   /**
    * Appends a line feed to this sequence.
+   *
+   * @return a reference to this object.
    */
-  public void newLine() {
+  public TextBuffer newLine() {
     buf.append(lineseparator);
+    return this;
   }
 
   /**
