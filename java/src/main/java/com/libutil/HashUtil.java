@@ -35,58 +35,85 @@ import javax.xml.bind.DatatypeConverter;
 public class HashUtil {
 
   public static String md5(byte[] input) {
-    return getHash(input, "MD5");
+    return getHashString(input, "MD5");
   }
 
   public static String md5(String input) {
-    return getHash(input, "MD5");
+    return getHashString(input, "MD5");
   }
 
   public static String sha1(byte[] input) {
-    return getHash(input, "SHA-1");
+    return getHashString(input, "SHA-1");
   }
 
   public static String sha1(String input) {
-    return getHash(input, "SHA-1");
+    return getHashString(input, "SHA-1");
   }
 
   public static String sha256(byte[] input) {
-    return getHash(input, "SHA-256");
+    return getHashString(input, "SHA-256");
   }
 
   public static String sha256(String input) {
-    return getHash(input, "SHA-256");
+    return getHashString(input, "SHA-256");
   }
 
   public static String sha512(byte[] input) {
-    return getHash(input, "SHA-512");
+    return getHashString(input, "SHA-512");
   }
 
   public static String sha512(String input) {
-    return getHash(input, "SHA-512");
+    return getHashString(input, "SHA-512");
   }
 
-  public static String getHash(String input, String algorithm) {
+  /**
+   * Returns hash string.
+   *
+   * @param input
+   *          the string for hash
+   * @param algorithm
+   *          the name of the algorithm.<br>
+   *          (MD5 / SHA-1 / SHA-256 / SHA-512)
+   * @return the hash string
+   */
+  public static String getHashString(String input, String algorithm) {
     byte[] b = input.getBytes(StandardCharsets.UTF_8);
-    String hash = getHash(b, algorithm);
+    String hash = getHashString(b, algorithm);
     return hash;
   }
 
   /**
-   * Returns hash value.
+   * Returns hash string.
    *
    * @param input
    *          input byte array
    * @param algorithm
-   *          hash algorithm (MD5 / SHA-1 / SHA-256 / SHA-512)
-   * @return hash value
+   *          the name of the algorithm.<br>
+   *          (MD5 / SHA-1 / SHA-256 / SHA-512)
+   * @return the hash string
    */
-  public static String getHash(byte[] input, String algorithm) {
-    String hash = null;
+  public static String getHashString(byte[] input, String algorithm) {
+    byte[] b = getHash(input, algorithm);
+    String h = DatatypeConverter.printHexBinary(b);
+    String hash = h.toLowerCase();
+    return hash;
+  }
+
+  /**
+   * Returns the hash value.
+   *
+   * @param input
+   *          input byte array
+   * @param algorithm
+   *          the name of the algorithm.<br>
+   *          (MD5 / SHA-1 / SHA-256 / SHA-512)
+   * @return the array of bytes for the resulting hash value
+   */
+  public static byte[] getHash(byte[] input, String algorithm) {
+    byte[] hash = null;
     try {
       MessageDigest md = MessageDigest.getInstance(algorithm);
-      byte[] b = md.digest(input);
-      hash = DatatypeConverter.printHexBinary(b).toLowerCase();
+      hash = md.digest(input);
     } catch (NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
     }
