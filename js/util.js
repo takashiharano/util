@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202207220000';
+util.v = '202208060205';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1655,7 +1655,7 @@ util.split = function(v, s, l) {
 };
 
 util.convertNewLine = function(s, nl) {
-  return s.replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/\n/g, nl);
+  return s.replace(/\r\n|\r/g, '\n').replace(/\n/g, nl);
 };
 
 util.toHalfWidth = function(s) {

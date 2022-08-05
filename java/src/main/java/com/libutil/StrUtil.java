@@ -92,13 +92,14 @@ public class StrUtil {
    * Convert newline control character.
    *
    * @param src
-   *          the source string
+   *          The source string
    * @param newLine
-   *          new line code
-   * @return the converted string
+   *          New line code.<br>
+   *          Special characters in regular expressions must be escaped.
+   * @return The converted string
    */
   public static String convertNewLine(String src, String newLine) {
-    return src.replaceAll("\r\n", "\n").replaceAll("\r", "\n").replaceAll("\n", newLine);
+    return src.replaceAll("\r\n|\r", "\n").replaceAll("\n", newLine);
   }
 
   /**
@@ -107,7 +108,7 @@ public class StrUtil {
    * @param target
    *          the target string
    * @param regex
-   *          the regext
+   *          the regex
    * @return matched count
    */
   public static int countMatcher(String target, String regex) {
@@ -1273,7 +1274,7 @@ public class StrUtil {
    * @return the replaced string
    */
   public static String removeSpaceNewline(String str) {
-    return str.replaceAll("\\s", "").replaceAll("\\r\\n", "\\n").replaceAll("\\r", "\\n").replaceAll("\\n", "");
+    return str.replaceAll("\\s", "").replaceAll("\\r\\n|\\r|\\n", "");
   }
 
   /**
