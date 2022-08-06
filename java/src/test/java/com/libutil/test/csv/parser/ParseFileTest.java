@@ -12,12 +12,12 @@ public class ParseFileTest {
   }
 
   public void test1() {
-    String csvText = FileUtil.readText("C:/test/csvtest1.tsv");
+    String csvText = FileUtil.readText("C:/test/csvtest1.csv");
     test(csvText);
   }
 
   public void test(String s) {
-    CsvParser parser = new CsvParser("\t");
+    CsvParser parser = new CsvParser();
     Log.i("src=" + CsvTestCommon.replaceSpecialChar(s));
     try {
       String[][] a = parser.parse(s);

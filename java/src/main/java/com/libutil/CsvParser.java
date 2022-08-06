@@ -116,11 +116,7 @@ public class CsvParser {
         }
       } else {
         if (enveloped == -1) {
-          if (quotCount % 2 == 0) {
-            enveloped = 0;
-          } else {
-            enveloped = 1;
-          }
+          enveloped = (quotCount % 2 == 0) ? 0 : 1;
         }
       }
     }
@@ -152,13 +148,14 @@ public class CsvParser {
   }
 
   /**
-   * Parses a line of CSV text and returns an array of elements.
+   * Parses one record of the CSV text and returns an array of the elements.<br>
+   * Generally, a record is one row of data.
    *
-   * @param line
-   *          a line of CSV
+   * @param csvText
+   *          one row of the CSV
    * @return The list of elements
    */
-  public String[] parseLine(String csvText) {
+  public String[] parseOneRecord(String csvText) {
     csvText = csvText.replaceAll("\r\n|\r", "\n");
 
     List<String> cols = new ArrayList<>();
@@ -189,11 +186,7 @@ public class CsvParser {
         }
       } else {
         if (enveloped == -1) {
-          if (quotCount % 2 == 0) {
-            enveloped = 0;
-          } else {
-            enveloped = 1;
-          }
+          enveloped = (quotCount % 2 == 0) ? 0 : 1;
         }
       }
     }

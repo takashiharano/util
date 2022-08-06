@@ -3,10 +3,10 @@ package com.libutil.test.csv.parser;
 import com.libutil.CsvParser;
 import com.libutil.test.Log;
 
-public class ParseLineWithQuoteTest {
+public class ParseOneRecordWithQuoteTest {
 
   public static void main(String args[]) {
-    ParseLineWithQuoteTest tester = new ParseLineWithQuoteTest();
+    ParseOneRecordWithQuoteTest tester = new ParseOneRecordWithQuoteTest();
     tester.test1();
   }
 
@@ -37,8 +37,12 @@ public class ParseLineWithQuoteTest {
     test("'',''", "[][]");
     test("'','',''", "[][][]");
 
-    test("abc\n", "[abc]");
-    test("abc\n\n", "[abc]");
+    test("''''''", "['']");
+    test("'''''',''''''", "['']['']");
+    test("'''''','''''',''''''", "['']['']['']");
+
+    test("abc\n", "[abc[LF]]");
+    test("abc\n\n", "[abc[LF][LF]]");
   }
 
   public void test(String s, String expected) {
@@ -46,7 +50,7 @@ public class ParseLineWithQuoteTest {
     parser.setQuotation("'");
     String[] a = null;
     try {
-      a = parser.parseLine(s);
+      a = parser.parseOneRecord(s);
     } catch (Exception e) {
       e.printStackTrace();
     }

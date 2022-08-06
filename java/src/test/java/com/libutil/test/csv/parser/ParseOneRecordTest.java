@@ -3,10 +3,10 @@ package com.libutil.test.csv.parser;
 import com.libutil.CsvParser;
 import com.libutil.test.Log;
 
-public class ParseLineTest {
+public class ParseOneRecordTest {
 
   public static void main(String args[]) {
-    ParseLineTest tester = new ParseLineTest();
+    ParseOneRecordTest tester = new ParseOneRecordTest();
     tester.test1();
   }
 
@@ -48,7 +48,7 @@ public class ParseLineTest {
     CsvParser parser = new CsvParser();
     String[] a = null;
     try {
-      a = parser.parseLine(s);
+      a = parser.parseOneRecord(s);
     } catch (Exception e) {
       e.printStackTrace();
     }
