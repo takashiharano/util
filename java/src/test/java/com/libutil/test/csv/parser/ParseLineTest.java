@@ -24,9 +24,9 @@ public class ParseLineTest {
     test("abc,\"\"123\"\",xyz", "[abc][\"123\"][xyz]"); // [abc]["123"][xyz]
     test("abc,\"\"123\"\",x\"yz", "[abc][\"123\"][x\"yz]"); // [abc]["123"][x"yz]
     test("abc,\"\"123\"\",x\"y\"z", "[abc][\"123\"][x\"y\"z]"); // [abc]["123"][x"y"z]
-    test("abc,\"\"123\"\",\"xyz,999", "[abc][\"123\"][\"xyz,999]"); // [abc]["123"]["xyz,999]
+    test("abc,\"\"123\"\",\"xyz,999", "[abc][\"123\"][xyz,999]"); // [abc]["123"][xyz,999]
 
-    test("abc,\"\"123\"\",\"x,\"yz,999", "[abc][\"123\"][\"x,\"yz,999]"); // [abc]["123"]["x,"yz,999]
+    test("abc,\"\"123\"\",\"x,\"yz,999", "[abc][\"123\"][\"x,\"yz][999]"); // [abc]["123"]["x,"yz][999]
 
     test("", "[]");
     test(",", "[][]");
@@ -36,8 +36,12 @@ public class ParseLineTest {
     test("\"\",\"\"", "[][]");
     test("\"\",\"\",\"\"", "[][][]");
 
-    test("abc\n", "[abc]");
-    test("abc\n\n", "[abc]");
+    test("\"\"\"\"\"", "[\"\"]");
+    test("\"\"\"\"\"\",\"\"\"\"\"\"", "[\"\"][\"\"]");
+    test("\"\"\"\"\"\",\"\"\"\"\"\",\"\"\"\"\"\"", "[\"\"][\"\"][\"\"]");
+
+    test("abc\n", "[abc[LF]]");
+    test("abc\n\n", "[abc[LF][LF]]");
   }
 
   public void test(String s, String expected) {

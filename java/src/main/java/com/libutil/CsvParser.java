@@ -37,11 +37,9 @@ public class CsvParser {
 
   private static final String DEFAULT_SEPARATOR = ",";
   private static final String DEFAULT_QUOTATION = "\"";
-  private static final String DEFAULT_ESCAPE = "\"";
 
   private String separator;
   private String quotation;
-  private String escapeChar;
 
   private String escapedQuotation;
   private String quotedEmpty;
@@ -60,11 +58,20 @@ public class CsvParser {
    *          the character that the parser will treat as the separator
    */
   public CsvParser(String separator) {
+    this(separator, DEFAULT_QUOTATION);
+  }
+
+  /**
+   * Constructs a CSV parser with the specified separator and quotation.
+   *
+   * @param separator
+   *          the character that the parser will treat as the separator
+   * @param quotation
+   *          the character for quote
+   */
+  public CsvParser(String separator, String quotation) {
     this.separator = separator;
-    this.quotation = DEFAULT_QUOTATION;
-    this.escapeChar = DEFAULT_ESCAPE;
-    this.escapedQuotation = escapeChar + quotation;
-    this.quotedEmpty = quotation + quotation;
+    setQuotation(quotation);
   }
 
   /**
@@ -75,65 +82,60 @@ public class CsvParser {
    * @return The list of elements. [ROW][COL]
    */
   public String[][] parse(String csvText) {
+    csvText = csvText.replaceAll("\r\n|\r", "\n");
     List<List<String>> rows = new ArrayList<>();
     List<String> cols = new ArrayList<>();
-    boolean inBlock = false;
-    boolean shouldRemoveQuot = false;
+    int enveloped = 0;
+    int quotCount = 0;
     int colBeginIndex = 0;
     int len = csvText.length();
     int i;
     for (i = 0; i < len; i++) {
       String c = String.valueOf(csvText.charAt(i));
       if (c.equals(quotation)) {
+        quotCount++;
         if (colBeginIndex == i) {
-          inBlock = true;
-        } else if (isEndOfBlock(csvText, colBeginIndex, i, separator)) {
-          if (inBlock) {
-            shouldRemoveQuot = true;
-          }
-          inBlock = false;
+          enveloped = -1;
         }
-      } else if (separator.equals(c)) {
-        if (!inBlock) {
-          colBeginIndex = storeColumn(cols, csvText, colBeginIndex, i, shouldRemoveQuot);
-          shouldRemoveQuot = false;
-        }
-      } else if ("\r".equals(c)) {
-        if (!inBlock) {
-          boolean f = true;
-          int j = i + 1;
-          if (j < len) {
-            String c1 = String.valueOf(csvText.charAt(j));
-            if ("\n".equals(c1)) {
-              // CRLF
-              colBeginIndex = storeColumn(cols, csvText, colBeginIndex, i, shouldRemoveQuot);
-              shouldRemoveQuot = false;
-              storeRow(rows, cols);
-              cols = new ArrayList<>();
-              f = false;
-              colBeginIndex++;
-              i++;
-            }
+      } else if (separator.equals(c) || "\n".equals(c)) {
+        if (enveloped == 1) {
+          if (!isQuotedPropery(csvText, len, i, quotCount)) {
+            enveloped = 0;
           }
-          if (f) {
-            // CR
-            colBeginIndex = storeColumn(cols, csvText, colBeginIndex, i, shouldRemoveQuot);
-            shouldRemoveQuot = false;
+        }
+        if ((enveloped == 0) || (enveloped != 0) && (quotCount % 2 == 0)) {
+          String val = getColumnValue(csvText, colBeginIndex, i, enveloped);
+          cols.add(val);
+          colBeginIndex = i + 1;
+          enveloped = 0;
+          quotCount = 0;
+          if ("\n".equals(c)) {
             storeRow(rows, cols);
             cols = new ArrayList<>();
           }
         }
-      } else if ("\n".equals(c)) {
-        if (!inBlock) {
-          // LF
-          colBeginIndex = storeColumn(cols, csvText, colBeginIndex, i, shouldRemoveQuot);
-          shouldRemoveQuot = false;
-          storeRow(rows, cols);
-          cols = new ArrayList<>();
+      } else {
+        if (enveloped == -1) {
+          if (quotCount % 2 == 0) {
+            enveloped = 0;
+          } else {
+            enveloped = 1;
+          }
         }
       }
     }
-    colBeginIndex = storeColumn(cols, csvText, colBeginIndex, i, shouldRemoveQuot);
+
+    int lastIndex = i - 1;
+    if (lastIndex > 0) {
+      String lastCh = String.valueOf(csvText.charAt(lastIndex));
+      if ((enveloped != 0) && !quotation.equals(lastCh)) {
+        enveloped = 0;
+        colBeginIndex++;
+      }
+    }
+
+    String val = getColumnValue(csvText, colBeginIndex, i, enveloped);
+    cols.add(val);
     if ((!((cols.size() == 1) && "".equals(cols.get(0)))) || (isLastLineEmpty(csvText))) {
       storeRow(rows, cols);
     }
@@ -156,66 +158,62 @@ public class CsvParser {
    *          a line of CSV
    * @return The list of elements
    */
-  public String[] parseLine(String line) {
-    String[] arrCols;
+  public String[] parseLine(String csvText) {
+    csvText = csvText.replaceAll("\r\n|\r", "\n");
+
     List<String> cols = new ArrayList<>();
-    boolean inBlock = false;
-    boolean shouldRemoveQuot = false;
+    int enveloped = 0;
+    int quotCount = 0;
     int colBeginIndex = 0;
-    int len = line.length();
+    int len = csvText.length();
     int i;
     for (i = 0; i < len; i++) {
-      String c = String.valueOf(line.charAt(i));
+      String c = String.valueOf(csvText.charAt(i));
       if (c.equals(quotation)) {
+        quotCount++;
         if (colBeginIndex == i) {
-          inBlock = true;
-        } else if (isEndOfBlock(line, colBeginIndex, i, separator)) {
-          if (inBlock) {
-            shouldRemoveQuot = true;
-          }
-          inBlock = false;
+          enveloped = -1;
         }
       } else if (separator.equals(c)) {
-        if (!inBlock) {
-          colBeginIndex = storeColumn(cols, line, colBeginIndex, i, shouldRemoveQuot);
-          shouldRemoveQuot = false;
-        }
-      } else if ("\r".equals(c)) {
-        if (!inBlock) {
-          boolean f = true;
-          int j = i + 1;
-          if (j < len) {
-            String c1 = String.valueOf(line.charAt(j));
-            if ("\n".equals(c1)) {
-              // CRLF
-              colBeginIndex = storeColumn(cols, line, colBeginIndex, i, shouldRemoveQuot);
-              arrCols = new String[cols.size()];
-              cols.toArray(arrCols);
-              return arrCols;
-            }
-          }
-          if (f) {
-            // CR
-            colBeginIndex = storeColumn(cols, line, colBeginIndex, i, shouldRemoveQuot);
-            arrCols = new String[cols.size()];
-            cols.toArray(arrCols);
-            return arrCols;
+        if (enveloped == 1) {
+          if (!isQuotedPropery(csvText, len, i, quotCount)) {
+            enveloped = 0;
           }
         }
-      } else if ("\n".equals(c)) {
-        if (!inBlock) {
-          // LF
-          colBeginIndex = storeColumn(cols, line, colBeginIndex, i, shouldRemoveQuot);
-          arrCols = new String[cols.size()];
-          cols.toArray(arrCols);
-          return arrCols;
+        if ((enveloped == 0) || (enveloped != 0) && (quotCount % 2 == 0)) {
+          String val = getColumnValue(csvText, colBeginIndex, i, enveloped);
+          cols.add(val);
+          colBeginIndex = i + 1;
+          enveloped = 0;
+          quotCount = 0;
+        }
+      } else {
+        if (enveloped == -1) {
+          if (quotCount % 2 == 0) {
+            enveloped = 0;
+          } else {
+            enveloped = 1;
+          }
         }
       }
     }
-    colBeginIndex = storeColumn(cols, line, colBeginIndex, i, shouldRemoveQuot);
-    arrCols = new String[cols.size()];
-    cols.toArray(arrCols);
-    return arrCols;
+
+    int lastIndex = i - 1;
+    if (lastIndex > 0) {
+      String lastCh = String.valueOf(csvText.charAt(lastIndex));
+      if ((enveloped != 0) && !quotation.equals(lastCh)) {
+        enveloped = 0;
+        colBeginIndex++;
+      }
+    }
+
+    String val = getColumnValue(csvText, colBeginIndex, i, enveloped);
+    cols.add(val);
+
+    String[] fields = new String[cols.size()];
+    cols.toArray(fields);
+
+    return fields;
   }
 
   /**
@@ -254,84 +252,25 @@ public class CsvParser {
    */
   public void setQuotation(String quotation) {
     this.quotation = quotation;
-    this.escapedQuotation = escapeChar + quotation;
+    this.escapedQuotation = quotation + quotation;
     this.quotedEmpty = quotation + quotation;
   }
 
-  /**
-   * Returns the character that the parser will treat as the escape.
-   *
-   * @return the escape character
-   */
-  public String getEscapeChar() {
-    return escapeChar;
-  }
-
-  /**
-   * Sets the character that the parser will treat as the escape.
-   *
-   * @param escapeChar
-   *          the escape character
-   */
-  public void setEscapeChar(String escapeChar) {
-    this.escapeChar = escapeChar;
-    this.escapedQuotation = escapeChar + quotation;
-  }
-
-  private int storeColumn(List<String> cols, String s, int colBeginIndex, int p, boolean shouldRemoveQuot) {
+  private String getColumnValue(String s, int colBeginIndex, int p, int enveloped) {
     String val = s.substring(colBeginIndex, p);
     if (quotedEmpty.equals(val)) {
       val = "";
     } else {
-      if (shouldRemoveQuot && !isQuotEscaped(s)) {
+      if ((enveloped != 0) && (val.length() >= 2)) {
         val = val.substring(1, val.length() - 1);
       }
       val = val.replace(escapedQuotation, quotation);
     }
-    cols.add(val);
-    return p + 1;
+    return val;
   }
 
   private void storeRow(List<List<String>> rows, List<String> cols) {
     rows.add(cols);
-  }
-
-  private boolean isEndOfBlock(String s, int beginIndex, int p, String separator) {
-    if (p == s.length() - 1) {
-      return true;
-    }
-    String c;
-    int count = 0;
-    for (int i = p; i >= beginIndex; i--) {
-      c = String.valueOf(s.charAt(i));
-      if (quotation.equals(c)) {
-        count++;
-      } else {
-        break;
-      }
-    }
-    if ((count == 2) && (p - beginIndex == 1)) {
-      return true;
-    } else if ((count % 2) == 0) {
-      return false;
-    }
-    String nextCh = String.valueOf(s.charAt(p + 1));
-    if (separator.equals(nextCh)) {
-      return true;
-    }
-    return false;
-  }
-
-  private boolean isQuotEscaped(String s) {
-    if (s.length() <= 4) {
-      return false;
-    }
-    String start = s.substring(0, 2);
-    String end = s.substring(s.length() - 2);
-    if ((escapedQuotation.equals(start)) && (escapedQuotation.equals(end))) {
-      return true;
-    }
-    return false;
   }
 
   private boolean isLastLineEmpty(String s) {
@@ -343,6 +282,18 @@ public class CsvParser {
       return true;
     }
     return false;
+  }
+
+  private boolean isQuotedPropery(String s, int len, int pos, int quotCount) {
+    if (quotCount % 2 == 0) {
+      if (pos + 1 < len) {
+        String lastCh = String.valueOf(s.charAt(pos - 1));
+        if (!quotation.equals(lastCh)) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
 }
