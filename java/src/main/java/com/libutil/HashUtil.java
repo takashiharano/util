@@ -34,38 +34,6 @@ import javax.xml.bind.DatatypeConverter;
  */
 public class HashUtil {
 
-  public static String md5(byte[] input) {
-    return getHashString(input, "MD5");
-  }
-
-  public static String md5(String input) {
-    return getHashString(input, "MD5");
-  }
-
-  public static String sha1(byte[] input) {
-    return getHashString(input, "SHA-1");
-  }
-
-  public static String sha1(String input) {
-    return getHashString(input, "SHA-1");
-  }
-
-  public static String sha256(byte[] input) {
-    return getHashString(input, "SHA-256");
-  }
-
-  public static String sha256(String input) {
-    return getHashString(input, "SHA-256");
-  }
-
-  public static String sha512(byte[] input) {
-    return getHashString(input, "SHA-512");
-  }
-
-  public static String sha512(String input) {
-    return getHashString(input, "SHA-512");
-  }
-
   /**
    * Returns hash string.
    *
