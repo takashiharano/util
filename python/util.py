@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202206220200
+v = 202208102305
 
 import sys
 import os
@@ -810,6 +810,9 @@ def get_datetime_str(dt=None, fmt='%Y-%m-%d %H:%M:%S.%f', tz=None):
         dt = datetime.datetime.today()
     elif typename(dt) == 'float' or typename(dt) == 'int':
         dt = datetime.datetime.fromtimestamp(dt, tz)
+    elif typename(dt) == 'str':
+        fmt = dt
+        dt = datetime.datetime.today()
     s = dt.strftime(fmt)
     return s
 
