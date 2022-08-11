@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202208112244
+v = 202208112308
 
 import sys
 import os
@@ -2846,11 +2846,9 @@ def zip(zip_path, filepath, excl_root_path=False, arcname=None, slink=True):
                 root_path = _get_root_path(filepath, excl_root_path)
                 _zip(zipf, filepath, root_path, arcname=arcname, slink=slink)
 
-    v = None
     if zip_path == None:
         v = zip_out.getvalue()
-    zipf.close()
-    return v
+        return v
 
 def _zip(zipf, target_path, root_path, arcname=None, slink=True):
     islink = os.path.islink(target_path)
@@ -2879,13 +2877,21 @@ def _zip(zipf, target_path, root_path, arcname=None, slink=True):
         zipf.write(target_path, arcname=arcname)
 
 # unzip('C:/tmp/zip1.zip', 'C:/path/dir1')
+# unzip('C:/tmp/zip1.zip', 'C:/path/dir1', 'a.txt')
+# unzip('C:/tmp/zip1.zip', 'C:/path/dir1', ['a.txt', 'dir1/b.txt'])
 # unzip('C:/tmp/zip1.zip', 'C:/path/dir1', 'pwd='pass123')
-def unzip(zip_path, out_path, pwd=None):
+def unzip(zip_path, out_path, member=None, pwd=None):
     if pwd is not None:
         pwd = pwd.encode(encoding='utf-8')
     with zipfile.ZipFile(zip_path) as zipf:
-        zipf.extractall(out_path, pwd=pwd)
-        zipf.close()
+        if member is None:
+            zipf.extractall(out_path, pwd=pwd)
+        elif typename(member) == 'str':
+            zipf.extract(member, out_path, pwd=pwd)
+        else:
+            for i in range(len(member)):
+                item = member[i]
+                zipf.extract(item, out_path, pwd=pwd)
 
 # 'C:/path/dir1', excl_root_path=True  -> C:/path/dir1
 # 'C:/path/dir1', excl_root_path=False -> C:/path
