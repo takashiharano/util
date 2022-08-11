@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202208112027
+v = 202208112053
 
 import sys
 import os
@@ -781,8 +781,9 @@ class DateTime:
 def now():
     return get_timestamp()
 
-def get_timestamp_in_millis():
-    return micro_to_milli(time.time())
+def get_timestamp_in_millis(dt=None, fmt=None):
+    ts = get_timestamp(dt, fmt)
+    return micro_to_milli(ts)
 
 # 1546400096.123456 (float)    -> datetime
 # '2019-01-02 12:34:56.123456' -> datetime
