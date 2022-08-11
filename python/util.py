@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202208112053
+v = 202208112234
 
 import sys
 import os
@@ -2892,6 +2892,15 @@ def _get_root_path(path, excl_root_path):
         root_path = get_parent_path(path)
     root_path = re.sub('\\\\', '/', root_path)
     return root_path
+
+# ['a.txt', 'b.txt', 'dir1/c.txt']
+def list_zip(zip_path):
+    if not path_exists(zip_path):
+        return None
+    zip_f = zipfile.ZipFile(zip_path)
+    namelist = zip_f.namelist()
+    zip_f.close()
+    return namelist
 
 #------------------------------------------------------------------------------
 # Debugging
