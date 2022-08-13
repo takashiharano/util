@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202208130709';
+util.v = '202208131721';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1419,14 +1419,28 @@ util.toJSON = function(o, r, s) {
 };
 
 util.copyObject = function(src, dst) {
-  for (var k in src) {
-    if (src[k] instanceof Object) {
-      dst[k] = {};
-      util.copyObject(src[k], dst[k]);
-    } else {
-      dst[k] = src[k];
+  if (src instanceof Array) {
+    if (!dst) dst = [];
+    for (var i = 0; i < src.length; i++) {
+      var v = src[i];
+      if (v instanceof Object) {
+        dst.push(util.copyObject(v));
+      } else {
+        dst.push(v);
+      }
+    }
+  } else {
+    if (!dst) dst = {};
+    for (var k in src) {
+      if (src[k] instanceof Object) {
+        dst[k] = {};
+        util.copyObject(src[k], dst[k]);
+      } else {
+        dst[k] = src[k];
+      }
     }
   }
+  return dst;
 };
 
 util.copyDefaultProps = function(dflt, tgt) {
