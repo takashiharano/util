@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202208131721';
+util.v = '202208131755';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2114,12 +2114,17 @@ util.removeListItem = function(list, item) {
  * -> [{id: 'B', cnt: 1}, {id: 'A', cnt: 2}, {id: 'C', cnt: 3}]
  */
 util.sortObject = function(list, key, desc) {
-  if (desc) {
-    list.sort(function(a, b) {return b[key] - a[key];});
-  } else {
-    list.sort(function(a, b) {return a[key] - b[key];});
-  }
+  var f = (desc ? util._sortDesc : util._sortAsc);
+  list.sort(function(a, b) {return f(a[key], b[key]);});
   return list;
+};
+util._sortAsc = function(a, b) {
+  if (a == b) return 0;
+  return (a > b ? 1 : -1);
+};
+util._sortDesc = function(a, b) {
+  if (a == b) return 0;
+  return (a < b ? 1 : -1);
 };
 
 //---------------------------------------------------------
