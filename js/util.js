@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202208131755';
+util.v = '202208131845';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2113,18 +2113,17 @@ util.removeListItem = function(list, item) {
  * [{id: 'A', cnt: 2}, {id: 'B', cnt: 1}, {id: 'C', cnt: 3}]
  * -> [{id: 'B', cnt: 1}, {id: 'A', cnt: 2}, {id: 'C', cnt: 3}]
  */
-util.sortObject = function(list, key, desc) {
-  var f = (desc ? util._sortDesc : util._sortAsc);
-  list.sort(function(a, b) {return f(a[key], b[key]);});
+util.sortObject = function(list, key, desc, asNum) {
+  list.sort(function(a, b) {return util._sort(a[key], b[key], desc, asNum);});
   return list;
 };
-util._sortAsc = function(a, b) {
+util._sort = function(a, b, desc, asNum) {
+  if (asNum) {
+    if (!isNaN(a) && (a !== '')) a = parseFloat(a);
+    if (!isNaN(b) && (b !== '')) b = parseFloat(b);
+  }
   if (a == b) return 0;
-  return (a > b ? 1 : -1);
-};
-util._sortDesc = function(a, b) {
-  if (a == b) return 0;
-  return (a < b ? 1 : -1);
+  return (desc ? (a < b ? 1 : -1) : (a > b ? 1 : -1));
 };
 
 //---------------------------------------------------------
