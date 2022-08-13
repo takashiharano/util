@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202208060205';
+util.v = '202208130709';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1418,11 +1418,11 @@ util.toJSON = function(o, r, s) {
   return JSON.stringify(o, r, s);
 };
 
-util.copyProps = function(src, dst) {
+util.copyObject = function(src, dst) {
   for (var k in src) {
     if (src[k] instanceof Object) {
       dst[k] = {};
-      util.copyProps(src[k], dst[k]);
+      util.copyObject(src[k], dst[k]);
     } else {
       dst[k] = src[k];
     }
@@ -2070,9 +2070,9 @@ util.arr2set = function(arr, srt) {
     v.push({key: k, cnt: o[k]});
   }
   if (srt == 'asc|count') {
-    v = util.sortObj(v, 'cnt');
+    v = util.sortObject(v, 'cnt');
   } else if (srt == 'desc|count') {
-    v = util.sortObj(v, 'cnt', true);
+    v = util.sortObject(v, 'cnt', true);
   }
   var r = [];
   for (var i = 0; i < v.length; i++) {
@@ -2099,7 +2099,7 @@ util.removeListItem = function(list, item) {
  * [{id: 'A', cnt: 2}, {id: 'B', cnt: 1}, {id: 'C', cnt: 3}]
  * -> [{id: 'B', cnt: 1}, {id: 'A', cnt: 2}, {id: 'C', cnt: 3}]
  */
-util.sortObj = function(list, key, desc) {
+util.sortObject = function(list, key, desc) {
   if (desc) {
     list.sort(function(a, b) {return b[key] - a[key];});
   } else {
@@ -5112,8 +5112,8 @@ util.modal = function(child, addCloseHandler) {
   this.sig = 'modal';
   var el = document.createElement('div');
   var style = {};
-  util.copyProps(util.modal.DFLT_STYLE, style);
-  if (util.modal.style) util.copyProps(util.modal.style, style);
+  util.copyObject(util.modal.DFLT_STYLE, style);
+  if (util.modal.style) util.copyObject(util.modal.style, style);
   util.setStyle(el, style);
   el.style.opacity = '0';
   if (addCloseHandler) el.addEventListener('click', this.onClick);
