@@ -68,8 +68,7 @@ function get_cpu_usage() {
 
   # usage = 100 - idle
   local usage
-  usage=$(echo "scale=2; (100 - ${v_id})" | bc)
-  usage=$(echo "${usage}" | sed -E "s/\.00$//")
+  usage=$(echo "100 - ${v_id}" | bc)
 
   echo "cpu=${usage}%"
 }
