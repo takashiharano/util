@@ -44,8 +44,8 @@ function get_cpu_usage() {
   local v_us
   local v_sy
   local v_id
-  #local v_wa
-  #local v_st
+  local v_wa
+  local v_st
 
   vals=(${cmd_res// / })
   #v_r=${vals[0]} # The number of runnable processes (running or waiting for run time)
@@ -63,14 +63,14 @@ function get_cpu_usage() {
   v_us=${vals[12]} # user time
   v_sy=${vals[13]} # system (kernel) time
   v_id=${vals[14]} # idle
-  #v_wa=${vals[15]} # I/O wait
-  #v_st=${vals[16]} # time stolen from a vm
+  v_wa=${vals[15]} # I/O wait
+  v_st=${vals[16]} # time stolen from a vm
 
   # usage = 100 - idle
   local usage
   usage=$(echo "100 - ${v_id}" | bc)
 
-  echo "cpu: usage=${usage}% us=${v_us}% sy=${v_sy}%"
+  echo "cpu: usage=${usage}% us=${v_us}% sy=${v_sy}% wa=${v_wa}% st=${v_st}%"
 }
 
 #######################################
@@ -272,28 +272,51 @@ function get_java_heap_usage() {
 }
 
 #######################################
-# ./perf.sh [java_process]
+# ./perf.sh [delay[count]] [java_process]
 #
 #  java_process  pid or name
 #
 # e.g.,
-#  ./perf.sh 1234
-#  ./perf.sh hello.jar
+#  ./perf.sh 1 5 1234
+#  ./perf.sh 1 5 hello.jar
 #######################################
+delay=0
+count=-1
 javaproc=""
+
 if [ $# -ge 1 ]; then
-  javaproc=$1
+  delay=$1
+  delay=$(echo "${delay} - 1" | bc)
 fi
 
-datetime=$(date +"${DATE_TIME_FORMAT}")
-cpu_usage=$(get_cpu_usage)
-mem_usage=$(get_mem_usage)
-
-res="$datetime  ${cpu_usage}  ${mem_usage}"
-
-if [ -n "${javaproc}" ]; then
-  jheap_usage=$(get_java_heap_usage "${javaproc}")
-  res="${res}  ${jheap_usage}"
+if [ $# -ge 2 ]; then
+  count=$2
 fi
 
-echo "${res}"
+if [ $# -ge 3 ]; then
+  javaproc=$3
+fi
+
+if [ ${count} -eq 0 ]; then
+  count=1
+fi
+
+cnt=0
+while [ ${count} -lt 0 -o ${cnt} -lt ${count} ]
+do
+  datetime=$(date +"${DATE_TIME_FORMAT}")
+  cpu_usage=$(get_cpu_usage)
+  mem_usage=$(get_mem_usage)
+
+  res="$datetime  ${cpu_usage}  ${mem_usage}"
+
+  if [ -n "${javaproc}" ]; then
+    jheap_usage=$(get_java_heap_usage "${javaproc}")
+    res="${res}  ${jheap_usage}"
+  fi
+
+  echo "${res}"
+
+  cnt=$(echo "${cnt} + 1" | bc)
+  sleep ${delay}
+done
