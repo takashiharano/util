@@ -23,8 +23,8 @@ function get_cpu_usage() {
 
   # procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
   #  r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
-  #  0  0 357632 209012   2892 2934188    0    2    33   227  132    8  9  4 86  1  0
-  #  0  0 357632 209056   2892 2934188    0    0     0     0 2416  337  0  2 98  0  0
+  #  0  0    268 425888  89220 2141776    0    0    76    74  491  247  2  0 97  1  0
+  #  0  0    268 425888  89220 2141776    0    0     0     0  627  230  0  0 100  0  0
   cmd_res=$(echo "${cmd_res}" | head -4 | tail -1)
   cmd_res=$(echo "${cmd_res}" | sed -E "s/\s+/ /g")
 
@@ -41,8 +41,8 @@ function get_cpu_usage() {
   #local v_bo
   #local v_in
   #local v_cs
-  #local v_us
-  #local v_sy
+  local v_us
+  local v_sy
   local v_id
   #local v_wa
   #local v_st
@@ -60,8 +60,8 @@ function get_cpu_usage() {
   #v_bo=${vals[9]} # Blocks sent to a block device (blocks/s)
   #v_in=${vals[10]} # number of interrupts per second, including the clock
   #v_cs=${vals[11]} # number of context switches per second
-  #v_us=${vals[12]} # user time
-  #v_sy=${vals[13]} # system (kernel) time
+  v_us=${vals[12]} # user time
+  v_sy=${vals[13]} # system (kernel) time
   v_id=${vals[14]} # idle
   #v_wa=${vals[15]} # I/O wait
   #v_st=${vals[16]} # time stolen from a vm
@@ -70,7 +70,7 @@ function get_cpu_usage() {
   local usage
   usage=$(echo "100 - ${v_id}" | bc)
 
-  echo "cpu=${usage}%"
+  echo "cpu: usage=${usage}% us=${v_us}% sy=${v_sy}%"
 }
 
 #######################################
@@ -116,7 +116,7 @@ function get_mem_usage() {
   usage=$(echo "${usage}" | sed -E "s/\.00$//")
 
   local res
-  res="mem=${usage}%"
+  res="mem: usage=${usage}%"
   echo "${res}"
 }
 
@@ -287,13 +287,13 @@ fi
 
 datetime=$(date +"${DATE_TIME_FORMAT}")
 cpu_usage=$(get_cpu_usage)
-free_res=$(get_mem_usage)
+mem_usage=$(get_mem_usage)
 
-res="$datetime ${cpu_usage} ${free_res}"
+res="$datetime  ${cpu_usage}  ${mem_usage}"
 
 if [ -n "${javaproc}" ]; then
   jheap_usage=$(get_java_heap_usage "${javaproc}")
-  res="${res} ${jheap_usage}"
+  res="${res}  ${jheap_usage}"
 fi
 
 echo "${res}"
