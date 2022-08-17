@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202208112308
+v = 202208172353
 
 import sys
 import os
@@ -2458,6 +2458,10 @@ def build_result_object(status, body=None, headers=None):
 def send_response_debug(enable=True):
     global res_debug
     res_debug = enable
+
+def send_html(html, headers=[]):
+    headers.append({'Cache-Control': 'no-cache'})
+    send_response('html', html, headers=headers)
 
 # Send binary response
 # content: bytes or hex string
