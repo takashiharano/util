@@ -77,7 +77,7 @@ function get_cpu_usage() {
 # Print memory usage
 #
 # Outputs:
-#  Memory usage percentage.
+#   Memory usage percentage.
 #######################################
 function get_mem_usage() {
   # $ free
@@ -123,10 +123,9 @@ function get_mem_usage() {
 #######################################
 # Print Java heap status
 # Arguments:
-#   Target name or PID, output format (option)
+#   Target name or PID
 # Outputs:
 #   Java Heap Usage.
-#   in TSV format if "tsv" is specified for the second argument.
 #
 # Usage: print_jheap TARGET_NAME|PID
 # e.g.,
@@ -151,7 +150,7 @@ function get_java_heap_usage() {
     res_array=($(jps | grep "${target}"))
 
     if [ ${#res_array[@]} -eq 0 ]; then
-      echo "java_heap: [ERROR] process_not_found"
+      echo "java_heap: no_process"
       return
     fi
     pid=${res_array[0]}
@@ -274,7 +273,9 @@ function get_java_heap_usage() {
 #######################################
 # ./perf.sh [delay[count]] [java_process]
 #
-#  java_process  pid or name
+# delay         Pause wait seconds between each display
+# count         Repeat count
+# java_process  PID or name
 #
 # e.g.,
 #  ./perf.sh 1 5 1234
