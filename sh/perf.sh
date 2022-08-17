@@ -281,7 +281,7 @@ function get_java_heap_usage() {
 #  ./perf.sh 1 5 hello.jar
 #######################################
 delay=0
-count=-1
+count=1
 javaproc=""
 
 if [ $# -ge 1 ]; then
