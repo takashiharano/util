@@ -123,37 +123,37 @@ function get_mem_usage() {
 #######################################
 # Print Java heap status
 # Arguments:
-#   Target name or PID
+#   Target name or vmid
 # Outputs:
 #   Java Heap Usage.
 #
-# Usage: print_jheap TARGET_NAME|PID
+# Usage: print_jheap TARGET_NAME|VMID
 # e.g.,
 # print_jheap "helloworld.jar"
 # print_jheap 1234
 #######################################
 function get_java_heap_usage() {
   if [ $# -lt 1 ]; then
-    echo "java_heap: [ERROR] no_target_name_or_pid"
+    echo "java_heap: [ERROR] no_target_name_or_vmid"
     return 1
   fi
   local target
   target=$1
 
-  local pid
-  pid=""
+  local vmid
+  vmid=""
   if [[ ${target} =~ ^[0-9]+$ ]]; then
-    pid=${target}
+    vmid=${target}
   else
-    # find the PID corresponding to the target name
+    # find the vmid corresponding to the target name
     local res_array
     res_array=($(jps | grep "${target}"))
 
     if [ ${#res_array[@]} -eq 0 ]; then
-      echo "java_heap: no_process"
+      echo "java_heap: nodata"
       return
     fi
-    pid=${res_array[0]}
+    vmid=${res_array[0]}
   fi
 
   local cmd_res
@@ -161,7 +161,7 @@ function get_java_heap_usage() {
   # $ jstat -gc 1234
   #  S0C    S1C    S0U    S1U      EC       EU        OC         OU       MC     MU    CCSC   CCSU   YGC     YGCT    FGC    FGCT    CGC    CGCT     GCT   
   # 2112.0 2112.0 1030.8  0.0   16896.0   9013.5   42368.0     7335.3   14848.0 13818.9 1792.0 1446.9      4    0.055   0      0.000   -          -    0.055
-  cmd_res=$(jstat -gc "${pid}")
+  cmd_res=$(jstat -gc "${vmid}")
   ###############################
 
   if [ $? -ne 0 ]; then
@@ -267,7 +267,7 @@ function get_java_heap_usage() {
     op=$(echo "${op}" | sed -E "s/\.00$//")
   fi
 
-  echo "java_heap: usage=${usage}% eden=${ep}% s0=${s0p}% s1=${s1p}% old=${op}% fgc=${fgc} fgct=${fgct}s"
+  echo "java_heap: usage=${usage}% eden=${ep}% s0=${s0p}% s1=${s1p}% old=${op}% fgc=${fgc} fgct=${fgct}"
 }
 
 #######################################
