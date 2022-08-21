@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -eu
 #
 # perf.sh
 # Copyright 2022 Takashi Harano
