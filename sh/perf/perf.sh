@@ -8,7 +8,7 @@
 DATE_TIME_FORMAT="%Y-%m-%dT%H:%M:%S.%3N%:z"
 
 #######################################
-# Print CPU Usage
+# Get CPU Usage
 #
 # Outputs:
 #   CPU usage percentage.
@@ -74,7 +74,7 @@ function get_cpu_usage() {
 }
 
 #######################################
-# Print memory usage
+# Get memory usage
 #
 # Outputs:
 #   Memory usage percentage.
@@ -93,19 +93,19 @@ function get_mem_usage() {
 
   local vals
   local total
-  #local used
-  #local free
-  #local shared
-  #local buffcache
+  local used
+  local free
+  local shared
+  local buff_cache
   local available
   local act_used
 
   vals=(${cmd_res//,/ })
   total=${vals[0]}
-  #used=${vals[1]}
-  #free=${vals[2]}
-  #shared=${vals[3]}
-  #buffcache=${vals[4]}
+  used=${vals[1]}
+  free=${vals[2]}
+  shared=${vals[3]}
+  buff_cache=${vals[4]}
   available=${vals[5]}
 
   # actual used = total - available
@@ -116,12 +116,12 @@ function get_mem_usage() {
   usage=$(echo "${usage}" | sed -E "s/\.00$//")
 
   local res
-  res="mem: usage=${usage}%"
+  res="mem: usage=${usage}% total=${total} used=${used} free=${free} shared=${shared} buff_cache=${buff_cache} available=${available}"
   echo "${res}"
 }
 
 #######################################
-# Print Java heap status
+# Get Java heap status
 # Arguments:
 #   Target name or vmid
 # Outputs:
@@ -280,6 +280,9 @@ function get_java_heap_usage() {
 # e.g.,
 #  ./perf.sh 1 5 1234
 #  ./perf.sh 1 5 hello.jar
+#
+# Outputs:
+# 2022-08-31T22:50:35.884+09:00  cpu: usage=0% us=0% sy=0% wa=0% st=0%  mem: usage=33% total=4018456 used=1059428 free=2024060 shared=32640 buff_cache=934968 available=2687824  java_heap: usage=29% eden=62% s0=48% s1=0% old=17% fgc=0 fgct=0.000
 #######################################
 delay=0
 count=1
