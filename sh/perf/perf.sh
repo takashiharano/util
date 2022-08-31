@@ -203,8 +203,8 @@ function get_java_heap_usage() {
   #local ccsu
   #local ygc
   #local ygct
-  local fgc
-  local fgct
+  #local fgc
+  #local fgct
   #local gct
 
   vals=(${heap_info//,/ })
@@ -222,8 +222,8 @@ function get_java_heap_usage() {
   #ccsu=${vals[11]} # Compressed class space used (KB)
   #ygc=${vals[12]} # Number of young generation garbage collection events
   #ygct=${vals[13]} # Young generation garbage collection time
-  fgc=${vals[14]} # Number of full GC events
-  fgct=${vals[15]} # Full garbage collection time
+  #fgc=${vals[14]} # Number of full GC events
+  #fgct=${vals[15]} # Full garbage collection time
   #gct=${vals[16]} # Total garbage collection time
 
   local new
@@ -267,7 +267,7 @@ function get_java_heap_usage() {
     op=$(echo "${op}" | sed -E "s/\.00$//")
   fi
 
-  echo "java_heap: usage=${usage}% eden=${ep}% s0=${s0p}% s1=${s1p}% old=${op}% fgc=${fgc} fgct=${fgct}"
+  echo "java_heap: usage=${usage}% eden=${ep}% s0=${s0p}% s1=${s1p}% old=${op}%"
 }
 
 #######################################
@@ -282,7 +282,7 @@ function get_java_heap_usage() {
 #  ./perf.sh 1 5 hello.jar
 #
 # Outputs:
-# 2022-08-31T22:50:35.884+09:00  cpu: usage=0% us=0% sy=0% wa=0% st=0%  mem: usage=33% total=4018456 used=1059428 free=2024060 shared=32640 buff_cache=934968 available=2687824  java_heap: usage=29% eden=62% s0=48% s1=0% old=17% fgc=0 fgct=0.000
+# 2022-08-31T22:50:35.884+09:00  cpu: usage=0% us=0% sy=0% wa=0% st=0%  mem: usage=33% total=4018456 used=1059428 free=2024060 shared=32640 buff_cache=934968 available=2687824  java_heap: usage=29% eden=62% s0=48% s1=0% old=17%
 #######################################
 delay=0
 count=1
