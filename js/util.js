@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202208131845';
+util.v = '202209192348';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -818,6 +818,17 @@ util.timecounter.stop = function(el) {
   return v;
 };
 
+util.timecounter.restart = function(el) {
+  var v = 0;
+  var o = util.timecounter.getObj(el);
+  if (o) {
+    v = o.update(o);
+    o.t0 = Date.now();
+  }
+  util.timecounter.start(el);
+  return v;
+};
+
 /**
  * Returns a string of time difference
  *
@@ -881,9 +892,8 @@ util.TimeCounter = function(el, t0, opt) {
   this.id = '_timecounter-' + util.timecounter.id++;
 };
 util.TimeCounter.prototype = {
-  start: function(interval) {
+  start: function() {
     var ctx = this;
-    if (interval != undefined) ctx.interval = interval;
     util.IntervalProc.stop(ctx.id);
     util.IntervalProc.start(ctx.id, ctx.update, ctx.interval, ctx);
   },
