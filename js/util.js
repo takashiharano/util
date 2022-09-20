@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202209192348';
+util.v = '202209202336';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -435,6 +435,13 @@ util.hours2clock = function(s, sep) {
  */
 util.getTZ = function(ext) {
   return util.formatTZ(new Date().getTimezoneOffset() * (-1), ext);
+};
+
+/**
+ * Returns local time zone offset value
+ */
+util.getTzVal = function() {
+  return util.clock2hours(util.getTZ());
 };
 
 /**
