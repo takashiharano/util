@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202209202336';
+util.v = '202209212340';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -60,7 +60,7 @@ util.DateTime = function(src, tzOffset) {
   var timestamp = dt.getTime();
 
   if (tzOffset == undefined) {
-    tzOffset = ((st && st.tz) ? st.tz : util.getTZ());
+    tzOffset = ((st && st.tz) ? st.tz : util.getLocalTZ());
   } else {
     var os = tzOffset;
     if (typeof os == 'string') os = util.getOffsetFromLocalTz(os);
@@ -155,7 +155,7 @@ util.DateTime.prototype = {
     r = r.replace(/%s/g, s);
     r = r.replace(/%z/g, this.getTZ());
     r = r.replace(/%Z/g, this.getTZ(true));
-    r = r.replace(/%N/g, util.getTzName());
+    r = r.replace(/%N/g, util.getLocalTzName());
     r = r.replace(/\\/g, '');
     return r;
   }
@@ -354,23 +354,36 @@ util.getTimestampOfMidnight = function(dt, offset) {
 };
 
 /**
- * Returns time zone offset string from minutes
+ * Returns time zone offset string from hours/minutes
+ * -8         -> -0800
+ *  9         -> +0900
+ *  9, true   -> +09:00
  * -480       -> -0800
  *  540       -> +0900
  *  540, true -> +09:00
  */
 util.formatTZ = function(v, e) {
-  v |= 0;
   var s = '+';
+  v = parseFloat(v);
   if (v < 0) {
     s = '-';
     v *= -1;
   }
-  var h = (v / 60) | 0;
-  var m = v - h * 60;
-  var str = s + ('0' + h).slice(-2) + ('0' + m).slice(-2);
+  var f = ((v <= 24) ? util.formatTzH : util.formatTzM);
+  var str = s + f(v);
   if (e) str = str.substr(0, 3) + ':' + str.substr(3, 2);
   return str;
+};
+util.formatTzH = function(v) {
+  var w = ('' + v).split('.');
+  var h = +w[0];
+  var m = +('0.' + (w[1] | 0)) * 60;
+  return ('0' + h).slice(-2) + ('0' + m).slice(-2);
+};
+util.formatTzM = function(v) {
+  var h = (v / 60) | 0;
+  var m = v - h * 60;
+  return ('0' + h).slice(-2) + ('0' + m).slice(-2);
 };
 
 /**
@@ -412,6 +425,7 @@ util.clock2hours = function(s) {
  * 9.5, ':' -> '09:30'
  */
 util.hours2clock = function(s, sep) {
+  if (sep == undefined) sep = ':';
   s += '';
   var sign = '';
   if (s.match(/^[+-]/)) {
@@ -433,22 +447,22 @@ util.hours2clock = function(s, sep) {
  * +0900
  * ext=true: +09:00
  */
-util.getTZ = function(ext) {
+util.getLocalTZ = function(ext) {
   return util.formatTZ(new Date().getTimezoneOffset() * (-1), ext);
 };
 
 /**
  * Returns local time zone offset value
  */
-util.getTzVal = function() {
-  return util.clock2hours(util.getTZ());
+util.getLocalTzVal = function() {
+  return util.clock2hours(util.getLocalTZ());
 };
 
 /**
  * Returns TZ database name
  * i.e., America/Los_Angeles
  */
-util.getTzName = function() {
+util.getLocalTzName = function() {
   var n = Intl.DateTimeFormat().resolvedOptions().timeZone;
   if (!n) n = '';
   return n;
@@ -987,7 +1001,7 @@ util.Clock.prototype = {
     }
   }
 };
-util.Clock.DFLT_OPT = {interval: 500, fmt: '%YYYY-%MM-%DD %W %HH:%mm:%SS', offset: 0, tz: util.getTZ()};
+util.Clock.DFLT_OPT = {interval: 500, fmt: '%YYYY-%MM-%DD %W %HH:%mm:%SS', offset: 0, tz: util.getLocalTZ()};
 
 //---------------------------------------------------------
 // Time calculation
