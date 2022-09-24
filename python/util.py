@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202208172353
+v = 202209242326
 
 import sys
 import os
@@ -1888,7 +1888,7 @@ def delete(path, force=False):
 # Copy a file or DIR
 def copy(src, dst, overwrite=True):
     if is_dir(src):
-        copy_dir(src, dst, overwrite)
+        copy_dir(src, dst)
     else:
         copy_file(src, dst)
 
