@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202209212340';
+util.v = '202210060015';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -5666,6 +5666,8 @@ util.dialog.sysCbN = function(ctx) {
  *
  * opt = {
  *   data: object,
+ *   value: 'value',
+ *   placeholder: 'placeholder',
  *   secure: true|false,
  *   style: {
  *     message: {
@@ -5721,6 +5723,8 @@ util.dialog.text = function(a1, a2, a3, a4, a5) {
     }
   }
   txtBox.spellcheck = false;
+  txtBox.value = (opt.value ? opt.value : '');
+  txtBox.placeholder = (opt.placeholder ? opt.placeholder : '');
   var body = document.createElement('div');
   var wrp1 = document.createElement('div');
   wrp1.style.display = 'inline-block';
