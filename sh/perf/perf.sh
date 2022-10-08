@@ -271,7 +271,7 @@ function get_java_heap_usage() {
 }
 
 #######################################
-# ./perf.sh [delay[count]] [java_process]
+# ./perf.sh [delay [count]] [java_process]
 #
 # delay         Pause wait seconds between each display
 # count         Repeat count
@@ -291,6 +291,10 @@ javaproc=""
 if [ $# -ge 1 ]; then
   delay=$1
   delay=$(echo "${delay} - 1" | bc)
+
+  if [ "${delay}" -lt 0 ]; then
+    delay=0
+  fi
 fi
 
 if [ $# -ge 2 ]; then
@@ -301,13 +305,12 @@ if [ $# -ge 3 ]; then
   javaproc=$3
 fi
 
-if [ ${count} -eq 0 ]; then
+if [ "${count}" -eq 0 ]; then
   count=1
 fi
 
 cnt=0
-while [ ${count} -lt 0 -o ${cnt} -lt ${count} ]
-do
+while [ ${count} -lt 0 ] || [ ${cnt} -lt ${count} ]; do
   datetime=$(date +"${DATE_TIME_FORMAT}")
   cpu_usage=$(get_cpu_usage)
   mem_usage=$(get_mem_usage)
