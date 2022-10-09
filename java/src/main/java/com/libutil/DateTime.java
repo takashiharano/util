@@ -23,6 +23,8 @@
  */
 package com.libutil;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
@@ -87,6 +89,33 @@ public class DateTime {
   }
 
   public DateTime(long timestamp, String timeZoneId) {
+    Date date = new Date(timestamp);
+    TimeZone tz = getTimeZoneFromId(timeZoneId);
+    _init(date, tz);
+  }
+
+  /**
+   * Allocates a DateTime object and initializes it to represent the specified
+   * number of seconds since the standard base time known as "the epoch", namely
+   * January 1, 1970, 00:00:00 GMT.
+   *
+   * @param timestamp
+   *          the seconds since January 1, 1970, 00:00:00 GMT.
+   */
+  public DateTime(double unixtime) {
+    long timestamp = secToMillis(unixtime);
+    Date date = new Date(timestamp);
+    _init(date, null);
+  }
+
+  public DateTime(double unixtime, TimeZone timezone) {
+    long timestamp = secToMillis(unixtime);
+    Date date = new Date(timestamp);
+    _init(date, timezone);
+  }
+
+  public DateTime(double unixtime, String timeZoneId) {
+    long timestamp = secToMillis(unixtime);
     Date date = new Date(timestamp);
     TimeZone tz = getTimeZoneFromId(timeZoneId);
     _init(date, tz);
@@ -1056,6 +1085,22 @@ public class DateTime {
     }
     return s.lastIndexOf("-");
   };
+
+  /**
+   * Converts seconds to milliseconds.
+   *
+   * @param sec
+   *          seconds
+   * @return milliseconds
+   */
+  public static long secToMillis(double sec) {
+    BigDecimal bd = new BigDecimal(sec);
+    bd = bd.setScale(3, RoundingMode.DOWN);
+    double d = bd.doubleValue();
+    double v = d * 1000;
+    long unixmillis = (long) v;
+    return unixmillis;
+  }
 
   /**
    * Parses text from the beginning of the given string to produce a date.

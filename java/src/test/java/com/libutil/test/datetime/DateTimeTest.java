@@ -26,6 +26,14 @@ public class DateTimeTest {
     datetime = new DateTime(1594092896789L);
     test(datetime);
 
+    Log.i("DateTime(1594092896.789) ----------");
+    datetime = new DateTime(1594092896.789);
+    test(datetime);
+
+    Log.i("DateTime(1594092896.789123) ----------");
+    datetime = new DateTime(1594092896.789123);
+    test(datetime);
+
     Log.i("DateTime(\"20210703T123456.789+0900\") ----------");
     String src = "20210703T123456.789+0900";
     datetime = new DateTime(src);
