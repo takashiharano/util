@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202210081635';
+util.v = '202210102352';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -6364,7 +6364,7 @@ util.getClientLanguages = function(f) {
 //---------------------------------------------------------
 // Browser
 //---------------------------------------------------------
-util.getBrowserType = function(ua) {
+util.getBrowserInfo = function(ua) {
   if (ua == undefined) ua = navigator.userAgent;
   var ver;
   var brws = {name: '', version: ''};
@@ -6413,7 +6413,7 @@ util.getBrowserType = function(ua) {
 };
 util.getColoredBrowserName = function(n, dark) {
   if (!n) {
-    var b = util.getBrowserType();
+    var b = util.getBrowserInfo();
     n = b.name;
   }
   var s = n;
@@ -6453,7 +6453,7 @@ util.getColoredBrowserName = function(n, dark) {
       s = '<span style="color:#86c8e8">Safa</span><span style="color:#dd5651">r</span><span style="color:#ececec">i</span>';
       break;
     default:
-      b = util.getBrowserType(n);
+      b = util.getBrowserInfo(n);
       if (b.name) s = util.getColoredBrowserName(b.name);
   }
   return s;
