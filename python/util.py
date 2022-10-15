@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202209242326
+v = 202210151826
 
 import sys
 import os
@@ -50,7 +50,7 @@ LOCAL_TZ_OFFSET = datetime.datetime.now(datetime.timezone.utc).astimezone().tzin
 
 sys.dont_write_bytecode = True
 stdin_data = None
-form_data = None
+field_storage = None
 logger = None
 start_time = 0
 res_debug = False
@@ -2207,19 +2207,11 @@ def decode_uri(s):
 #------------------------------------------------------------------------------
 # CGI
 #------------------------------------------------------------------------------
-def get_field_storage():
-    global form_data
-    if form_data is None:
-        form_data = cgi.FieldStorage()
-    return form_data
-
-def free_form_data():
-    global form_data
-    form_data = None
-
 def get_request_param(key, default=None):
-    form = get_field_storage()
-    return form.getvalue(key, default)
+    v = get_query(key)
+    if v is None:
+        v = default
+    return v
 
 # Query String
 def get_query(key=None, q=None):
@@ -2254,9 +2246,17 @@ def _get_query(s, key):
         v = a
     return v
 
-# POST data
-def get_post_data():
-    return read_stdin()
+# for file upload
+# Exclusive with read_stdin()
+def get_field_storage():
+    global field_storage
+    if field_storage is None:
+        field_storage = cgi.FieldStorage()
+    return field_storage
+
+def free_field_storage():
+    global field_storage
+    field_storage = None
 
 # Remote IP Address
 def get_ip_addr(default=''):
@@ -2406,8 +2406,8 @@ def send_response(type, content, status=200, headers=None, encoding=DEFAULT_ENCO
     #  ap_content_length_filter: apr_bucket_read() failed
     #  Failed to flush CGI output to client
     global stdin_data
-    global form_data
-    if stdin_data is None and form_data is None:
+    global field_storage
+    if stdin_data is None and field_storage is None:
         stdin_data = sys.stdin.read()
 
     if type == 'text':
@@ -2479,8 +2479,8 @@ def send_binary(content, filename='', content_type='application/octet-stream', e
     #  ap_content_length_filter: apr_bucket_read() failed
     #  Failed to flush CGI output to client
     global stdin_data
-    global form_data
-    if stdin_data is None and form_data is None:
+    global field_storage
+    if stdin_data is None and field_storage is None:
         stdin_data = sys.stdin.read()
 
     if typename(content) == 'str':
