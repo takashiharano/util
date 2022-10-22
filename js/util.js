@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202210210037';
+util.v = '202210222103';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2706,7 +2706,7 @@ util.isTextInput = function(el) {
 util.addSelectOption = function(select, label, val, selected) {
   select = util.getElement(select);
   var opt = document.createElement('option');
-  opt.value = val;
+  opt.value = (val === undefined ? label : val);
   opt.innerText = label;
   if (selected) opt.selected = true;
   select.appendChild(opt);
