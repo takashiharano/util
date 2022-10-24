@@ -99,7 +99,7 @@ public class DateTime {
    * number of seconds since the standard base time known as "the epoch", namely
    * January 1, 1970, 00:00:00 GMT.
    *
-   * @param timestamp
+   * @param unixtime
    *          the seconds since January 1, 1970, 00:00:00 GMT.
    */
   public DateTime(double unixtime) {
