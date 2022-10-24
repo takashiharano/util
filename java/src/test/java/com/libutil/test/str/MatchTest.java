@@ -13,6 +13,10 @@ public class MatchTest {
     Log.d(StrUtil.match(str, "Abc"));
     Log.d(StrUtil.match(str, "abc"));
     Log.d(StrUtil.match(str, "abc", Pattern.CASE_INSENSITIVE));
+
+    Log.d(StrUtil.match(null, "abc"));
+    Log.d(StrUtil.match(str, null));
+    Log.d(StrUtil.match(null, null));
   }
 
 }

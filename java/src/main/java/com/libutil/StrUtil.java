@@ -1088,6 +1088,9 @@ public class StrUtil {
    *         this matcher's pattern
    */
   public static boolean match(String target, String regex, int flags) {
+    if ((target == null) || (regex == null)) {
+      return false;
+    }
     Pattern p = Pattern.compile(regex, flags);
     Matcher m = p.matcher(target);
     return m.find();
