@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202210252231
+v = 202210260053
 
 import sys
 import os
@@ -966,11 +966,11 @@ def serialize_datetime(s):
 def _serialize_datetime(s, tz):
     s = re.sub('[-\s:\.]', '', s)
     s = (s + '0000000000000000')[0:20]
-    s += tz
     if s[4:6] == '00':
         s = s[0:4] + '01' + s[6:]
     if s[6:8] == '00':
         s = s[0:6] + '01' + s[8:]
+    s += tz
     return s
 
 # '20220123T123456+0900'
