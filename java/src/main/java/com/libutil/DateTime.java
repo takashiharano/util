@@ -1014,6 +1014,12 @@ public class DateTime {
     String yyyy = prt[0];
     String mm = zeroPadding(prt[1]);
     String dd = zeroPadding(prt[2]);
+    if (mm.equals("00")) {
+      mm = "01";
+    }
+    if (dd.equals("00")) {
+      dd = "01";
+    }
     date = yyyy + mm + dd;
 
     prt = time.split("\\.");
@@ -1042,7 +1048,15 @@ public class DateTime {
 
   private static String __serializeDateTime(String s, String tz) {
     s = s.replaceAll("[-\\s:\\.]", "");
-    s = (s + "000000000").substring(0, 17);
+    s = (s + "0000000000000").substring(0, 17);
+    String w = s.substring(4, 6);
+    if (w.equals("00")) {
+      s = s.substring(0, 4) + "01" + s.substring(6);
+    }
+    w = s.substring(6, 8);
+    if (w.equals("00")) {
+      s = s.substring(0, 6) + "01" + s.substring(8);
+    }
     if (tz != null) {
       s += normalizeTimeZone(tz);
     }
