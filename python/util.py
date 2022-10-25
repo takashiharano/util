@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202210151826
+v = 202210252224
 
 import sys
 import os
@@ -856,6 +856,26 @@ def get_timestamp_of_midnight(dt=None):
     midnight = dt0.timestamp
     return midnight
 
+# T:1666702205842, 'D'
+# > 1666623600000
+# scale: Y, M, D, H, m, S
+def floor_unixtime(unixtime, scale):
+    if scale == 'Y':
+        fmt = '%Y'
+    elif scale == 'M':
+        fmt = '%Y%m'
+    elif scale == 'D':
+        fmt = '%Y%m%d'
+    elif scale == 'H':
+        fmt = '%Y%m%dT%H'
+    elif scale == 'm':
+        fmt = '%Y%m%dT%H%M'
+    elif scale == 'S':
+        fmt = '%Y%m%dT%H%M%S'
+    s = get_datetime_str(unixtime, fmt)
+    t = get_timestamp(s)
+    return t
+
 # Last day of month
 # 2019, 1 -> 31
 # 2019, 2 -> 28
@@ -905,7 +925,11 @@ def serialize_datetime(s):
     prt = date.split('-')
     yyyy = prt[0]
     mm = ('0' + prt[1])[-2:]
+    if mm == '00':
+        mm = '01'
     dd = ('0' + prt[2])[-2:]
+    if dd == '00':
+        dd = '01'
     date = yyyy + mm + dd
 
     prt = time.split('.')
@@ -930,8 +954,12 @@ def serialize_datetime(s):
 
 def _serialize_datetime(s, tz):
     s = re.sub('[-\s:\.]', '', s)
-    s = (s + '000000000000')[0:20]
+    s = (s + '0000000000000000')[0:20]
     s += tz
+    if s[4:6] == '00':
+        s = s[0:4] + '01' + s[6:]
+    if s[6:8] == '00':
+        s = s[0:6] + '01' + s[8:]
     return s
 
 # '20220123T123456+0900'
