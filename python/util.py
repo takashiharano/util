@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202210252224
+v = 202210252231
 
 import sys
 import os
@@ -856,9 +856,20 @@ def get_timestamp_of_midnight(dt=None):
     midnight = dt0.timestamp
     return midnight
 
-# T:1666702205842, 'D'
-# > 1666623600000
+# T:1666702205.842
 # scale: Y, M, D, H, m, S
+# Y 1640962800.0
+# > 2022-01-01 00:00:00.000 +09:00
+# M 1664550000.0
+# > 2022-10-01 00:00:00.000 +09:00
+# D 1666623600.0
+# > 2022-10-25 00:00:00.000 +09:00
+# H 1666699200.0
+# > 2022-10-25 21:00:00.000 +09:00
+# m 1666702200.0
+# > 2022-10-25 21:50:00.000 +09:00
+# S 1666702205.0
+# > 2022-10-25 21:50:05.000 +09:00
 def floor_unixtime(unixtime, scale):
     if scale == 'Y':
         fmt = '%Y'
