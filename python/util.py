@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202210282106
+v = 202211020034
 
 import sys
 import os
@@ -2372,7 +2372,7 @@ def build_cookie(key, value, max_age=None, expires=None, path=None, secure=False
     return s
 
 # 'key=; expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; Secure; HttpOnly'
-def build_cookie_clear(key, path=None, secure=False, http_only=False):
+def build_cookie_for_clear(key, path=None, secure=False, http_only=False):
     s = key + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT'
 
     if path is not None:
