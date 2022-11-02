@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202211020034
+v = 202211022200
 
 import sys
 import os
@@ -1740,16 +1740,20 @@ def is_file(path):
 def is_dir(path):
     return os.path.isdir(path)
 
-def file_lock(lock_file_path, retry=1, wait=1):
-    for i in range(retry):
-        if os.path.exists(lock_file_path) and retry > 1:
-            time.sleep(wait)
-        else:
+def file_lock(lock_file_path, retry=0, wait=1):
+    cnt = 0
+    while True:
+        if not os.path.exists(lock_file_path):
             try:
                 mkdir(lock_file_path)
                 return True
             except:
-                return False
+                pass
+        cnt += 1
+        if cnt <= retry:
+            time.sleep(wait)
+        else:
+            break
     return False
 
 def file_unlock(lock_file_path):
