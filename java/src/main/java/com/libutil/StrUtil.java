@@ -1097,6 +1097,134 @@ public class StrUtil {
   }
 
   /**
+   * Returns a new double initialized to the value represented by the specified
+   * String.
+   *
+   * @param s
+   *          the string to be parsed
+   * @return the double value represented by the string argument. returns 0 in
+   *         case of errors.
+   */
+  public static double parseDouble(String s) {
+    return parseFloat(s, 0);
+  }
+
+  /**
+   * Returns a new double initialized to the value represented by the specified
+   * String.
+   *
+   * @param s
+   *          the string to be parsed
+   * @param defaultValue
+   *          the value used if the string does not contain a parsable float.
+   * @return the double value represented by the string argument.
+   */
+  public static double parseDouble(String s, double defaultValue) {
+    double v;
+    try {
+      v = Double.parseDouble(s);
+    } catch (Exception e) {
+      v = defaultValue;
+    }
+    return v;
+  }
+
+  /**
+   * Returns a new float initialized to the value represented by the specified
+   * String.
+   *
+   * @param s
+   *          the string to be parsed
+   * @return the float value represented by the string argument. returns 0 in case
+   *         of errors.
+   */
+  public static float parseFloat(String s) {
+    return parseFloat(s, 0);
+  }
+
+  /**
+   * Returns a new float initialized to the value represented by the specified
+   * String.
+   *
+   * @param s
+   *          the string to be parsed
+   * @param defaultValue
+   *          the value used if the string does not contain a parsable float.
+   * @return the float value represented by the string argument.
+   */
+  public static float parseFloat(String s, float defaultValue) {
+    float v;
+    try {
+      v = Float.parseFloat(s);
+    } catch (Exception e) {
+      v = defaultValue;
+    }
+    return v;
+  }
+
+  /**
+   * Parses the string argument as a signed decimal integer.
+   *
+   * @param s
+   *          a String containing the int representation to be parsed
+   * @return the integer value represented by the argument in decimal. returns 0
+   *         in case of errors.
+   */
+  public static int parseInt(String s) {
+    return parseInt(s, 0);
+  }
+
+  /**
+   * Parses the string argument as a signed decimal integer.
+   *
+   * @param s
+   *          a String containing the int representation to be parsed
+   * @param defaultValue
+   *          the value used if the string does not contain a parsable integer.
+   * @return the integer value represented by the argument in decimal.
+   */
+  public static int parseInt(String s, int defaultValue) {
+    int v;
+    try {
+      v = Integer.parseInt(s);
+    } catch (Exception e) {
+      v = defaultValue;
+    }
+    return v;
+  }
+
+  /**
+   * Parses the string argument as a signed decimal long.
+   *
+   * @param s
+   *          a String containing the long representation to be parsed
+   * @return the integer value represented by the argument in decimal. returns 0
+   *         in case of errors.
+   */
+  public static long parseLong(String s) {
+    return parseInt(s, 0);
+  }
+
+  /**
+   * Parses the string argument as a signed decimal long.
+   *
+   * @param s
+   *          a String containing the long representation to be parsed
+   * @param defaultValue
+   *          the value used if the string does not contain a parsable integer.
+   * @return the integer value represented by the argument in decimal.
+   */
+  public static long parseLong(String s, long defaultValue) {
+    long v;
+    try {
+      v = Long.parseLong(s);
+    } catch (Exception e) {
+      v = defaultValue;
+    }
+    return v;
+  }
+
+  /**
    * Returns the word in the singular or plural, depending on the number
    * specified.
    *
