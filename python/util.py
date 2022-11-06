@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202211022200
+v = 202211062055
 
 import sys
 import os
@@ -812,8 +812,12 @@ def get_datetime_str(dt=None, fmt='%Y-%m-%d %H:%M:%S.%f', tz=None):
     elif typename(dt) == 'float' or typename(dt) == 'int':
         dt = datetime.datetime.fromtimestamp(dt, tz)
     elif typename(dt) == 'str':
-        fmt = dt
-        dt = datetime.datetime.today()
+        if match(dt, '%'):
+            fmt = dt
+            dt = datetime.datetime.today()
+        else:
+            dt = get_timestamp(dt)
+            dt = datetime.datetime.fromtimestamp(dt, tz)
     s = dt.strftime(fmt)
     return s
 
@@ -826,9 +830,13 @@ def get_timestamp(dt=None, fmt=None):
         dt = datetime.datetime.today()
     elif typename(dt) == 'str':
         if fmt is None:
+            if is_float(dt):
+                return float(dt)
             dt = serialize_datetime(dt)
             fmt = '%Y%m%d%H%M%S%f'
         dt = datetime.datetime.strptime(dt, fmt)
+    elif typename(dt) == 'int' or typename(dt) == 'float':
+        return dt
     ts = dt.timestamp()
     return ts
 
