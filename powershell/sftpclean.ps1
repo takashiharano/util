@@ -4,9 +4,12 @@
 # Released under the MIT license
 # https://libutil.com/
 ############################################################################
+# about_Execution_Policies (https://go.microsoft.com/fwlink/?LinkID=135170)
+# > Set-ExecutionPolicy Unrestricted -Scope CurrentUser
 
 $HOSTNAME = "localhost"
 $USER = "user1"
+#$PVTKEY = "~/.ssh/id_rsa"
 $PORT = 22
 $TARGET_DIR = "/home/user1/data"
 $RETENTION_SEC = 86400
@@ -54,7 +57,15 @@ function Invoke-SFTP-Command {
     Param (
         [string]$Command
     )
-    echo $Command | sftp -o "Port ${PORT}" ${USER}@${HOSTNAME}
+    $cmd = "sftp.exe"
+    $args = @()
+    if ((${PVTKEY} -ne $null) -And (${PVTKEY} -ne "")) {
+        $args += "-i"
+        $args += ${PVTKEY}
+    }
+    $args += "-oPort=${PORT}"
+    $args += "${USER}@${HOSTNAME}"
+    echo ${Command} |  & $cmd $args
 }
 
 #---------------------------------------------------------------------------
