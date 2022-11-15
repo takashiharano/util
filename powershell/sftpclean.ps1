@@ -74,7 +74,7 @@ function Invoke-SFTP-Remove {
         [array]$Files
     )
     $cmd = "cd " + $TARGET_DIR + "`n"
-    foreach($file in $Files){
+    foreach ($file in $Files) {
         $cmd += "rm " + $file + "`n"
     }
     Invoke-SFTP-Command $cmd
