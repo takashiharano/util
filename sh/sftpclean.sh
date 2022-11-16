@@ -8,6 +8,8 @@
 
 HOST="localhost"
 USER="user1"
+#PVTKEY="~/.ssh/id_rsa"
+PVTKEY=""
 PORT=22
 TARGET_DIR="/home/user1/data"
 RETENTION_SEC=86400
@@ -48,11 +50,19 @@ function to_unixtime() {
 ###########################################
 function exec_sftp_cmd() {
   local sftp_cmd
+  local cmd
+
   sftp_cmd=$1
+
+  cmd="spawn sftp"
+  if [ -n "${PVTKEY}" ]; then
+    cmd+=" -i ${PVTKEY}"
+  fi
+  cmd+=" -P ${PORT} ${USER}@${HOST}"
 
   sftp_ret=$(expect -c "
   set timeout 1
-  spawn sftp -P ${PORT} ${USER}@${HOST}
+  ${cmd}
   expect \"sftp&gt;\"
   ${sftp_cmd}
   send \"bye\r\"
