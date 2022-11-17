@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202211062055
+v = 202211172053
 
 import sys
 import os
@@ -788,6 +788,7 @@ def get_timestamp_in_millis(dt=None, fmt=None):
 # 1546400096.123456 (float)    -> datetime
 # '2019-01-02 12:34:56.123456' -> datetime
 # fmt='%Y-%m-%d %H:%M:%S.%f'
+# return: datetime
 def get_datetime(src=None, fmt=None, tz=None):
     if src is None:
         dt = datetime.datetime.today()
@@ -1067,16 +1068,20 @@ def format_datetime(dt, fmt):
 # moment='2020-07-01 19:00:00.0000' -> '2020-07-02 03:00:00.0000'
 # moment='2020-07-01 00:00:00.0000', offset=-1 -> '2020-06-30 18:00:00.0000'
 def next_date_time(time_list, offset=1, moment=None, tz=None):
-    if moment is None:
-        moment = datetime.datetime.today()
     dt = next_datetime(time_list=time_list, offset=offset, moment=moment, tz=tz)
     return DateTime(dt)
+
+def next_timestamp(time_list, offset=1, moment=None, tz=None):
+    dt = next_datetime(time_list=time_list, offset=offset, moment=moment, tz=tz)
+    return dt.timestamp()
 
 def next_datetime(time_list, offset=1, moment=None, tz=None):
     if moment is None:
         moment = datetime.datetime.today()
     elif typename(moment) == 'float' or typename(moment) == 'int':
         moment = datetime.datetime.fromtimestamp(moment, tz)
+    elif typename(moment) == 'str':
+        moment = get_datetime(moment)
 
     time_list = sorted(time_list)
     last_index = len(time_list) - 1
