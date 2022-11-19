@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202211191311';
+util.v = '202211200001';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3655,8 +3655,17 @@ util.infotip.opt = null;
  * show("message", 0, {pos: 'active'});
  * show("message", 0, {style: {'font-size': '18px'}});
  */
-util.infotip.show = function(msg, duration, opt) {
-  var x, y, style, offset;
+util.infotip.show = function(msg, a2, a3) {
+  var x, y, style, offset, opt;
+  var duration = util.DFLT_DURATION;
+  if (typeof a2 == 'number') {
+    duration = a2;
+    opt = a3;
+  } else if (a2 instanceof Object) {
+    opt = a2;
+  } else if (a2 == undefined) {
+    opt = a3;
+  }
   if (opt) {
     if (opt.pos) {
       if (opt.pos == 'pointer') {
