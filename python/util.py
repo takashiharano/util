@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202211172053
+v = 202211191419
 
 import sys
 import os
@@ -1510,12 +1510,14 @@ def sleep(seconds):
 #------------------------------------------------------------------------------
 # Base64
 #------------------------------------------------------------------------------
-def decode_base64(s, encoding=DEFAULT_ENCODING, tostring=True, altchars=None, validate=False):
+def decode_base64(s, encoding=DEFAULT_ENCODING, bin=False, altchars=None, validate=False):
     b = base64.b64decode(s, altchars=altchars, validate=validate)
-    if tostring:
-        decoded = b.decode(encoding)
-    else:
+    if bin:
+        # bytes
         decoded = b
+    else:
+        # str
+        decoded = b.decode(encoding)
     return decoded
 
 def encode_base64(s, encoding=DEFAULT_ENCODING, tostring=True, altchars=None):
