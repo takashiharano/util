@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202211202339';
+util.v = '202211220141';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3182,8 +3182,8 @@ util.updateTextAreaInfo = function(textarea) {
   var listener = textarea.listener;
   if (listener) {
     var data = {
-      cp10: u10,
-      cp16: u10,
+      codePoint: u10,
+      cp16: u16,
       ch: ch,
       len: len,
       lenB: lenB,
