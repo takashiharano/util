@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202211191419
+v = 202211240036
 
 import sys
 import os
@@ -708,6 +708,16 @@ def next_list_val(arr, val, offset=1):
                 r = arr[n - last_index]
             break
     return r
+
+# [1, 2, 1, 3, 2]
+# -> [1, 2, 3]
+def to_set(arr):
+    data_set = []
+    for i in range(len(arr)):
+       v = arr[i]
+       if not v in data_set:
+           data_set.append(v)
+    return data_set
 
 #------------------------------------------------------------------------------
 # Date Time
