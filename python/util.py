@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202211240036
+v = 202211261358
 
 import sys
 import os
@@ -243,6 +243,22 @@ def is_num(s):
     if s is None:
         return False
     return is_int(s) or is_float(s)
+
+# '1' -> 1
+def to_int(s, default=0):
+    try:
+        v = int(s)
+    except:
+        v = default
+    return v
+
+# '1.5' -> 1.5
+def to_float(s, default=0):
+    try:
+        v = float(s)
+    except:
+        v = default
+    return v
 
 # '-0102.3040'
 # -> '-102.304'
