@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202211261358
+v = 202212042343
 
 import sys
 import os
@@ -807,7 +807,7 @@ class DateTime:
 def now():
     return get_timestamp()
 
-def get_timestamp_in_millis(dt=None, fmt=None):
+def get_unixtime_millis(dt=None, fmt=None):
     ts = get_timestamp(dt, fmt)
     return micro_to_milli(ts)
 
