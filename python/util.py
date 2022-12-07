@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202212042343
+v = 202212072006
 
 import sys
 import os
@@ -152,7 +152,7 @@ def count_str_pattern(string, pattern, flags=0):
 # -> ''
 # 'aaa of bbb of ccc', '.+? of (.*)'
 # -> 'bbb of ccc'
-def extract_str(s, pattern, count=0, flags=0):
+def extract_string(s, pattern, count=0, flags=0):
     ptn = re.sub(r'(?P<g1>[^(]*)\((?P<g2>.+)[^\\]?\)(?P<g3>.*)', '\g<g1>(?P<g1>\g<g2>)\g<g3>', pattern)
     ret = ''
     if re.search('\(?P<g1>', ptn):
@@ -2130,7 +2130,7 @@ def random_ascii():
     return chr(c)
 
 # String
-def random_str(min, max=None, tbl=[*'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789']):
+def random_string(min, max=None, tbl=[*'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789']):
     strlen = min
     if max is not None:
         strlen = random_int(min, max)
