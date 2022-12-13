@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202211220141';
+util.v = '202212132101';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -5942,25 +5942,7 @@ util.Meter = function(target, opt) {
   var label = null;
   if (opt) label = opt.label;
   if (label) {
-    var lblEl = document.createElement('div');
-    s = {
-      position: 'absolute',
-      display: 'inline-block',
-      height: '1em',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      margin: 'auto 2px',
-      color: '#fff',
-      'font-size': '12px',
-      'font-family': 'Consolas, Monaco, Menlo, monospace, sans-serif',
-      'text-align': 'center',
-      'vertical-align': 'middle'
-    };
-    util.setStyle(lblEl, s);
-    if (label.style) util.setStyle(lblEl, label.style);
-    lblEl.innerHTML = label.text;
+    var lblEl = this.createLblEl(label);
     base.appendChild(lblEl);
   }
 
@@ -5989,6 +5971,33 @@ util.Meter = function(target, opt) {
 };
 
 util.Meter.prototype = {
+  initLblEl: function() {
+    this.lblEl = this.createLblEl();
+    this.el.appendChild(this.lblEl);
+  },
+  createLblEl: function(opt) {
+    if (!opt) opt = {};
+    var lblEl = document.createElement('div');
+    var s = {
+      position: 'absolute',
+      display: 'inline-block',
+      height: '1em',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      margin: 'auto 2px',
+      color: '#fff',
+      'font-size': '12px',
+      'font-family': 'Consolas, Monaco, Menlo, monospace, sans-serif',
+      'text-align': 'center',
+      'vertical-align': 'middle'
+    };
+    util.setStyle(lblEl, s);
+    if (opt.style) util.setStyle(lblEl, opt.style);
+    if (opt.text) lblEl.innerHTML = opt.text;
+    return lblEl;
+  },
   getValue: function() {
     return this.value;
   },
@@ -6008,10 +6017,12 @@ util.Meter.prototype = {
     this.value = v;
   },
   setText: function(s) {
+    if (!this.lblEl) this.initLblEl();
     this.lblEl.innerHTML = s;
     this.redraw();
   },
   setTextStyle: function(s) {
+    if (!this.lblEl) this.initLblEl();
     util.setStyle(this.lblEl, s);
     this.redraw();
   },
