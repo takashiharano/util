@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202212072006
+v = 202212200030
 
 import sys
 import os
@@ -2105,15 +2105,26 @@ def exec_cmd(cmd, timeout=None, encoding=None):
 # Random
 #------------------------------------------------------------------------------
 # int
-def random_int(start, stop=None, step=1):
-    if stop is None:
+def random_int(a=None, b=None, step=1):
+    start = a
+    stop = b
+    if a is None:
+        start = 0
+        stop = 9223372036854775807
+
+    if a is not None and stop is None:
         start += 1
     else:
+        if stop is not None and start > stop:
+            x = start
+            start = stop
+            stop = x
         stop += 1
+
     return random.randrange(start, stop, step)
 
 # float
-def random_float(a, b):
+def random_float(a=0, b=1):
     return random.uniform(a, b)
 
 # boolean
@@ -2130,7 +2141,7 @@ def random_ascii():
     return chr(c)
 
 # String
-def random_string(min, max=None, tbl=[*'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789']):
+def random_string(min=8, max=None, tbl=[*'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789']):
     strlen = min
     if max is not None:
         strlen = random_int(min, max)
