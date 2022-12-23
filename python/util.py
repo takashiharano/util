@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202212200030
+v = 202212240205
 
 import sys
 import os
@@ -2198,6 +2198,81 @@ def hash(src, algorithm='SHA-256'):
 def get_file_hash(path, algorithm='SHA-256'):
     b = read_binary_file(path)
     return hash(b, algorithm)
+
+#------------------------------------------------------------------------------
+# Ring Buffer
+#------------------------------------------------------------------------------
+class RingBuffer:
+    def __init__(self, size):
+        self.size = size
+        self.count = 0
+        self.buf = []
+
+    def __len__(self):
+        return len(self.buf)
+
+    def add(self, value):
+        i = self.count % self.size;
+        if self.count < self.size:
+            self.buf.append(value)
+        else:
+            self.buf[i] = value
+        self.count += 1
+
+    def get(self, index):
+        if self.size < self.count:
+            index += self.count
+        index %= self.size
+        if index >= self.count:
+            return None
+        return self.buf[index]
+
+    def get_all(self):
+        pos = 0
+        ln = self.count
+        if self.count > self.size:
+            ln = self.size
+            pos = self.count % ln
+        arr = []
+        for i in range(ln):
+            arr.append(self.get(i))
+        return arr
+
+    def get_reversed(self, index):
+        idx = (self.count - index - 1) % self.size
+        if idx >= self.count:
+            return None
+        return self.buf[idx]
+
+    def get_all_reversed(self):
+        arr = self.get_all()
+        arr.reverse()
+        return arr
+
+# [0]       <- 0
+# [0, 1]    <- 1
+# [0, 1, 2] <- 2
+# [1, 2, 3] <- 3
+def push_as_ringbuffer(arr, value, size):
+    rbuf = RingBuffer(size)
+    for i in range(len(arr)):
+        rbuf.add(arr[i])
+    rbuf.add(value)
+    return rbuf.get_all()
+
+# 0 -> [0]
+# 1 -> [1, 0]
+# 2 -> [2, 1, 0]
+# 3 -> [3, 2, 1]
+def unshift_as_ringbuffer(arr, value, size):
+    buf = [value]
+    if size > len(arr):
+        ln = len(arr)
+    else:
+        ln = size - 1
+    for i in range(ln):
+        buf.append(arr[i])
+    return buf
 
 #------------------------------------------------------------------------------
 # HTTP Request
