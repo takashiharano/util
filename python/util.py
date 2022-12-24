@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202212240205
+v = 202212241418
 
 import sys
 import os
@@ -2255,14 +2255,10 @@ class RingBuffer:
 # [0, 1, 2] <- 2
 # [1, 2, 3] <- 3
 def push(arr, value, size=0):
+    arr.append(value)
     if size == 0:
-        arr.append(value)
         return arr
-    rbuf = RingBuffer(size)
-    for i in range(len(arr)):
-        rbuf.add(arr[i])
-    rbuf.add(value)
-    return rbuf.get_all()
+    return arr[-size:]
 
 # size = 3:
 # 0 -> [0]
@@ -2270,17 +2266,10 @@ def push(arr, value, size=0):
 # 2 -> [2, 1, 0]
 # 3 -> [3, 2, 1]
 def unshift(arr, value, size=0):
+    arr.insert(0, value)
     if size == 0:
-        arr.insert(0, value)
         return arr
-    buf = [value]
-    if size > len(arr):
-        ln = len(arr)
-    else:
-        ln = size - 1
-    for i in range(ln):
-        buf.append(arr[i])
-    return buf
+    return arr[0:size]
 
 #------------------------------------------------------------------------------
 # HTTP Request
