@@ -11,7 +11,7 @@ def test(size, addsize):
     for i in range(addsize):
         data = TEST_DATA[i]
         print('add(' + str(i) + '): ' + data)
-        arr = util.push_as_ringbuffer(arr, data, size)
+        arr = util.push(arr, data, size)
 
     print('len: ' + str(len(arr)))
     print('-----------')

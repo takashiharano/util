@@ -2249,22 +2249,30 @@ class RingBuffer:
         arr.reverse()
         return arr
 
+# size = 3:
 # [0]       <- 0
 # [0, 1]    <- 1
 # [0, 1, 2] <- 2
 # [1, 2, 3] <- 3
-def push_as_ringbuffer(arr, value, size):
+def push(arr, value, size=0):
+    if size == 0:
+        arr.append(value)
+        return arr
     rbuf = RingBuffer(size)
     for i in range(len(arr)):
         rbuf.add(arr[i])
     rbuf.add(value)
     return rbuf.get_all()
 
+# size = 3:
 # 0 -> [0]
 # 1 -> [1, 0]
 # 2 -> [2, 1, 0]
 # 3 -> [3, 2, 1]
-def unshift_as_ringbuffer(arr, value, size):
+def unshift(arr, value, size=0):
+    if size == 0:
+        arr.insert(0, value)
+        return arr
     buf = [value]
     if size > len(arr):
         ln = len(arr)
