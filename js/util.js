@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202212160014';
+util.v = '202301102302';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -5829,7 +5829,8 @@ util.confirm = function(a1, a2, a3, a4, a5) {
  *     value: 80,
  *     style: '1px solid #00f'
  *   }
- *  ]
+ *  ],
+ * sleed
  * }
  *
  * <div id="meter1"></div>
@@ -5853,7 +5854,7 @@ util.Meter = function(target, opt) {
   var green = 'linear-gradient(to right, #0d0, #8f8)';
   var yellow = 'linear-gradient(to right, #dd0 , #ff8)';
   var red = 'linear-gradient(to right, #d66 , #fcc)';
-
+  var speed = 250;
   if (opt) {
     if (opt.min != undefined) min = opt.min;
     if (opt.max != undefined) max = opt.max;
@@ -5875,6 +5876,7 @@ util.Meter = function(target, opt) {
       if (opt.yellow != undefined) yellow = opt.yellow;
       if (opt.red != undefined) red = opt.red;
     }
+    if (opt.speed != undefined) speed = opt.speed;
   }
 
   if (low == undefined) low = min;
@@ -5886,7 +5888,6 @@ util.Meter = function(target, opt) {
     if (optimum < min) optimum = min;
     if (optimum > max) optimum = max;
   }
-
   var base = target;
   base.className = 'meter';
   var style = {
@@ -5906,8 +5907,7 @@ util.Meter = function(target, opt) {
   style = {
     width: v + '%',
     height: '100%',
-    background: green,
-    transition: 'all 0.25s ease-out'
+    background: green
   };
   if (opt && opt.transition) style.transition = opt.transition;
   util.setStyle(bar, style);
@@ -5961,12 +5961,14 @@ util.Meter = function(target, opt) {
     yellow: yellow,
     red: red,
     label: label,
-    scales: scales
+    scales: scales,
+    speed: speed
   };
   this.value = value;
   this.el = base;
   this.bar = bar;
   this.lblEl = lblEl;
+  this.setSpeed(speed);
   this.redraw();
 };
 
@@ -6001,10 +6003,20 @@ util.Meter.prototype = {
   getValue: function() {
     return this.value;
   },
-  setValue: function(v, txt) {
+  setValue: function(v, a2, a3) {
     if (v != null) this._setValue(v);
+    var txt, speed;
+    if (a2 != undefined) {
+      if (typeof a2 == 'string') {
+        txt = a2;speed = a3;
+      } else {
+        speed = a2;
+      }
+    }
     if (txt != undefined) this.setText(txt);
+    if (speed != undefined) this.setSpeed(speed);
     this.redraw();
+    setTimeout(util._resetMeterSpeed, 5, this);
   },
   _setValue: function(v) {
     v |= 0;
@@ -6062,6 +6074,10 @@ util.Meter.prototype = {
     this.optimum = v | 0;
     this.redraw();
   },
+  setSpeed: function(v) {
+    var s = 'all ' + (v / 1000) + 's ease-out';
+    util.setStyle(this.bar, 'transition', s);
+  },
   redraw: function() {
     var ctx = this;
     var opt = ctx.opt;
@@ -6117,6 +6133,10 @@ util.Meter.buildHTML = function(val, opt) {
   var d = document.createElement('div');
   var m = new util.Meter(d, opt);
   return m.el.outerHTML;
+};
+
+util._resetMeterSpeed = function(c) {
+  c.setSpeed(c.opt.speed);
 };
 
 //---------------------------------------------------------
