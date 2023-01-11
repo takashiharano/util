@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202301102302';
+util.v = '202301112114';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -7017,15 +7017,17 @@ util.Counter.prototype = {
   getValue: function() {
     return this.v;
   },
-  setValue: function(v) {
+  setValue: function(v, dur) {
     var ctx = this;
     v = util.floor(parseFloat(v), ctx.scale);
     ctx._stopTmr(ctx);
     ctx.v = v;
-    var dMax = ctx.dMax;
+    var dMax = (dur == undefined ? ctx.dMax : dur);
+    var dMin = (dur == undefined ? ctx.dMin : dur);
     var ngtvD = 0;
     if (dMax == 0) {
       ctx.print(ctx, v);
+      ctx.v0 = v;
       return;
     } else if (dMax < 0) {
       ngtvD = 1;
@@ -7052,12 +7054,12 @@ util.Counter.prototype = {
       } else {
         ctx.step = 1;
       }
-      if (a < ctx.dMin) ctx.r = util.ceil(ctx.dMin / a, ctx.scale);
+      if ((a < dMin) && (a != 0)) ctx.r = util.ceil(dMin / a, ctx.scale);
     }
     if (Math.floor(ctx.step) % 10 == 0) ctx.step += 1;
     if (d < 0) ctx.step *= (-1);
     if (ngtvD) {
-      var t = (a < ctx.dMin ? ctx.dMin : dMax);
+      var t = (a < dMin ? dMin : dMax);
       ctx.v0 = v;
       ctx.tmrId = setTimeout(ctx.update, t, ctx);
     } else {
