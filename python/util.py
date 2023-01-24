@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202301242230
+v = 202301242244
 
 import sys
 import os
@@ -2230,11 +2230,9 @@ class RingBuffer:
         return self.buf[index]
 
     def get_all(self):
-        pos = 0
         ln = self.count
         if self.count > self.size:
             ln = self.size
-            pos = self.count % ln
         arr = []
         for i in range(ln):
             arr.append(self.get(i))
