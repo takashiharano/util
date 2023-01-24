@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202212241418
+v = 202301242230
 
 import sys
 import os
@@ -1687,11 +1687,11 @@ def read_file_as_base64(path):
     return base64.b64encode(b).decode()
 
 # Write File
-def write_file(path, data, encoding=DEFAULT_ENCODING, make_dir=True):
+def write_file(path, data, encoding=DEFAULT_ENCODING, make_dir=True, chunk_size=0):
     if typename(data) == 'str':
         write_text_file(path, data, encoding, make_dir)
     else:
-        write_binary_file(path, data, make_dir)
+        write_binary_file(path, data, make_dir, chunk_size)
 
 # Write text file
 def write_text_file(path, text, encoding=DEFAULT_ENCODING, make_dir=True):
@@ -1710,19 +1710,21 @@ def write_text_file_from_list(path, text_list, encoding=DEFAULT_ENCODING, make_d
     write_text_file(path, text, encoding, make_dir)
 
 # Write binary file
-def write_binary_file(path, data, make_dir=True):
+def write_binary_file(path, data, make_dir=True, chunk_size=0):
     if make_dir:
         make_parent_dir(path)
     f = open(path, 'wb')
     data_type = typename(data)
-    if data_type == 'BufferedWriter' or data_type == 'BytesIO' or data_type == '_TemporaryFileWrapper':
-        for chunk in _read_chunk(data):
+    if data_type == 'BufferedWriter' or data_type == 'BytesIO' or data_type == '_TemporaryFileWrapper' or data_type == 'BufferedRandom':
+        for chunk in _read_chunk(data, chunk_size):
             f.write(chunk)
     else:
         f.write(data)
     f.close()
 
-def _read_chunk(file_object, chunk_size=102400):
+def _read_chunk(file_object, chunk_size=0):
+    if chunk_size == 0:
+        chunk_size = 102400
     while True:
         data = file_object.read(chunk_size)
         if not data:
