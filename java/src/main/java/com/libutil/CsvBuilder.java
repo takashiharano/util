@@ -242,10 +242,29 @@ public class CsvBuilder {
    * <pre>
    * e.g.,
    * CHUNK="bbb,ccc"
+   * aaaCHUNK
+   * </pre>
+   *
+   * Note that the counter values of columns/rows will be inconsistent.
+   *
+   * @param chunk
+   *          the chunk data
+   */
+  public void appendAsIs(String chunk) {
+    buffer.append(chunk);
+  }
+
+  /**
+   * Appends a string as is as a chunk to this sequence.
+   *
+   * <pre>
+   * e.g.,
+   * CHUNK="bbb,ccc"
    * aaa,CHUNK
    * </pre>
    *
-   * Note that the counter values ​​are inconsistent.
+   * This method takes care of separator handling.<br>
+   * Note that the counter values of columns/rows will be inconsistent.
    *
    * @param chunk
    *          the chunk data
@@ -326,6 +345,26 @@ public class CsvBuilder {
   }
 
   /**
+   * Sets the count of rows.
+   *
+   * @param n
+   *          count
+   */
+  public void setRowCount(int n) {
+    this.rowCount = n;
+  }
+
+  /**
+   * Sets the count of columns.
+   *
+   * @param n
+   *          count
+   */
+  public void setColCount(int n) {
+    this.colCount = n;
+  }
+
+  /**
    * Quotes the string.
    *
    * @param src
@@ -402,8 +441,7 @@ public class CsvBuilder {
     }
     if (shouldQuote) {
       value = quoteString(value, quotation, escape);
-    } else if (value.contains("\r\n") || value.contains("\n") || value.contains("\r") || value.contains(quotation)
-        || value.contains(separator)) {
+    } else if (value.contains("\r\n") || value.contains("\n") || value.contains("\r") || value.contains(quotation) || value.contains(separator)) {
       value = quoteString(value, quotation, escape);
     }
     buffer.append(value);
