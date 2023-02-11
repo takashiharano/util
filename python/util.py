@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202301242244
+v = 2023002111619
 
 import sys
 import os
@@ -1655,7 +1655,9 @@ def read_file(path, mode='b', default=None, encoding=DEFAULT_ENCODING):
         return read_binary_file(path)
 
 # Read file as text
-def read_text_file(path, encoding=DEFAULT_ENCODING):
+def read_text_file(path, default=None, encoding=DEFAULT_ENCODING):
+    if not path_exists(path):
+        return default
     # f = TextIOWrapper
     f = open(path, 'r', encoding=encoding)
     text = f.read()
