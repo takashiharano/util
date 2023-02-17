@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202301112114';
+util.v = '202302172320';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -5105,10 +5105,10 @@ util.Window.onPointerUp = function() {
   if (ctx.uiStatus & util.Window.UI_ST_RESIZING) ctx.endResize(ctx);
 };
 
-util.Window.onResize = function() {
+util.Window.onResize = function(e) {
   for (var i = 0; i < util.Window.windows.length; i++) {
     var ctx = util.Window.windows[i];
-    ctx.onResize(ctx);
+    ctx.onResize(ctx, e);
   }
 };
 
@@ -7712,27 +7712,24 @@ util._log.e = function(o) {
 };
 
 //---------------------------------------------------------
-util.onReady = function() {
-  util.setupStyle();
-};
-
-util.onResize = function() {
+util.onResize = function(e) {
   util.infotip.adjust();
   util.dialog.adjust();
-  util.Window.onResize();
+  util.Window.onResize(e);
 };
 
-util.$onReady = function() {
+util.$onReady = function(e) {
+  util.setupStyle();
   var fn = window.$onReady;
-  if (fn) fn();
+  if (fn) fn(e);
 };
-util.$onLoad = function() {
+util.$onLoad = function(e) {
   var fn = window.$onLoad;
-  if (fn) fn();
+  if (fn) fn(e);
 };
-util.$onBeforeUnload = function() {
+util.$onBeforeUnload = function(e) {
   var fn = window.$onBeforeUnload;
-  if (fn) fn();
+  if (fn) fn(e);
 };
 util.$onUnload = function() {
   var fn = window.$onUnload;
@@ -7816,7 +7813,6 @@ util.init = function() {
   try {
     if (typeof window.localStorage != 'undefined') util.LS_AVAILABLE = true;
   } catch (e) {}
-  window.addEventListener('DOMContentLoaded', util.onReady, true);
   window.addEventListener('mousemove', util.onMouseMove, true);
   window.addEventListener('mouseup', util.onMouseUp, true);
   window.addEventListener('keydown', util.onKeyDown, true);
