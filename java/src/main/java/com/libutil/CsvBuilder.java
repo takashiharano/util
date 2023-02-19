@@ -255,7 +255,8 @@ public class CsvBuilder {
   }
 
   /**
-   * Appends a string as is as a chunk to this sequence.
+   * Appends a string as is as a chunk to this sequence.<br>
+   * This method determines column positions and adds separators if necessary.
    *
    * <pre>
    * e.g.,
