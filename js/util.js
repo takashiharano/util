@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202302212318';
+util.v = '202302220108';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -7466,13 +7466,14 @@ util.onTouchEnd = function() {
 util.keyHandlers = {down: [], press: [], up: []};
 
 /**
- * keyCode: code
+ * keyCode: code / 'A'
  * type: down / press / up
  * fn: function(e) {};
  * combination: {ctrl: true, shift: false, alt: false, meta: false};
- * addKeyHandler(83, 'down', fn, combination);
+ * addKeyHandler(65, 'down', fn, combination);
  */
 util.addKeyHandler = function(keyCode, type, fn, combination) {
+  if (typeof keyCode == 'string') keyCode = keyCode.toUpperCase().charCodeAt(0);
   if ((type != 'down') && (type != 'press') && (type != 'up')) return;
   var handler = {keyCode: keyCode, combination: combination, fn: fn};
   util.keyHandlers[type].push(handler);
@@ -7524,7 +7525,6 @@ util.addEscKeyHandler = function(fn) {
 
 // k: keyCode or 'A-Za-z0-9'
 util.addCtrlKeyHandler = function(k, fn) {
-  if (typeof k == 'string') k = k.toUpperCase().charCodeAt(0);
   util.addKeyHandler(k, 'down', fn, {ctrl: true, shift: false, alt: false, meta: false});
 };
 
