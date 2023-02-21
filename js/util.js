@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202302180026';
+util.v = '202302212318';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -5416,6 +5416,11 @@ util.dialog.prototype = {
     return {boby: body, btnEls: btnEls};
   },
 
+  pressBtn: function(n) {
+    var b = this.btnEls[n];
+    if (b) util.dialog.btnCb({target: b});
+  },
+
   close: function(ctx) {
     ctx.modal.removeChild(ctx.el);
     util.modal.hide(ctx.modal);
@@ -5575,7 +5580,9 @@ util.dialog.info = function(a1, a2, a3, a4) {
     }
   }
   content.innerHTML = msg;
-  util.dialog.open(content, dialogOpt);
+  var d = util.dialog.open(content, dialogOpt);
+  d.pressOK = function() {d.pressBtn(0);};
+  return d;
 };
 
 //-----------------------------------------------------------
@@ -5669,7 +5676,15 @@ util.dialog.confirmDialog = function(title, content, definition, opt) {
     focusEl: definition.focusEl, // prior
     style: opt.style
   };
-  util.dialog.open(content, dialogOpt);
+  ctx.dlg = util.dialog.open(content, dialogOpt);
+};
+util.dialog.confirmDialog.prototype = {
+  pressY: function() {
+    this.dlg.pressBtn(0);
+  },
+  pressN: function() {
+    this.dlg.pressBtn(1);
+  }
 };
 util.dialog.sysCbY = function(ctx) {
   if (ctx.cbY) ctx.cbY(ctx.data);
@@ -5791,10 +5806,10 @@ util.dialog.text.sysCbCancel = function(ctx) {
 };
 
 util.alert = function(a1, a2, a3, a4) {
-  util.dialog.info(a1, a2, a3, a4);
+  return util.dialog.info(a1, a2, a3, a4);
 };
 util.confirm = function(a1, a2, a3, a4, a5) {
-  util.dialog.confirm(a1, a2, a3, a4, a5);
+  return util.dialog.confirm(a1, a2, a3, a4, a5);
 };
 
 //---------------------------------------------------------
