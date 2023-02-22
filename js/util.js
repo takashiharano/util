@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202302220141';
+util.v = '202302221211';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -5417,7 +5417,7 @@ util.dialog.prototype = {
     return {boby: body, btnEls: btnEls};
   },
 
-  pressBtn: function(n) {
+  pressButton: function(n) {
     if (this.open) {
       var b = this.btnEls[n];
       if (b) util.dialog.btnCb({target: b});
@@ -5519,6 +5519,12 @@ util.dialog.close = function(btnIdx) {
   }
 };
 
+util.dialog.get = function(idx) {
+  if (idx == undefined) idx = util.dialog.instances.length - 1;
+  if (idx >= util.dialog.instances.length) return null;
+  return util.dialog.instances[idx];
+};
+
 util.dialog.count = function() {
   return util.dialog.instances.length;
 };
@@ -5584,9 +5590,7 @@ util.dialog.info = function(a1, a2, a3, a4) {
     }
   }
   content.innerHTML = msg;
-  var d = util.dialog.open(content, dialogOpt);
-  d.pressOK = function() {d.pressBtn(0);};
-  return d;
+  return util.dialog.open(content, dialogOpt);
 };
 
 //-----------------------------------------------------------
@@ -5683,11 +5687,8 @@ util.dialog.confirmDialog = function(title, content, definition, opt) {
   ctx.dlg = util.dialog.open(content, dialogOpt);
 };
 util.dialog.confirmDialog.prototype = {
-  pressY: function() {
-    this.dlg.pressBtn(0);
-  },
-  pressN: function() {
-    this.dlg.pressBtn(1);
+  pressButton: function(n) {
+    this.dlg.pressButton(n);
   }
 };
 util.dialog.sysCbY = function(ctx) {
