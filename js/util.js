@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202302221211';
+util.v = '202302221938';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -5443,18 +5443,12 @@ util.dialog.focusBtn = function() {
     util.dialog.initFocusEl = null;
   }
 };
-util.dialog.getTopDialog = function() {
-  var dialog = null;
-  var instances = util.dialog.instances;
-  if (instances.length > 0) dialog = instances[instances.length - 1];
-  return dialog;
-};
 util.dialog.adjust = function() {
-  var d = util.dialog.getTopDialog();
+  var d = util.dialog.get();
   if (d) d.center(d);
 };
 util.dialog.show = function() {
-  var d = util.dialog.getTopDialog();
+  var d = util.dialog.get();
   d.el.style.opacity = 1;
   util.dialog.adjust();
 };
@@ -5505,16 +5499,16 @@ util.dialog.btnHandler = function(el) {
 };
 
 util.dialog.close = function(btnIdx) {
-  var dialog = util.dialog.instances.pop();
-  if (!dialog) return;
+  var d = util.dialog.instances.pop();
+  if (!d) return;
   if (btnIdx == undefined) {
-    dialog.close(dialog);
+    d.close(d);
   } else {
-    var b = dialog.btnEls[btnIdx];
+    var b = d.btnEls[btnIdx];
     if (b) {
-      util.dialog.btnHandler(b);
+      util.d.btnHandler(b);
     } else {
-      dialog.close(dialog);
+      d.close(d);
     }
   }
 };
@@ -5527,6 +5521,11 @@ util.dialog.get = function(idx) {
 
 util.dialog.count = function() {
   return util.dialog.instances.length;
+};
+
+util.dialog.pressButton = function(n) {
+  var d = util.dialog.get();
+  if (d) d.pressButton(n);
 };
 
 //-----------------------------------------------
