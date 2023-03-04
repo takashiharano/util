@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 2023002111619
+v = 202303041640
 
 import sys
 import os
@@ -2614,7 +2614,7 @@ def send_response(type, content, status=200, headers=None, encoding=DEFAULT_ENCO
             for name in header:
                 print(name + ': ' + header[name])
     print()
-    print(content)
+    print(content, end='')
 
 def send_result_json(status, body=None, headers=None, encoding=None):
     result = build_result_object(status, body)
