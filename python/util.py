@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202303041640
+v = 202303051637
 
 import sys
 import os
@@ -1697,8 +1697,6 @@ def write_file(path, data, encoding=DEFAULT_ENCODING, make_dir=True, chunk_size=
 
 # Write text file
 def write_text_file(path, text, encoding=DEFAULT_ENCODING, make_dir=True):
-    if typename(text) == 'list':
-        text = list2text(text)
     if make_dir:
         make_parent_dir(path)
     b = text.encode(encoding=encoding)
