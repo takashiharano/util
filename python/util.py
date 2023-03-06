@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202303051637
+v = 202303062038
 
 import sys
 import os
@@ -1786,12 +1786,11 @@ def is_dir(path):
 def file_lock(lock_file_path, retry=0, wait=1):
     cnt = 0
     while True:
-        if not os.path.exists(lock_file_path):
-            try:
-                mkdir(lock_file_path)
-                return True
-            except:
-                pass
+        try:
+            mkdir(lock_file_path)
+            return True
+        except:
+            pass
         cnt += 1
         if cnt <= retry:
             time.sleep(wait)
