@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202303051637
+v = 202303152017
 
 import sys
 import os
@@ -2512,6 +2512,16 @@ def build_cookie_for_clear(key, path=None, secure=False, http_only=False):
     if http_only:
         s += '; HttpOnly'
 
+    return s
+
+def link_urls(s, attr=None):
+    if attr is None:
+        attr = 'target="_blank" rel="noopener"'
+    link = '<a href="\\1"'
+    if attr != '':
+        link += ' ' + attr;
+    link += '>\\1</a>';
+    s = replace(s, '(https?:\/\/[!#$%&\'*+,/:;=?@[\]0-9A-Za-z\-._~]+)', link);
     return s
 
 #------------------------------------------------------------------------------
