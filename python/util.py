@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202303152017
+v = 202303170034
 
 import sys
 import os
@@ -527,6 +527,11 @@ def bytes2bin(b, line_break=16):
         sb = bin(v)[2:]
         s += sb.zfill(8)
     return s
+
+def is_comment(line, start='#'):
+    if line.strip().startswith(start):
+        return True
+    return False
 
 #------------------------------------------------------------------------------
 # String permutation
