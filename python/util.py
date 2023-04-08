@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202303170034
+v = 202304081254
 
 import sys
 import os
@@ -532,6 +532,48 @@ def is_comment(line, start='#'):
     if line.strip().startswith(start):
         return True
     return False
+
+#------------------------------------------------------------------------------
+# has_item_value(items='AAA|BBB|CCC', item='BBB') = True
+def has_item_value(items, item, separator='|'):
+    if typename(items) == 'str':
+        items = items.split(separator)
+    for i in range(len(items)):
+        if items[i] == item:
+            return True
+    return False
+
+# add_item_value(items='AAA|BBB', item='CCC') = 'AAA|BBB|CCC'
+def add_item_value(items, item, separator='|'):
+    tp = 'list'
+    if typename(items) == 'str':
+        tp = 'str'
+        items = items.split(separator)
+    if not has_item_value(items, item, separator):
+        items.append(item)
+    if tp == 'str':
+        items = _to_items_str(items, separator)
+    return items
+
+# remove_item_value(items='AAA|BBB|CCC', item='CCC') = 'AAA|BBB'
+def remove_item_value(items, item, separator='|'):
+    tp = 'list'
+    if typename(items) == 'str':
+        tp = 'str'
+        items = items.split(separator)
+    if not has_item_value(items, item, separator):
+        items.remove(item)
+    if tp == 'str':
+        items = _to_items_str(items, separator)
+    return items
+
+def _to_items_str(items, separator='|'):
+    s = ''
+    for i in range(len(items)):
+        if i > 0:
+            s += separator
+        s += items[i]
+    return s
 
 #------------------------------------------------------------------------------
 # String permutation
