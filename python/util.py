@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202304081254
+v = 202304081753
 
 import sys
 import os
@@ -538,10 +538,7 @@ def is_comment(line, start='#'):
 def has_item_value(items, item, separator='|'):
     if typename(items) == 'str':
         items = items.split(separator)
-    for i in range(len(items)):
-        if items[i] == item:
-            return True
-    return False
+    return item in items
 
 # add_item_value(items='AAA|BBB', item='CCC') = 'AAA|BBB|CCC'
 def add_item_value(items, item, separator='|'):
@@ -561,7 +558,7 @@ def remove_item_value(items, item, separator='|'):
     if typename(items) == 'str':
         tp = 'str'
         items = items.split(separator)
-    if not has_item_value(items, item, separator):
+    if item in items:
         items.remove(item)
     if tp == 'str':
         items = _to_items_str(items, separator)
