@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202304081753
+v = 202304110115
 
 import sys
 import os
@@ -537,7 +537,7 @@ def is_comment(line, start='#'):
 # has_item_value(items='AAA|BBB|CCC', item='BBB') = True
 def has_item_value(items, item, separator='|'):
     if typename(items) == 'str':
-        items = items.split(separator)
+        items = split_item_value(items, separator)
     return item in items
 
 # add_item_value(items='AAA|BBB', item='CCC') = 'AAA|BBB|CCC'
@@ -545,8 +545,8 @@ def add_item_value(items, item, separator='|'):
     tp = 'list'
     if typename(items) == 'str':
         tp = 'str'
-        items = items.split(separator)
-    if not has_item_value(items, item, separator):
+        items = split_item_value(items, separator)
+    if not item in items:
         items.append(item)
     if tp == 'str':
         items = _to_items_str(items, separator)
@@ -557,12 +557,18 @@ def remove_item_value(items, item, separator='|'):
     tp = 'list'
     if typename(items) == 'str':
         tp = 'str'
-        items = items.split(separator)
+        items = split_item_value(items, separator)
     if item in items:
         items.remove(item)
     if tp == 'str':
         items = _to_items_str(items, separator)
     return items
+
+def split_item_value(s, separator):
+    a = s.split(separator)
+    if len(a) == 1 and a[0] == '':
+        a = []
+    return a
 
 def _to_items_str(items, separator='|'):
     s = ''
