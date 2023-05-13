@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202304140147';
+util.v = '202305130104';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -5510,6 +5510,12 @@ util.dialog.close = function(btnIdx) {
     } else {
       d.close(d);
     }
+  }
+};
+util.dialog.closeAll = function() {
+  var n = util.dialog.count();
+  for (var i = 0; i < n; i++) {
+    util.dialog.close();
   }
 };
 
