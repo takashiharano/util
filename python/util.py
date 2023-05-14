@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202304110115
+v = 202305142241
 
 import sys
 import os
@@ -2462,7 +2462,8 @@ def _get_query(s, key):
     for i in range(len(q)):
         p = q[i].split('=')
         if p[0] == key:
-            a.append(p[1])
+            if len(p) >= 2:
+                a.append(p[1])
     v = None
     if len(a) == 1:
         v = a[0]
