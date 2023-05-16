@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202305142241
+v = 202305170010
 
 import sys
 import os
@@ -2440,10 +2440,16 @@ def get_request_param(key, default=None):
 # Query String
 def get_query(key=None, q=None):
     if q is None:
-        if os.environ.get('REQUEST_METHOD') == 'POST':
-            q = read_stdin()
+        content_type = os.environ.get('CONTENT_TYPE', '')
+        if content_type.startswith('multipart/form-data'):
+            if key is not None:
+                form = get_field_storage()
+                return form.getvalue(key, None)
         else:
-            q = os.environ.get('QUERY_STRING')
+            if os.environ.get('REQUEST_METHOD') == 'POST':
+                q = read_stdin()
+            else:
+                q = os.environ.get('QUERY_STRING')
 
     if q is not None and key is not None:
         q = _get_query(q, key)
