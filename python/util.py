@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202305211937
+v = 202305212036
 
 import sys
 import os
@@ -2649,7 +2649,7 @@ def get_status_message(status):
 #  {'Set-Cookie': 'key2=val2'}
 #  {'Location': '/foo.txt'},
 # ]
-def send_response(type, content, status=200, headers=None, encoding=DEFAULT_ENCODING):
+def send_response(content, type='text/plain', status=200, headers=None, encoding=DEFAULT_ENCODING):
     global res_debug
 
     # Prevent the following error:
@@ -2660,21 +2660,15 @@ def send_response(type, content, status=200, headers=None, encoding=DEFAULT_ENCO
     if stdin_data is None and field_storage is None:
         stdin_data = sys.stdin.read()
 
-    if type == 'text':
-        type = 'text/plain'
-    elif type == 'json':
-        type = 'application/json'
+    if type == 'application/json':
         if typename(content) != 'str':
             content = to_json(content)
-    elif type == 'html':
-        type = 'text/html'
-    elif type == 'binary':
-        type = 'application/octet-stream'
 
     content_type = 'Content-Type: ' + type
     if encoding is not None:
-        content_type += '; charset=' + encoding
         set_stdout_encoding(encoding)
+        if type != 'application/octet-stream':
+            content_type += '; charset=' + encoding
 
     if res_debug:
         log(content)
@@ -2693,7 +2687,7 @@ def send_response(type, content, status=200, headers=None, encoding=DEFAULT_ENCO
 def send_result_json(status, body=None, headers=None, encoding=None):
     result = build_result_object(status, body)
     content = to_json(result)
-    send_response('json', content, headers=headers, encoding=encoding)
+    send_response(content, 'application/json', headers=headers, encoding=encoding)
 
 def build_result_object(status, body=None, headers=None):
     result = {
@@ -2711,7 +2705,7 @@ def send_response_debug(enable=True):
 
 def send_html(html, headers=[]):
     headers.append({'Cache-Control': 'no-cache'})
-    send_response('html', html, headers=headers)
+    send_response(html, 'text/html', headers=headers)
 
 # Send binary response
 # content: bytes or hex string
