@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202305170010
+v = 202305211937
 
 import sys
 import os
@@ -2431,38 +2431,46 @@ def decode_uri(s):
 #------------------------------------------------------------------------------
 # CGI
 #------------------------------------------------------------------------------
-def get_request_param(key, default=None):
-    v = get_query(key)
+def get_request_param(key=None, default=None):
+    q = get_query()
+    v = get_query_value(q, key, default)
+    return v
+
+# from query string
+def get_query_param(key=None, default=None):
+    q = os.environ.get('QUERY_STRING')
+    v = get_query_value(q, key, default)
+    return v
+
+# returns whole query string
+def get_query():
+    content_type = os.environ.get('CONTENT_TYPE', '')
+    if content_type.startswith('multipart/form-data'):
+        q = get_field_storage()
+    elif os.environ.get('REQUEST_METHOD') == 'POST':
+        q = read_stdin()
+    else:
+        q = os.environ.get('QUERY_STRING')
+    return q
+
+# returns key=None ? s : s[key]
+def get_query_value(s, key=None, default=None):
+    v = s
+    if typename(s) == 'FieldStorage':
+        v = s.getvalue(key, None)
+    elif v is not None and key is not None:
+        v = get_query_param_value(s, key)
+        if v is not None:
+            if typename(v) == 'list':
+                for i in range(len(v)):
+                    v[i] = decode_uri(v[i])
+            else:
+                v = decode_uri(v)
     if v is None:
         v = default
     return v
 
-# Query String
-def get_query(key=None, q=None):
-    if q is None:
-        content_type = os.environ.get('CONTENT_TYPE', '')
-        if content_type.startswith('multipart/form-data'):
-            if key is not None:
-                form = get_field_storage()
-                return form.getvalue(key, None)
-        else:
-            if os.environ.get('REQUEST_METHOD') == 'POST':
-                q = read_stdin()
-            else:
-                q = os.environ.get('QUERY_STRING')
-
-    if q is not None and key is not None:
-        q = _get_query(q, key)
-        if q is not None:
-            if typename(q) == 'list':
-                for i in range(len(q)):
-                    q[i] = decode_uri(q[i])
-            else:
-                q = decode_uri(q)
-
-    return q
-
-def _get_query(s, key):
+def get_query_param_value(s, key):
     q = s.split('&')
     a = []
     for i in range(len(q)):
@@ -2479,6 +2487,7 @@ def _get_query(s, key):
 
 # for file upload
 # Exclusive with read_stdin()
+# returns FieldStorage
 def get_field_storage():
     global field_storage
     if field_storage is None:
