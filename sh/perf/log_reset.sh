@@ -1,8 +1,8 @@
 #!/bin/bash -eu
 
-LOG_DIR="/home/user1/logs"
+LOG_DIR="/home/user1/logs/perf"
 FILE_NAME="perf.log"
-MAX_N=9
+MAX_N=90
 
 cd ${LOG_DIR}
 file_path="${LOG_DIR}/${FILE_NAME}"

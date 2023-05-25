@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-LOG_DIR="/home/user1/logs"
+LOG_DIR="/home/user1/logs/perf"
 FILE_NAME="perf.log"
 JVM=""
 
