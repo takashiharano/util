@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202305212036
+v = 202306170126
 
 import sys
 import os
@@ -532,6 +532,95 @@ def is_comment(line, start='#'):
     if line.strip().startswith(start):
         return True
     return False
+
+def split_parameters(s, limit=0):
+    vsls = []
+    start = 0
+    val_len = 0
+    srch = True
+    quoted = False
+    quoted_ch = None
+    paren = 0
+    ch = ''
+    val = ''
+    for i in range(len(s)):
+        val_len += 1
+        ch = s[i]
+
+        if ch == ' ':
+            if srch or quoted_ch is not None or paren > 0:
+                continue
+            else:
+                srch = True
+                if quoted:
+                    val = s[start + 1:start + val_len - 1]
+                    quoted = False
+                else:
+                    val = s[start:start + val_len]
+                vsls.append(val)
+                if len(vsls) + 1 == limit:
+                    if i < len(s) - 1:
+                        start = i + 1
+                        val_len = len(s) - start
+                        if quoted:
+                            val = s[start + 1:start + val_len - 1]
+                            quoted = False
+                        else:
+                            val = s[start:start + val_len]
+                        vsls.append(val)
+                        i = len(s)
+
+        elif ch == '(':
+            if srch:
+                start = i
+                val_len = 0
+                srch = False
+            if quoted_ch is None:
+                paren += 1
+
+        elif ch == ')':
+            if srch:
+                start = i
+                val_len = 0
+                srch = False
+            elif paren > 0:
+                if i > 0 and s[i - 1] == '\\':
+                    continue
+                paren -= 1
+
+        elif ch == '"' or ch == "'":
+            if paren > 0:
+                continue
+            elif srch:
+                start = i
+                val_len = 0
+                srch = False
+                quoted = True
+                quoted_ch = ch
+            elif ch == quoted_ch:
+                if i > 0 and s[i - 1] == '\\':
+                    continue
+                quoted_ch = None
+
+        else:
+            if srch:
+                start = i
+                val_len = 0
+                srch = False
+
+    val_len += 1
+    if not srch:
+        if quoted:
+            val = s[start + 1:start + val_len - 1]
+            quoted = False
+        else:
+            val = s[start:start + val_len]
+        vsls.append(val)
+
+    if len(vsls) == 0:
+        vsls = ['']
+
+    return vsls
 
 #------------------------------------------------------------------------------
 # has_item_value(items='AAA|BBB|CCC', item='BBB') = True
