@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202306170126
+v = 202306171934
 
 import sys
 import os
@@ -533,8 +533,8 @@ def is_comment(line, start='#'):
         return True
     return False
 
-def split_parameters(s, limit=0):
-    vsls = []
+def split_keywords(s, limit=0):
+    vals = []
     start = 0
     val_len = 0
     srch = True
@@ -543,6 +543,7 @@ def split_parameters(s, limit=0):
     paren = 0
     ch = ''
     val = ''
+    s = s.strip()
     for i in range(len(s)):
         val_len += 1
         ch = s[i]
@@ -557,8 +558,9 @@ def split_parameters(s, limit=0):
                     quoted = False
                 else:
                     val = s[start:start + val_len]
-                vsls.append(val)
-                if len(vsls) + 1 == limit:
+
+                vals.append(val)
+                if len(vals) + 1 == limit:
                     if i < len(s) - 1:
                         start = i + 1
                         val_len = len(s) - start
@@ -567,7 +569,7 @@ def split_parameters(s, limit=0):
                             quoted = False
                         else:
                             val = s[start:start + val_len]
-                        vsls.append(val)
+                        vals.append(val)
                         i = len(s)
 
         elif ch == '(':
@@ -591,16 +593,20 @@ def split_parameters(s, limit=0):
         elif ch == '"' or ch == "'":
             if paren > 0:
                 continue
-            elif srch:
-                start = i
-                val_len = 0
-                srch = False
-                quoted = True
-                quoted_ch = ch
             elif ch == quoted_ch:
                 if i > 0 and s[i - 1] == '\\':
                     continue
                 quoted_ch = None
+                if i < len(s) - 1 and s[i + 1] != ' ':
+                    quoted = False
+
+            else:
+                if srch:
+                    start = i
+                    val_len = 0
+                    srch = False
+                    quoted = True
+                quoted_ch = ch
 
         else:
             if srch:
@@ -615,12 +621,12 @@ def split_parameters(s, limit=0):
             quoted = False
         else:
             val = s[start:start + val_len]
-        vsls.append(val)
+        vals.append(val)
 
-    if len(vsls) == 0:
-        vsls = ['']
+    if len(vals) == 0:
+        vals = ['']
 
-    return vsls
+    return vals
 
 #------------------------------------------------------------------------------
 # has_item_value(items='AAA|BBB|CCC', item='BBB') = True
