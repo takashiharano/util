@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202306171934
+v = 202306172007
 
 import sys
 import os
@@ -538,7 +538,7 @@ def split_keywords(s, limit=0):
     start = 0
     val_len = 0
     srch = True
-    quoted = False
+    quoting_ch = None
     quoted_ch = None
     paren = 0
     ch = ''
@@ -549,26 +549,22 @@ def split_keywords(s, limit=0):
         ch = s[i]
 
         if ch == ' ':
-            if srch or quoted_ch is not None or paren > 0:
+            if srch or quoting_ch is not None or paren > 0:
                 continue
             else:
                 srch = True
-                if quoted:
-                    val = s[start + 1:start + val_len - 1]
-                    quoted = False
-                else:
-                    val = s[start:start + val_len]
-
+                val = s[start:start + val_len]
+                val = extract_quoted_string(val, quoted_ch)
+                quoted_ch = None
                 vals.append(val)
+
                 if len(vals) + 1 == limit:
                     if i < len(s) - 1:
                         start = i + 1
                         val_len = len(s) - start
-                        if quoted:
-                            val = s[start + 1:start + val_len - 1]
-                            quoted = False
-                        else:
-                            val = s[start:start + val_len]
+                        val = s[start:start + val_len]
+                        val = extract_quoted_string(val, quoted_ch)
+                        quoted_ch = None
                         vals.append(val)
                         i = len(s)
 
@@ -577,7 +573,7 @@ def split_keywords(s, limit=0):
                 start = i
                 val_len = 0
                 srch = False
-            if quoted_ch is None:
+            if quoting_ch is None:
                 paren += 1
 
         elif ch == ')':
@@ -593,20 +589,17 @@ def split_keywords(s, limit=0):
         elif ch == '"' or ch == "'":
             if paren > 0:
                 continue
-            elif ch == quoted_ch:
+            elif ch == quoting_ch:
                 if i > 0 and s[i - 1] == '\\':
                     continue
-                quoted_ch = None
-                if i < len(s) - 1 and s[i + 1] != ' ':
-                    quoted = False
-
+                quoting_ch = None
             else:
                 if srch:
                     start = i
                     val_len = 0
                     srch = False
-                    quoted = True
-                quoted_ch = ch
+                    quoted_ch = ch
+                quoting_ch = ch
 
         else:
             if srch:
@@ -616,17 +609,20 @@ def split_keywords(s, limit=0):
 
     val_len += 1
     if not srch:
-        if quoted:
-            val = s[start + 1:start + val_len - 1]
-            quoted = False
-        else:
-            val = s[start:start + val_len]
+        val = s[start:start + val_len]
+        val = extract_quoted_string(val, quoted_ch)
+        quoted_ch = None
         vals.append(val)
 
     if len(vals) == 0:
         vals = ['']
 
     return vals
+
+def extract_quoted_string(s, q='"'):
+    if q is None or len(s) == 0 or len(s) == 1 or s[0] != q or s[-1] != q:
+        return s
+    return s[1:len(s) - 1]
 
 #------------------------------------------------------------------------------
 # has_item_value(items='AAA|BBB|CCC', item='BBB') = True

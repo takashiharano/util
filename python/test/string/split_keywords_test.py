@@ -8,6 +8,7 @@ TEST_DATA_IN = [
     'aaa',
     'aaa bbb',
     'aaa bbb ccc',
+    '\"aaa\"',
     '"aaa bbb"',
     'aaa "bbb ccc"',
     'aaa "bbb ccc" ddd',
@@ -15,14 +16,11 @@ TEST_DATA_IN = [
     '"aaa\"bbb\"" ccc',
     'aaa:"bbb ccc"',
     'aaa bbb:"ccc ddd"',
-    'aaa bbb:"ccc ddd" eee',
-    '\"aaa\"'
+    'aaa bbb:"ccc ddd" eee'
 ]
 
 TEST_DATA_IN2 = [
-    'aaa',
-    'aaa bbb',
-    'aaa bbb ccc',
+    '\'aaa\'',
     '\'aaa bbb\'',
     'aaa \'bbb ccc\'',
     'aaa \'bbb ccc\' ddd',
@@ -30,10 +28,8 @@ TEST_DATA_IN2 = [
     '\'aaa\'bbb\'\' ccc',
     'aaa:\'bbb ccc\'',
     'aaa bbb:\'ccc ddd\'',
-    'aaa bbb:\'ccc ddd\' eee',
-    '\'aaa\''
+    'aaa bbb:\'ccc ddd\' eee'
 ]
-
 
 TEST_DATA_IN3 = [
     '(aaa)',
@@ -50,7 +46,7 @@ def test1(data_in):
     for i in range(len(word_list)):
         word = word_list[i]
         print('[' + str(i) + '] ' + word)
-    print('\n')
+    print('')
 
 def main():
     for i in range(len(TEST_DATA_IN)):
