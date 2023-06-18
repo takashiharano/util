@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202306172007
+v = 202306181520
 
 import sys
 import os
@@ -533,6 +533,7 @@ def is_comment(line, start='#'):
         return True
     return False
 
+# 'aaa "bbb ccc"' -> ['aaa', 'bbb ccc']
 def split_keywords(s, limit=0):
     vals = []
     start = 0
@@ -555,8 +556,8 @@ def split_keywords(s, limit=0):
                 srch = True
                 val = s[start:start + val_len]
                 val = extract_quoted_string(val, quoted_ch)
-                quoted_ch = None
                 vals.append(val)
+                quoted_ch = None
 
                 if len(vals) + 1 == limit:
                     if i < len(s) - 1:
@@ -564,8 +565,8 @@ def split_keywords(s, limit=0):
                         val_len = len(s) - start
                         val = s[start:start + val_len]
                         val = extract_quoted_string(val, quoted_ch)
-                        quoted_ch = None
                         vals.append(val)
+                        quoted_ch = None
                         i = len(s)
 
         elif ch == '(':
@@ -611,16 +612,19 @@ def split_keywords(s, limit=0):
     if not srch:
         val = s[start:start + val_len]
         val = extract_quoted_string(val, quoted_ch)
-        quoted_ch = None
         vals.append(val)
+        quoted_ch = None
 
     if len(vals) == 0:
         vals = ['']
 
     return vals
 
-def extract_quoted_string(s, q='"'):
-    if q is None or len(s) == 0 or len(s) == 1 or s[0] != q or s[-1] != q:
+# '"abc"' -> 'abc'
+def extract_quoted_string(s, q1='"', q2=None):
+    if q2 is None:
+        q2 = q1
+    if s is None or q1 is None or len(s) == 0 or len(s) == 1 or s[0] != q1 or s[-1] != q2:
         return s
     return s[1:len(s) - 1]
 
