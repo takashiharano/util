@@ -852,7 +852,7 @@ public class StrUtil {
     if (s == null) {
       return false;
     }
-    return match(s, "^-?\\d+\\.\\d+$");
+    return match(s, "^[-+]?\\d*\\.\\d+$");
   }
 
   /**
@@ -866,7 +866,7 @@ public class StrUtil {
     if (s == null) {
       return false;
     }
-    return match(s, "^-?\\d+$");
+    return match(s, "^[-+]?\\d+$");
   }
 
   /**

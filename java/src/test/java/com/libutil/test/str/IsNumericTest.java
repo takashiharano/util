@@ -34,6 +34,30 @@ public class IsNumericTest {
 
     str = "-1.";
     Log.d(str + "=" + StrUtil.isInteger(str));
+
+    str = "+1";
+    Log.d(str + "=" + StrUtil.isInteger(str));
+
+    str = "+1.2";
+    Log.d(str + "=" + StrUtil.isInteger(str));
+
+    str = ".1";
+    Log.d(str + "=" + StrUtil.isInteger(str));
+
+    str = "-.1";
+    Log.d(str + "=" + StrUtil.isInteger(str));
+
+    str = "+.1";
+    Log.d(str + "=" + StrUtil.isInteger(str));
+
+    str = "abc";
+    Log.d(str + "=" + StrUtil.isInteger(str));
+
+    str = "";
+    Log.d(str + "=" + StrUtil.isInteger(str));
+
+    str = null;
+    Log.d(str + "=" + StrUtil.isInteger(str));
   }
 
   private static void isFloatTest() {
@@ -56,6 +80,30 @@ public class IsNumericTest {
     Log.d(str + "=" + StrUtil.isFloat(str));
 
     str = "-1.";
+    Log.d(str + "=" + StrUtil.isFloat(str));
+
+    str = "+1";
+    Log.d(str + "=" + StrUtil.isFloat(str));
+
+    str = "+1.2";
+    Log.d(str + "=" + StrUtil.isFloat(str));
+
+    str = ".1";
+    Log.d(str + "=" + StrUtil.isFloat(str));
+
+    str = "-.1";
+    Log.d(str + "=" + StrUtil.isFloat(str));
+
+    str = "+.1";
+    Log.d(str + "=" + StrUtil.isFloat(str));
+
+    str = "abc";
+    Log.d(str + "=" + StrUtil.isFloat(str));
+
+    str = "";
+    Log.d(str + "=" + StrUtil.isFloat(str));
+
+    str = null;
     Log.d(str + "=" + StrUtil.isFloat(str));
   }
 
@@ -81,6 +129,21 @@ public class IsNumericTest {
     Log.d(str + "=" + StrUtil.isNumeric(str));
 
     str = "-1.";
+    Log.d(str + "=" + StrUtil.isNumeric(str));
+
+    str = "+1";
+    Log.d(str + "=" + StrUtil.isNumeric(str));
+
+    str = "+1.2";
+    Log.d(str + "=" + StrUtil.isNumeric(str));
+
+    str = ".1";
+    Log.d(str + "=" + StrUtil.isNumeric(str));
+
+    str = "-.1";
+    Log.d(str + "=" + StrUtil.isNumeric(str));
+
+    str = "+.1";
     Log.d(str + "=" + StrUtil.isNumeric(str));
 
     str = "abc";
@@ -117,6 +180,21 @@ public class IsNumericTest {
     str = "-1.";
     Log.d(str + "=" + StrUtil.isNaN(str));
 
+    str = "+1";
+    Log.d(str + "=" + StrUtil.isNaN(str));
+
+    str = "+1.2";
+    Log.d(str + "=" + StrUtil.isNaN(str));
+
+    str = ".1";
+    Log.d(str + "=" + StrUtil.isNaN(str));
+
+    str = "-.1";
+    Log.d(str + "=" + StrUtil.isNaN(str));
+
+    str = "+.1";
+    Log.d(str + "=" + StrUtil.isNaN(str));
+
     str = "abc";
     Log.d(str + "=" + StrUtil.isNaN(str));
 
@@ -149,6 +227,21 @@ public class IsNumericTest {
     Log.d(str + "=" + StrUtil.isNumber(str));
 
     str = "-1.";
+    Log.d(str + "=" + StrUtil.isNumber(str));
+
+    str = "+1";
+    Log.d(str + "=" + StrUtil.isNumber(str));
+
+    str = "+1.2";
+    Log.d(str + "=" + StrUtil.isNumber(str));
+
+    str = ".1";
+    Log.d(str + "=" + StrUtil.isNumber(str));
+
+    str = "-.1";
+    Log.d(str + "=" + StrUtil.isNumber(str));
+
+    str = "+.1";
     Log.d(str + "=" + StrUtil.isNumber(str));
 
     str = "abc";
