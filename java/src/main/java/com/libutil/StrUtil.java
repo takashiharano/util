@@ -1777,7 +1777,8 @@ public class StrUtil {
     int start = 0;
     int len = 0;
     boolean srch = true;
-    char quot = 0;
+    char quotingCh = 0;
+    char quotedCh = 0;
     int paren = 0;
     char ch;
     String str = "";
@@ -1787,18 +1788,22 @@ public class StrUtil {
       ch = src.charAt(i);
       switch (ch) {
         case ' ':
-          if (srch || (quot != 0) || (paren > 0)) {
+          if (srch || (quotingCh != 0) || (paren > 0)) {
             continue;
           } else {
             srch = true;
             str = src.substring(start, start + len);
+            str = extractQuotedString(str, quotedCh);
             keywords.add(str);
+            quotedCh = 0;
             if (keywords.size() + 1 == limit) {
               if (i < size - 1) {
                 start = i + 1;
                 len = size - start;
                 str = src.substring(start, start + len);
+                str = extractQuotedString(str, quotedCh);
                 keywords.add(str);
+                quotedCh = 0;
                 i = src.length();
               }
             }
@@ -1810,7 +1815,7 @@ public class StrUtil {
             len = 0;
             srch = false;
           }
-          if (quot == 0) {
+          if (quotingCh == 0) {
             paren++;
           }
           break;
@@ -1830,16 +1835,19 @@ public class StrUtil {
         case '\'':
           if (paren > 0) {
             continue;
-          } else if (srch) {
-            start = i;
-            len = 0;
-            srch = false;
-            quot = ch;
-          } else if (ch == quot) {
+          } else if (ch == quotingCh) {
             if ((i > 0) && (src.charAt(i - 1) == '\\')) {
               continue;
             }
-            quot = 0;
+            quotingCh = 0;
+          } else {
+            if (srch) {
+              start = i;
+              len = 0;
+              srch = false;
+              quotedCh = ch;
+            }
+            quotingCh = ch;
           }
           break;
         default:
@@ -1853,7 +1861,9 @@ public class StrUtil {
     len++;
     if (!srch) {
       str = src.substring(start, start + len);
+      str = extractQuotedString(str, quotedCh);
       keywords.add(str);
+      quotedCh = 0;
     }
 
     String[] ret;
@@ -1864,6 +1874,29 @@ public class StrUtil {
       keywords.toArray(ret);
     }
     return ret;
+  }
+
+  public static String extractQuotedString(String s) {
+    return extractQuotedString(s, (char) 0x22, (char) 0);
+  }
+
+  public static String extractQuotedString(String s, String q) {
+    return extractQuotedString(s, q.charAt(0), (char) 0);
+  }
+
+  public static String extractQuotedString(String s, String qS, String qE) {
+    return extractQuotedString(s, qS.charAt(0), qE.charAt(0));
+  }
+
+  public static String extractQuotedString(String s, char q) {
+    return extractQuotedString(s, q, q);
+  }
+
+  public static String extractQuotedString(String s, char qS, char qE) {
+    if ((s == null) || (qS == 0) || (s.length() == 0) || (s.length() == 1) || (s.charAt(0) != qS) || (s.charAt(s.length() - 1) != qE)) {
+      return s;
+    }
+    return s.substring(1, s.length() - 1);
   }
 
   /**
