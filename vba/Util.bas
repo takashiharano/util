@@ -24,7 +24,7 @@
 ' SOFTWARE.
 '
 ' https://libutil.com/
-' v202106272353
+' v202306182144
 '==============================================================================
 Option Explicit
 
@@ -51,7 +51,7 @@ Const adSaveCreateOverWrite = 2
 '# File
 '------------------------------------------------------------------------------
 ''
-' テキストファイルを読み込んで返します。
+' Reads a text file and returns the contents.
 '
 Public Function ReadTextFile(path As String, Optional charset As String = "UTF-8") As String
     Dim buf As String
@@ -66,7 +66,7 @@ Public Function ReadTextFile(path As String, Optional charset As String = "UTF-8
 End Function
 
 ''
-' テキストファイルを読み込んで改行で区切った配列として返します。
+' Returns the text file content as an array splitted by Newline.
 '
 Public Function ReadTextFileAsArray(path As String, Optional charset As String = "UTF-8") As String()
     Dim txt As String
@@ -75,7 +75,7 @@ Public Function ReadTextFileAsArray(path As String, Optional charset As String =
 End Function
 
 ''
-' テキストファイルを書き込みます。
+' Writes the string content into a text file.
 '
 Public Sub WriteTextFile(path As String, content As String, Optional charset As String = "UTF-8")
     With CreateObject("ADODB.Stream")
@@ -102,7 +102,7 @@ Public Sub WriteTextFile(path As String, content As String, Optional charset As 
 End Sub
 
 ''
-' ファイルが存在するかを返します。
+' Returns whether the file exists.
 '
 Public Function FileExists(path As String) As Boolean
     If Dir(path) = "" Then
@@ -113,7 +113,7 @@ Public Function FileExists(path As String) As Boolean
 End Function
 
 ''
-' ファイル存在しない場合にTrueを返します。
+' Returns True if the file does not exist.
 '
 Public Function FileNotFound(path As String) As Boolean
     If Dir(path) = "" Then
@@ -124,8 +124,8 @@ Public Function FileNotFound(path As String) As Boolean
 End Function
 
 ''
-' ファイルを削除します。
-' 戻り値：削除したらTrue
+' Delete the file.
+' Returns: True if deleted
 '
 Public Function DeleteFile(path As String) As Boolean
     DeleteFile = False
@@ -136,9 +136,9 @@ Public Function DeleteFile(path As String) As Boolean
 End Function
 
 ''
-' フォルダを選択します。
-' 選択ダイアログを表示、選択するとそのパスを返します。
-' SelectFolderPath("A1")  'A1セルにパス文字列を設定します。
+' Select a folder.
+' Displays the selection dialog and returns the path when selected.
+' SelectFolderPath("A1") 'Set the path string in cell A1.
 '
 Public Function SelectFolderPath(Optional outCell As String = "", Optional ws As Worksheet = Nothing)
     If ws Is Nothing Then
@@ -162,11 +162,11 @@ Public Function SelectFolderPath(Optional outCell As String = "", Optional ws As
 End Function
 
 ''
-' ファイルパスを選択します。
-' 選択ダイアログを表示、選択するとそのパスを返します。
-' title:="ダイアログタイトル"
-' fileFilter:="ファイル種別フィルター"
-' outCell:="A1" A1セルにパス文字列を設定します。
+' Select a file path.
+' Displays the selection dialog and returns the path when selected.
+' title:="Dialog title"
+' fileFilter:="File type filter"
+' outCell:="A1" Set the path string in cell A1.
 '
 Public Function SelectFilePath(Optional title As String = "", _
                                Optional fileFilter As String = "All Files (*.*),*.*", _
@@ -188,7 +188,7 @@ Public Function SelectFilePath(Optional title As String = "", _
 End Function
 
 ''
-' パスからファイル名の部分を返します。
+' Returns the filename part from the path.
 ' "C:\dir\file.txt" -> "bar.txt"
 ' "file.txt"        -> "bar.txt"
 '
@@ -199,7 +199,7 @@ Public Function GetFileName(path) As String
 End Function
 
 ''
-' パスから拡張子を返します。
+' Returns the extension from a path.
 ' "C:\dir\file.txt" -> "txt"
 ' "file.txt"        -> "txt"
 '
@@ -212,10 +212,10 @@ Public Function GetFileExtension(path) As String
 End Function
 
 ''
-' 指定されたフォルダを親パス含めて生成します。
+' Generate the specified folder including the parent path.
 '
-' 絶対: "C:\a\b\c"
-' 相対: "a\b\c"
+' Absolute: "C:\a\b\c"
+' Relative: "a\b\c"
 '
 Public Sub MkDirs(path As String)
     Dim i As Long
@@ -237,7 +237,7 @@ End Sub
 '# Workbook
 '------------------------------------------------------------------------------
 ''
-' ExcelのBookが開いているか返します。
+' Returns whether the Excel Book is open.
 '
 Public Function IsBookOpened(path) As Boolean
     IsBookOpened = False
@@ -253,7 +253,7 @@ Public Function IsBookOpened(path) As Boolean
 End Function
 
 ''
-' ExcelのBookを開きます。
+' Open an Excel Book.
 '
 ' Dim wb As Workbook
 ' Set wb = OpenBook("C:\Book1.xlsx")
@@ -272,7 +272,7 @@ ErrHandler:
 End Function
 
 ''
-' ExcelのBookを閉じます。
+' Close the Excel Book.
 '
 Public Function CloseBook(path)
     If path = "" Or IsBookOpened(path) = False Then
@@ -289,7 +289,7 @@ End Function
 '# Sheet
 '------------------------------------------------------------------------------
 ''
-' 指定された名前のシートが存在するかを返します。
+' Returns whether a sheet with the specified name exists.
 '
 Function SheetExists(name As String, Optional wb As Workbook = Nothing)
     If wb Is Nothing Then
@@ -306,14 +306,14 @@ Function SheetExists(name As String, Optional wb As Workbook = Nothing)
 End Function
 
 ''
-' 指定された名前のシートが存在しない場合にTrueを返します。
+' Returns True if a sheet with the specified name does not exist.
 '
 Function SheetNotFound(name As String, Optional wb As Workbook = Nothing)
     SheetNotFound = Not SheetExists(name, wb)
 End Function
 
 ''
-' 指定されたシートの先頭行を返します。
+' Returns the top row number of the specified sheet.
 '
 Public Function GetFirstRowOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
     If ws Is Nothing Then
@@ -331,7 +331,7 @@ Public Function GetFirstRowOfSheet(Optional sheetName As String = "", Optional w
 End Function
 
 ''
-' 指定されたシートの最終行を返します。
+' Returns the last row number of the specified sheet.
 '
 Public Function GetLastRowOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
     If ws Is Nothing Then
@@ -349,7 +349,7 @@ Public Function GetLastRowOfSheet(Optional sheetName As String = "", Optional ws
 End Function
 
 ''
-' 指定されたシートの先頭列を返します。(A=1, B=2, ...)
+' Returns the first column number of the specified sheet. (A=1, B=2, ...)
 '
 Public Function GetFirstColOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
     If ws Is Nothing Then
@@ -367,7 +367,7 @@ Public Function GetFirstColOfSheet(Optional sheetName As String = "", Optional w
 End Function
 
 ''
-' 指定されたシートの最終列を返します。(A=1, B=2, ...)
+' Returns the last column number of the specified sheet. (A=1, B=2, ...)
 '
 Public Function GetLastColOfSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
     If ws Is Nothing Then
@@ -385,7 +385,7 @@ Public Function GetLastColOfSheet(Optional sheetName As String = "", Optional ws
 End Function
 
 ''
-' 指定された列の先頭行を返します。
+' Returns the first row number of the specified column.
 '
 Public Function GetFirstRowOfCol(col As String, Optional ws As Worksheet = Nothing) As Long
     If ws Is Nothing Then
@@ -406,7 +406,7 @@ Public Function GetFirstRowOfCol(col As String, Optional ws As Worksheet = Nothi
 End Function
 
 ''
-' 指定された列の最終行を返します。
+' Returns the last row number for the specified column.
 '
 Public Function GetLastRowOfCol(col As String, Optional ws As Worksheet = Nothing) As Long
     If ws Is Nothing Then
@@ -420,7 +420,7 @@ Public Function GetLastRowOfCol(col As String, Optional ws As Worksheet = Nothin
 End Function
 
 ''
-' 指定された行の先頭列を返します。("A", "B", ...)
+' Returns the first column number of the specified row. ("A", "B", ...)
 '
 Public Function GetFirstColOfRow(row As Long, Optional ws As Worksheet = Nothing) As String
     If ws Is Nothing Then
@@ -442,7 +442,7 @@ Public Function GetFirstColOfRow(row As Long, Optional ws As Worksheet = Nothing
 End Function
 
 ''
-' 指定された行の最終列を返します。("A", "B", ...)
+' Returns the last column number of the specified row. ("A", "B", ...)
 '
 Public Function GetLastColOfRow(row As Long, Optional ws As Worksheet = Nothing) As String
     If ws Is Nothing Then
@@ -456,7 +456,7 @@ Public Function GetLastColOfRow(row As Long, Optional ws As Worksheet = Nothing)
 End Function
 
 ''
-' 指定されたセルに計算式が存在するかを返します。
+' Returns whether a formula exists in the specified cell.
 '
 Public Function HasFormula(ref As String, Optional ws As Worksheet = Nothing) As Boolean
     If ws Is Nothing Then
@@ -466,7 +466,7 @@ Public Function HasFormula(ref As String, Optional ws As Worksheet = Nothing) As
 End Function
 
 ''
-' シートの表示位置を左上に設定します。
+' Sets the display position of the sheet to the upper left.
 '
 Public Sub ScrollToUpperLeft(Optional ws As Worksheet = Nothing)
     If ws Is Nothing Then
@@ -478,7 +478,7 @@ Public Sub ScrollToUpperLeft(Optional ws As Worksheet = Nothing)
 End Sub
 
 ''
-' シートの表示位置をA1に設定します。
+' Sets the display position of the sheet to A1.
 '
 Public Sub ScrollToA1Cell(Optional ws As Worksheet = Nothing)
     If ws Is Nothing Then
@@ -489,7 +489,7 @@ Public Sub ScrollToA1Cell(Optional ws As Worksheet = Nothing)
 End Sub
 
 ''
-' ブック内のすべての表示位置をA1に戻します。
+' Reset all display positions in the workbook to A1.
 '
 Public Sub ResetAllSheetsToA1(Optional wb As Workbook = Nothing)
     If wb Is Nothing Then
@@ -505,10 +505,10 @@ Public Sub ResetAllSheetsToA1(Optional wb As Workbook = Nothing)
 End Sub
 
 '------------------------------------------------------------------------------
-'# セル値
+'# Cell Values
 '------------------------------------------------------------------------------
 ''
-' 指定されたセルの値を返します。(シート名指定可能Rangeラッパー)
+' Returns the value of the specified cell. (Sheet name specifiable Range wrapper)
 ' GetCellValue("A1")
 ' GetCellValue("Sheet1!A1")
 '
@@ -529,7 +529,7 @@ Public Function GetCellValue(ref As String, Optional ws As Worksheet = Nothing) 
 End Function
 
 ''
-' 指定されたセルの値を設定します。(シート名指定可能Rangeラッパー)
+' Sets the value of the specified cell. (Sheet name specifiable Range wrapper)
 ' SetCellValue("A1", "abc")
 ' SetCellValue("Sheet1!A1", "abc")
 '
@@ -550,7 +550,7 @@ Public Sub SetCellValue(ref As String, val As Variant, Optional ws As Worksheet 
 End Sub
 
 ''
-' シートの値をA1から存在する範囲全て取得して返します。
+' Gets and returns all the existing range of sheet values from A1.
 '
 Public Function GetSheetValues(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Variant
     If ws Is Nothing Then
@@ -579,7 +579,7 @@ Public Function GetSheetValues(Optional sheetName As String = "", Optional ws As
 End Function
 
 ''
-' 指定されたセル範囲の値を2次元配列で返します。
+' Returns the values of the specified cell range in a 2D array.
 '
 ' GetRangeValues("A1:B2")
 ' GetRangeValues("Sheet1!A1:B2")
@@ -688,17 +688,17 @@ Public Function GetRangeValues(refs As String, _
 End Function
 
 ''
-' 指定されたセル範囲に2次元配列の値を展開します。
+' Expands the values of a 2D array to the specified cell range.
 '
 ' SetRangeValues("A1:B2", values, transpose)
-' -> 範囲かvaluesの範囲の小さい範囲に展開
+' -> expand to a smaller range of ranges or ranges of values
 '
 ' SetRangeValues("A1", values, transpose)
-' -> A1を起点にvaluesを全展開
+' -> Expand all values starting from A1
 '
 ' Optional
-'  transpose=False : [行][列]
-'  transpose=True  : [列][行]
+'  transpose=False : [ROW][COL]
+'  transpose=True  : [COL][ROW]
 '
 Public Sub SetRangeValues(refs As String, values As Variant, _
                           Optional transpose As Boolean = False, _
@@ -849,7 +849,7 @@ Public Sub SetRangeValues(refs As String, values As Variant, _
 End Sub
 
 ''
-' セル範囲内の値を1次元配列に格納します。(行方向→)
+' Stores the values in a cell range in a one-dimensional array. (row direction: horizontal)
 '
 ' RowToArray("A1:B3")
 ' RowToArray("Sheet1!A1:B3")
@@ -901,7 +901,7 @@ Public Function RowToArray(refs As String, Optional ws As Worksheet = Nothing) A
 End Function
 
 ''
-' セル範囲内の値を1次元配列に格納します。(列方向↓)
+' Stores the values in a cell range in a one-dimensional array. (column direction: vertical)
 '
 ' ColToArray("A1:B3")
 ' ColToArray("Sheet1!A1:B3")
@@ -953,7 +953,7 @@ Public Function ColToArray(refs As String, Optional ws As Worksheet = Nothing) A
 End Function
 
 ''
-' 1次元配列の値を行→に展開します。
+' Expands the values of a one-dimensional array into rows.
 '
 ' ArrayToRow(arr, "A1")
 ' ArrayToRow(arr, "Sheet1!A1")
@@ -998,7 +998,7 @@ Public Sub ArrayToRow(arr As Variant, targetStartCell As String, Optional ws As 
 End Sub
 
 ''
-' 1次元配列の値を列↓に展開します。
+' Expands the values of a one-dimensional array into columns.
 '
 ' ArrayToCol(arr, "A1")
 ' ArrayToCol(arr, "Sheet1!A1")
@@ -1045,7 +1045,7 @@ Public Sub ArrayToCol(arr As Variant, targetStartCell As String, Optional ws As 
 End Sub
 
 ''
-' 指定された範囲の列方向↓の値を行方向→に展開します。
+' Expands column-wise values in the specified range row-wise.
 '
 ' ColToRow("A", "B1")
 ' ColToRow("A1:A3", "B1")
@@ -1087,7 +1087,7 @@ Public Sub ColToRow(fmAddr As String, toAddr As String)
 End Sub
 
 ''
-' 指定された範囲の行方向→の値を列方向↓に展開します。
+' Expands the row-wise values in the specified range column-wise.
 '
 ' RowToCol("1", "A2")
 ' RowToCol("A1:C1", "A2")
@@ -1129,7 +1129,7 @@ Public Sub RowToCol(fmAddr As String, toAddr As String)
 End Sub
 
 ''
-' 選択されている範囲を指定されたセルを先頭に行方向→に展開します。
+' Expands the selected range in the row direction starting with the specified cell.
 '
 Public Sub SelectionToRow(dest As String)
     Dim vals As Variant
@@ -1138,7 +1138,7 @@ Public Sub SelectionToRow(dest As String)
 End Sub
 
 ''
-' 選択されている範囲を指定されたセルを先頭に列方向↓に展開します。
+' Expands the selected range in the column direction starting with the specified cell.
 '
 Public Sub SelectionToCol(dest As String)
     Dim vals As Variant
@@ -1147,7 +1147,7 @@ Public Sub SelectionToCol(dest As String)
 End Sub
 
 ''
-' 選択されている範囲の値を1次元配列として返します。
+' Returns the selected range values as a one-dimensional array.
 '
 Public Function GetSelectedValues() As Variant
     Dim cnt As Long
@@ -1162,7 +1162,8 @@ Public Function GetSelectedValues() As Variant
 End Function
 
 ''
-' 指定された列範囲の値を重複要素のないSetコレクションに変換して返します。
+' Converts the values in the specified column range into a Set collection with no duplicate elements and returns it.
+'
 ' ExtractUniqueValues("A1:B20")
 ' ExtractUniqueValues("Sheet1!A1:B20")
 '
@@ -1173,7 +1174,9 @@ Public Function ExtractUniqueValues(refs As String, Optional ws As Worksheet = N
 End Function
 
 ''
-' 指定された列範囲の値を重複要素のないSetコレクションに変換し、指定されたセルを起点に列方向↓に表示します。
+' Converts the values in the specified column range into a Set collection with no duplicate elements, 
+' and displays them in the column direction starting from the specified cell.
+'
 ' Call PrintUniqueValues("A1:B20", "B1")
 ' Call PrintUniqueValues("A:A", "B1")
 '
@@ -1187,7 +1190,8 @@ Public Sub PrintUniqueValues(refs As String, outStartCellAddr As String, Optiona
 End Sub
 
 ''
-' 選択されている範囲の値を重複要素のないSetコレクションに変換し、指定されたセルを起点に列方向↓に表示します。
+' Converts the values in the selected range to a Set collection with no duplicate elements, 
+' and displays them in the column direction starting from the specified cell.
 '
 Public Sub SelectionToUniqueValues(dest As String, Optional ws As Worksheet = Nothing)
     If ws Is Nothing Then
@@ -1201,7 +1205,7 @@ Public Sub SelectionToUniqueValues(dest As String, Optional ws As Worksheet = No
 End Sub
 
 ''
-' 単一の値を2次元配列に格納します。
+' Stores a single value in a two-dimensional array.
 '
 Private Function SingleValueToArray(value As Variant)
     Dim arr As Variant
@@ -1211,7 +1215,7 @@ Private Function SingleValueToArray(value As Variant)
 End Function
 
 ''
-' シート全体をクリアします。
+' Clears the entire sheet.
 '
 Public Function ClearSheet(Optional sheetName As String = "", Optional ws As Worksheet = Nothing) As Long
     If ws Is Nothing Then
@@ -1225,10 +1229,10 @@ Public Function ClearSheet(Optional sheetName As String = "", Optional ws As Wor
 End Function
 
 '------------------------------------------------------------------------------
-'# 配列操作
+'# Array Manipulation
 '------------------------------------------------------------------------------
 ''
-' 配列に要素をpushします。
+' Push an element into an array.
 '
 Public Sub ArrayPush(ByRef arr As Variant, val As Variant)
     On Error GoTo ArrInit
@@ -1241,7 +1245,7 @@ ArrInit:
 End Sub
 
 ''
-' 配列のサイズを返します。
+' Returns the size of the array.
 '
 Public Function GetArraySize(ByRef arr As Variant, Optional dimension As Long = 1) As Long
     GetArraySize = -1
@@ -1255,7 +1259,7 @@ Public Function GetArraySize(ByRef arr As Variant, Optional dimension As Long = 
 End Function
 
 ''
-' 配列の次元数を返します。
+' Returns the number of dimensions of the array.
 '
 Public Function GetArrayDimensions(ByRef arr As Variant) As Long
     Dim i As Long
@@ -1272,7 +1276,7 @@ Public Function GetArrayDimensions(ByRef arr As Variant) As Long
 End Function
 
 ''
-' 配列が空であるかを返します。
+' Returns whether the array is empty.
 '
 Public Function IsEmptyArray(arr As Variant) As Boolean
     IsEmptyArray = False
@@ -1285,7 +1289,7 @@ ErrHandler:
 End Function
 
 ''
-' 配列を重複要素のないSetコレクションに変換して返します。
+' Converts an array into a Set collection with no duplicate elements and returns it.
 '
 Public Function Array2Set(ByRef arr As Variant) As Variant
     Dim dic As Object
@@ -1304,7 +1308,7 @@ Public Function Array2Set(ByRef arr As Variant) As Variant
 End Function
 
 ''
-' テキストを改行で区切って配列として返します。
+' Returns the text as an array separated by line breaks.
 '
 Public Function TextToArray(txt As String) As String()
     txt = ReplaceLineSeparator(txt, vbLf)
@@ -1317,10 +1321,10 @@ Public Function TextToArray(txt As String) As String()
 End Function
 
 '------------------------------------------------------------------------------
-'# 文字列操作
+'# String Manipulation
 '------------------------------------------------------------------------------
 ''
-' 文字列のパターンマッチを検査します。
+' Check for string pattern matching.
 ' ("ABC123", "\d") -> True
 ' ("ABC123", "abc") -> False
 ' ("ABC123", "abc", True) -> True
@@ -1342,7 +1346,7 @@ Public Function Match(target As String, pattern As String, Optional ignoreCase A
 End Function
 
 ''
-' 文字列のパターンにマッチした部分を抜き出します。
+' Extracts parts of a string that match a pattern.
 ' ("abc123xyz", ".+?(\d+).*") -> "123"
 '
 Public Function GetPattern(target As String, pattern As String) As String
@@ -1368,7 +1372,7 @@ Public Function GetPattern(target As String, pattern As String) As String
 End Function
 
 ''
-' 正規表現のメタ文字をエスケープして返します。
+' Escapes and returns the regular expression metacharacters.
 '
 Public Function EscapeMetaChars(str As String) As String
     str = Replace(str, "\", "\\")
@@ -1389,7 +1393,7 @@ Public Function EscapeMetaChars(str As String) As String
 End Function
 
 ''
-' 改行コードを変換して返します。
+' Converts the linefeed code and returns it.
 '
 Function ReplaceLineSeparator(text As String, separator As String) As String
     Dim newText As String
@@ -1400,8 +1404,8 @@ Function ReplaceLineSeparator(text As String, separator As String) As String
 End Function
 
 ''
-' 文字列の長さを幅でカウントします。
-' 半角=1/全角=2
+' Count string length by width.
+' Half-width=1 / Full-width=2
 '
 Public Function LenW(str As String) As Long
     Dim ch As String
@@ -1422,12 +1426,12 @@ Public Function LenW(str As String) As Long
 End Function
 
 ''
-' リスト内にある文字列の最長の文字数を返します。
+' Returns the number of characters for the longest string in the list.
 '
 ' textList
-'     文字列のリスト
+'     list of strings
 ' byWidth
-'     文字数ではなく文字幅(半角=1/全角=2)で扱います。
+'     Handled by character width (half-width=1 / full-width=2), not the number of characters.
 '
 Public Function CountLongestLen(textList() As String, Optional byWidth As Boolean = True)
     Dim longestLen As Long
@@ -1450,20 +1454,20 @@ Public Function CountLongestLen(textList() As String, Optional byWidth As Boolea
 End Function
 
 ''
-' 指定された文字列でパディングします。
+' Pads with the specified string.
 '
 ' str
-'     元の文字列
+'     source string
 ' padding
-'     パディング用文字列
+'     string for padding
 ' totalLen
-'     パディング後のトータル文字数(半角=1/全角=2でカウント)
+'     Total number of characters after padding (half-width=1 / full-width=2 counted)
 ' direction
-'     パディング位置
+'     padding position
 '     "L" = Pad to the Left
 '     "R" = Pad to the Right
 ' byWidth
-'     文字数ではなく文字幅(半角=1/全角=2)で扱います。
+'     Handled by character width (half-width=1 / full-width=2), not the number of characters.
 '
 Public Function PadString(str As String, padding As String, totalLen As Long, direction As String, Optional byWidth As Boolean = True)
     Dim ret As String
@@ -1493,7 +1497,7 @@ Public Function PadString(str As String, padding As String, totalLen As Long, di
 End Function
 
 ''
-' 文字列を1文字ずつに分解した配列にして返します。
+' Returns an array that decomposes the string into individual characters.
 '
 Public Function String2Array(str As String) As String()
     Dim strLen As Long
@@ -1508,7 +1512,7 @@ Public Function String2Array(str As String) As String()
 End Function
 
 ''
-' 指定された文字集合で指定された文字列が何番目に出現するかを返します。
+' Returns the position of the specified string in the specified character set.
 ' ("ABC", "A")  -> 1
 ' ("ABC", "B")  -> 2
 ' ("ABC", "AA") -> 4
@@ -1542,7 +1546,7 @@ Public Function StrPIndex(tbl As String, ptn As String) As Long
 End Function
 
 ''
-' 文字集合を順列で並べた場合の指定されたインデックスに値する文字列を返します。
+' Returns the string corresponding to the specified index in the permuted character set.
 ' ("ABC", 1) -> "A"
 ' ("ABC", 2) -> "B"
 ' ("ABC", 4) -> "AA"
@@ -1596,10 +1600,10 @@ Public Function StrP(strTbl As String, idx As Long) As String
 End Function
 
 '------------------------------------------------------------------------------
-'# セル参照アドレス
+'# Cell Reference Addresses
 '------------------------------------------------------------------------------
 ''
-' セル参照の英字部分を返します。
+' Returns the alphabetic portion of a cell reference.
 ' GetCellRefA("A1") -> "A"
 ' GetCellRefA("$A$1") -> "A"
 '
@@ -1622,7 +1626,7 @@ Public Function GetCellRefA(ref As String) As String
 End Function
 
 ''
-' セル参照の数字部分を返します。
+' Returns the numeric portion of a cell reference.
 ' GetCellRefA("A1") -> 1
 ' GetCellRefA("$A$1") -> 1
 ' GetCellRefA("A") -> 0
@@ -1649,7 +1653,7 @@ Public Function GetCellRefN(ref As String) As Long
 End Function
 
 ''
-' セル番号をセル名に変換します。
+' Convert column number to column name.
 '  1 -> "A"
 '  2 -> "B"
 ' 26 -> "Z"
@@ -1660,7 +1664,7 @@ Public Function XlsColN2A(index As Long) As String
 End Function
 
 ''
-' セル名をセル番号に変換します。
+' Convert column name to column number.
 '  "A" ->  1
 '  "B" ->  2
 '  "Z" -> 26
@@ -1671,7 +1675,7 @@ Public Function XlsColA2N(col As String) As Long
 End Function
 
 ''
-' セル名からのオフセットの位置にあるセル名を返します。
+' Returns the column name at an offset from the column name.
 '  "A",  1 -> "B"
 '  "B", -1 -> "A"
 '
@@ -1682,7 +1686,7 @@ Public Function RelativeXlsColA(col As String, offset As Long) As String
 End Function
 
 ''
-' セルアドレスからのオフセットの位置にあるアドレスを返します。
+' Returns the address at offset from the cell address.
 '  "A1",  1,  2 -> "B3"
 '  "B3", -1. -2 -> "A1"
 '
@@ -1705,7 +1709,7 @@ Public Function RelativeCellAddr(orgAddr As String, colOffset As Long, rowOffset
 End Function
 
 ''
-' セル参照範囲に含まれる行数を返します。
+' Returns the number of rows contained in the cell reference range.
 ' CountRowRange("A1:B3") -> 3
 ' CountRowRange("A1")    -> 1
 '
@@ -1740,7 +1744,7 @@ Public Function CountRowRange(refs As String) As Long
 End Function
 
 ''
-' セル参照範囲に含まれる列数を返します。
+' Returns the number of columns in the cell reference range.
 ' CountColRange("A1:B3") -> 2
 ' CountColRange("A1")    -> 1
 '
@@ -1780,7 +1784,7 @@ Public Function CountColRange(refs As String) As Long
 End Function
 
 ''
-' セル参照が複数セルであるかを返します。
+' Returns whether a cell reference is multi-cell.
 ' "A1"    -> False
 ' "A1:A1" -> False
 ' "A1:B2" -> True
@@ -1816,7 +1820,7 @@ Public Function IsMultiRange(refs As String) As Boolean
 End Function
 
 ''
-' セル参照アドレスをパーツに分解します。
+' Splits the cell reference address into parts.
 '
 ' "Sheet1!A1:B2"
 ' -> (0) "Sheet1"
@@ -1868,7 +1872,7 @@ Public Function SplitRefAddrs(refs) As String()
 End Function
 
 ''
-' セル参照アドレスが行番号だけであるかを返します。
+' Returns whether the cell reference address is just the row number.
 '
 ' "1"     -> True
 ' "A"     -> False
@@ -1885,7 +1889,7 @@ Public Function IsOnlyRowNumber(refs As String) As Boolean
 End Function
 
 ''
-' セル参照アドレスが列名だけであるかを返します。
+' Returns whether the cell reference address is just the column name.
 '
 ' "A"     -> True
 ' "A1"    -> False
@@ -1905,7 +1909,7 @@ End Function
 '# Date Time
 '------------------------------------------------------------------------------
 ''
-' Unix time (秒) を返します。
+' Returns Unix time in seconds.
 '
 Public Function GetUnixTime() As Long
     Dim offset As Long
@@ -1914,7 +1918,7 @@ Public Function GetUnixTime() As Long
 End Function
 
 ''
-' ローカルタイムゾーン情報を返します。
+' Returns local timezone information.
 '
 Public Function GetTimeZoneInfo() As Object
     Dim locator As Object
@@ -1927,7 +1931,7 @@ Public Function GetTimeZoneInfo() As Object
 End Function
 
 ''
-' ローカルタイムゾーンのオフセットを分で返します。
+' Returns the local timezone offset in minutes.
 '
 Public Function GetLocalTimeZoneOffset() As Long
     Dim tzSet As Object
@@ -1941,7 +1945,7 @@ Public Function GetLocalTimeZoneOffset() As Long
 End Function
 
 ''
-' ローカルタイムゾーン名を返します。
+' Returns the local timezone name.
 '
 Public Function GetLocalTimeZoneName() As String
     Dim tzSet As Object
@@ -1958,8 +1962,8 @@ End Function
 '# Clipboard
 '------------------------------------------------------------------------------
 ''
-' クリップボードの値を取得します。
-' 画像等テキストでないものが入っている場合は空文字を返します。
+' Get the clipboard value.
+' Returns an empty string if it contains something other than text, such as an image.
 '
 Public Function GetClipboard() As String
     GetClipboard = ""
@@ -1973,7 +1977,7 @@ Public Function GetClipboard() As String
 End Function
 
 ''
-' クリップボードにテキストを設定します。
+' Sets the text on the clipboard.
 '
 Public Sub SetClipboard(text As String)
     With CreateObject("Forms.TextBox.1")
@@ -1986,7 +1990,7 @@ Public Sub SetClipboard(text As String)
 End Sub
 
 ''
-' クリップボードが持っている値の形式を返します。
+' Returns the format of the value that the clipboard has.
 ' https://docs.microsoft.com/ja-jp/office/vba/api/excel.xlclipboardformat
 '
 Public Function GetClipboardFormat() As Long
@@ -1996,7 +2000,7 @@ Public Function GetClipboardFormat() As Long
 End Function
 
 ''
-' クリップボードが値を持っているかを返します。
+' Returns whether the clipboard has a value.
 '
 Public Function HasClipboardValue() As Boolean
     HasClipboardValue = True
@@ -2039,7 +2043,7 @@ End Function
 '# Debug
 '------------------------------------------------------------------------------
 ''
-' イミディエイトウィンドウにログ出力します。
+' Logs to the Immediate window.
 '
 Public Sub DbgLog(v As Variant, Optional dumpBytes As Boolean = False)
     Dim t As String
