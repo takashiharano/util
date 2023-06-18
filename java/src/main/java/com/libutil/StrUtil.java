@@ -1761,7 +1761,7 @@ public class StrUtil {
    * <br>
    * e.g.,<br>
    * 1 2 3 "abc" "d ef" "g\"hi" ("jkl" + m) 'xyz' 'a"b b"a'<br>
-   * to [1, 2, 3, "abc", "d ef", "g\"hi", ("jkl" + m), 'xyz', 'a"b b"a']<br>
+   * to [1, 2, 3, abc, d ef, g\"hi, ("jkl" + m), xyz, a"b b"a]<br>
    * 
    * @param src
    *          the source string
@@ -1876,22 +1876,70 @@ public class StrUtil {
     return ret;
   }
 
+  /**
+   * Extracts and returns the string enclosed in quotes.<br>
+   * The quotation character is '"'.
+   *
+   * @param s
+   *          source string to extract
+   * @return the string inside the quotes
+   */
   public static String extractQuotedString(String s) {
     return extractQuotedString(s, (char) 0x22, (char) 0);
   }
 
+  /**
+   * Extracts and returns the string enclosed in quotes.
+   *
+   * @param s
+   *          source string to extract
+   * @param q
+   *          quotation character
+   * @return the string inside the quotes
+   */
   public static String extractQuotedString(String s, String q) {
     return extractQuotedString(s, q.charAt(0), (char) 0);
   }
 
+  /**
+   * Extracts and returns the string enclosed in quotes.
+   *
+   * @param s
+   *          source string to extract
+   * @param qS
+   *          opening quotation character
+   * @param qE
+   *          closing quotation character
+   * @return the string inside the quotes
+   */
   public static String extractQuotedString(String s, String qS, String qE) {
     return extractQuotedString(s, qS.charAt(0), qE.charAt(0));
   }
 
+  /**
+   * Extracts and returns the string enclosed in quotes.
+   *
+   * @param s
+   *          source string to extract
+   * @param q
+   *          quotation character
+   * @return the string inside the quotes
+   */
   public static String extractQuotedString(String s, char q) {
     return extractQuotedString(s, q, q);
   }
 
+  /**
+   * Extracts and returns the string enclosed in quotes.
+   *
+   * @param s
+   *          source string to extract
+   * @param qS
+   *          opening quotation character
+   * @param qE
+   *          closing quotation character
+   * @return the string inside the quotes
+   */
   public static String extractQuotedString(String s, char qS, char qE) {
     if ((s == null) || (qS == 0) || (s.length() == 0) || (s.length() == 1) || (s.charAt(0) != qS) || (s.charAt(s.length() - 1) != qE)) {
       return s;
