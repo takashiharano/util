@@ -43,7 +43,7 @@ public class IsTrueTest {
     if (got == exp) {
       st = "OK";
     }
-    String ret = "[" + st + "] " + s + " exp=" + exp + " git=" + got;
+    String ret = "[" + st + "] " + s + " exp=" + exp + " got=" + got;
     Log.i(ret);
   }
 
