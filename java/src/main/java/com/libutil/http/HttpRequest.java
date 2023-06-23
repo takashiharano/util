@@ -49,6 +49,11 @@ public class HttpRequest {
   private int connectionTimeoutSec;
   private int readTimeoutSec;
 
+  public HttpRequest(String uri) {
+    this.uri = uri;
+    this.method = "GET";
+  }
+
   public HttpRequest(String uri, String method) {
     this.uri = uri;
     this.method = method;
