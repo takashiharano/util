@@ -1097,6 +1097,70 @@ public class StrUtil {
   }
 
   /**
+   * Normalize numbers.<br>
+   * Trim leading and trailing zeros.<br>
+   * If the decimal part is zero or empty, format it to only the integer part.<br>
+   * If the integer part is empty, put "0" there.<br>
+   * The minus sign is kept and the plus sign is removed.<br>
+   * If the argument cannot be regarded as a number, it is returned as is.<br>
+   * <br>
+   * e.g.,)<br>
+   * 01.20 to 1.2<br>
+   * 1.0 to 1<br>
+   * 1. to 1<br>
+   * .1 to 0.1<br>
+   * -01.20 to -1.2<br>
+   * +01.20 to 1.2<br>
+   *
+   * @param n
+   *          the number
+   * @return normalized number
+   */
+  public static String normalizeNumber(String n) {
+    if (n == null) {
+      return n;
+    }
+    String s = n.trim();
+    if ("".equals(s)) {
+      return n;
+    }
+
+    boolean sign = false;
+    if (s.charAt(0) == '-') {
+      sign = true;
+      s = s.substring(1);
+    } else if (s.charAt(0) == '+') {
+      s = s.substring(1);
+    }
+
+    String[] w = s.split("\\.");
+    String i = w[0];
+    if (w.length > 2) {
+      return n;
+    }
+    String f = ((w.length == 2) ? w[1] : "0");
+
+    i = i.replaceAll("^0+", "");
+    if ("".equals(i)) {
+      i = "0";
+    }
+
+    f = f.replaceAll("0+$", "");
+
+    StringBuilder sb = new StringBuilder();
+    if (sign) {
+      sb.append("-");
+    }
+    sb.append(i);
+    if (!"".equals(f)) {
+      sb.append(".");
+      sb.append(f);
+    }
+
+    return sb.toString();
+  }
+
+  /**
    * Returns a new double initialized to the value represented by the specified
    * String.
    *
