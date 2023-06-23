@@ -18,10 +18,8 @@ public class HttpPostTest {
     params.put("data1", "value1");
     params.put("data2", "value2");
 
-    String query = params.buildQueryString();
-
     HttpRequest request = new HttpRequest(url, method);
-    HttpResponse response = request.send(query);
+    HttpResponse response = request.send(params);
 
     int status = response.getStatus();
     System.out.println("status = " + status);
