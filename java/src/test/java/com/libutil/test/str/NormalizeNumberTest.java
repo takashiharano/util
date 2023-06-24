@@ -95,7 +95,7 @@ public class NormalizeNumberTest {
     String got = StrUtil.normalizeNumber(s);
     if ((got == null) && (exp == null)) {
       st = "OK";
-    } else if (got.equals(exp)) {
+    } else if ((got != null) && (got.equals(exp))) {
       st = "OK";
     }
     String ret = "[" + st + "] " + s + " exp=" + exp + " got=" + got;
