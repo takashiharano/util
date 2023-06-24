@@ -96,6 +96,33 @@ public class HttpResponse {
   }
 
   /**
+   * Returns the header value corresponding to the given name.<br>
+   * If the field has multiple values it returns the first one.
+   *
+   * @param name
+   *          field name
+   * @return the value
+   */
+  public String getHeaderValue(String name) {
+    if (!headerFields.containsKey(name)) {
+      return null;
+    }
+    List<String> fieldValues = headerFields.get(name);
+    return fieldValues.get(0);
+  }
+
+  /**
+   * Returns a list of header values corresponding to the given name.
+   *
+   * @param name
+   *          field name
+   * @return the values
+   */
+  public List<String> getHeaderValues(String name) {
+    return headerFields.get(name);
+  }
+
+  /**
    * Returns response body as byte array.
    *
    * @return response body

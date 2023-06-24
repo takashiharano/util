@@ -48,6 +48,7 @@ public class HttpRequest {
   private Proxy proxy;
   private int connectionTimeoutSec;
   private int readTimeoutSec;
+  private boolean redirect;
 
   public HttpRequest(String uri) {
     this.uri = uri;
@@ -114,105 +115,7 @@ public class HttpRequest {
    * @return HttpResponse object
    */
   public HttpResponse send(String data) {
-    HttpResponse response;
-    try {
-      response = _send(data);
-    } catch (Exception e) {
-      response = new HttpResponse();
-      response.setStatus(0);
-      response.setErrorDetail(e);
-    }
-    return response;
-  }
-
-  /**
-   * Send an HTTP request.
-   *
-   * @param data
-   *          a payload body
-   * @return HttpResponse object
-   * @throws IOException
-   *           If an I/O error occurs
-   */
-  public HttpResponse _send(String data) throws IOException {
-    if ("GET".equals(method)) {
-      if (data != null) {
-        uri += "?" + data;
-      }
-    }
-
-    if (proxy == null) {
-      proxy = Proxy.NO_PROXY;
-    }
-
-    URL url = new URL(uri);
-    HttpURLConnection conn = (HttpURLConnection) url.openConnection(proxy);
-    conn.setRequestMethod(method);
-    conn.setInstanceFollowRedirects(false);
-    if (connectionTimeoutSec > 0) {
-      conn.setConnectTimeout(connectionTimeoutSec * 1000);
-    }
-
-    if (readTimeoutSec > 0) {
-      conn.setReadTimeout(readTimeoutSec * 1000);
-    }
-
-    if ((reqHeaders == null) || !hasRequestHeader("Content-Type")) {
-      setContentType("application/x-www-form-urlencoded");
-    }
-    for (Entry<String, String> entry : reqHeaders.entrySet()) {
-      conn.setRequestProperty(entry.getKey(), entry.getValue());
-    }
-
-    if (isWritableMethod(method)) {
-      conn.setDoOutput(true);
-      OutputStream os = conn.getOutputStream();
-      OutputStreamWriter out = new OutputStreamWriter(os);
-      if (data != null) {
-        out.write(data);
-      }
-      out.close();
-      os.close();
-    }
-
-    conn.connect();
-
-    int statusCode = 0;
-    String statusMessage = null;
-    byte[] body = null;
-    InputStream is = null;
-    try {
-      statusCode = conn.getResponseCode();
-      statusMessage = conn.getResponseMessage();
-      is = conn.getInputStream();
-      if (is != null) {
-        body = readStream(is);
-        is.close();
-      }
-    } catch (SocketTimeoutException ste) {
-      throw ste;
-    } catch (IOException e) {
-      is = conn.getErrorStream();
-      if (is != null) {
-        body = readStream(is);
-        is.close();
-      }
-    } finally {
-      if (is != null) {
-        is.close();
-      }
-    }
-    HttpResponse response = new HttpResponse();
-
-    response.setStatus(statusCode);
-    response.setStatusMessage(statusMessage);
-    response.setHeaderFields(conn.getHeaderFields());
-    response.setContentLength(conn.getContentLength());
-    response.setBody(body);
-
-    conn.disconnect();
-
-    return response;
+    return send(data, null);
   }
 
   /**
@@ -325,6 +228,27 @@ public class HttpRequest {
     this.readTimeoutSec = seconds;
   }
 
+  /**
+   * Returns true if the request should be redirected to the URL indicated in the
+   * Location header.
+   *
+   * @return true if the request should be redirected; otherwise false
+   */
+  public boolean shouldRedirect() {
+    return redirect;
+  }
+
+  /**
+   * Set to true if the request should be redirected to the URL indicated in the
+   * Location header.
+   *
+   * @param redirect
+   *          true if the request should be redirected; otherwise false
+   */
+  public void setRedirect(boolean redirect) {
+    this.redirect = redirect;
+  }
+
   private boolean isWritableMethod(String method) {
     if ("POST".equals(method) || "PUT".equals(method) || "DELETE".equals(method)) {
       return true;
@@ -363,6 +287,118 @@ public class HttpRequest {
       BinUtil.copyByteArray(b, buf, offset, readSize);
     }
     return buf;
+  }
+
+  private HttpResponse send(String data, HttpResponse response) {
+    if (response != null) {
+      String location = response.getHeaderValue("Location");
+      if (location == null) {
+        return response;
+      }
+      this.uri = location;
+    }
+    try {
+      response = _send(data);
+      int status = response.getStatus();
+      if ((status >= 300) && (status <= 399) && redirect) {
+        response = send(data, response);
+      }
+    } catch (Exception e) {
+      response = new HttpResponse();
+      response.setStatus(0);
+      response.setErrorDetail(e);
+    }
+    return response;
+  }
+
+  /**
+   * Send an HTTP request.
+   *
+   * @param data
+   *          a payload body
+   * @return HttpResponse object
+   * @throws IOException
+   *           If an I/O error occurs
+   */
+  private HttpResponse _send(String data) throws IOException {
+    if ("GET".equals(method)) {
+      if (data != null) {
+        uri += "?" + data;
+      }
+    }
+
+    if (proxy == null) {
+      proxy = Proxy.NO_PROXY;
+    }
+
+    URL url = new URL(uri);
+    HttpURLConnection conn = (HttpURLConnection) url.openConnection(proxy);
+    conn.setRequestMethod(method);
+    conn.setInstanceFollowRedirects(false);
+    if (connectionTimeoutSec > 0) {
+      conn.setConnectTimeout(connectionTimeoutSec * 1000);
+    }
+
+    if (readTimeoutSec > 0) {
+      conn.setReadTimeout(readTimeoutSec * 1000);
+    }
+
+    if ((reqHeaders == null) || !hasRequestHeader("Content-Type")) {
+      setContentType("application/x-www-form-urlencoded");
+    }
+    for (Entry<String, String> entry : reqHeaders.entrySet()) {
+      conn.setRequestProperty(entry.getKey(), entry.getValue());
+    }
+
+    if (isWritableMethod(method)) {
+      conn.setDoOutput(true);
+      OutputStream os = conn.getOutputStream();
+      OutputStreamWriter out = new OutputStreamWriter(os);
+      if (data != null) {
+        out.write(data);
+      }
+      out.close();
+      os.close();
+    }
+
+    conn.connect();
+
+    int statusCode = 0;
+    String statusMessage = null;
+    byte[] body = null;
+    InputStream is = null;
+    try {
+      statusCode = conn.getResponseCode();
+      statusMessage = conn.getResponseMessage();
+      is = conn.getInputStream();
+      if (is != null) {
+        body = readStream(is);
+        is.close();
+      }
+    } catch (SocketTimeoutException ste) {
+      throw ste;
+    } catch (IOException e) {
+      is = conn.getErrorStream();
+      if (is != null) {
+        body = readStream(is);
+        is.close();
+      }
+    } finally {
+      if (is != null) {
+        is.close();
+      }
+    }
+    HttpResponse response = new HttpResponse();
+
+    response.setStatus(statusCode);
+    response.setStatusMessage(statusMessage);
+    response.setHeaderFields(conn.getHeaderFields());
+    response.setContentLength(conn.getContentLength());
+    response.setBody(body);
+
+    conn.disconnect();
+
+    return response;
   }
 
 }
