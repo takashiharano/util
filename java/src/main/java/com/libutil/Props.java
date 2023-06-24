@@ -235,6 +235,69 @@ public class Props {
   }
 
   /**
+   * Returns the value for the specified key as a boolean.
+   *
+   * @param key
+   *          the key of the value
+   * @return A zero value, "false", "", null, are converted to false; any other
+   *         value is converted to true. The value is case-insensitive.
+   */
+  public boolean getValueAsBoolean(String key) {
+    String v = getValue(key);
+    if (v == null) {
+      return false;
+    }
+    v = v.toLowerCase();
+    if (v.equals("") || v.equals("0") || v.equals("false")) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Returns the value for the specified key as a boolean.
+   *
+   * @param key
+   *          the key of the value
+   * @param valueAsTrue
+   *          the value to be true
+   * @return true if the value in this property list with the specified key value
+   *         equals valueAsTrue.
+   */
+  public boolean getValueAsBoolean(String key, String valueAsTrue) {
+    String value = getValue(key);
+    return valueAsTrue.equals(value);
+  }
+
+  /**
+   * Returns the value for the specified key as a boolean.
+   *
+   * @param key
+   *          the key of the value
+   * @param valuesAsTrue
+   *          the values to be true
+   * @return true if the value in this property list with the specified key value
+   *         equals one of valuesAsTrue.
+   */
+  public boolean getValueAsBoolean(String key, String[] valuesAsTrue) {
+    String value = getValue(key);
+    for (int i = 0; i < valuesAsTrue.length; i++) {
+      String v = valuesAsTrue[i];
+      if (v == null) {
+        if (value == null) {
+          return true;
+        } else {
+          continue;
+        }
+      }
+      if (v.equals(value)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Returns the value for the specified key as an integer.
    *
    * @param key
@@ -372,69 +435,6 @@ public class Props {
       return false;
     }
     return true;
-  }
-
-  /**
-   * Returns the value for the specified key as a boolean.
-   *
-   * @param key
-   *          the key of the value
-   * @return A zero value, "false", "", null, are converted to false; any other
-   *         value is converted to true. The value is case-insensitive.
-   */
-  public boolean isTrue(String key) {
-    String v = getValue(key);
-    if (v == null) {
-      return false;
-    }
-    v = v.toLowerCase();
-    if (v.equals("") || v.equals("0") || v.equals("false")) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Returns the value for the specified key as a boolean.
-   *
-   * @param key
-   *          the key of the value
-   * @param valueAsTrue
-   *          the value to be true
-   * @return true if the value in this property list with the specified key value
-   *         equals valueAsTrue.
-   */
-  public boolean isTrue(String key, String valueAsTrue) {
-    String value = getValue(key);
-    return valueAsTrue.equals(value);
-  }
-
-  /**
-   * Returns the value for the specified key as a boolean.
-   *
-   * @param key
-   *          the key of the value
-   * @param valuesAsTrue
-   *          the values to be true
-   * @return true if the value in this property list with the specified key value
-   *         equals one of valuesAsTrue.
-   */
-  public boolean isTrue(String key, String[] valuesAsTrue) {
-    String value = getValue(key);
-    for (int i = 0; i < valuesAsTrue.length; i++) {
-      String v = valuesAsTrue[i];
-      if (v == null) {
-        if (value == null) {
-          return true;
-        } else {
-          continue;
-        }
-      }
-      if (v.equals(value)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /**
