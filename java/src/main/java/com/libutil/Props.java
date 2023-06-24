@@ -177,6 +177,17 @@ public class Props {
   }
 
   /**
+   * Returns true if this map contains a mapping for the specified key.
+   *
+   * @param key
+   *          The key whose presence in this map is to be tested
+   * @return true if this map contains a mapping for the specified key.
+   */
+  public boolean containsKey(String key) {
+    return properties.containsKey(key);
+  }
+
+  /**
    * Returns the path of the properties file.
    *
    * @return file path
@@ -345,6 +356,22 @@ public class Props {
       v = defaultValue;
     }
     return v;
+  }
+
+  /**
+   * Returns if the value for the specified key exists.
+   * 
+   * @param key
+   *          the key for the value
+   * @return true if the key is valid and the corresponding value is not empty;
+   *         false otherwise
+   */
+  public boolean hasValue(String key) {
+    String value = properties.get(key);
+    if ((value == null) || (value.equals(""))) {
+      return false;
+    }
+    return true;
   }
 
   /**
