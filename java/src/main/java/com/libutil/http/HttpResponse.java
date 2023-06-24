@@ -31,6 +31,7 @@ import java.util.Map;
  * The class HttpResponse represents a HTTP response.
  */
 public class HttpResponse {
+
   private int status = 0;
   private String statusMessage;
   private Map<String, List<String>> headerFields;
