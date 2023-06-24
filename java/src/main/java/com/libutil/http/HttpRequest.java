@@ -229,16 +229,6 @@ public class HttpRequest {
   }
 
   /**
-   * Returns true if the request should be redirected to the URL indicated in the
-   * Location header.
-   *
-   * @return true if the request should be redirected; otherwise false
-   */
-  public boolean shouldRedirect() {
-    return redirect;
-  }
-
-  /**
    * Set to true if the request should be redirected to the URL indicated in the
    * Location header.
    *
