@@ -423,7 +423,7 @@ public class Props {
 
   /**
    * Returns if the value for the specified key exists.
-   * 
+   *
    * @param key
    *          the key for the value
    * @return true if the key is valid and the corresponding value is not empty;
