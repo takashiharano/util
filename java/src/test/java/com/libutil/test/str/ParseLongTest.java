@@ -9,11 +9,13 @@ public class ParseLongTest {
     test("-1", -1);
     test("0", 0);
     test("1", 1);
+    test("4294967296", 4294967296L);
     test("a", 0);
 
     test2("-1", -1);
     test2("0", 0);
     test2("1", 1);
+    test("-4294967296", -4294967296L);
     test2("a", -1);
   }
 

@@ -1170,7 +1170,7 @@ public class StrUtil {
    *         case of errors.
    */
   public static double parseDouble(String s) {
-    return parseFloat(s, 0);
+    return parseDouble(s, 0.0);
   }
 
   /**
@@ -1203,7 +1203,7 @@ public class StrUtil {
    *         of errors.
    */
   public static float parseFloat(String s) {
-    return parseFloat(s, 0);
+    return parseFloat(s, 0.0f);
   }
 
   /**
@@ -1266,7 +1266,7 @@ public class StrUtil {
    *         in case of errors.
    */
   public static long parseLong(String s) {
-    return parseInt(s, 0);
+    return parseLong(s, 0L);
   }
 
   /**
