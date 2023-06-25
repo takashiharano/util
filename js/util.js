@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202306232204';
+util.v = '202306251530';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2165,6 +2165,10 @@ util.sortObject = function(list, key, desc, asNum) {
 util._sort = function(a, b, desc, asNum) {
   if (a == undefined) a = '';
   if (b == undefined) b = '';
+  if (a === true) a = 1;
+  if (b === true) b = 1;
+  if (a === false) a = 0;
+  if (b === false) b = 0;
   if (asNum) {
     if (!isNaN(a) && (a !== '')) a = parseFloat(a);
     if (!isNaN(b) && (b !== '')) b = parseFloat(b);
