@@ -3,7 +3,7 @@ package com.libutil.test.props;
 import com.libutil.Props;
 import com.libutil.test.Log;
 
-public class GetFloatValueTest {
+public class GetValueAsFloatTest {
 
   public static void main(String args[]) {
     Props props = new Props("C:/test/prop1.properties");
@@ -15,7 +15,7 @@ public class GetFloatValueTest {
   public static void test1(Props props) {
     for (int i = 1; i <= 9; i++) {
       String key = "key" + i;
-      float value = props.getFloatValue(key);
+      float value = props.getValueAsFloat(key);
       Log.i(key + "=" + value);
     }
   }
@@ -23,7 +23,7 @@ public class GetFloatValueTest {
   public static void test2(Props props) {
     for (int i = 1; i <= 9; i++) {
       String key = "key" + i;
-      float value = props.getFloatValue(key, 9.8f);
+      float value = props.getValueAsFloat(key, 9.8f);
       Log.i(key + "=" + value);
     }
   }

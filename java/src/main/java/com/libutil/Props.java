@@ -298,14 +298,76 @@ public class Props {
   }
 
   /**
+   * Returns the value for the specified key as a double.
+   *
+   * @param key
+   *          the key of the value
+   * @return the value in this property list with the specified key value.
+   */
+  public double getValueAsDouble(String key) {
+    return getValueAsDouble(key, 0);
+  }
+
+  /**
+   * Returns the value for the specified key as a double.
+   *
+   * @param key
+   *          the key of the value
+   * @param defaultValue
+   *          the value if specified key is not found
+   * @return the value in this property list with the specified key value.
+   */
+  public double getValueAsDouble(String key, double defaultValue) {
+    double v;
+    try {
+      String value = getValue(key);
+      v = Double.parseDouble(value);
+    } catch (Exception e) {
+      v = defaultValue;
+    }
+    return v;
+  }
+
+  /**
+   * Returns the value for the specified key as a float.
+   *
+   * @param key
+   *          the key of the value
+   * @return the value in this property list with the specified key value.
+   */
+  public float getValueAsFloat(String key) {
+    return getValueAsFloat(key, 0f);
+  }
+
+  /**
+   * Returns the value for the specified key as a float.
+   *
+   * @param key
+   *          the key of the value
+   * @param defaultValue
+   *          the value if specified key is not found
+   * @return the value in this property list with the specified key value.
+   */
+  public float getValueAsFloat(String key, float defaultValue) {
+    float v;
+    try {
+      String value = getValue(key);
+      v = Float.parseFloat(value);
+    } catch (Exception e) {
+      v = defaultValue;
+    }
+    return v;
+  }
+
+  /**
    * Returns the value for the specified key as an integer.
    *
    * @param key
    *          the key of the value
    * @return the value in this property list with the specified key value.
    */
-  public int getIntValue(String key) {
-    return getIntValue(key, 0);
+  public int getValueAsInteger(String key) {
+    return getValueAsInteger(key, 0);
   }
 
   /**
@@ -317,7 +379,7 @@ public class Props {
    *          the value if specified key is not found
    * @return the value in this property list with the specified key value.
    */
-  public int getIntValue(String key, int defaultValue) {
+  public int getValueAsInteger(String key, int defaultValue) {
     int v;
     try {
       String value = getValue(key);
@@ -335,8 +397,8 @@ public class Props {
    *          the key of the value
    * @return the value in this property list with the specified key value.
    */
-  public long getLongValue(String key) {
-    return getLongValue(key, 0L);
+  public long getValueAsLong(String key) {
+    return getValueAsLong(key, 0L);
   }
 
   /**
@@ -348,7 +410,7 @@ public class Props {
    *          the value if specified key is not found
    * @return the value in this property list with the specified key value.
    */
-  public long getLongValue(String key, long defaultValue) {
+  public long getValueAsLong(String key, long defaultValue) {
     long v;
     try {
       String value = getValue(key);
@@ -360,65 +422,59 @@ public class Props {
   }
 
   /**
-   * Returns the value for the specified key as a float.
+   * Returns an array of values when multiple properties are defined.
    *
-   * @param key
-   *          the key of the value
-   * @return the value in this property list with the specified key value.
+   * @param baseName
+   *          The base field name (name1, name2 ... then "name")
+   * @return an array of values
    */
-  public float getFloatValue(String key) {
-    return getFloatValue(key, 0f);
-  }
+  public String[] getValues(String baseName) {
+    int min = getMinFieldNameIndex(baseName);
+    int max = getMaxFieldNameIndex(baseName);
 
-  /**
-   * Returns the value for the specified key as a float.
-   *
-   * @param key
-   *          the key of the value
-   * @param defaultValue
-   *          the value if specified key is not found
-   * @return the value in this property list with the specified key value.
-   */
-  public float getFloatValue(String key, float defaultValue) {
-    float v;
-    try {
-      String value = getValue(key);
-      v = Float.parseFloat(value);
-    } catch (Exception e) {
-      v = defaultValue;
+    if ((min == -1) || (max == -1)) {
+      return new String[0];
     }
-    return v;
-  }
 
-  /**
-   * Returns the value for the specified key as a double.
-   *
-   * @param key
-   *          the key of the value
-   * @return the value in this property list with the specified key value.
-   */
-  public double getDoubleValue(String key) {
-    return getDoubleValue(key, 0);
-  }
-
-  /**
-   * Returns the value for the specified key as a double.
-   *
-   * @param key
-   *          the key of the value
-   * @param defaultValue
-   *          the value if specified key is not found
-   * @return the value in this property list with the specified key value.
-   */
-  public double getDoubleValue(String key, double defaultValue) {
-    double v;
-    try {
-      String value = getValue(key);
-      v = Double.parseDouble(value);
-    } catch (Exception e) {
-      v = defaultValue;
+    List<String> list = new ArrayList<>();
+    for (int i = min; i <= max; i++) {
+      String value = getValue(baseName + i);
+      list.add(value);
     }
-    return v;
+
+    String[] values = new String[list.size()];
+    list.toArray(values);
+    return values;
+  }
+
+  /**
+   * Returns if the value for the specified key exists.
+   *
+   * @param key
+   *          the key for the value
+   * @return true if the key is valid and the corresponding value is not empty;
+   *         false otherwise
+   */
+  public boolean hasValue(String key) {
+    String value = properties.get(key);
+    if ((value == null) || (value.equals(""))) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Returns the keys of the properties.
+   *
+   * @return keys
+   */
+  public String[] getKeys() {
+    ArrayList<String> keys = new ArrayList<>();
+    for (Entry<String, String> entry : properties.entrySet()) {
+      String key = entry.getKey();
+      keys.add(key);
+    }
+    return keys.toArray(new String[keys.size()]);
   }
 
   /**
@@ -485,62 +541,6 @@ public class Props {
       }
     }
     return max;
-  }
-
-  /**
-   * Returns an array of values when multiple properties are defined.
-   *
-   * @param baseName
-   *          The base field name (name1, name2 ... then "name")
-   * @return an array of values
-   */
-  public String[] getValues(String baseName) {
-    int min = getMinFieldNameIndex(baseName);
-    int max = getMaxFieldNameIndex(baseName);
-
-    if ((min == -1) || (max == -1)) {
-      return new String[0];
-    }
-
-    List<String> list = new ArrayList<>();
-    for (int i = min; i <= max; i++) {
-      String value = getValue(baseName + i);
-      list.add(value);
-    }
-
-    String[] values = new String[list.size()];
-    list.toArray(values);
-    return values;
-  }
-
-  /**
-   * Returns if the value for the specified key exists.
-   *
-   * @param key
-   *          the key for the value
-   * @return true if the key is valid and the corresponding value is not empty;
-   *         false otherwise
-   */
-  public boolean hasValue(String key) {
-    String value = properties.get(key);
-    if ((value == null) || (value.equals(""))) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Returns the keys of the properties.
-   *
-   * @return keys
-   */
-  public String[] getKeys() {
-    ArrayList<String> keys = new ArrayList<>();
-    for (Entry<String, String> entry : properties.entrySet()) {
-      String key = entry.getKey();
-      keys.add(key);
-    }
-    return keys.toArray(new String[keys.size()]);
   }
 
   /**
