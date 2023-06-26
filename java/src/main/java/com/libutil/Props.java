@@ -422,6 +422,98 @@ public class Props {
   }
 
   /**
+   * Returns the minimum value of the subscript at the end of the field name when
+   * multiple properties are defined.
+   *
+   * <pre>
+   * name1=aaa
+   * name2=bbb
+   * name3=ccc
+   * Returns 1
+   * </pre>
+   *
+   * @param name
+   *          The field name
+   * @return Minimum subscript value.<br>
+   *         Returns -1 if the field name does not exist.
+   */
+  public int getMinFieldNameIndex(String name) {
+    Pattern p1 = Pattern.compile("^" + name + "[0-9]+$");
+    int min = -1;
+    for (Entry<String, String> entry : properties.entrySet()) {
+      String key = entry.getKey();
+      Matcher matcher = p1.matcher(key);
+      if (matcher.matches()) {
+        String num = key.replaceAll(name, "");
+        int n = Integer.parseInt(num);
+        if ((min == -1) || (n < min)) {
+          min = n;
+        }
+      }
+    }
+    return min;
+  }
+
+  /**
+   * Returns the maximum value of the subscript at the end of the field name when
+   * multiple properties are defined.
+   *
+   * <pre>
+   * name1=aaa
+   * name2=bbb
+   * name3=ccc
+   * Returns 3
+   * </pre>
+   *
+   * @param name
+   *          The field name
+   * @return Maximum subscript value.<br>
+   *         Returns -1 if the field name does not exist.
+   */
+  public int getMaxFieldNameIndex(String name) {
+    Pattern p1 = Pattern.compile("^" + name + "[0-9]+$");
+    int max = -1;
+    for (Entry<String, String> entry : properties.entrySet()) {
+      String key = entry.getKey();
+      Matcher matcher = p1.matcher(key);
+      if (matcher.matches()) {
+        String num = key.replaceAll(name, "");
+        int n = Integer.parseInt(num);
+        if (max < n) {
+          max = n;
+        }
+      }
+    }
+    return max;
+  }
+
+  /**
+   * Returns an array of values when multiple properties are defined.
+   *
+   * @param baseName
+   *          The base field name (name1, name2 ... then "name")
+   * @return an array of values
+   */
+  public String[] getValues(String baseName) {
+    int min = getMinFieldNameIndex(baseName);
+    int max = getMaxFieldNameIndex(baseName);
+
+    if ((min == -1) || (max == -1)) {
+      return new String[0];
+    }
+
+    List<String> list = new ArrayList<>();
+    for (int i = min; i <= max; i++) {
+      String value = getValue(baseName + i);
+      list.add(value);
+    }
+
+    String[] values = new String[list.size()];
+    list.toArray(values);
+    return values;
+  }
+
+  /**
    * Returns if the value for the specified key exists.
    *
    * @param key
@@ -549,6 +641,21 @@ public class Props {
    */
   public String removeValue(String key) {
     return properties.remove(key);
+  }
+
+  /**
+   * Returns all properties in JSON.
+   *
+   * @return JSON string
+   */
+  public String toJSON() {
+    JsonBuilder jb = new JsonBuilder();
+    for (Entry<String, String> entry : properties.entrySet()) {
+      String k = entry.getKey();
+      String v = entry.getValue();
+      jb.append(k, v);
+    }
+    return jb.toString();
   }
 
   /**
