@@ -24,7 +24,7 @@
 ' SOFTWARE.
 '
 ' https://libutil.com/
-' v202306182144
+' v202306272347
 '==============================================================================
 Option Explicit
 
@@ -1174,7 +1174,7 @@ Public Function ExtractUniqueValues(refs As String, Optional ws As Worksheet = N
 End Function
 
 ''
-' Converts the values in the specified column range into a Set collection with no duplicate elements, 
+' Converts the values in the specified column range into a Set collection with no duplicate elements,
 ' and displays them in the column direction starting from the specified cell.
 '
 ' Call PrintUniqueValues("A1:B20", "B1")
@@ -1190,7 +1190,7 @@ Public Sub PrintUniqueValues(refs As String, outStartCellAddr As String, Optiona
 End Sub
 
 ''
-' Converts the values in the selected range to a Set collection with no duplicate elements, 
+' Converts the values in the selected range to a Set collection with no duplicate elements,
 ' and displays them in the column direction starting from the specified cell.
 '
 Public Sub SelectionToUniqueValues(dest As String, Optional ws As Worksheet = Nothing)
@@ -2037,6 +2037,34 @@ Public Function HttpRequest(url As String, Optional method As String = "GET", Op
     Loop
 
     Set HttpRequest = httpReq
+End Function
+
+'------------------------------------------------------------------------------
+'# Command
+'------------------------------------------------------------------------------
+''
+' Execute a command
+'
+Public Function ExecCommand(command As String) As String
+    Dim wsh As Object
+    Dim wshExec As Object
+    Dim resOut As String
+    Dim resErr As String
+    Dim result As String
+
+    Set wsh = CreateObject("WScript.Shell")
+    Set wshExec = wsh.exec("%ComSpec% /c " & command)
+    resOut = wshExec.stdOut.ReadAll
+    resErr = wshExec.StdErr.ReadAll
+    result = resOut
+    If resErr <> "" Then
+        result = result & vbCrLf & resErr
+    End If
+
+    Set wshExec = Nothing
+    Set wsh = Nothing
+
+    ExecCommand = result
 End Function
 
 '------------------------------------------------------------------------------
