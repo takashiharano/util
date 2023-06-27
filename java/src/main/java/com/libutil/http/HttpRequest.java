@@ -57,7 +57,7 @@ public class HttpRequest {
 
   public HttpRequest(String uri, String method) {
     this.uri = uri;
-    this.method = method;
+    this.method = method.toUpperCase();
   }
 
   public HttpRequest(String uri, String method, Proxy proxy) {
