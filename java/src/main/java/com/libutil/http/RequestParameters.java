@@ -82,4 +82,8 @@ public class RequestParameters extends LinkedHashMap<String, String> {
     return sb.toString();
   }
 
+  public String toString() {
+    return buildQueryString();
+  }
+
 }
