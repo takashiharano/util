@@ -5,7 +5,7 @@ import com.libutil.http.HttpRequest;
 import com.libutil.http.HttpResponse;
 import com.libutil.test.Log;
 
-public class HttpCookieTest {
+public class HttpGetCookiesTest {
 
   public static void main(String[] args) {
     test();
@@ -24,6 +24,10 @@ public class HttpCookieTest {
     Log.i("status=" + status + " " + statusMessage);
 
     HttpCookie[] cookies = res.getCookies();
+    if (cookies == null) {
+      Log.i("cookie = null");
+      return;
+    }
 
     for (int i = 0; i < cookies.length; i++) {
       HttpCookie cookie = cookies[i];

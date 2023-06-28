@@ -4,7 +4,7 @@ import com.libutil.http.HttpRequest;
 import com.libutil.http.HttpResponse;
 import com.libutil.test.Log;
 
-public class HttpCookieValueTest {
+public class HttpGetCookieValueTest {
 
   public static void main(String[] args) {
     test();

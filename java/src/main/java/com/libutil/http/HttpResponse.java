@@ -173,6 +173,9 @@ public class HttpResponse {
    * @return a cookie. if not found, returns null.
    */
   public HttpCookie getCookie(String name, boolean caseSensitive) {
+    if (cookies == null) {
+      return null;
+    }
     if (!caseSensitive) {
       name = name.toLowerCase();
     }
