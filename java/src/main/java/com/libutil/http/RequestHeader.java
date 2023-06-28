@@ -26,13 +26,13 @@ package com.libutil.http;
 import java.util.LinkedHashMap;
 
 /**
- * The class RequestHeaders represents a HTTP request headers.
+ * The class RequestHeader represents a HTTP request headers.
  */
-public class RequestHeaders extends LinkedHashMap<String, String> {
+public class RequestHeader extends LinkedHashMap<String, String> {
 
   private static final long serialVersionUID = -7331346952226491145L;
 
-  public RequestHeaders() {
+  public RequestHeader() {
     super();
   }
 

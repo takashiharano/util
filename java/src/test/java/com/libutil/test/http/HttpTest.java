@@ -1,6 +1,5 @@
 package com.libutil.test.http;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -11,7 +10,7 @@ import java.util.Map.Entry;
 
 import com.libutil.http.HttpRequest;
 import com.libutil.http.HttpResponse;
-import com.libutil.http.RequestHeaders;
+import com.libutil.http.RequestHeader;
 import com.libutil.http.RequestParameters;
 import com.libutil.test.Log;
 
@@ -47,7 +46,7 @@ public class HttpTest {
       proxy = new Proxy(Proxy.Type.HTTP, socketAddr);
     }
 
-    RequestHeaders reqHeaders = new RequestHeaders();
+    RequestHeader reqHeaders = new RequestHeader();
     reqHeaders.put("User-Agent", USER_AGENT_ORIGINAL);
 
     RequestParameters params = new RequestParameters();
@@ -79,12 +78,12 @@ public class HttpTest {
    * @param url
    * @param method
    * @param params
+   * @param requestHeader
    * @param proxy
-   * @throws IOException
    */
-  public static void http(String url, String method, String params, RequestHeaders reqHeaders, Proxy proxy) {
+  public static void http(String url, String method, String params, RequestHeader requestHeader, Proxy proxy) {
     HttpRequest httpReq = new HttpRequest(url, method, proxy);
-    httpReq.setRequestHeaders(reqHeaders);
+    httpReq.setRequestHeader(requestHeader);
     HttpResponse response = httpReq.send(params);
 
     int statusCode = response.getStatus();

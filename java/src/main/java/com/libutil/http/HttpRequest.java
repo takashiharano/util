@@ -45,7 +45,7 @@ public class HttpRequest {
 
   private String uri;
   private String method;
-  private RequestHeaders reqHeaders;
+  private RequestHeader requestHeader;
   private StringBuilder cookie;
   private Proxy proxy;
   private int connectionTimeoutSec;
@@ -140,11 +140,11 @@ public class HttpRequest {
   /**
    * Set request header map.
    *
-   * @param reqHeaders
+   * @param requestHeader
    *          the hash map of request header
    */
-  public void setRequestHeaders(RequestHeaders reqHeaders) {
-    this.reqHeaders = reqHeaders;
+  public void setRequestHeader(RequestHeader requestHeader) {
+    this.requestHeader = requestHeader;
   }
 
   /**
@@ -156,10 +156,10 @@ public class HttpRequest {
    *          field value
    */
   public void setRequestHeader(String name, String value) {
-    if (reqHeaders == null) {
-      reqHeaders = new RequestHeaders();
+    if (requestHeader == null) {
+      requestHeader = new RequestHeader();
     }
-    reqHeaders.put(name, value);
+    requestHeader.put(name, value);
   }
 
   /**
@@ -170,10 +170,10 @@ public class HttpRequest {
    * @return true if exists
    */
   public boolean hasRequestHeader(String name) {
-    if (reqHeaders == null) {
+    if (requestHeader == null) {
       return false;
     }
-    return reqHeaders.containsKey(name);
+    return requestHeader.containsKey(name);
   }
 
   /**
@@ -352,7 +352,7 @@ public class HttpRequest {
       conn.setReadTimeout(readTimeoutSec * 1000);
     }
 
-    if ((reqHeaders == null) || !hasRequestHeader("Content-Type")) {
+    if ((requestHeader == null) || !hasRequestHeader("Content-Type")) {
       setContentType("application/x-www-form-urlencoded");
     }
 
@@ -360,7 +360,7 @@ public class HttpRequest {
       setRequestHeader("Cookie", cookie.toString());
     }
 
-    for (Entry<String, String> entry : reqHeaders.entrySet()) {
+    for (Entry<String, String> entry : requestHeader.entrySet()) {
       conn.setRequestProperty(entry.getKey(), entry.getValue());
     }
 
