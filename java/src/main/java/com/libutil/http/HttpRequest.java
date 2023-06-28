@@ -32,6 +32,7 @@ import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Map.Entry;
 
 import com.libutil.Base64Util;
@@ -45,6 +46,7 @@ public class HttpRequest {
   private String uri;
   private String method;
   private RequestHeaders reqHeaders;
+  private StringBuilder cookie;
   private Proxy proxy;
   private int connectionTimeoutSec;
   private int readTimeoutSec;
@@ -146,14 +148,14 @@ public class HttpRequest {
   }
 
   /**
-   * Add request header field.
+   * Sets request header field.
    *
    * @param name
    *          field name
    * @param value
    *          field value
    */
-  public void addRequestHeader(String name, String value) {
+  public void setRequestHeader(String name, String value) {
     if (reqHeaders == null) {
       reqHeaders = new RequestHeaders();
     }
@@ -164,7 +166,7 @@ public class HttpRequest {
    * Returns if the request header contains the given field name.
    *
    * @param name
-   *          field name
+   *          field name (case-sensitive)
    * @return true if exists
    */
   public boolean hasRequestHeader(String name) {
@@ -181,7 +183,7 @@ public class HttpRequest {
    *          the content type
    */
   public void setContentType(String type) {
-    addRequestHeader("Content-Type", type);
+    setRequestHeader("Content-Type", type);
   }
 
   /**
@@ -191,7 +193,24 @@ public class HttpRequest {
    *          the user agent
    */
   public void setUserAgent(String ua) {
-    addRequestHeader("User-Agent", ua);
+    setRequestHeader("User-Agent", ua);
+  }
+
+  public void setCookieValue(String name, String value) {
+    if (cookie == null) {
+      cookie = new StringBuilder();
+    } else {
+      cookie.append("; ");
+    }
+    try {
+      String encName = URLEncoder.encode(name, "UTF-8");
+      String encVal = URLEncoder.encode(value, "UTF-8");
+      cookie.append(encName);
+      cookie.append("=");
+      cookie.append(encVal);
+    } catch (UnsupportedEncodingException e) {
+      // never reached
+    }
   }
 
   /**
@@ -205,7 +224,7 @@ public class HttpRequest {
   public void setAuthentication(String user, String pass) {
     String userPass = user + ":" + pass;
     String authData = Base64Util.encode(userPass);
-    addRequestHeader("Authorization", "Basic " + authData);
+    setRequestHeader("Authorization", "Basic " + authData);
   }
 
   /**
@@ -336,6 +355,11 @@ public class HttpRequest {
     if ((reqHeaders == null) || !hasRequestHeader("Content-Type")) {
       setContentType("application/x-www-form-urlencoded");
     }
+
+    if (cookie != null) {
+      setRequestHeader("Cookie", cookie.toString());
+    }
+
     for (Entry<String, String> entry : reqHeaders.entrySet()) {
       conn.setRequestProperty(entry.getKey(), entry.getValue());
     }

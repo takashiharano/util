@@ -37,7 +37,7 @@ public class HttpCookie {
   private String name;
   private String value;
   private String expires;
-  private Integer maxAge;
+  private Integer maxAge; // in seconds
   private String domain;
   private String path;
   private boolean secure;
@@ -112,8 +112,8 @@ public class HttpCookie {
   /**
    * Returns the Expires attribute value.
    *
-   * @return the Expires attribute value. if the attribute does not exist, returns
-   *         null.
+   * @return the Expires attribute value like "Wed, 28 Jun 2023 09:15:30 GMT".<br>
+   *         if the attribute does not exist, returns null.
    */
   public String getExpires() {
     return expires;
@@ -123,14 +123,14 @@ public class HttpCookie {
    * Sets the Expires attribute value.
    *
    * @param expires
-   *          the Expires attribute value.
+   *          the Expires attribute value. e.g., "Wed, 28 Jun 2023 09:15:30 GMT"
    */
   public void setExpires(String expires) {
     this.expires = expires;
   }
 
   /**
-   * Returns the Max-Age Attribute value.
+   * Returns the Max-Age Attribute value in seconds.
    *
    * @return the Max-Age Attribute value. if the attribute does not exist, returns
    *         null.
@@ -143,7 +143,7 @@ public class HttpCookie {
    * Sets the Max-Age Attribute value.
    *
    * @param maxAge
-   *          the Max-Age Attribute value
+   *          the Max-Age Attribute value in seconds
    */
   public void setMaxAge(Integer maxAge) {
     this.maxAge = maxAge;
