@@ -379,10 +379,13 @@ public class HttpRequest {
       }
     }
     HttpResponse response = new HttpResponse();
-
     response.setStatus(statusCode);
     response.setStatusMessage(statusMessage);
-    response.setHeaderFields(conn.getHeaderFields());
+    try {
+      response.setHeaderFields(conn.getHeaderFields());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     response.setContentLength(conn.getContentLength());
     response.setBody(body);
 
