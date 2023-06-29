@@ -42,7 +42,7 @@ import com.libutil.BinUtil;
  */
 public class HttpRequest {
 
-  private String uri;
+  private String url;
   private String method;
   private RequestHeader requestHeader;
   private Cookies cookies;
@@ -50,14 +50,15 @@ public class HttpRequest {
   private int connectionTimeoutSec;
   private int readTimeoutSec;
   private boolean redirect;
+  private String query;
 
-  public HttpRequest(String uri) {
-    this.uri = uri;
+  public HttpRequest(String url) {
+    this.url = url;
     this.method = "GET";
   }
 
-  public HttpRequest(String uri, String method) {
-    this.uri = uri;
+  public HttpRequest(String url, String method) {
+    this.url = url;
     this.method = method.toUpperCase();
   }
 
@@ -186,6 +187,16 @@ public class HttpRequest {
   }
 
   /**
+   * Sets a query string.
+   *
+   * @param q
+   *          query string
+   */
+  public void setQueryString(String q) {
+    this.query = q;
+  }
+
+  /**
    * Add User-Agent field into the request header.
    *
    * @param ua
@@ -255,6 +266,27 @@ public class HttpRequest {
     this.redirect = redirect;
   }
 
+  /**
+   * Join the base URL and a given path.<br>
+   * The URL will be BASE_URL/PATH
+   *
+   * @param path
+   *          path to append
+   */
+  public void joinPath(String path) {
+    UrlUtil.joinPath(url, path);
+  }
+
+  /**
+   * Appends a query string to the base URL.<br>
+   * 
+   * @param q
+   *          query string to append
+   */
+  public void appendQuery(String q) {
+    UrlUtil.appendQuery(url, q);
+  }
+
   private boolean isWritableMethod(String method) {
     if ("POST".equals(method) || "PUT".equals(method) || "DELETE".equals(method)) {
       return true;
@@ -301,7 +333,7 @@ public class HttpRequest {
       if (location == null) {
         return response;
       }
-      this.uri = location;
+      this.url = location;
     }
     try {
       response = _send(data);
@@ -322,15 +354,19 @@ public class HttpRequest {
    * Send an HTTP request.
    *
    * @param data
-   *          a payload body
+   *          A payload body. For GET, add it to the URL as a query string.
    * @return HttpResponse object
    * @throws IOException
    *           If an I/O error occurs
    */
   private HttpResponse _send(String data) throws IOException {
+    if (query != null) {
+      url = UrlUtil.appendQuery(url, query);
+    }
+
     if ("GET".equals(method)) {
       if (data != null) {
-        uri += "?" + data;
+        url = UrlUtil.appendQuery(url, data);
       }
     }
 
@@ -338,8 +374,8 @@ public class HttpRequest {
       proxy = Proxy.NO_PROXY;
     }
 
-    URL url = new URL(uri);
-    HttpURLConnection conn = (HttpURLConnection) url.openConnection(proxy);
+    URL urlObj = new URL(url);
+    HttpURLConnection conn = (HttpURLConnection) urlObj.openConnection(proxy);
     conn.setRequestMethod(method);
     conn.setInstanceFollowRedirects(false);
     if (connectionTimeoutSec > 0) {

@@ -24,9 +24,7 @@
 package com.libutil.http;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.LinkedHashMap;
-import java.util.Map.Entry;
 
 /**
  * The class RequestParameters represents a HTTP request parameters.
@@ -45,13 +43,7 @@ public class RequestParameters extends LinkedHashMap<String, String> {
    * @return the query string
    */
   public String buildQueryString() {
-    String data = null;
-    try {
-      data = buildQueryString("UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      // never reached
-    }
-    return data;
+    return UrlUtil.buildQueryString(this);
   }
 
   /**
@@ -64,22 +56,7 @@ public class RequestParameters extends LinkedHashMap<String, String> {
    *           If the named encoding is not supported
    */
   public String buildQueryString(String encoding) throws UnsupportedEncodingException {
-    StringBuilder sb = new StringBuilder();
-    int i = 0;
-    for (Entry<String, String> entry : this.entrySet()) {
-      String key = entry.getKey();
-      String value = entry.getValue();
-      String endKey = URLEncoder.encode(key, encoding);
-      String endVal = URLEncoder.encode(value, encoding);
-      if (i > 0) {
-        sb.append("&");
-      }
-      sb.append(endKey);
-      sb.append("=");
-      sb.append(endVal);
-      i++;
-    }
-    return sb.toString();
+    return UrlUtil.buildQueryString(this, encoding);
   }
 
   public String toString() {
