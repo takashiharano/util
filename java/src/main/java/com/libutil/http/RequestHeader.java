@@ -24,6 +24,8 @@
 package com.libutil.http;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * The class RequestHeader represents a HTTP request headers.
@@ -34,6 +36,20 @@ public class RequestHeader extends LinkedHashMap<String, String> {
 
   public RequestHeader() {
     super();
+  }
+
+  /**
+   * Stores all the contents of the given Map into this object.
+   *
+   * @param map
+   *          a map consisting of names and values
+   */
+  public void set(Map<String, String> map) {
+    for (Entry<String, String> entry : map.entrySet()) {
+      String name = entry.getKey();
+      String value = entry.getValue();
+      put(name, value);
+    }
   }
 
 }
