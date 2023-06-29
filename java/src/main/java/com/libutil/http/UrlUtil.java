@@ -51,53 +51,6 @@ public class UrlUtil {
   }
 
   /**
-   * Join a base URL and a query string.
-   *
-   * @param baseUrl
-   *          the base URL
-   * @param query
-   *          a query string
-   * @return baseUrl?param
-   */
-  public static String appendQuery(String baseUrl, String query) {
-    if (query == null) {
-      return baseUrl;
-    }
-    StringBuilder sb = new StringBuilder();
-    sb.append(baseUrl);
-    if (baseUrl.contains("?")) {
-      sb.append("&");
-    } else {
-      sb.append("?");
-    }
-    sb.append(query);
-    return sb.toString();
-  }
-
-  /**
-   * Join the base URL and a given path.<br>
-   * The URL will be BASE_URL/PATH
-   *
-   * @param baseUrl
-   *          the base URL
-   * @param path
-   *          the path
-   * @return baseURL/path
-   */
-  public static String joinPath(String baseUrl, String path) {
-    if (path == null) {
-      return baseUrl;
-    }
-    StringBuilder sb = new StringBuilder();
-    sb.append(baseUrl);
-    if (!baseUrl.endsWith("/") && !path.startsWith("/")) {
-      sb.append("/");
-    }
-    sb.append(path);
-    return sb.toString();
-  }
-
-  /**
    * Build a query string from a map.
    *
    * @param map
@@ -142,6 +95,72 @@ public class UrlUtil {
       i++;
     }
     return sb.toString();
+  }
+
+  /**
+   * Join the base URL and a given path.<br>
+   * The URL will be BASE_URL/PATH
+   *
+   * @param baseUrl
+   *          the base URL
+   * @param path
+   *          the path
+   * @return baseURL/path
+   */
+  public static String joinPath(String baseUrl, String path) {
+    if ((baseUrl == null) || (path == null) || "".equals(path)) {
+      return baseUrl;
+    }
+    StringBuilder sb = new StringBuilder();
+    sb.append(baseUrl);
+    if (baseUrl.endsWith("/") && path.startsWith("/")) {
+      path = path.substring(1);
+    } else if (!baseUrl.endsWith("/") && !path.startsWith("/")) {
+      sb.append("/");
+    }
+    sb.append(path);
+    return sb.toString();
+  }
+
+  /**
+   * Join a base URL and a query string.
+   *
+   * @param baseUrl
+   *          the base URL
+   * @param query
+   *          a query string
+   * @return baseUrl?param
+   */
+  public static String appendQuery(String baseUrl, String query) {
+    if ((baseUrl == null) || (query == null) || "".equals(query)) {
+      return baseUrl;
+    }
+    StringBuilder sb = new StringBuilder();
+    sb.append(baseUrl);
+    if (baseUrl.contains("?")) {
+      sb.append("&");
+    } else {
+      sb.append("?");
+    }
+    sb.append(query);
+    return sb.toString();
+  }
+
+  /**
+   * Build a URL consisting of the baseUrl, path and query.
+   *
+   * @param baseUrl
+   *          the base URL
+   * @param path
+   *          the path following baseUrl
+   * @param query
+   *          query string
+   * @return a URL string. BASE_URL/PATH?QUERY
+   */
+  public static String buildUrl(String baseUrl, String path, String query) {
+    String url = joinPath(baseUrl, path);
+    url = appendQuery(url, query);
+    return url;
   }
 
 }
