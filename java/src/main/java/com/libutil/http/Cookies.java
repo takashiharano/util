@@ -54,10 +54,10 @@ public class Cookies extends LinkedHashMap<String, Cookie> {
    *          a map consisting of names and values
    */
   public void set(Map<String, String> map) {
-    for (Entry<String, Cookie> entry : this.entrySet()) {
-      Cookie cookie = entry.getValue();
-      String name = cookie.getName();
-      put(name, cookie);
+    for (Entry<String, String> entry : map.entrySet()) {
+      String name = entry.getKey();
+      String value = entry.getValue();
+      put(name, value);
     }
   }
 
