@@ -310,6 +310,7 @@ public class HttpRequest {
         response = send(data, response);
       }
     } catch (Exception e) {
+      e.printStackTrace();
       response = new HttpResponse();
       response.setStatus(0);
       response.setErrorDetail(e);
@@ -350,15 +351,19 @@ public class HttpRequest {
     }
 
     if ((requestHeader == null) || !hasRequestHeader("Content-Type")) {
-      setContentType("application/x-www-form-urlencoded");
+      if ("POST".equals(method) || "PUT".equals(method)) {
+        setContentType("application/x-www-form-urlencoded");
+      }
     }
 
     if (cookies != null) {
       setRequestHeader("Cookie", cookies.toString());
     }
 
-    for (Entry<String, String> entry : requestHeader.entrySet()) {
-      conn.setRequestProperty(entry.getKey(), entry.getValue());
+    if (requestHeader != null) {
+      for (Entry<String, String> entry : requestHeader.entrySet()) {
+        conn.setRequestProperty(entry.getKey(), entry.getValue());
+      }
     }
 
     if (isWritableMethod(method)) {
@@ -402,11 +407,7 @@ public class HttpRequest {
     HttpResponse response = new HttpResponse();
     response.setStatus(statusCode);
     response.setStatusMessage(statusMessage);
-    try {
-      response.setHeaderFields(conn.getHeaderFields());
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    response.setHeaderFields(conn.getHeaderFields());
     response.setContentLength(conn.getContentLength());
     response.setBody(body);
 
