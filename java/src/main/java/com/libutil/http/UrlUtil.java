@@ -55,7 +55,7 @@ public class UrlUtil {
    *
    * @param baseUrl
    *          the base URL
-   * @param param
+   * @param query
    *          a query string
    * @return baseUrl?param
    */
@@ -125,14 +125,14 @@ public class UrlUtil {
    * @throws UnsupportedEncodingException
    *           If the named encoding is not supported
    */
-  public static String buildQueryString(Map<String, String> map, String encode) throws UnsupportedEncodingException {
+  public static String buildQueryString(Map<String, String> map, String encoding) throws UnsupportedEncodingException {
     StringBuilder sb = new StringBuilder();
     int i = 0;
     for (Entry<String, String> entry : map.entrySet()) {
       String key = entry.getKey();
       String value = entry.getValue();
-      String encKey = URLEncoder.encode(key, encode);
-      String encVal = URLEncoder.encode(value, encode);
+      String encKey = URLEncoder.encode(key, encoding);
+      String encVal = URLEncoder.encode(value, encoding);
       if (i > 0) {
         sb.append("&");
       }
