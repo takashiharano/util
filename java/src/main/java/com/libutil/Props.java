@@ -31,6 +31,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -619,6 +620,20 @@ public class Props {
    */
   public void setValue(String key, boolean value) {
     properties.put(key, Boolean.toString(value));
+  }
+
+  /**
+   * Stores all the contents of the given Map into this object.
+   *
+   * @param map
+   *          a map consisting of keys and values
+   */
+  public void set(Map<String, String> map) {
+    for (Entry<String, String> entry : map.entrySet()) {
+      String key = entry.getKey();
+      String value = entry.getValue();
+      properties.put(key, value);
+    }
   }
 
   /**
