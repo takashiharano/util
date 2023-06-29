@@ -32,7 +32,6 @@ import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Map.Entry;
 
 import com.libutil.Base64Util;
@@ -46,7 +45,7 @@ public class HttpRequest {
   private String uri;
   private String method;
   private RequestHeader requestHeader;
-  private StringBuilder cookie;
+  private Cookies cookies;
   private Proxy proxy;
   private int connectionTimeoutSec;
   private int readTimeoutSec;
@@ -196,21 +195,19 @@ public class HttpRequest {
     setRequestHeader("User-Agent", ua);
   }
 
+  /**
+   * Sets a cookie name and value.
+   *
+   * @param name
+   *          the cookie-name
+   * @param value
+   *          the cookie-value
+   */
   public void setCookieValue(String name, String value) {
-    if (cookie == null) {
-      cookie = new StringBuilder();
-    } else {
-      cookie.append("; ");
+    if (cookies == null) {
+      cookies = new Cookies();
     }
-    try {
-      String encName = URLEncoder.encode(name, "UTF-8");
-      String encVal = URLEncoder.encode(value, "UTF-8");
-      cookie.append(encName);
-      cookie.append("=");
-      cookie.append(encVal);
-    } catch (UnsupportedEncodingException e) {
-      // never reached
-    }
+    cookies.put(name, value);
   }
 
   /**
@@ -356,8 +353,8 @@ public class HttpRequest {
       setContentType("application/x-www-form-urlencoded");
     }
 
-    if (cookie != null) {
-      setRequestHeader("Cookie", cookie.toString());
+    if (cookies != null) {
+      setRequestHeader("Cookie", cookies.toString());
     }
 
     for (Entry<String, String> entry : requestHeader.entrySet()) {

@@ -35,7 +35,7 @@ public class HttpResponse {
   private int status = 0;
   private String statusMessage;
   private Map<String, List<String>> headerFields;
-  private HttpCookie[] cookies;
+  private Cookies cookies;
   private byte[] body;
   private int contentLength;
   private Exception exception;
@@ -101,12 +101,13 @@ public class HttpResponse {
     }
     // Set-Cookie: id=abc; Expires=Wed, 28 Jun 2023 09:15:30 GMT; Max-Age=86400;
     // Domain=takashiharano.com; Path=/; Secure; HttpOnly
-    cookies = new HttpCookie[cookieFields.length];
+    cookies = new Cookies();
     for (int i = 0; i < cookieFields.length; i++) {
       String c = cookieFields[i];
-      HttpCookie cookie = new HttpCookie();
+      Cookie cookie = new Cookie();
       cookie.parse(c);
-      cookies[i] = cookie;
+      String name = cookie.getName();
+      cookies.put(name, cookie);
     }
   }
 
@@ -144,11 +145,11 @@ public class HttpResponse {
   }
 
   /**
-   * Returns an array of HTTP Cookie.
+   * Returns HTTP Cookie fields map.
    *
-   * @return an array of HTTP Cookie
+   * @return a HTTP Cookie fields map
    */
-  public HttpCookie[] getCookies() {
+  public Cookies getCookies() {
     return cookies;
   }
 
@@ -156,68 +157,37 @@ public class HttpResponse {
    * Returns a cookie corresponding to the specified cookie-name.
    *
    * @param name
-   *          the cookie-name (case-insensitive)
+   *          the cookie-name (case-sensitive)
    * @return a cookie. if not found, returns null.
    */
-  public HttpCookie getCookie(String name) {
-    return getCookie(name, false);
-  }
-
-  /**
-   * Returns a cookie corresponding to the specified cookie-name.
-   *
-   * @param name
-   *          the cookie-name
-   * @param caseSensitive
-   *          if true, names are case sensitive.
-   * @return a cookie. if not found, returns null.
-   */
-  public HttpCookie getCookie(String name, boolean caseSensitive) {
-    if (cookies == null) {
-      return null;
-    }
-    if (!caseSensitive) {
-      name = name.toLowerCase();
-    }
-    for (int i = 0; i < cookies.length; i++) {
-      HttpCookie cookie = cookies[i];
-      String cName = cookie.getName();
-      if (!caseSensitive) {
-        cName = cName.toLowerCase();
-      }
-      if (cName.equals(name)) {
-        return cookie;
-      }
-    }
-    return null;
+  public Cookie getCookie(String name) {
+    return cookies.get(name);
   }
 
   /**
    * Returns a cookie value corresponding to the specified cookie-name.
    *
    * @param name
-   *          the cookie-name (case-insensitive)
+   *          the cookie-name (case-sensitive)
    * @return a cookie value. if not found, returns null.
    */
   public String getCookieValue(String name) {
-    return getCookieValue(name, false);
-  }
-
-  /**
-   * Returns a cookie value corresponding to the specified cookie-name.
-   *
-   * @param name
-   *          the cookie-name
-   * @param caseSensitive
-   *          if true, names are case sensitive.
-   * @return a cookie value. if not found, returns null.
-   */
-  public String getCookieValue(String name, boolean caseSensitive) {
-    HttpCookie cookie = getCookie(name, caseSensitive);
+    Cookie cookie = getCookie(name);
     if (cookie == null) {
       return null;
     }
     return cookie.getValue();
+  }
+
+  /**
+   * Returns whether a cookie corresponding to the given name exists.
+   *
+   * @param name
+   *          the cookie-name
+   * @return true if the cookie exists; false otherwise
+   */
+  public boolean hasCookie(String name) {
+    return cookies.has(name);
   }
 
   /**

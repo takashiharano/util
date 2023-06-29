@@ -1,6 +1,9 @@
 package com.libutil.test.http;
 
-import com.libutil.http.HttpCookie;
+import java.util.Map.Entry;
+
+import com.libutil.http.Cookie;
+import com.libutil.http.Cookies;
 import com.libutil.http.HttpRequest;
 import com.libutil.http.HttpResponse;
 import com.libutil.test.Log;
@@ -23,14 +26,18 @@ public class HttpGetCookiesTest {
 
     Log.i("status=" + status + " " + statusMessage);
 
-    HttpCookie[] cookies = res.getCookies();
+    Cookies cookies = res.getCookies();
     if (cookies == null) {
       Log.i("cookie = null");
       return;
     }
 
-    for (int i = 0; i < cookies.length; i++) {
-      HttpCookie cookie = cookies[i];
+    int size = cookies.size();
+    Log.i("size=" + size);
+
+    int i = 0;
+    for (Entry<String, Cookie> entry : cookies.entrySet()) {
+      Cookie cookie = entry.getValue();
       Log.i("----");
       Log.i("[" + i + "] " + cookie);
       Log.i(cookie.getName() + "=" + cookie.getValue());
@@ -42,6 +49,7 @@ public class HttpGetCookiesTest {
       Log.i("Path=" + cookie.getPath());
       Log.i("Secure=" + cookie.isSecure());
       Log.i("HttpOnly=" + cookie.isHttpOnly());
+      i++;
     }
   }
 

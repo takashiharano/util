@@ -24,7 +24,7 @@
 package com.libutil.http;
 
 /**
- * The class HttpCookie represents a HTTP cookie.<br>
+ * The class Cookie represents a HTTP cookie.<br>
  * https://datatracker.ietf.org/doc/html/rfc6265
  *
  * <pre>
@@ -32,7 +32,7 @@ package com.libutil.http;
  * Set-Cookie: id=abc; Expires=Wed, 28 Jun 2023 09:15:30 GMT; Max-Age=86400; Domain=takashiharano.com; Path=/; Secure; HttpOnly
  * </pre>
  */
-public class HttpCookie {
+public class Cookie {
 
   private String name;
   private String value;
@@ -43,24 +43,24 @@ public class HttpCookie {
   private boolean secure;
   private boolean httpOnly;
 
-  public HttpCookie() {
+  public Cookie() {
     super();
   }
 
-  public HttpCookie(String name, String value) {
+  public Cookie(String name, String value) {
     this.name = name;
     this.value = value;
   }
 
-  public HttpCookie(String name, String value, String expires) {
+  public Cookie(String name, String value, String expires) {
     this(name, value, expires, null, null, null, false, false);
   }
 
-  public HttpCookie(String name, String value, Integer maxAge) {
+  public Cookie(String name, String value, Integer maxAge) {
     this(name, value, null, maxAge, null, null, false, false);
   }
 
-  public HttpCookie(String name, String value, String expires, Integer maxAge, String domain, String path, boolean secure, boolean httpOnly) {
+  public Cookie(String name, String value, String expires, Integer maxAge, String domain, String path, boolean secure, boolean httpOnly) {
     this.name = name;
     this.value = value;
     this.expires = expires;
