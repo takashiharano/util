@@ -13,14 +13,14 @@ public class HttpGetTest {
     String url = "https://takashiharano.com/test/";
     String q = "aaa=bbb";
 
-    HttpRequest request = new HttpRequest(url);
-    HttpResponse response = request.send(q);
+    HttpRequest req = new HttpRequest(url);
+    HttpResponse res = req.send(q);
 
-    int status = response.getStatus();
+    int status = res.getStatus();
     System.out.println("status = " + status);
 
     if (status == 200) {
-      String body = response.getResponseText();
+      String body = res.getResponseText();
       System.out.println(body);
     }
   }
