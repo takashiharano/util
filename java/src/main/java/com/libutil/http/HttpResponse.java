@@ -24,8 +24,10 @@
 package com.libutil.http;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * The class HttpResponse represents a HTTP response.
@@ -142,6 +144,36 @@ public class HttpResponse {
     String[] values = new String[valueList.size()];
     valueList.toArray(values);
     return values;
+  }
+
+  /**
+   * Returns an array of the header field name.
+   *
+   * @return an array of the header field name.<br>
+   *         if there are no fields, returns an empty array [].
+   */
+  public String[] getHeaderNames() {
+    List<String> list = new ArrayList<>();
+    for (Entry<String, List<String>> entry : headerFields.entrySet()) {
+      String name = entry.getKey();
+      if (name != null) {
+        list.add(name);
+      }
+    }
+    String[] array = new String[list.size()];
+    list.toArray(array);
+    return array;
+  }
+
+  /**
+   * Returns whether the given name exists in the header fields.
+   *
+   * @param name
+   *          field name
+   * @return true if the name exists in the header fields.
+   */
+  public boolean hasHeaderField(String name) {
+    return headerFields.containsKey(name);
   }
 
   /**
