@@ -207,6 +207,16 @@ public class HttpRequest {
   }
 
   /**
+   * Sets cookies object to this object.
+   *
+   * @param cookies
+   *          Cookies object
+   */
+  public void setCookies(Cookies cookies) {
+    this.cookies = cookies;
+  }
+
+  /**
    * Sets a cookie name and value.
    *
    * @param name
