@@ -193,6 +193,9 @@ public class HttpResponse {
    * @return a cookie. if not found, returns null.
    */
   public Cookie getCookie(String name) {
+    if (cookies == null) {
+      return null;
+    }
     return cookies.get(name);
   }
 
@@ -209,6 +212,20 @@ public class HttpResponse {
       return null;
     }
     return cookie.getValue();
+  }
+
+  /**
+   * Returns an array of the cookie field name.
+   *
+   * @return an array of the cookie field name.<br>
+   *         if there are no "Set-Cookie" fields in the HTTP response header,
+   *         returns null.
+   */
+  public String[] getCookieNames() {
+    if (cookies == null) {
+      return null;
+    }
+    return cookies.getNames();
   }
 
   /**

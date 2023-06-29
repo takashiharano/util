@@ -25,7 +25,9 @@ package com.libutil.http;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -70,6 +72,25 @@ public class Cookies extends LinkedHashMap<String, Cookie> {
    */
   public boolean has(String name) {
     return this.containsKey(name);
+  }
+
+  /**
+   * Returns an array of the cookie field name.
+   *
+   * @return an array of the cookie field name.<br>
+   *         if there are no fields, returns an empty array [].
+   */
+  public String[] getNames() {
+    List<String> list = new ArrayList<>();
+    for (Entry<String, Cookie> entry : this.entrySet()) {
+      String name = entry.getKey();
+      if (name != null) {
+        list.add(name);
+      }
+    }
+    String[] array = new String[list.size()];
+    list.toArray(array);
+    return array;
   }
 
   /**
