@@ -786,9 +786,9 @@ public class BinUtil {
   }
 
   /**
-   * Returns the value obtained by XORing the given byte array with k in 8-bit
-   * units.
-   * 
+   * Returns the value obtained by XORing the given byte array with given n
+   * (0-255) in 8-bit units.
+   *
    * @param src
    *          a byte array to be converted
    * @param n
