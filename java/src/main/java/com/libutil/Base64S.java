@@ -49,7 +49,7 @@ public class Base64S {
    * @return A String containing the resulting Base64 encoded characters
    */
   public static String encode(byte[] src, int key) {
-    byte[] buf = encrypt(src, key);
+    byte[] buf = BinUtil.xor(src, key);
     String encoded = Base64.getEncoder().encodeToString(buf);
     return encoded;
   }
@@ -109,7 +109,7 @@ public class Base64S {
    */
   public static byte[] decode(String src, int key) throws RuntimeException {
     byte[] buf = Base64.getDecoder().decode(src);
-    return decrypt(buf, key);
+    return BinUtil.xor(buf, key);
   }
 
   /**
@@ -149,14 +149,6 @@ public class Base64S {
       throw new RuntimeException(e);
     }
     return str;
-  }
-
-  private static byte[] decrypt(byte[] src, int key) {
-    return BinUtil.xor(src, key);
-  }
-
-  private static byte[] encrypt(byte[] src, int key) {
-    return BinUtil.xor(src, key);
   }
 
 }
