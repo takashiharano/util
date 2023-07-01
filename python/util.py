@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202306181520
+v = 202307020047
 
 import sys
 import os
@@ -1681,6 +1681,15 @@ def sleep(seconds):
 #------------------------------------------------------------------------------
 # Base64
 #------------------------------------------------------------------------------
+def encode_base64(s, encoding=DEFAULT_ENCODING, tostring=True, altchars=None):
+    b = s
+    if typename(s) == 'str':
+        b = s.encode(encoding)
+    encoded = base64.b64encode(b, altchars=altchars)
+    if tostring:
+        encoded = encoded.decode(encoding)
+    return encoded
+
 def decode_base64(s, encoding=DEFAULT_ENCODING, bin=False, altchars=None, validate=False):
     b = base64.b64decode(s, altchars=altchars, validate=validate)
     if bin:
@@ -1691,14 +1700,32 @@ def decode_base64(s, encoding=DEFAULT_ENCODING, bin=False, altchars=None, valida
         decoded = b.decode(encoding)
     return decoded
 
-def encode_base64(s, encoding=DEFAULT_ENCODING, tostring=True, altchars=None):
+#------------------------------------------------------------------------------
+# Base64S
+#------------------------------------------------------------------------------
+def encode_base64s(s, k, encoding=DEFAULT_ENCODING):
     b = s
     if typename(s) == 'str':
         b = s.encode(encoding)
-    encoded = base64.b64encode(b, altchars=altchars)
-    if tostring:
-        encoded = encoded.decode(encoding)
-    return encoded
+    b = xor(b, k)
+    b = base64.b64encode(b)
+    b64 = b.decode(encoding)
+    return b64
+
+def decode_base64s(b64, k, bin=False, encoding=DEFAULT_ENCODING):
+    b = base64.b64decode(b64)
+    d = xor(b, k)
+    if not bin:
+        d = d.decode(encoding)
+    return d
+
+def xor(a, n):
+    n = n % 256
+    buf = []
+    for i in range(len(a)):
+        b = a[i] ^ n
+        buf.append(b)
+    return bytearray(buf)
 
 #------------------------------------------------------------------------------
 # Path
