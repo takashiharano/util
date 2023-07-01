@@ -152,17 +152,11 @@ public class Base64S {
   }
 
   private static byte[] decrypt(byte[] src, int key) {
-    return convert(src, key);
+    return BinUtil.xor(src, key);
   }
 
   private static byte[] encrypt(byte[] src, int key) {
-    return convert(src, key);
-  }
-
-  private static byte[] convert(byte[] src, int key) {
-    int n = key % 256;
-    byte[] buf = BinUtil.xor(src, n);
-    return buf;
+    return BinUtil.xor(src, key);
   }
 
 }
