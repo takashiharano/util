@@ -1,4 +1,5 @@
 # Base64S
+# Base64S (with "S" standing for "Secure") is a derivative encoding scheme of Base64.
 #
 # The MIT License
 #
