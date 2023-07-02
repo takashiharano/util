@@ -49,7 +49,7 @@
 function Get-Base64SEncodedString {
     Param (
         $Src,
-        [int]$N
+        [int]$Key
     )
 
     if ($Src.GetType().Name -eq "String") {
@@ -58,7 +58,7 @@ function Get-Base64SEncodedString {
         $b = $Src
     }
 
-    $buf = Get-XoredBytes $b $N
+    $buf = Get-XoredBytes $b $Key
     $encoded = [System.Convert]::ToBase64String($buf)
 
     return $encoded
@@ -70,11 +70,11 @@ function Get-Base64SEncodedString {
 function Get-Base64SDecodedBytes {
     Param (
         $Src,
-        [int]$N
+        [int]$Key
     )
 
     $buf = [System.Convert]::FromBase64String($Src)
-    $arr = Get-XoredBytes $buf $N
+    $arr = Get-XoredBytes $buf $Key
     return $arr
 }
 
@@ -84,10 +84,10 @@ function Get-Base64SDecodedBytes {
 function Get-Base64SDecodedString {
     Param (
         $Src,
-        [int]$N
+        [int]$Key
     )
 
-    $buf = Get-Base64SDecodedBytes $Src $N
+    $buf = Get-Base64SDecodedBytes $Src $Key
     $str = [System.Text.Encoding]::UTF8.GetString($buf)
     return $str
 }
@@ -96,14 +96,14 @@ function Get-Base64SDecodedString {
 function Get-XoredBytes {
     Param (
         [byte[]]$Src,
-        [int]$N
+        [int]$Key
     )
 
-    $N = $N % 256
+    $n = $Key % 256
     $buf = New-Object byte[] $Src.Length
 
     for ($i=0; $i -lt $Src.Length; $i++) {
-        $b = Get-Xor $Src[$i] $N
+        $b = Get-Xor $Src[$i] $n
         $buf[$i] = $b
     }
 
