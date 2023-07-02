@@ -27,9 +27,13 @@ python/test/misc/dict_saved_None.json
 python/test/dict/data/dict_saved.json
 python/test/log.txt
 
-vba/Util.xlsm
-vba/~$Util.xlsm
 js/_linter_util.bat
 js/_linter_util.txt
 js/_copy_utiljs.bat
+
 python/_copy_utilpy.bat
+
+vba/Util.xlsm
+vba/~$Util.xlsm
+vba/Base64S.xlsm
+vba/~$Base64S.xlsm
