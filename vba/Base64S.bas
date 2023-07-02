@@ -8,21 +8,22 @@ Option Explicit
 ''
 ' Plain text to Base64 encoded string with XORing source and key
 '
-Public Function EncodeString(str As String, n As Integer) As String
+Public Function EncodeString(str As String, key As Integer) As String
     Dim arr() As Byte
     Dim ret As String
     arr = StringToUtf8Bytes(str)
-    ret = Encode(arr, n)
+    ret = Encode(arr, key)
     EncodeString = ret
 End Function
 
-Public Function Encode(arr() As Byte, n As Integer) As String
+Public Function Encode(arr() As Byte, key As Integer) As String
     Dim i As Integer
     Dim arrLen As Integer
     Dim buf() As Byte
     arrLen = UBound(arr)
     ReDim buf(arrLen)
-    n = n Mod 256
+    Dim n As Integer
+    n = key Mod 256
     For i = 0 To arrLen
         buf(i) = arr(i) Xor n
     Next
@@ -32,15 +33,15 @@ End Function
 ''
 ' Base64 encoded string to Plain text with XORing source and key
 '
-Public Function DecodeString(str As String, n As Integer) As String
+Public Function DecodeString(str As String, key As Integer) As String
     Dim arr() As Byte
     Dim ret As String
-    arr = Decode(str, n)
+    arr = Decode(str, key)
     ret = Utf8BytesToString(arr)
     DecodeString = ret
 End Function
 
-Public Function Decode(src As String, n As Integer) As Byte()
+Public Function Decode(src As String, key As Integer) As Byte()
     Dim i As Integer
     Dim bufLen As Integer
     Dim buf() As Byte
@@ -48,7 +49,8 @@ Public Function Decode(src As String, n As Integer) As Byte()
     buf = DecodeBase64(src)
     bufLen = UBound(buf)
     ReDim arr(bufLen)
-    n = n Mod 256
+    Dim n As Integer
+    n = key Mod 256
     For i = 0 To bufLen
         arr(i) = buf(i) Xor n
     Next
