@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 
 import com.libutil.http.HttpRequest;
 import com.libutil.http.HttpResponse;
-import com.libutil.http.RequestHeader;
+import com.libutil.http.RequestHeaders;
 import com.libutil.http.RequestParameters;
 import com.libutil.test.Log;
 
@@ -46,7 +46,7 @@ public class HttpTest {
       proxy = new Proxy(Proxy.Type.HTTP, socketAddr);
     }
 
-    RequestHeader reqHeaders = new RequestHeader();
+    RequestHeaders reqHeaders = new RequestHeaders();
     reqHeaders.put("User-Agent", USER_AGENT_ORIGINAL);
 
     RequestParameters params = new RequestParameters();
@@ -78,12 +78,12 @@ public class HttpTest {
    * @param url
    * @param method
    * @param params
-   * @param requestHeader
+   * @param requestHeaders
    * @param proxy
    */
-  public static void http(String url, String method, String params, RequestHeader requestHeader, Proxy proxy) {
+  public static void http(String url, String method, String params, RequestHeaders requestHeaders, Proxy proxy) {
     HttpRequest httpReq = new HttpRequest(url, method, proxy);
-    httpReq.setRequestHeader(requestHeader);
+    httpReq.setRequestHeaders(requestHeaders);
     HttpResponse response = httpReq.send(params);
 
     int statusCode = response.getStatus();

@@ -28,18 +28,46 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * The class RequestHeader represents a HTTP request headers.
+ * The class RequestHeaders represents a HTTP request headers.
  */
-public class RequestHeader extends LinkedHashMap<String, String> {
+public class RequestHeaders extends LinkedHashMap<String, String> {
 
   private static final long serialVersionUID = -7331346952226491145L;
 
-  public RequestHeader() {
+  public RequestHeaders() {
     super();
   }
 
   /**
-   * Stores all the contents of the given Map into this object.
+   * Returns whether a header field corresponding to the given name exists.
+   *
+   * @param name
+   *          the field name
+   * @return true if the field exists; false otherwise
+   */
+  public boolean has(String name) {
+    return this.containsKey(name);
+  }
+
+  /**
+   * Sets the general request property.<br>
+   * If a property with the key already exists, overwrite its value with the new
+   * value.<br>
+   * NOTE: HTTP requires all request properties which can legally have multiple
+   * instances with the same key to use a comma-separated list syntax which
+   * enables multiple properties to be appended into a single property.
+   * 
+   * @param name
+   *          the keyword by which the request is known(e.g., "Accept").<br>
+   * @param value
+   *          the value associated with it.
+   */
+  public void set(String name, String value) {
+    put(name, value);
+  }
+
+  /**
+   * Stores all the contents of the given Map into this object.<br>
    *
    * @param map
    *          a map consisting of names and values

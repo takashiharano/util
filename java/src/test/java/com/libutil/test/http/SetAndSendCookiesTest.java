@@ -4,7 +4,7 @@ import com.libutil.http.Cookies;
 import com.libutil.http.HttpRequest;
 import com.libutil.http.HttpResponse;
 
-public class SetCookiesTest {
+public class SetAndSendCookiesTest {
 
   public static void main(String[] args) {
     test();

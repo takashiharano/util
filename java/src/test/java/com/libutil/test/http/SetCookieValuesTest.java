@@ -3,7 +3,7 @@ package com.libutil.test.http;
 import com.libutil.http.HttpRequest;
 import com.libutil.http.HttpResponse;
 
-public class SetCookieTest {
+public class SetCookieValuesTest {
 
   public static void main(String[] args) {
     test();

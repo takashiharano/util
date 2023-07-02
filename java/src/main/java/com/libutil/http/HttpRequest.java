@@ -44,7 +44,7 @@ public class HttpRequest {
 
   private String url;
   private String method;
-  private RequestHeader requestHeader;
+  private RequestHeaders requestHeaders;
   private Cookies cookies;
   private Proxy proxy;
   private int connectionTimeoutSec;
@@ -143,8 +143,8 @@ public class HttpRequest {
    * @param requestHeader
    *          the hash map of request header
    */
-  public void setRequestHeader(RequestHeader requestHeader) {
-    this.requestHeader = requestHeader;
+  public void setRequestHeaders(RequestHeaders requestHeaders) {
+    this.requestHeaders = requestHeaders;
   }
 
   /**
@@ -156,10 +156,10 @@ public class HttpRequest {
    *          field value
    */
   public void setRequestHeader(String name, String value) {
-    if (requestHeader == null) {
-      requestHeader = new RequestHeader();
+    if (requestHeaders == null) {
+      requestHeaders = new RequestHeaders();
     }
-    requestHeader.put(name, value);
+    requestHeaders.put(name, value);
   }
 
   /**
@@ -170,10 +170,10 @@ public class HttpRequest {
    * @return true if exists
    */
   public boolean hasRequestHeader(String name) {
-    if (requestHeader == null) {
+    if (requestHeaders == null) {
       return false;
     }
-    return requestHeader.containsKey(name);
+    return requestHeaders.has(name);
   }
 
   /**
@@ -396,7 +396,7 @@ public class HttpRequest {
       conn.setReadTimeout(readTimeoutSec * 1000);
     }
 
-    if ((requestHeader == null) || !hasRequestHeader("Content-Type")) {
+    if ((requestHeaders == null) || !hasRequestHeader("Content-Type")) {
       if ("POST".equals(method) || "PUT".equals(method)) {
         setContentType("application/x-www-form-urlencoded");
       }
@@ -406,8 +406,8 @@ public class HttpRequest {
       setRequestHeader("Cookie", cookies.toString());
     }
 
-    if (requestHeader != null) {
-      for (Entry<String, String> entry : requestHeader.entrySet()) {
+    if (requestHeaders != null) {
+      for (Entry<String, String> entry : requestHeaders.entrySet()) {
         conn.setRequestProperty(entry.getKey(), entry.getValue());
       }
     }

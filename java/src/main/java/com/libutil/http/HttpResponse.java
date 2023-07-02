@@ -36,7 +36,7 @@ public class HttpResponse {
 
   private int status = 0;
   private String statusMessage;
-  private Map<String, List<String>> headerFields;
+  private ResponseHeaders headerFields;
   private Cookies cookies;
   private byte[] body;
   private int contentLength;
@@ -85,7 +85,7 @@ public class HttpResponse {
    *
    * @return header fields map
    */
-  public Map<String, List<String>> getHeaderFields() {
+  public ResponseHeaders getHeaderFields() {
     return headerFields;
   }
 
@@ -96,13 +96,30 @@ public class HttpResponse {
    *          header fields map
    */
   public void setHeaderFields(Map<String, List<String>> headerFields) {
-    this.headerFields = headerFields;
-    String[] cookieFields = getHeaderValues("Set-Cookie");
-    if (cookieFields == null) {
-      return;
+    this.headerFields = new ResponseHeaders();
+    for (Entry<String, List<String>> entry : headerFields.entrySet()) {
+      String fieldName = entry.getKey();
+      List<String> fieldValues = entry.getValue();
+      this.headerFields.put(fieldName, fieldValues);
     }
-    // Set-Cookie: id=abc; Expires=Wed, 28 Jun 2023 09:15:30 GMT; Max-Age=86400;
-    // Domain=takashiharano.com; Path=/; Secure; HttpOnly
+
+    String[] cookieFields = getHeaderValues("Set-Cookie");
+    if (cookieFields != null) {
+      storeCookies(cookieFields);
+    }
+  }
+
+  /**
+   * Stores the cookie values into Cookie and Cookies object.
+   *
+   * <pre>
+   * Set-Cookie: id=abc; Expires=Wed, 28 Jun 2023 09:15:30 GMT; Max-Age=86400; Domain=takashiharano.com; Path=/; Secure; HttpOnly
+   * </pre>
+   *
+   * @param cookieFields
+   *          an array of the header field of "Set-Cookie"
+   */
+  private void storeCookies(String[] cookieFields) {
     cookies = new Cookies();
     for (int i = 0; i < cookieFields.length; i++) {
       String c = cookieFields[i];
@@ -173,7 +190,7 @@ public class HttpResponse {
    * @return true if the name exists in the header fields.
    */
   public boolean hasHeaderField(String name) {
-    return headerFields.containsKey(name);
+    return headerFields.has(name);
   }
 
   /**
