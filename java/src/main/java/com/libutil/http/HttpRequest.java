@@ -140,7 +140,7 @@ public class HttpRequest {
   /**
    * Set request header map.
    *
-   * @param requestHeader
+   * @param requestHeaders
    *          the hash map of request header
    */
   public void setRequestHeaders(RequestHeaders requestHeaders) {

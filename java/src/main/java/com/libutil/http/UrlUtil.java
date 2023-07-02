@@ -28,6 +28,9 @@ import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Map.Entry;
 
+/**
+ * This class implements the URL string related processing.
+ */
 public class UrlUtil {
 
   /**

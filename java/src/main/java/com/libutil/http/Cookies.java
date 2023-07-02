@@ -31,6 +31,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+/**
+ * The hash table of HTTP cookies.
+ */
 public class Cookies extends LinkedHashMap<String, Cookie> {
 
   private static final long serialVersionUID = 1L;
