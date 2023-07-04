@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202307020047
+v = 202307050051
 
 import sys
 import os
@@ -1945,6 +1945,7 @@ def append_line_to_text_file(path, text, encoding=DEFAULT_ENCODING, max=0):
 
     new_data = new_data + text + LINE_SEP
     write_text_file(path, new_data)
+    return new_data
 
 def path_exists(path):
     return os.path.exists(path)
