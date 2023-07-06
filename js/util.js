@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202307062026';
+util.v = '202307062210';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2535,6 +2535,18 @@ $el.fn = {
   scrollY: function(y) {
     return util.callFn4El(util.scrollY, this, y);
   },
+  scrollToTop: function() {
+    return util.callFn4El(util.scrollToTop, this);
+  },
+  scrollToRight: function() {
+    return util.callFn4El(util.scrollToRight, this);
+  },
+  scrollToBottom: function() {
+    return util.callFn4El(util.scrollToBottom, this);
+  },
+  scrollToLeft: function() {
+    return util.callFn4El(util.scrollToLeft, this);
+  },
   prev: function() {
     return util.prevElement(this);
   },
@@ -2785,6 +2797,18 @@ util.scrollY = function(el, y) {
   }
   el.scrollTop = y;
   return el.scrollTop;
+};
+util.scrollToTop = function(el) {
+  el.scrollTop = 0;
+};
+util.scrollToRight = function(el) {
+  el.scrollLeft = el.scrollWidth;
+};
+util.scrollToBottom = function(el) {
+  el.scrollTop = el.scrollHeight;
+};
+util.scrollToLeft = function(el) {
+  el.scrollLeft = 0;
 };
 
 util.escHtml = function(s) {
