@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202307062210';
+util.v = '202307082214';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -829,14 +829,17 @@ util.timecounter.start = function(el, t0, opt) {
 /**
  * Stop displaying the time difference
  */
-util.timecounter.stop = function(el) {
+util.timecounter.stop = function(el, t0, opt) {
   var v = 0;
   var o = util.timecounter.getObj(el);
-  if (o) {
-    v = o.update(o);
-    o.stop();
-    delete util.timecounter.objs[o.id];
+  if (!o) {
+    o = new util.TimeCounter(el, t0, opt);
+    util.timecounter.objs[o.id] = o;
   }
+  if (t0 != undefined) o.t0 = t0;
+  v = o.update(o);
+  o.stop();
+  delete util.timecounter.objs[o.id];
   return v;
 };
 
