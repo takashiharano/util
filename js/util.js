@@ -2428,8 +2428,8 @@ util.http.listeners = {
 //---------------------------------------------------------
 // Element
 //---------------------------------------------------------
-var $el = function(target, idx) {
-  var el = util.getElement(target, idx);
+var $el = function(tgt, idx) {
+  var el = util.getElement(tgt, idx);
   if (el) {
     for (var k in $el.fn) {
       if (el[k] == undefined) el[k] = $el.fn[k];
@@ -2561,11 +2561,11 @@ $el.fn = {
   }
 };
 
-util.getElement = function(target, idx) {
-  var el = target;
-  if (typeof target == 'string') {
-    el = document.querySelectorAll(target);
-    if (target.charAt(0) == '#') idx = 0;
+util.getElement = function(tgt, idx) {
+  var el = tgt;
+  if (typeof tgt == 'string') {
+    el = document.querySelectorAll(tgt);
+    if (tgt.charAt(0) == '#') idx = 0;
     if (idx != undefined) el = el.item(idx);
   }
   return el;
@@ -3231,18 +3231,18 @@ util.updateTextAreaInfo = function(textarea) {
     listener(data);
   }
 };
-util.textarea._adqdLIstener = function(target) {
-  target.addEventListener('input', util.textarea.onInput);
-  target.addEventListener('change', util.textarea.onInput);
-  target.addEventListener('keydown', util.textarea.onInput);
-  target.addEventListener('keyup', util.textarea.onInput);
-  target.addEventListener('click', util.textarea.onInput);
+util.textarea._adqdLIstener = function(tgt) {
+  tgt.addEventListener('input', util.textarea.onInput);
+  tgt.addEventListener('change', util.textarea.onInput);
+  tgt.addEventListener('keydown', util.textarea.onInput);
+  tgt.addEventListener('keyup', util.textarea.onInput);
+  tgt.addEventListener('click', util.textarea.onInput);
 };
 util.textarea.onInput = function(e) {
   util.updateTextAreaInfo(e.target);
 };
-util.textarea.addListener = function(target, f) {
-  var el = util.getElement(target);
+util.textarea.addListener = function(tgt, f) {
+  var el = util.getElement(tgt);
   if (el) {
     el.listener = f;
     util.textarea._adqdLIstener(el);
@@ -3261,9 +3261,9 @@ util.textarea.addListener = function(target, f) {
  * util.writeHTML('#id', '');
  * util.writeHTML('#id', '', 200);
  */
-util.writeHTML = function(target, html, speed) {
-  var el = target;
-  if (typeof target == 'string') el = document.querySelector(target);
+util.writeHTML = function(tgt, html, speed) {
+  var el = tgt;
+  if (typeof tgt == 'string') el = document.querySelector(tgt);
   if (!el) return;
   if (speed == 0) {
     el.innerHTML = html;
@@ -3291,10 +3291,10 @@ util.__writeHTML = function(cbData) {
 /**
  * Fade out and clear
  */
-util.clearHTML = function(target, speed) {
+util.clearHTML = function(tgt, speed) {
   var DFLT_SPEED = 200;
   if ((speed == undefined) || (speed < 0)) speed = DFLT_SPEED;
-  util.fadeOut(target, speed, util._clearHTML, target);
+  util.fadeOut(tgt, speed, util._clearHTML, tgt);
 };
 util._clearHTML = function(el) {
   el.innerHTML = '';
@@ -5863,7 +5863,7 @@ util.confirm = function(a1, a2, a3, a4, a5) {
 // Meter
 //---------------------------------------------------------
 /**
- * target: element / selector
+ * tgt: element / selector
  * opt = {
  *  min
  *  max
@@ -5898,12 +5898,12 @@ util.confirm = function(a1, a2, a3, a4, a5) {
  * <div id="meter1"></div>
  * var m = new util.Meter('#meter1', opt);
  */
-util.initMeter = function(target, opt) {
-  return new util.Meter(target, opt);
+util.initMeter = function(tgt, opt) {
+  return new util.Meter(tgt, opt);
 };
-util.Meter = function(target, opt) {
-  target = util.getElement(target);
-  target.innerHTML = '';
+util.Meter = function(tgt, opt) {
+  tgt = util.getElement(tgt);
+  tgt.innerHTML = '';
 
   var min = 0;
   var max = 100;
@@ -5950,7 +5950,7 @@ util.Meter = function(target, opt) {
     if (optimum < min) optimum = min;
     if (optimum > max) optimum = max;
   }
-  var base = target;
+  var base = tgt;
   base.className = 'meter';
   var style = {
     display: 'inline-block',
