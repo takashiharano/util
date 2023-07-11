@@ -352,7 +352,6 @@ public class HttpRequest {
         response = send(data, response);
       }
     } catch (Exception e) {
-      e.printStackTrace();
       response = new HttpResponse();
       response.setStatus(0);
       response.setErrorDetail(e);
