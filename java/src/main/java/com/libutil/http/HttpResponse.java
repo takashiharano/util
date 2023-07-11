@@ -332,6 +332,21 @@ public class HttpResponse {
     return exception;
   }
 
+  /**
+   * Returns whether an exception has occurred.
+   *
+   * @return true if an exception has occurred; false otherwise
+   */
+  public boolean hasException() {
+    return (exception != null);
+  }
+
+  /**
+   * Sets an error detail
+   *
+   * @param exception
+   *          an Exception object
+   */
   public void setErrorDetail(Exception exception) {
     this.exception = exception;
     if (exception instanceof java.net.ConnectException) {
