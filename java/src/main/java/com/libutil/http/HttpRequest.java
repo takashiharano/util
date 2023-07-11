@@ -143,7 +143,7 @@ public class HttpRequest {
    * @param requestHeaders
    *          the hash map of request header
    */
-  public void setRequestHeaders(RequestHeaders requestHeaders) {
+  public void setHeaders(RequestHeaders requestHeaders) {
     this.requestHeaders = requestHeaders;
   }
 
@@ -155,7 +155,7 @@ public class HttpRequest {
    * @param value
    *          field value
    */
-  public void setRequestHeader(String name, String value) {
+  public void setHeader(String name, String value) {
     if (requestHeaders == null) {
       requestHeaders = new RequestHeaders();
     }
@@ -169,7 +169,7 @@ public class HttpRequest {
    *          field name (case-sensitive)
    * @return true if exists
    */
-  public boolean hasRequestHeader(String name) {
+  public boolean hasHeader(String name) {
     if (requestHeaders == null) {
       return false;
     }
@@ -183,7 +183,7 @@ public class HttpRequest {
    *          the content type
    */
   public void setContentType(String type) {
-    setRequestHeader("Content-Type", type);
+    setHeader("Content-Type", type);
   }
 
   /**
@@ -203,7 +203,7 @@ public class HttpRequest {
    *          the user agent
    */
   public void setUserAgent(String ua) {
-    setRequestHeader("User-Agent", ua);
+    setHeader("User-Agent", ua);
   }
 
   /**
@@ -242,7 +242,7 @@ public class HttpRequest {
   public void setAuthentication(String user, String pass) {
     String userPass = user + ":" + pass;
     String authData = Base64Util.encode(userPass);
-    setRequestHeader("Authorization", "Basic " + authData);
+    setHeader("Authorization", "Basic " + authData);
   }
 
   /**
@@ -395,14 +395,14 @@ public class HttpRequest {
       conn.setReadTimeout(readTimeoutSec * 1000);
     }
 
-    if ((requestHeaders == null) || !hasRequestHeader("Content-Type")) {
+    if ((requestHeaders == null) || !hasHeader("Content-Type")) {
       if ("POST".equals(method) || "PUT".equals(method)) {
         setContentType("application/x-www-form-urlencoded");
       }
     }
 
     if (cookies != null) {
-      setRequestHeader("Cookie", cookies.toString());
+      setHeader("Cookie", cookies.toString());
     }
 
     if (requestHeaders != null) {

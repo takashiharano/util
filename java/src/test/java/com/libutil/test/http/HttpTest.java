@@ -16,7 +16,7 @@ import com.libutil.test.Log;
 
 public class HttpTest {
 
-  private static final String USER_AGENT_ORIGINAL = "Test Agent";
+  private static final String USER_AGENT_ORIGINAL = "TestAgent/1.0";
   private static final String DEFAULT_URL = "https://takashiharano.com/test/";
 
   public static void main(String[] args) {
@@ -82,13 +82,13 @@ public class HttpTest {
    * @param proxy
    */
   public static void http(String url, String method, String params, RequestHeaders requestHeaders, Proxy proxy) {
-    HttpRequest httpReq = new HttpRequest(url, method, proxy);
-    httpReq.setRequestHeaders(requestHeaders);
-    HttpResponse response = httpReq.send(params);
+    HttpRequest req = new HttpRequest(url, method, proxy);
+    req.setHeaders(requestHeaders);
+    HttpResponse res = req.send(params);
 
-    int statusCode = response.getStatus();
-    String statusMessage = response.getStatusMessage();
-    Map<String, List<String>> headerFields = response.getHeaderFields();
+    int statusCode = res.getStatus();
+    String statusMessage = res.getStatusMessage();
+    Map<String, List<String>> headerFields = res.getHeaderFields();
 
     StringBuilder sb = new StringBuilder();
     sb.append("--------------------\n");
@@ -122,7 +122,7 @@ public class HttpTest {
     if (statusCode == 200) {
       sb.append("\n");
       sb.append("--- Body ---\n");
-      String body = response.getResponseText();
+      String body = res.getResponseText();
       sb.append(body);
     } else {
       sb.append("---ERROR---");
@@ -130,8 +130,8 @@ public class HttpTest {
 
     System.out.println(sb.toString());
 
-    if (response.getStatus() == 0) {
-      Log.e(response.getException());
+    if (res.getStatus() == 0) {
+      Log.e(res.getException());
     }
   }
 

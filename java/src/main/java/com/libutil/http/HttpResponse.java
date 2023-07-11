@@ -189,7 +189,7 @@ public class HttpResponse {
    *          field name
    * @return true if the name exists in the header fields.
    */
-  public boolean hasHeaderField(String name) {
+  public boolean hasHeader(String name) {
     return headerFields.has(name);
   }
 
