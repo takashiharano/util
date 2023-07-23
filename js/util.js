@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202307082307';
+util.v = '202307232215';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -4195,6 +4195,128 @@ util.loader._hide = function(ctx) {
   util.overlay.hide(ctx.el, ctx.ldrEl);
   var i = util.getCtxIdx4El(util.loader.ctxs, ctx.el);
   util.loader.ctxs.splice(i, 1);
+};
+
+//---------------------------------------------------------
+// Loading Screen
+// util.loadingScreen.show('Loading...');
+// util.loadingScreen.show('Loading...', '<img src="img.png">');
+// util.loadingScreen.hide();
+//---------------------------------------------------------
+util.loadingScreen = {};
+util.loadingScreen.modal = null;
+util.loadingScreen.baseEl = null;
+util.loadingScreen.msg = null;
+util.loadingScreen.show = function(m, html) {
+  if (util.loadingScreen.modal) {
+    var msg = util.loadingScreen.msg;
+    if (m) {
+      if (!msg) {
+        msg = util.loadingScreen.appendMsgArea(util.loadingScreen.baseEl);
+        util.loadingScreen.msg = msg;
+      }
+      msg.innerHTML = m;
+      util.setStyle(msg, 'opacity', '1');
+    } else {
+      if (msg) {
+        msg.innerText = '';
+        util.setStyle(msg, 'opacity', '0');
+      }
+    }
+    return false;
+  }
+  util.loadingScreen.create(msg, m, html);
+  return true;
+};
+util.loadingScreen.create = function(msg, m, html) {
+  var outerWrp = document.createElement('div');
+  var styles = {
+    'display': 'table',
+    'position': 'absolute',
+    'width': '100%',
+    'height': '100%',
+    'top': '0',
+    'right': '0',
+    'bottom': '0',
+    'left': '0',
+    'margin': 'auto'
+  };
+  util.setStyle(outerWrp, styles);
+  var wrp = document.createElement('div');
+  styles = {
+    'display': 'table-cell',
+    'position': 'relative',
+    'width': '100%',
+    'height': '100%',
+    'text-align': 'center',
+    'vertical-align': 'middle'
+  };
+  util.setStyle(wrp, styles);
+  util.loadingScreen.baseEl = wrp;
+  outerWrp.appendChild(wrp);
+  if (html) {
+    util.loadingScreen.appendHtml(wrp, html);
+  } else {
+    util.loadingScreen.appendLoader(wrp);
+  }
+  if (m && !util.loadingScreen.msg) {
+    msg = util.loadingScreen.appendMsgArea(wrp);
+    msg.innerHTML = m;
+    util.loadingScreen.msg = msg;
+  }
+  styles = {background: 'rgba(0,0,0,0.3)'};
+  var closeAnywhere = false;
+  var modal = util.modal.show(outerWrp, closeAnywhere, styles);
+  util.loadingScreen.modal = modal;
+  util.setStyle(document.body, 'cursor', 'progress');
+};
+util.loadingScreen.hide = function() {
+  if (util.loadingScreen.modal) {
+    util.loadingScreen.destroy();
+    return true;
+  }
+  return false;
+};
+util.loadingScreen.destroy = function() {
+  util.loadingScreen.modal.hide();
+  util.loadingScreen.msg = null;
+  util.loadingScreen.baseEl = null;
+  util.loadingScreen.modal = null;
+  util.setStyle(document.body, 'cursor', '');
+};
+util.loadingScreen.appendLoader = function(baseEl) {
+  var opt = {};
+  util.copyDefaultProps(util.loader.DFLTOPT, opt);
+  var el = util.loader.create(opt);
+  util.setStyle(el, 'top', '-112px');
+  baseEl.appendChild(el);
+};
+util.loadingScreen.appendHtml = function(baseEl, html) {
+  var el = document.createElement('div');
+  el.innerHTML = html;
+  baseEl.appendChild(el);
+};
+util.loadingScreen.appendMsgArea = function(baseEl) {
+  var msg = util.loadingScreen.createMsgArea();
+  baseEl.appendChild(msg);
+  return msg;
+};
+util.loadingScreen.createMsgArea = function() {
+  var el = document.createElement('pre');
+  var styles = {
+    'display': 'inline-block',
+    'position': 'relative',
+    'width': 'auto',
+    'height': 'auto',
+    'top': '0',
+    'border-radius': '4px',
+    'background': 'rgba(0,0,0,0.5)',
+    'padding': '0.5em 1em',
+    'color': '#fff',
+    'font-size': '14px'
+  };
+  util.setStyle(el, styles);
+  return el;
 };
 
 //---------------------------------------------------------
