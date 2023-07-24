@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202307232215';
+util.v = '202307242350';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -906,8 +906,7 @@ util.timecounter.ids = function() {
  * TimeCounter Class
  */
 util.TimeCounter = function(el, t0, opt) {
-  if (!opt) opt = {};
-  util.copyDefaultProps(util.TimeCounter.DFLT_OPT, opt);
+  opt = util.copyDefaultProps(util.TimeCounter.DFLT_OPT, opt);
   this.el = el;
   this.t0 = (t0 == undefined ? Date.now() : t0);
   this.interval = opt.interval;
@@ -973,8 +972,7 @@ util.Clock = function(el, opt) {
   } else if (typeof a1 == 'number') {
     opt = {offset: opt};
   }
-  if (!opt) opt = {};
-  util.copyDefaultProps(util.Clock.DFLT_OPT, opt);
+  opt = util.copyDefaultProps(util.Clock.DFLT_OPT, opt);
   this.el = el;
   this.opt = opt;
   this.interval = opt.interval;
@@ -2852,8 +2850,7 @@ util.overlay.show = function(tgt, el, opt) {
   tgt = util.getElement(tgt);
   el = util.getElement(el);
   if (!tgt || !el || tgt.contains(el)) return;
-  if (!opt) opt = {};
-  util.copyDefaultProps(util.overlay.DFLT_SHOW_OPT, opt);
+  opt = util.copyDefaultProps(util.overlay.DFLT_SHOW_OPT, opt);
   el.style.opacity = 0;
   el.style.position = 'absolute';
   if (opt.fade > 0) util.addClass(el, 'fadeout');
@@ -2910,8 +2907,7 @@ util.overlay.hide = function(tgt, el, opt) {
   tgt = util.getElement(tgt);
   el = util.getElement(el);
   if (!tgt || !el || !tgt.contains(el)) return;
-  if (!opt) opt = {};
-  util.copyDefaultProps(util.overlay.DFLT_HIDE_OPT, opt);
+  opt = util.copyDefaultProps(util.overlay.DFLT_HIDE_OPT, opt);
   var o = {el: el, tgt: tgt};
   if (opt.fade > 0) {
     util.fadeOut(el, opt.fade, util.overlay._hide, o);
@@ -4125,8 +4121,7 @@ util.loader.show = function(el, opt) {
     opt = el;
     el = null;
   }
-  if (!opt) opt = {};
-  util.copyDefaultProps(util.loader.DFLTOPT, opt);
+  opt = util.copyDefaultProps(util.loader.DFLTOPT, opt);
   el = util.getElement(el);
   if (!el) el = document.body;
   var ctx = util.getCtx4El(util.loader.ctxs, el);
@@ -4285,8 +4280,7 @@ util.loadingScreen.destroy = function() {
   util.setStyle(document.body, 'cursor', '');
 };
 util.loadingScreen.appendLoader = function(baseEl) {
-  var opt = {};
-  util.copyDefaultProps(util.loader.DFLTOPT, opt);
+  var opt = util.copyDefaultProps(util.loader.DFLTOPT);
   var el = util.loader.create(opt);
   util.setStyle(el, 'top', '-112px');
   baseEl.appendChild(el);
@@ -5363,8 +5357,7 @@ util.MODAL_ZINDEX = util.SYSTEM_ZINDEX_BASE;
 util.modal = function(child, addCloseHandler) {
   this.sig = 'modal';
   var el = document.createElement('div');
-  var style = {};
-  util.copyObject(util.modal.DFLT_STYLE, style);
+  var style = util.copyObject(util.modal.DFLT_STYLE);
   if (util.modal.style) util.copyObject(util.modal.style, style);
   util.setStyle(el, style);
   el.style.opacity = '0';
@@ -6364,8 +6357,7 @@ util._resetMeterSpeed = function(c) {
  */
 util.Led = function(tgt, opt) {
   var baseEl = util.getElement(tgt);
-  if (!opt) opt = {};
-  util.copyDefaultProps(util.Led.DFLTOPT, opt);
+  opt = util.copyDefaultProps(util.Led.DFLTOPT, opt);
   var active = opt.active ? true : false;
 
   var ledEl = document.createElement('span');
@@ -7209,8 +7201,7 @@ util.initCounter = function(el, opt) {
 util.Counter = function(el, opt) {
   var ctx = this;
   el = util.getElement(el);
-  if (!opt) opt = {};
-  util.copyDefaultProps(util.Counter.DFLTOPT, opt);
+  opt = util.copyDefaultProps(util.Counter.DFLTOPT, opt);
   if (typeof opt.duration == 'number') {
     opt.duration = {min: opt.duration, max: opt.duration};
   }
