@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202307242350';
+util.v = '202307301906';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1662,6 +1662,17 @@ util.rpad = function(str, pad, len, adj) {
   r += pd;
   if (adj) r = r.substr(0, len);
   return r;
+};
+
+/**
+ * ABCDEFGHIJKLMNOPQRSTUVWXYZ
+ * -> ABCDEFG..TUVWXYZ
+ */
+util.clipString = function(s, n1, n2) {
+  if (!n1) n1 = 7;
+  if (!n2) n2 = 7;
+  if (s.length >= (n1 + n2 + 2)) s = s.substr(0, n1) + '..' + s.substr(s.length - n2, n2);
+  return s;
 };
 
 /**
