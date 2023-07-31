@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202307301906';
+util.v = '202307312222';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1668,10 +1668,11 @@ util.rpad = function(str, pad, len, adj) {
  * ABCDEFGHIJKLMNOPQRSTUVWXYZ
  * -> ABCDEFG..TUVWXYZ
  */
-util.clipString = function(s, n1, n2) {
-  if (!n1) n1 = 7;
-  if (!n2) n2 = 7;
-  if (s.length >= (n1 + n2 + 2)) s = s.substr(0, n1) + '..' + s.substr(s.length - n2, n2);
+util.clipString = function(s, n1, n2, c) {
+  if (n1 == undefined) n1 = 7;
+  if (n2 == undefined) n2 = 7;
+  if (c == undefined) c = '..';
+  if (s.length >= (n1 + n2 + c.length)) s = s.substr(0, n1) + c + s.substr(s.length - n2, n2);
   return s;
 };
 
