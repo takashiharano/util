@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202307312222';
+util.v = '202308102350';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1668,7 +1668,7 @@ util.rpad = function(str, pad, len, adj) {
  * ABCDEFGHIJKLMNOPQRSTUVWXYZ
  * -> ABCDEFG..TUVWXYZ
  */
-util.clipString = function(s, n1, n2, c) {
+util.snip = function(s, n1, n2, c) {
   if (n1 == undefined) n1 = 7;
   if (n2 == undefined) n2 = 7;
   if (c == undefined) c = '..';
