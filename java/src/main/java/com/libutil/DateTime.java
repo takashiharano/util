@@ -696,7 +696,8 @@ public class DateTime {
    * Returns the current date-time string in the specified format.
    *
    * @param format
-   *          the pattern describing the date and time format
+   *          the pattern describing the date and time format.<br>
+   *          e.g., "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
    * @return the current date-time string.
    */
   public static String getCurrentDateTimeString(String format) {
