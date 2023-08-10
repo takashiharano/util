@@ -1794,6 +1794,83 @@ public class StrUtil {
   }
 
   /**
+   * Snip the string.<br>
+   * e.g., "ABCDEFGHIJKLMNOPQRSTUVWXYZ" to "ABCDEFG..TUVWXYZ"
+   *
+   * @param s
+   *          the target string
+   * @return the snipped string
+   */
+  public static String snip(String s) {
+    return snip(s, -1, -1, null);
+  }
+
+  /**
+   * Snip the string.<br>
+   * e.g., "ABCDEFGHIJKLMNOPQRSTUVWXYZ" to "ABCDEFG..TUVWXYZ"
+   *
+   * @param s
+   *          the target string
+   * @param n1
+   *          leading length
+   * @param n2
+   *          trailing length
+   * @return the snipped string
+   */
+  public static String snip(String s, int n1, int n2) {
+    return snip(s, n1, n2, null);
+  }
+
+  /**
+   * Snip the string.<br>
+   * e.g., "ABCDEFGHIJKLMNOPQRSTUVWXYZ" to "ABCDEFG..TUVWXYZ"
+   *
+   * @param s
+   *          the target string
+   * @param n1
+   *          leading length
+   * @param n2
+   *          trailing length
+   * @return the snipped string
+   */
+  public static String snip(String s, String snip) {
+    return snip(s, -1, -1, snip);
+  }
+
+  /**
+   * Snip the string.<br>
+   * e.g., "ABCDEFGHIJKLMNOPQRSTUVWXYZ" to "ABCDEFG..TUVWXYZ"
+   *
+   * @param s
+   *          the target string
+   * @param n1
+   *          leading length
+   * @param n2
+   *          trailing length
+   * @param chars
+   *          characters for snipped part
+   * @return the snipped string
+   */
+  public static String snip(String s, int n1, int n2, String chars) {
+    if (s == null) {
+      return null;
+    }
+    if (n1 == -1) {
+      n1 = 7;
+    }
+    if (n2 == -1) {
+      n2 = 7;
+    }
+    if (chars == null) {
+      chars = "..";
+    }
+    if (s.length() >= (n1 + n2 + chars.length())) {
+      s = s.substring(0, n1) + chars + s.substring(s.length() - n2, s.length());
+    }
+    return s;
+  }
+
+  /**
    * Splits the string.
    *
    * @param src
