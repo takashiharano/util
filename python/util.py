@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202307050051
+v = 202308111723
 
 import sys
 import os
@@ -627,6 +627,14 @@ def extract_quoted_string(s, q1='"', q2=None):
     if s is None or q1 is None or len(s) == 0 or len(s) == 1 or s[0] != q1 or s[-1] != q2:
         return s
     return s[1:len(s) - 1]
+
+# 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' -> 'ABCDEFG..TUVWXYZ'
+def snip(s, n1=7, n2=7, chars='..'):
+    if s is None:
+        return s
+    if len(s) >= (n1 + n2 + len(chars)):
+        s = s[0:n1] + chars + s[-n2:]
+    return s
 
 #------------------------------------------------------------------------------
 # has_item_value(items='AAA|BBB|CCC', item='BBB') = True
