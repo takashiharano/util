@@ -99,11 +99,6 @@ perf.init = function() {
   perf.heapS1Counter = util.initCounter('#heap-s1-usage-val', counterOption);
   perf.heapOldCounter = util.initCounter('#heap-old-usage-val', counterOption);
 
-  var updateInterval = perf.INTERVAL;
-  if (perf.autoReload) {
-    util.IntervalProc.start('perf', perf.procInterval, updateInterval, null, true);
-  }
-
   $el('#perf-auto-update').checked = true;
   $el('#perf-auto-update').addEventListener('change', perf.onPerfAutpUpdateChanged);
 
@@ -150,7 +145,8 @@ perf.procInterval = function() {
 perf.startAutoReload = function() {
   $el('#perf-auto-update').checked = true;
   perf.autoReload = true;
-  perf.procInterval();
+  var updateInterval = sysmon.INTERVAL;
+  util.IntervalProc.start('perf', perf.procInterval, updateInterval, null, true);
 };
 
 perf.stopAutoReload = function() {
