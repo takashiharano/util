@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202308102350';
+util.v = '202308121422';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -6404,28 +6404,28 @@ util.Led.DFLTOPT = {
 util.Led.DFLT_BLINK_DURATION = 700;
 util.Led.prototype = {
   on: function(a1, a2) {
-    var color = a1;
-    var speed = a2;
+    var c = a1;
+    var s = a2;
     if (typeof a1 == 'number') {
-      color = '';speed = a1;
+      c = '';s = a1;
     }
     var ctx = this;
     ctx._stopBlink();
-    if (color) ctx.opt.color = color;
+    if (c) ctx.opt.color = c;
     ctx.active = true;
-    ctx._on(ctx, speed);
+    ctx._on(ctx, s);
   },
   off: function(a1, a2) {
-    var color = a1;
-    var speed = a2;
+    var c = a1;
+    var s = a2;
     if (typeof a1 == 'number') {
-      color = '';speed = a1;
+      c = '';s = a1;
     }
     var ctx = this;
     ctx._stopBlink();
-    if (color) ctx.opt.offColor = color;
+    if (c) ctx.opt.offColor = c;
     ctx.active = false;
-    ctx._off(ctx, speed);
+    ctx._off(ctx, s);
   },
   toggle: function(speed) {
     var ctx = this;
@@ -6435,28 +6435,34 @@ util.Led.prototype = {
       ctx.on(speed);
     }
   },
-  _on: function(ctx, speed) {
+  _on: function(ctx, s) {
     ctx.lighted = true;
-    if (speed == undefined) speed = ctx.opt.speed;
-    speed = (speed ? (speed / 1000) : 0);
+    if (s == undefined) s = ctx.opt.speed;
+    s = (s ? (s / 1000) : 0);
     var style = {
       color: ctx.opt.color,
-      transition: 'all ' + speed + 's ease-out'
+      transition: 'all ' + s + 's ease-out'
     };
     util.setStyle(ctx.ledEl, style);
   },
-  _off: function(ctx, speed) {
+  _off: function(ctx, s) {
     ctx.lighted = false;
-    if (speed == undefined) speed = ctx.opt.speed;
-    speed = (speed ? (speed / 1000) : 0);
+    if (s == undefined) s = ctx.opt.speed;
+    s = (s ? (s / 1000) : 0);
     var style = {
       color: ctx.opt.offColor,
-      transition: 'all ' + speed + 's ease-in'
+      transition: 'all ' + s + 's ease-in'
     };
     util.setStyle(ctx.ledEl, style);
   },
-  blink: function(d) {
+  blink: function(a1, a2) {
     var ctx = this;
+    var d = a1;
+    var c;
+    if (typeof a1 == 'string') {
+      c = a1;d = a2;
+    }
+    if (c) ctx.opt.color = c;
     ctx._stopBlink();
     if (d === false) return;
     d |= 0;
@@ -6474,7 +6480,11 @@ util.Led.prototype = {
   },
   blink2: function(a) {
     var ctx = this;
-    if (a == undefined) a = true;
+    if (a == undefined) {
+      a = true;
+    } else if (typeof a == 'string') {
+      ctx.opt.color = a;
+    }
     ctx._stopBlink();
     if (a) {
       ctx._on(ctx);
