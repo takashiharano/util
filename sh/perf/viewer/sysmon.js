@@ -449,6 +449,9 @@ perf.drawChart = function(xLabels, chartData) {
     responsive: true,
     scales: {
       xAxis: {
+        grid: {
+          color: '#444'
+        },
         ticks: {
           color: '#ccc',
           callback: function(value, index, ticks) {
