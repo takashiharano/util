@@ -1,2 +1,2 @@
-*/1 * * * * ~/sh/perf/log_append.sh
-0 0 * * * ~/sh/perf/log_reset.sh
+*/1 * * * * ~/sh/perf/perf_logging.sh append
+0 0 * * * ~/sh/perf/perf_logging.sh reset
