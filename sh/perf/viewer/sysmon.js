@@ -14,9 +14,6 @@ sysmon.onReady = function() {
 
 sysmon.onLoad = function() {
   sysmon.led1 = new util.Led('#led1');
-  sysmon.led1.blink2();
-  sysmon.drawStatus('Watching');
-
   perf.init();
 };
 
@@ -147,12 +144,16 @@ perf.startAutoReload = function() {
   perf.autoReload = true;
   var updateInterval = sysmon.INTERVAL;
   util.IntervalProc.start('perf', perf.procInterval, updateInterval, null, true);
+  sysmon.led1.blink2();
+  sysmon.drawStatus('Watching');
 };
 
 perf.stopAutoReload = function() {
   $el('#reset-perf-button').disabled = false;
   $el('#perf-auto-update').checked = false;
   perf.autoReload = false;
+  sysmon.led1.off();
+  sysmon.drawStatus('Stopped');
 };
 
 perf.getData = function(n) {

@@ -84,12 +84,6 @@ button:hover {
 #perflog {
   min-width: 1520px;
   width: 100%;
-  height: 100px;
-  font-size: 12px;
-}
-
-#mdmbatlog {
-  width: 800px;
   height: 150px;
   font-size: 12px;
 }
@@ -123,11 +117,11 @@ button:hover {
 </div>
 
 <div style="margin-top:10px;">
-  <span>Server Performance Log</span>
+  <span>System Performance Log</span>
   <div id="perflog" class="console"></div>
 
   <div id="perf-history" style="margin-top:4px;">
-    <span style="color:#ccc;">Server Performance</span>
+    <span style="color:#ccc;">System Performance</span>
     <span id="log-date" style="margin-left:16px;color:#ccc;"></span>
     <span style="margin-left:16px;color:#ccc;">
       <span>CPU:</span><span id="cpu-meter"></span><span id="cpu-val" style="margin-left:4px;">-</span>
