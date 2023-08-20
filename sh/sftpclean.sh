@@ -113,7 +113,7 @@ echo "${sftp_ret}" | while read line; do
 
   # data-2022-11-13_12.34.56.csv -> (2022-11-13_12.34.56)
   if [[ ${filename} =~ ([0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}\.[0-9]{2}\.[0-9]{2}) ]]; then
-    # 2022-11-13_12.34.56 -> unixtime (1668310496)
+    # 2022-11-13_12.34.56 -> unixtime (e.g., 1668310496)
     unixtime=$(to_unixtime "${BASH_REMATCH[1]}")
 
     if [ ${unixtime} -lt ${EXPIRES_AT} ]; then
