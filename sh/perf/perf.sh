@@ -4,6 +4,22 @@
 # Copyright 2022 Takashi Harano
 # Released under the MIT license
 # https://libutil.com/
+#
+# Usage:
+#   $ ./perf.sh [delay [count]] [java_process]
+#     delay:        Display interval seconds
+#     count:        Repeat count. -1 for infinity
+#     java_process: PID or name of jps command result
+#
+#   e.g.,
+#   $ ./perf.sh
+#   $ ./perf.sh 1 10 1234
+#   $ ./perf.sh 1 10 hello.jar
+#
+# Outputs:
+#   2023-08-20T12:34:56.789+09:00  cpu: usage=0% us=0% sy=0% wa=0% st=0%  mem: usage=33% total=4018456 used=1059428 free=2024060 shared=32640 buff_cache=934968 available=2687824
+#   2023-08-20T12:34:56.789+09:00  cpu: usage=0% us=0% sy=0% wa=0% st=0%  mem: usage=33% total=4018456 used=1059428 free=2024060 shared=32640 buff_cache=934968 available=2687824  java_heap: usage=29% eden=62% s0=48% s1=0% old=17%
+#   2023-08-20T12:34:56.789+09:00  cpu: usage=0% us=0% sy=0% wa=0% st=0%  mem: usage=33% total=4018456 used=1059428 free=2024060 shared=32640 buff_cache=934968 available=2687824  java_heap: nodata
 ############################################################################
 
 DATE_TIME_FORMAT="%Y-%m-%dT%H:%M:%S.%3N%:z"
@@ -272,18 +288,7 @@ function get_java_heap_usage() {
 }
 
 #######################################
-# ./perf.sh [delay [count]] [java_process]
-#
-# delay         Pause wait seconds between each display
-# count         Repeat count
-# java_process  PID or name
-#
-# e.g.,
-#  ./perf.sh 1 5 1234
-#  ./perf.sh 1 5 hello.jar
-#
-# Outputs:
-# 2022-08-31T22:50:35.884+09:00  cpu: usage=0% us=0% sy=0% wa=0% st=0%  mem: usage=33% total=4018456 used=1059428 free=2024060 shared=32640 buff_cache=934968 available=2687824  java_heap: usage=29% eden=62% s0=48% s1=0% old=17%
+# Main
 #######################################
 delay=0
 count=1

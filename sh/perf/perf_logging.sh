@@ -4,10 +4,15 @@
 # Copyright 2023 Takashi Harano
 # Released under the MIT license
 # https://libutil.com/
+#
+# Usage:
+# [cron]
+# */1 * * * * ~/sh/perf/perf_logging.sh append
+# 0 0 * * * ~/sh/perf/perf_logging.sh reset
 ############################################################################
 
 #---------------------------------------------------------------------------
-LOG_DIR="/home/user1/logs/perf"
+LOG_DIR="/path/to/logs/perf"
 FILE_NAME="perf.log"
 JVM=""
 MAX_N=90
