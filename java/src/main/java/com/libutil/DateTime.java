@@ -630,8 +630,8 @@ public class DateTime {
    * @return the difference days
    */
   public static int diffDays(long t1, long t2, String timezone, boolean abs) {
-    long d1 = getTimestampOfMidnight(t1, timezone);
-    long d2 = getTimestampOfMidnight(t2, timezone);
+    long d1 = getMidnightTimestamp(t1, timezone);
+    long d2 = getMidnightTimestamp(t2, timezone);
     long d = d2 - d1;
     int sign = 1;
     if (d < 0) {
@@ -670,8 +670,8 @@ public class DateTime {
    * @return the difference days
    */
   public static int diffDays(String t1, String t2, boolean abs) {
-    long d1 = getTimestampOfMidnight(t1);
-    long d2 = getTimestampOfMidnight(t2);
+    long d1 = getMidnightTimestamp(t1);
+    long d2 = getMidnightTimestamp(t2);
     long d = d2 - d1;
     int sign = 1;
     if (d < 0) {
@@ -771,7 +771,7 @@ public class DateTime {
    *          "20220120T1234546.789+0900")
    * @return the midnight timestamp
    */
-  public static long getTimestampOfMidnight(String moment) {
+  public static long getMidnightTimestamp(String moment) {
     DateTime dt = new DateTime(moment);
     int year = dt.getYear();
     int month = dt.getMonth();
@@ -789,8 +789,8 @@ public class DateTime {
    *          the moment
    * @return the midnight timestamp
    */
-  public static long getTimestampOfMidnight(long timestamp) {
-    return getTimestampOfMidnight(timestamp, null);
+  public static long getMidnightTimestamp(long timestamp) {
+    return getMidnightTimestamp(timestamp, null);
   }
 
   /**
@@ -802,7 +802,7 @@ public class DateTime {
    *          the time zone. (e.g., "+0900") if null, treated as the local time.
    * @return the midnight timestamp
    */
-  public static long getTimestampOfMidnight(long timestamp, String timezone) {
+  public static long getMidnightTimestamp(long timestamp, String timezone) {
     DateTime dt = new DateTime(timestamp, timezone);
     int year = dt.getYear();
     int month = dt.getMonth();
