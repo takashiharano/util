@@ -66,7 +66,11 @@ perf.animation = {
 perf.init = function() {
   perf.setupDnDHandler();
 
-  perf.perfLogConsole = util.initConsole('#perflog');
+  var opt = {
+    bufsize: 1440
+  };
+  perf.perfLogConsole = util.initConsole('#perflog', opt);
+
   perf.startAutoReload();
 
   var meterOption = {
@@ -122,6 +126,7 @@ perf.setupDnDHandler = function() {
 
 perf.onDropFile = function(data) {
   perf.stopAutoReload();
+  perf.drawLog(data);
   var obj = perf.convertRawToJsonObject(data);
   perf.draw(obj);
 };
@@ -233,7 +238,7 @@ perf.draw = function(dataList) {
   };
 
   var oldestTimestamp = dataList[0].timestamp;
-  var latestTimestamp = dataList[dataList.length - 1].timestamp;
+  var latestTimestamp = oldestTimestamp;
   var periodFrom = util.getMidnightTimestamp(latestTimestamp);
 
   var data;
