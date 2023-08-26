@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202308111723
+v = 202308261435
 
 import sys
 import os
@@ -1037,7 +1037,7 @@ def get_timestamp_of_day(timestr='00:00:00.000000', fmt='%H:%M:%S.%f', offset=0)
     return ts
 
 # Returns the midnight timestamp for the given moment.
-def get_timestamp_of_midnight(dt=None):
+def get_midnight_timestamp(dt=None):
     dt1 = DateTime(dt)
     s = dt1.to_str('%Y%m%d')
     dt0 = DateTime(s)
