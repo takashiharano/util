@@ -227,39 +227,11 @@ perf.draw = function(dataList) {
     return;
   }
 
-  var xLabels = [];
-
-  var chartData = {
-    cpu: [],
-    mem: [],
-    jheap: [],
-    jheapEden: [],
-    jheapOld: []
-  };
-
   var oldestTimestamp = dataList[0].timestamp;
-  var latestTimestamp = oldestTimestamp;
-  var periodFrom = util.getMidnightTimestamp(latestTimestamp);
+  var periodFrom = util.getMidnightTimestamp(oldestTimestamp);
 
   var data;
   var ts;
-  // >= midnight of the latest data
-  if (oldestTimestamp < periodFrom) {
-    var tmpDataList = [];
-    for (var i = 0; i < dataList.length; i++) {
-      data = dataList[i];
-      ts = data.timestamp;
-      if (ts >= periodFrom) {
-        tmpDataList.push(data);
-      }
-    }
-    dataList = tmpDataList;
-  }
-
-  if (dataList.length == 0) {
-    return;
-  }
-
   var firstData = dataList[0];
   var lastData = dataList[dataList.length - 1];
   var tsS = firstData.timestamp;
@@ -274,6 +246,15 @@ perf.draw = function(dataList) {
   var tsMn2 = tsMn1 + util.DAY;
   var preMin = ((tsS - tsMn1) / util.MINUTE) | 0;
   var postMin = ((tsMn2 - tsE) / util.MINUTE) | 0;
+
+  var xLabels = [];
+  var chartData = {
+    cpu: [],
+    mem: [],
+    jheap: [],
+    jheapEden: [],
+    jheapOld: []
+  };
 
   for (i = 0; i < preMin; i++) {
     dtStr = perf.getDateTimeString(tsMn1 + i * util.MINUTE);
