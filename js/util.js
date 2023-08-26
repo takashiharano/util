@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202308261308';
+util.v = '202308261343';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -530,8 +530,8 @@ util.difftime = function(t0, t1) {
  */
 util.diffDays = function(ms1, ms2, offset, abs) {
   var sign = 1;
-  ms1 = util.getTimestampOfMidnight(ms1, offset);
-  ms2 = util.getTimestampOfMidnight(ms2, offset);
+  ms1 = util.getMidnightTimestamp(ms1, offset);
+  ms2 = util.getMidnightTimestamp(ms2, offset);
   var d = ms2 - ms1;
   if (d < 0) {
     d *= -1;
