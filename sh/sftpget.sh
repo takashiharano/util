@@ -4,6 +4,9 @@
 # Copyright 2023 Takashi Harano
 # Released under the MIT license
 # https://libutil.com/
+#
+# Usage:
+#   $ sftpget.sh BASE_FILENAME EXTENSION DESTDIR [delete]
 ############################################################################
 
 #---------------------------------------------------------------------------
@@ -136,7 +139,7 @@ function delete_files() {
 #
 ###########################################################################
 if [ $# -lt 3 ]; then
-  echo "Usage: sftp.sh BASE_FILENAME EXTENSION DESTDIR [delete]"
+  echo "Usage: sftpget.sh BASE_FILENAME EXTENSION DESTDIR [delete]"
   exit 1
 fi
 
