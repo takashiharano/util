@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202308121422';
+util.v = '202308261308';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -337,10 +337,12 @@ util.getTimestampOfDay = function(timeString, offset) {
  * offset: TZ offset. '-1200' to '+1400' (abs) / -12 to 14 (rel)
  * 1628679929040 -> 1628640000000 (offset='+0000')
  */
-util.getTimestampOfMidnight = function(dt, offset) {
+util.getMidnightTimestamp = function(dt, offset) {
   var ms = dt;
   var os = 0;
-  if (typeof dt == 'string') {
+  if (dt == undefined) {
+    dt = util.getDateTime();
+  } else if (typeof dt == 'string') {
     dt = util.getDateTime(dt);
     ms = dt.timestamp;
     if ((offset == undefined) && dt.tz) os = util.getOffsetFromLocalTz(dt.tz);

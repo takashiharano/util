@@ -234,7 +234,7 @@ perf.draw = function(dataList) {
 
   var oldestTimestamp = dataList[0].timestamp;
   var latestTimestamp = dataList[dataList.length - 1].timestamp;
-  var periodFrom = util.getTimestampOfMidnight(latestTimestamp);
+  var periodFrom = util.getMidnightTimestamp(latestTimestamp);
 
   var data;
   var ts;
@@ -265,7 +265,7 @@ perf.draw = function(dataList) {
   totalMem = util.convByte(totalMem * 1024);
   $el('#mem-total-val').innerHTML = totalMem;
 
-  var tsMn1 = util.getTimestampOfMidnight(tsS);
+  var tsMn1 = util.getMidnightTimestamp(tsS);
   var tsMn2 = tsMn1 + util.DAY;
   var preMin = ((tsS - tsMn1) / util.MINUTE) | 0;
   var postMin = ((tsMn2 - tsE) / util.MINUTE) | 0;
