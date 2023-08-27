@@ -183,12 +183,11 @@ input:-webkit-autofill {
     </span>
 
     <span style="position:absolute;right:8px;">
-      <span style="margin-right:4px;">
-        <span id="perf-hist-info"></span>
-        <button class="small-button" style="min-width:12px;" onclick="perf.showPrev();">&lt;</button><button class="small-button" style="min-width:12px;margin-left:4px;" onclick="perf.showNext();">&gt;</button>
-      </span>
-      <input type="text" id="perf-hist-n" style="width:60px;"><button id="show-perf-button" class="small-button" onclick="perf.showData();">Show</button>
-      <input type="checkbox" id="perf-auto-update"><label for="perf-auto-update">Auto Update</label>
+      <span id="perf-hist-info"></span>
+      <button class="small-button" style="min-width:12px;" onclick="perf.showPrev();">&lt;</button><button class="small-button" style="min-width:12px;margin-left:4px;" onclick="perf.showNext();">&gt;</button><input type="text" id="perf-hist-n" style="margin-left:4px;width:36px;"><button id="show-perf-button" class="small-button" onclick="perf.showData();">Show</button>
+      <div style="display:inline-block;position:relative;top:3px;">
+        <input type="checkbox" id="perf-auto-update"><label for="perf-auto-update">Auto Update</label>
+      </div>
       <button id="reset-perf-button" class="small-button" onclick="perf.reset();" disabled>Reset</button>
     </span>
 
