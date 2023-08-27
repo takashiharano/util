@@ -1827,14 +1827,12 @@ public class StrUtil {
    *
    * @param s
    *          the target string
-   * @param n1
-   *          leading length
-   * @param n2
-   *          trailing length
+   * @param chars
+   *          characters for snipped part
    * @return the snipped string
    */
-  public static String snip(String s, String snip) {
-    return snip(s, -1, -1, snip);
+  public static String snip(String s, String chars) {
+    return snip(s, -1, -1, chars);
   }
 
   /**
