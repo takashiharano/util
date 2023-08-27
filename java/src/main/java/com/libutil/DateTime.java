@@ -700,7 +700,7 @@ public class DateTime {
    *          e.g., "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
    * @return the current date-time string.
    */
-  public static String getCurrentDateTimeString(String format) {
+  public static String getCurrentString(String format) {
     DateTime dt = new DateTime();
     return dt.toString(format);
   }
