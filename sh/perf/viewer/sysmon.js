@@ -42,7 +42,12 @@ sysmon.callApi = function(action, params, cb) {
 };
 
 sysmon.showInfotip = function(s) {
-  util.infotip.show(s);
+  var opt = {
+    style: {
+      'font-size': '14px'
+    }
+  };
+  util.infotip.show(s, opt);
 };
 
 window.addEventListener('DOMContentLoaded', sysmon.onReady, true);
@@ -161,6 +166,28 @@ perf.stopAutoReload = function() {
   sysmon.drawStatus('Stopped');
 };
 
+perf.showData = function() {
+  perf.stopAutoReload();
+  var n = $el('#perf-hist-n').value;
+  if (n.length >= 4) {
+    n = perf.convDateToN(n);
+  }
+  perf.getData(n);
+};
+
+perf.convDateToN = function(d1) {
+  var dt = util.getDateTime();
+  if (d1.length == 4) {
+    var mmdd = dt.toString('%MM%DD');
+    var y = dt.year;
+    if (d1 > mmdd) y -= 1;
+    d1 = y + d1;
+  }
+  var d0 = dt.toString('%YYYY%MM%DD');
+  var n = util.diffDays(d1, d0);
+  return n;
+};
+
 perf.getData = function(n) {
   if (!n) {
     n = '';
@@ -201,16 +228,21 @@ perf.getDataCb = function(xhr, res, req) {
     return;
   }
 
-  var data = util.decodeBase64(res.body);
-  perf.drawLog(data);
+  var data = res.body;
+  var n = +data.n;
+  perf.n = n;
+  var maxN = data.max_n;
+  var logtext = data.logtext;
+  var logtext = util.decodeBase64(logtext);
+  perf.drawLog(logtext);
 
-  var n = '';
+  var info = '';
   if (perf.n != 0) {
-    n = '[' + perf.n + ']';
+    info = '[' + perf.n + '/' + maxN + ']';
   }
-  $el('#perf-hist-n').innerHTML = n;
+  $el('#perf-hist-info').innerHTML = info;
 
-  var obj = perf.convertRawToJsonObject(data);
+  var obj = perf.convertRawToJsonObject(logtext);
   perf.draw(obj);
   perf.animation = false;
   util.IntervalProc.next('perf');
@@ -430,8 +462,13 @@ perf.drawChart = function(xLabels, chartData) {
       mode: 'nearest',
       intersect: false,
     },
-    legend: {
-      display: true,
+    plugins: {
+      legend: {
+        display: true,
+        labels: {
+          color: '#ccc'
+        }
+      }
     },
     responsive: true,
     scales: {
@@ -568,4 +605,10 @@ perf.parseInt = function(v, d) {
 
 perf.drawLog = function(s) {
   perf.perfLogConsole.write(s);
+};
+
+$onEnterKey = function(e) {
+  if ($el('#perf-hist-n').hasFocus()) {
+    perf.showData();
+  }
 };

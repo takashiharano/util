@@ -9,7 +9,8 @@ ROOT_DIR = '../../'
 sys.path.append(os.path.join(os.path.dirname(__file__), ROOT_DIR + 'libs'))
 import util
 
-LOG_PATH = '../../../logs/perf/perf.log'
+LOG_DIR = '../../../logs/perf'
+LOG_PATH = LOG_DIR + '/perf.log'
 
 #------------------------------------------------------------------------------
 # 2022-08-17T23:28:01.800+09:00  cpu: usage=1% us=0% sy=1% wa=0% st=0%  mem: usage=23%
@@ -27,11 +28,33 @@ def get_perf_log(n):
         status = 'NOT_FOUND'
         text = None
 
+    max_n = get_max_log_n()
+
     ret = {
         'status': status,
-        'body': text
+        'body': {
+            'n': n,
+            'max_n': max_n,
+            'logtext': text
+        }
     }
     return ret
+
+def get_max_log_n():
+    files = util.list_files(LOG_DIR)
+    max = -1
+    for i in range(len(files)):
+        filename = files[i]
+        parts = filename.split('.')
+        ext = parts[-1]
+        n = -1
+        try:
+            n = int(ext)
+        except:
+            pass
+        if n > max:
+            max = n
+    return max
 
 #------------------------------------------------------------------------------
 def print_screen():
@@ -72,6 +95,32 @@ button:hover {
   cursor: pointer;
 }
 
+button:disabled {
+  color: #888;
+}
+
+input {
+  font-size: 12px;
+  border: none;
+  border-bottom: solid 1px #888;
+  padding: 2px;
+  color: #fff;
+  background: transparent;
+  font-family: Consolas, Monaco, Menlo, monospace, sans-serif;
+  outline: none;
+}
+
+input:-webkit-autofill {
+  -webkit-transition: all 86400s;
+  transition: all 86400s;
+}
+
+.small-button {
+  min-width: 30px;
+  height: 16px;
+  font-size: 8px;
+}
+
 .console {
   potision: relative;
   padding: 4px;
@@ -97,7 +146,7 @@ button:hover {
   min-height:296px;
   max-height:296px;
 }
-#perf-hist-n {
+#perf-hist-info {
   margin-right: 8px;
   color: #aaa;
   font-size: 12px;
@@ -120,9 +169,8 @@ button:hover {
   <span>System Performance Log</span>
   <div id="perflog" class="console"></div>
 
-  <div id="perf-history" style="margin-top:4px;">
-    <span style="color:#ccc;">System Performance</span>
-    <span id="log-date" style="margin-left:16px;color:#ccc;"></span>
+  <div id="perf-history" style="margin-top:24px;">
+    <span id="log-date" style="color:#ccc;"></span>
     <span style="margin-left:16px;color:#ccc;">
       <span>CPU:</span><span id="cpu-meter"></span><span id="cpu-val" style="margin-left:4px;">-</span>
       <span style="margin-left:8px;">MEM(<span id="mem-total-val">-</span>):</span><span id="mem-meter"></span><span id="mem-val" style="margin-left:4px;">-</span>
@@ -135,12 +183,11 @@ button:hover {
     </span>
 
     <span style="position:absolute;right:8px;">
-       <span style="margin-right:4px;">
-         <span id="perf-hist-n"></span>
-         <button class="small-button" onclick="perf.showPrev();">&lt;</button>
-         <button class="small-button" onclick="perf.showNext();">&gt;</button>
-       </span>
-
+      <span style="margin-right:4px;">
+        <span id="perf-hist-info"></span>
+        <button class="small-button" style="min-width:12px;" onclick="perf.showPrev();">&lt;</button><button class="small-button" style="min-width:12px;margin-left:4px;" onclick="perf.showNext();">&gt;</button>
+      </span>
+      <input type="text" id="perf-hist-n" style="width:60px;"><button id="show-perf-button" class="small-button" onclick="perf.showData();">Show</button>
       <input type="checkbox" id="perf-auto-update"><label for="perf-auto-update">Auto Update</label>
       <button id="reset-perf-button" class="small-button" onclick="perf.reset();" disabled>Reset</button>
     </span>
