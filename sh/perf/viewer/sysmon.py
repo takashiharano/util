@@ -17,7 +17,7 @@ LOG_PATH = LOG_DIR + '/perf.log'
 def get_perf_log(n):
     path = LOG_PATH
 
-    if n != '':
+    if n != '' and n != '0':
         path += '.' + n
 
     if util.path_exists(path):
@@ -100,7 +100,7 @@ button:disabled {
 }
 
 input {
-  font-size: 12px;
+  font-size: 13px;
   border: none;
   border-bottom: solid 1px #888;
   padding: 2px;
@@ -169,9 +169,12 @@ input:-webkit-autofill {
   <span>System Performance Log</span>
   <div id="perflog" class="console"></div>
 
-  <div id="perf-history" style="margin-top:24px;">
-    <span id="log-date" style="color:#ccc;"></span>
-    <span style="margin-left:16px;color:#ccc;">
+  <div id="perf-history" style="margin-top:16px;">
+    <div style="margin-bottom:4px;">
+      <span id="log-date" style="color:#ccc;"></span>
+    </div>
+
+    <span style="color:#ccc;">
       <span>CPU:</span><span id="cpu-meter"></span><span id="cpu-val" style="margin-left:4px;">-</span>
       <span style="margin-left:8px;">MEM(<span id="mem-total-val">-</span>):</span><span id="mem-meter"></span><span id="mem-val" style="margin-left:4px;">-</span>
 
@@ -184,7 +187,7 @@ input:-webkit-autofill {
 
     <span style="position:absolute;right:8px;">
       <span id="perf-hist-info"></span>
-      <button class="small-button" style="min-width:12px;" onclick="perf.showPrev();">&lt;</button><button class="small-button" style="min-width:12px;margin-left:4px;" onclick="perf.showNext();">&gt;</button><input type="text" id="perf-hist-n" style="margin-left:4px;width:36px;"><button id="show-perf-button" class="small-button" onclick="perf.showData();">Show</button>
+      <button class="small-button" style="min-width:12px;" onclick="perf.showPrev();">&lt;</button><button class="small-button" style="min-width:12px;margin-left:4px;" onclick="perf.showNext();">&gt;</button><input type="text" id="perf-hist-n" style="margin-left:4px;margin-right:4px;width:36px;text-align:right;"><button id="show-perf-button" class="small-button" onclick="perf.showData();">Show</button>
       <div style="display:inline-block;position:relative;top:3px;">
         <input type="checkbox" id="perf-auto-update"><label for="perf-auto-update">Auto Update</label>
       </div>

@@ -9,7 +9,7 @@ sysmon.INTERVAL = 30000;
 sysmon.led1 = null;
 
 sysmon.onReady = function() {
-  util.clock('#clock', '%YYYY-%MM-%DD %HH:%mm:%SS');
+  util.clock('#clock', '%YYYY-%MM-%DD %W %HH:%mm:%SS');
 };
 
 sysmon.onLoad = function() {
@@ -44,7 +44,7 @@ sysmon.callApi = function(action, params, cb) {
 sysmon.showInfotip = function(s) {
   var opt = {
     style: {
-      'font-size': '14px'
+      'font-size': '18px'
     }
   };
   util.infotip.show(s, opt);
@@ -224,6 +224,7 @@ perf.getDataCb = function(xhr, res, req) {
     perf.n--;
     if (perf.n < 0) {
       perf.n = 0;
+      $el('#perf-hist-n').value = '';
     }
     return;
   }
@@ -231,6 +232,10 @@ perf.getDataCb = function(xhr, res, req) {
   var data = res.body;
   var n = +data.n;
   perf.n = n;
+  $el('#perf-hist-n').value = '';
+  if (n > 0) {
+    $el('#perf-hist-n').value = n;
+  }
   var maxN = data.max_n;
   var logtext = data.logtext;
   var logtext = util.decodeBase64(logtext);
@@ -255,22 +260,38 @@ perf.getDataErrCb = function(xhr, res, req) {
 
 perf.draw = function(dataList) {
   if (dataList.length == 0) {
-    sysmon.showInfotip('No performance log data');
-    return;
+    sysmon.showInfotip('Performance data is empty');
   }
 
-  var oldestTimestamp = dataList[0].timestamp;
+  var oldestTimestamp = 0;
+  if (dataList.length > 0) {
+    oldestTimestamp = dataList[0].timestamp;
+  }
   var periodFrom = util.getMidnightTimestamp(oldestTimestamp);
 
   var data;
   var ts;
-  var firstData = dataList[0];
-  var lastData = dataList[dataList.length - 1];
-  var tsS = firstData.timestamp;
-  var tsE = lastData.timestamp;
-  var logDate = util.getDateTimeString(tsS, '%YYYY-%MM-%DD');
+  var firstData = {};
+  var lastData = {};
+  var tsS = 0;
+  var tsE = 0;
 
-  var totalMem = parseInt(lastData.mem.total);
+  if (dataList.length > 0) {
+    firstData = dataList[0];
+    lastData = dataList[dataList.length - 1];
+    tsS = firstData.timestamp;
+    tsE = lastData.timestamp;
+  }
+
+  var logDate = '---------- ---';
+  if (tsS > 0) {
+    logDate = util.getDateTimeString(tsS, '%YYYY-%MM-%DD %W');
+  }
+
+  var totalMem = 0;
+  if (dataList.length > 0) {
+    parseInt(lastData.mem.total);
+  }
   totalMem = util.convByte(totalMem * 1024);
   $el('#mem-total-val').innerHTML = totalMem;
 
@@ -465,6 +486,7 @@ perf.drawChart = function(xLabels, chartData) {
     plugins: {
       legend: {
         display: true,
+        align: 'start',
         labels: {
           color: '#ccc'
         }
