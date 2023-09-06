@@ -78,7 +78,7 @@ public class CsvParser {
   /**
    * Load the CSV file and parses the contents.
    *
-   * @param file
+   * @param path
    *          the file path to read
    * @return The list of elements. [ROW][COL]
    */
