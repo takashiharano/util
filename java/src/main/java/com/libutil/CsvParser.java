@@ -23,6 +23,7 @@
  */
 package com.libutil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,6 +73,33 @@ public class CsvParser {
   public CsvParser(String separator, String quotation) {
     this.separator = separator;
     setQuotation(quotation);
+  }
+
+  /**
+   * Load the CSV file and parses the contents.
+   *
+   * @param file
+   *          the file path to read
+   * @return The list of elements. [ROW][COL]
+   */
+  public String[][] load(String path) {
+    File file = new File(path);
+    return load(file);
+  }
+
+  /**
+   * Load the CSV file and parses the contents.
+   *
+   * @param file
+   *          the file object to read
+   * @return The list of elements. [ROW][COL]
+   */
+  public String[][] load(File file) {
+    String text = FileUtil.readText(file);
+    if (text == null) {
+      return null;
+    }
+    return parse(text);
   }
 
   /**
