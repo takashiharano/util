@@ -80,7 +80,8 @@ public class CsvParser {
    *
    * @param path
    *          the file path to read
-   * @return The list of elements. [ROW][COL]
+   * @return The list of elements. [ROW][COL]<br>
+   *         Returns null if the file does not exist, or in case of a read error.
    */
   public String[][] load(String path) {
     File file = new File(path);
@@ -92,7 +93,8 @@ public class CsvParser {
    *
    * @param file
    *          the file object to read
-   * @return The list of elements. [ROW][COL]
+   * @return The list of elements. [ROW][COL]<br>
+   *         Returns null if the file does not exist, or in case of a read error.
    */
   public String[][] load(File file) {
     String text = FileUtil.readText(file);
