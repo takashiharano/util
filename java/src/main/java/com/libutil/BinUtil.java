@@ -785,24 +785,4 @@ public class BinUtil {
     return buf;
   }
 
-  /**
-   * Returns the value obtained by XORing the given byte array with given n
-   * (0-255) in 8-bit units.
-   *
-   * @param src
-   *          a byte array to be converted
-   * @param n
-   *          the value to XOR with (0-255)
-   * @return the byte array with XOR of two values
-   */
-  public static byte[] xor(byte[] src, int n) {
-    int k = n % 256;
-    byte[] buf = new byte[src.length];
-    for (int i = 0; i < src.length; i++) {
-      int b = ((int) src[i]) & 255;
-      buf[i] = (byte) (b ^ k);
-    }
-    return buf;
-  }
-
 }

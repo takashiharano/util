@@ -27,12 +27,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 
 /**
- * Base64S (with "S" standing for "Secure") is a derivative encoding scheme of
+ * Base64s (with "s" standing for "Secure") is a derivative encoding scheme of
  * Base64.<br>
  * This class implements an encoder and a decoder of the Base64 encoding scheme
  * with XOR.
  */
-public class Base64S {
+public class Base64s {
 
   /**
    * The default charset to be used to encode/decode a string.
@@ -42,16 +42,22 @@ public class Base64S {
   /**
    * Encodes the given byte array into a String using the Base64 encoding scheme
    * with XOR. Perform a bitwise XOR prior to encode.<br>
-   * Note that if the key is 0, it's normal Base64 encoding.
+   * Note that if the key is empty, it's normal Base64 encoding.
    *
    * @param src
    *          The byte array to be encoded
    * @param key
-   *          The key to take XOR (0-255)
+   *          The key to take XOR
    * @return A String containing the resulting Base64 encoded characters
    */
-  public static String encode(byte[] src, int key) {
-    byte[] buf = BinUtil.xor(src, key);
+  public static String encode(byte[] src, String key) {
+    byte[] k = null;
+    try {
+      k = key.getBytes(DEFAULT_CHARSET);
+    } catch (UnsupportedEncodingException e) {
+      // never reached
+    }
+    byte[] buf = _encode(src, k);
     String encoded = Base64.getEncoder().encodeToString(buf);
     return encoded;
   }
@@ -59,32 +65,32 @@ public class Base64S {
   /**
    * Encodes the specified string into a String using the Base64 encoding scheme
    * with XOR. Perform a bitwise XOR prior to encode.<br>
-   * Note that if the key is 0, it's normal Base64 encoding.
+   * Note that if the key is empty, it's normal Base64 encoding.
    *
    * @param src
    *          The string to be encode
    * @param key
-   *          The key to take XOR (0-255)
+   *          The key to take XOR
    * @return An encoded string
    */
-  public static String encode(String src, int key) {
+  public static String encode(String src, String key) {
     return encode(src, key, DEFAULT_CHARSET);
   }
 
   /**
    * Encodes the specified string into a String using the Base64 encoding scheme
    * with XOR. Perform a bitwise XOR prior to encode.<br>
-   * Note that if the key is 0, it's normal Base64 encoding.
+   * Note that if the key is empty, it's normal Base64 encoding.
    *
    * @param src
    *          The string to be encoded
    * @param key
-   *          The key to take XOR (0-255)
+   *          The key to take XOR
    * @param charsetName
    *          The charset to be used to decode the bytes
    * @return An encoded string
    */
-  public static String encode(String src, int key, String charsetName) {
+  public static String encode(String src, String key, String charsetName) {
     String endoded = null;
     try {
       byte[] srcBytes = src.getBytes(charsetName);
@@ -99,50 +105,56 @@ public class Base64S {
    * Decodes a Base64 encoded String into a newly-allocated byte array using the
    * Base64 encoding scheme with XOR. Perform a bitwise XOR to decoded byte
    * array.<br>
-   * Note that if the key is 0, it's normal Base64 decoding.
+   * Note that if the key is empty, it's normal Base64 decoding.
    *
    * @param src
    *          The string to be decoded
    * @param key
-   *          The key to take XOR (0-255)
+   *          The key to take XOR
    * @return A newly-allocated byte array containing the decoded bytes.
    * @throws RuntimeException
    *           If failed to decode
    */
-  public static byte[] decode(String src, int key) throws RuntimeException {
+  public static byte[] decode(String src, String key) throws RuntimeException {
+    byte[] k = null;
+    try {
+      k = key.getBytes(DEFAULT_CHARSET);
+    } catch (UnsupportedEncodingException e) {
+      // never reached
+    }
     byte[] buf = Base64.getDecoder().decode(src);
-    return BinUtil.xor(buf, key);
+    return _decode(buf, k);
   }
 
   /**
    * Decodes a Base64 encoded String into an original string using the Base64
    * encoding scheme with XOR. Perform a bitwise XOR to decoded byte array.<br>
-   * Note that if the key is 0, it's normal Base64 decoding.
+   * Note that if the key is empty, it's normal Base64 decoding.
    *
    * @param src
    *          The string to be decoded
    * @param key
-   *          The key to take XOR (0-255)
+   *          The key to take XOR
    * @return A decoded string
    */
-  public static String decodeString(String src, int key) {
+  public static String decodeString(String src, String key) {
     return decodeString(src, key, DEFAULT_CHARSET);
   }
 
   /**
    * Decodes a Base64 encoded String into an original string using the Base64
    * encoding scheme with XOR. Perform a bitwise XOR to decoded byte array.<br>
-   * Note that if the key is 0, it's normal Base64 decoding.
+   * Note that if the key is empty, it's normal Base64 decoding.
    *
    * @param src
    *          The string to be decoded
    * @param key
-   *          The key to take XOR (0-255)
+   *          The key to take XOR
    * @param charsetName
    *          The charset to be used to decode
    * @return A decoded string
    */
-  public static String decodeString(String src, int key, String charsetName) {
+  public static String decodeString(String src, String key, String charsetName) {
     String str = null;
     try {
       byte[] decoded = decode(src, key);
@@ -151,6 +163,51 @@ public class Base64S {
       throw new RuntimeException(e);
     }
     return str;
+  }
+
+  private static byte[] _encode(byte[] src, byte[] key) {
+    if ((src.length == 0) || (key.length == 0)) {
+      return src;
+    }
+
+    int p = key.length - src.length;
+    if (p < 0) {
+      p = 0;
+    }
+
+    byte[] buf = new byte[src.length + p + 1];
+    buf[0] = (byte) p;
+
+    int i;
+    for (i = 0; i < src.length; i++) {
+      buf[i + 1] = (byte) (src[i] ^ key[i % key.length]);
+    }
+
+    int j = i;
+    for (i = 0; i < p; i++) {
+      buf[j + 1] = (byte) (255 ^ key[j % key.length]);
+      j++;
+    }
+
+    return buf;
+  }
+
+  private static byte[] _decode(byte[] src, byte[] key) {
+    if ((src.length == 0) || (key.length == 0)) {
+      return src;
+    }
+
+    int p = src[0] & 255;
+    int len = src.length - p;
+    byte[] buf = new byte[len - 1];
+
+    int j = 0;
+    for (int i = 1; i < len; i++) {
+      buf[j] = (byte) (src[i] ^ key[j % key.length]);
+      j++;
+    }
+
+    return buf;
   }
 
 }

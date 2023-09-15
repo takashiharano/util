@@ -1,6 +1,6 @@
 package com.libutil.test.base64s;
 
-import com.libutil.Base64S;
+import com.libutil.Base64s;
 import com.libutil.TestUtil;
 import com.libutil.test.Log;
 
@@ -15,48 +15,38 @@ public class DecodeTest {
   }
 
   private static void decodeTest() {
-    test("YWJj", 0, "abc");
-    test("YGNi", 1, "abc");
-    test("Y2Bh", 2, "abc");
-    test("n5yd", 254, "abc");
-    test("np2c", 255, "abc");
-    test("YWJj", 256, "abc");
-    test("YGNi", 257, "abc");
-    test("n5yd", 510, "abc");
-    test("np2c", 511, "abc");
-    test("YWJj", 512, "abc");
-    test("YGNi", 513, "abc");
+    test("", "", "");
+    test("", "x", "");
+    test("YWJj", "", "abc");
+    test("ABkaGw==", "x", "abc");
+    test("ABkbGQ==", "xyz", "abc");
+    test("ARkbGc4=", "xyz1", "abc");
+    test("/iDNzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczL3A==", "A2345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234#", "a");
   }
 
   private static void decodeTestJa() {
-    test("44GC44GE44GG", 0, "あいう");
-    test("4oCD4oCF4oCH", 1, "あいう");
-    test("4YOA4YOG4YOE", 2, "あいう");
-    test("HX98HX96HX94", 254, "あいう");
-    test("HH59HH57HH55", 255, "あいう");
-    test("44GC44GE44GG", 256, "あいう");
-    test("4oCD4oCF4oCH", 257, "あいう");
-    test("HX98HX96HX94", 510, "あいう");
-    test("HH59HH57HH55", 511, "あいう");
-    test("44GC44GE44GG", 512, "あいう");
-    test("4oCD4oCF4oCH", 513, "あいう");
+    test("44GC44GE44GG", "", "あいう");
+    test("AJv5+pv5/Jv5/g==", "x", "あいう");
+    test("AJv4+Jv4/pv4/A==", "xyz", "あいう");
+    test("AZv4+NKzt9e0sJ4=", "xyz123456a", "あいう");
   }
 
   private static void decodeBytesTest() {
     byte[] exp = { (byte) 0x61, (byte) 0x62, (byte) 0x63 };
-    test("YWJj", 0, exp);
-    test("YGNi", 1, exp);
-    test("Y2Bh", 2, exp);
+    test("YWJj", "", exp);
+    test("ABkaGw==", "x", exp);
+    test("ABkbGQ==", "xyz", exp);
+    test("AxkbGc7NzA==", "xyz123", exp);
   }
 
-  private static void test(String s, int n, String expected) {
-    String r = Base64S.decodeString(s, n);
-    TestUtil.assertEquals(n + "", expected, r);
+  private static void test(String s, String k, String expected) {
+    String r = Base64s.decodeString(s, k);
+    TestUtil.assertEquals(k, expected, r);
   }
 
-  private static void test(String s, int n, byte[] expected) {
-    byte[] r = Base64S.decode(s, n);
-    Log.i("n=" + n);
+  private static void test(String s, String k, byte[] expected) {
+    byte[] r = Base64s.decode(s, k);
+    Log.i("k=" + k);
     for (int i = 0; i < r.length; i++) {
       Log.i("EXP=" + expected[i] + " : ACTUAL=" + r[i]);
     }

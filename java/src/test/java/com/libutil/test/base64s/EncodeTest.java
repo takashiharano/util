@@ -1,6 +1,6 @@
 package com.libutil.test.base64s;
 
-import com.libutil.Base64S;
+import com.libutil.Base64s;
 import com.libutil.TestUtil;
 import com.libutil.test.Log;
 
@@ -15,48 +15,38 @@ public class EncodeTest {
   }
 
   private static void encodeTest() {
-    test("abc", 0, "YWJj");
-    test("abc", 1, "YGNi");
-    test("abc", 2, "Y2Bh");
-    test("abc", 254, "n5yd");
-    test("abc", 255, "np2c");
-    test("abc", 256, "YWJj");
-    test("abc", 257, "YGNi");
-    test("abc", 510, "n5yd");
-    test("abc", 511, "np2c");
-    test("abc", 512, "YWJj");
-    test("abc", 513, "YGNi");
+    test("", "", "");
+    test("", "x", "");
+    test("abc", "", "YWJj");
+    test("abc", "x", "ABkaGw==");
+    test("abc", "xyz", "ABkbGQ==");
+    test("abc", "xyz1", "ARkbGc4=");
+    test("a", "A2345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234#", "/iDNzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczL3A==");
   }
 
   private static void encodeTestJa() {
-    test("あいう", 0, "44GC44GE44GG");
-    test("あいう", 1, "4oCD4oCF4oCH");
-    test("あいう", 2, "4YOA4YOG4YOE");
-    test("あいう", 254, "HX98HX96HX94");
-    test("あいう", 255, "HH59HH57HH55");
-    test("あいう", 256, "44GC44GE44GG");
-    test("あいう", 257, "4oCD4oCF4oCH");
-    test("あいう", 510, "HX98HX96HX94");
-    test("あいう", 511, "HH59HH57HH55");
-    test("あいう", 512, "44GC44GE44GG");
-    test("あいう", 513, "4oCD4oCF4oCH");
+    test("あいう", "", "44GC44GE44GG");
+    test("あいう", "x", "AJv5+pv5/Jv5/g==");
+    test("あいう", "xyz", "AJv4+Jv4/pv4/A==");
+    test("あいう", "xyz123456a", "AZv4+NKzt9e0sJ4=");
   }
 
   private static void encodeBytesTest() {
     byte[] b = { (byte) 0x61, (byte) 0x62, (byte) 0x63 };
-    test(b, 0, "YWJj");
-    test(b, 1, "YGNi");
-    test(b, 2, "Y2Bh");
+    test(b, "", "YWJj");
+    test(b, "x", "ABkaGw==");
+    test(b, "xyz", "ABkbGQ==");
+    test(b, "xyz1", "ARkbGc4=");
   }
 
-  private static void test(String s, int n, String expected) {
-    String r = Base64S.encode(s, n);
-    TestUtil.assertEquals(n + "", expected, r);
+  private static void test(String s, String key, String expected) {
+    String r = Base64s.encode(s, key);
+    TestUtil.assertEquals(key, expected, r);
   }
 
-  private static void test(byte[] b, int n, String expected) {
-    String r = Base64S.encode(b, n);
-    TestUtil.assertEquals(n + "", expected, r);
+  private static void test(byte[] b, String key, String expected) {
+    String r = Base64s.encode(b, key);
+    TestUtil.assertEquals(key, expected, r);
   }
 
 }
