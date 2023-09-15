@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202308261435
+v = 202309152326
 
 import sys
 import os
@@ -1709,31 +1709,59 @@ def decode_base64(s, encoding=DEFAULT_ENCODING, bin=False, altchars=None, valida
     return decoded
 
 #------------------------------------------------------------------------------
-# Base64S
+# Base64s
 #------------------------------------------------------------------------------
 def encode_base64s(s, k, encoding=DEFAULT_ENCODING):
-    b = s
+    a = s
     if typename(s) == 'str':
-        b = s.encode(encoding)
-    b = xor(b, k)
+        a = s.encode(encoding)
+    kb = k.encode(DEFAULT_ENCODING)
+    b = _encode_base64s(a, kb)
     b = base64.b64encode(b)
     b64 = b.decode(encoding)
     return b64
 
 def decode_base64s(b64, k, bin=False, encoding=DEFAULT_ENCODING):
     b = base64.b64decode(b64)
-    d = xor(b, k)
+    kb = k.encode(DEFAULT_ENCODING)
+    d = _decode_base64s(b, kb)
     if not bin:
         d = d.decode(encoding)
     return d
 
-def xor(a, n):
-    n = n % 256
-    buf = []
-    for i in range(len(a)):
-        b = a[i] ^ n
-        buf.append(b)
-    return bytearray(buf)
+def _encode_base64s(a, k):
+    al = len(a)
+    kl = len(k)
+    if al == 0 or kl == 0:
+        return a
+
+    p = kl - al
+    if p < 0:
+        p = 0
+
+    b = []
+    b.append(p)
+    for i in range(al):
+        b.append(a[i] ^ k[i % kl])
+
+    j = i + 1
+    for i in range(p):
+        b.append(255 ^ k[j % kl])
+        j += 1
+
+    return bytearray(b)
+
+def _decode_base64s(b, k):
+    bl = len(b)
+    kl = len(k)
+    if bl == 0 or kl == 0:
+        return b
+    p = b[0]
+    al = bl - p
+    a = []
+    for i in range(1, al):
+        a.append(b[i] ^ k[(i - 1) % kl])
+    return bytearray(a)
 
 #------------------------------------------------------------------------------
 # Path
