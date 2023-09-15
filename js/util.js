@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202309142236';
+util.v = '202309152140';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -6881,15 +6881,15 @@ util.decodeBase64 = function(s) {
 };
 
 //---------------------------------------------------------
-// Base64S
+// Base64s
 //---------------------------------------------------------
-util.encodeBase64S = function(s, k) {
+util.encodeBase64s = function(s, k) {
   var a = ((typeof s == 'string') ? util.UTF8.toByteArray(s) : s);
   var x = util.UTF8.toByteArray(k);
-  var b = util._encodeBase64S(a, x);
+  var b = util._encodeBase64s(a, x);
   return util.Base64.encode(b);
 };
-util._encodeBase64S = function(a, k) {
+util._encodeBase64s = function(a, k) {
   var al = a.length;
   var kl = k.length;
   if ((al == 0) || (kl == 0)) return a;
@@ -6906,14 +6906,14 @@ util._encodeBase64S = function(a, k) {
   }
   return b;
 };
-util.decodeBase64S = function(s, k, byB) {
+util.decodeBase64s = function(s, k, byB) {
   var b = util.Base64.decode(s);
   var x = util.UTF8.toByteArray(k);
-  var a = util._decodeBase64S(b, x);
+  var a = util._decodeBase64s(b, x);
   if (!byB) a = util.UTF8.fromByteArray(a);
   return a;
 };
-util._decodeBase64S = function(b, k) {
+util._decodeBase64s = function(b, k) {
   var bl = b.length;
   var kl = k.length;
   if ((bl == 0) || (kl == 0)) return b;
