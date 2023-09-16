@@ -27,7 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 
 /**
- * Base64s (with "s" standing for "Secure") is a derivative encoding scheme of
+ * Base64s (with "s" standing for "secure") is a derivative encoding scheme of
  * Base64.<br>
  * This class implements an encoder and a decoder of the Base64 encoding scheme
  * with XOR.

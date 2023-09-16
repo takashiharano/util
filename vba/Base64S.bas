@@ -1,60 +1,133 @@
-' Base64S
+' Base64s
 ' Copyright 2023 Takashi Harano
 ' Released under the MIT license
-' Base64S (with "S" standing for "Secure") is a derivative encoding scheme of Base64.
+' Base64s (with "s" standing for "secure") is a derivative encoding scheme of Base64.
 
 Option Explicit
 
 ''
 ' Plain text to Base64 encoded string with XORing source and key
 '
-Public Function EncodeString(str As String, key As Integer) As String
-    Dim arr() As Byte
+Public Function EncodeString(str As String, key As String) As String
+    If str = "" Then
+        EncodeString = str
+        Exit Function
+    End If
+
+    Dim src() As Byte
     Dim ret As String
-    arr = StringToUtf8Bytes(str)
-    ret = Encode(arr, key)
+    src = StringToUtf8Bytes(str)
+    ret = Encode(src, key)
+
     EncodeString = ret
 End Function
 
-Public Function Encode(arr() As Byte, key As Integer) As String
-    Dim i As Integer
-    Dim arrLen As Integer
+Public Function Encode(src() As Byte, key As String) As String
+    If IsEmptyArray(src) Then
+        Encode = src
+        Exit Function
+    End If
+
+    If key = "" Then
+        Encode = EncodeBase64(src)
+        Exit Function
+    End If
+
+    Dim kb() As Byte
+    Dim srcLen As Integer
+    Dim keyLen As Integer
+    Dim p As Integer
     Dim buf() As Byte
-    arrLen = UBound(arr)
-    ReDim buf(arrLen)
-    Dim n As Integer
-    n = key Mod 256
-    For i = 0 To arrLen
-        buf(i) = arr(i) Xor n
+    Dim i As Integer
+    Dim j As Integer
+
+    kb = StringToUtf8Bytes(key)
+    srcLen = UBound(src) + 1
+    keyLen = UBound(kb) + 1
+
+    p = keyLen - srcLen
+    If p < 0 Then
+        p = 0
+    End If
+
+    ReDim buf(srcLen + p)
+    buf(0) = p
+
+    For i = 0 To (srcLen - 1)
+        buf(i + 1) = src(i) Xor kb(i Mod keyLen)
     Next
+
+    j = i
+    If p > 0 Then
+        For i = 0 To (p - 1)
+            buf(j + 1) = 255 Xor kb(j Mod keyLen)
+            j = j + 1
+        Next
+    End If
+
     Encode = EncodeBase64(buf)
 End Function
 
 ''
 ' Base64 encoded string to Plain text with XORing source and key
 '
-Public Function DecodeString(str As String, key As Integer) As String
-    Dim arr() As Byte
+Public Function DecodeString(b64 As String, key As String) As String
+    If b64 = "" Then
+        DecodeString = b64
+        Exit Function
+    End If
+
     Dim ret As String
-    arr = Decode(str, key)
-    ret = Utf8BytesToString(arr)
+    If key = "" Then
+        ret = DecodeBase64String(b64)
+    Else
+        Dim buf() As Byte
+        buf = Decode(b64, key)
+        ret = Utf8BytesToString(buf)
+    End If
+
     DecodeString = ret
 End Function
 
-Public Function Decode(src As String, key As Integer) As Byte()
-    Dim i As Integer
+Public Function Decode(b64 As String, key As String) As Byte()
+    Dim src() As Byte
+
+    If b64 = "" Then
+        Decode = src
+        Exit Function
+    End If
+
+    src = DecodeBase64(b64)
+
+    If key = "" Then
+        Decode = src
+        Exit Function
+    End If
+
+    Dim kb() As Byte
+    Dim srcLen As Integer
+    Dim keyLen As Integer
     Dim bufLen As Integer
+    Dim p As Integer
     Dim buf() As Byte
-    Dim arr() As Byte
-    buf = DecodeBase64(src)
-    bufLen = UBound(buf)
-    ReDim arr(bufLen)
-    Dim n As Integer
-    n = key Mod 256
-    For i = 0 To bufLen
-        arr(i) = buf(i) Xor n
+    Dim i As Integer
+    Dim j As Integer
+
+    kb = StringToUtf8Bytes(key)
+    srcLen = UBound(src) + 1
+    keyLen = UBound(kb) + 1
+
+    p = src(0)
+    bufLen = srcLen - p
+    ReDim buf(bufLen - 2)
+
+    j = 0
+    For i = 1 To (bufLen - 1)
+        buf(j) = src(i) Xor kb(j Mod keyLen)
+        j = j + 1
     Next
-    Decode = arr
+
+    Decode = buf
 End Function
 
 ''
@@ -244,4 +317,14 @@ Private Function Utf8BytesToString(ByRef arr() As Byte) As String
         .Close
     End With
     Utf8BytesToString = str
+End Function
+
+Private Function IsEmptyArray(arr As Variant) As Boolean
+    IsEmptyArray = False
+    Dim i As Long
+    On Error GoTo ErrHandler
+    i = UBound(arr)
+    Exit Function
+ErrHandler:
+    IsEmptyArray = True
 End Function
