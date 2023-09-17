@@ -290,7 +290,7 @@ perf.draw = function(dataList) {
 
   var totalMem = 0;
   if (dataList.length > 0) {
-    parseInt(lastData.mem.total);
+    totalMem = parseInt(lastData.mem.total);
   }
   totalMem = util.convByte(totalMem * 1024);
   $el('#mem-total-val').innerHTML = totalMem;
