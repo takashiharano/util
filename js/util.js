@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202309152140';
+util.v = '202309171521';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1891,22 +1891,25 @@ util.trimTrailingZeros = function(s) {
  * 1 -> '1'
  * 1024 -> '1K'
  * 1048576 -> '1M'
+ * scale: 1=1.2K / 2=1.25K
  * sep=true: '1,023K'
  * sp=true: '1 K'
  */
-util.convByte = function(v, sep, sp) {
+util.convByte = function(v, scale, sep, sp) {
   var U = ['', 'K', 'M', 'G', 'T', 'P'];
   var b = v;
   var u = '';
   for (var i = 5; i >= 1; i--) {
     var c = Math.pow(1024, i);
-    if (v >= c) {
-      b = v / c;
+    var w = v / c;
+    if ((v >= c) || (w > 0.9756)) {
+      b = w;
       u = U[i];
       break;
     }
   }
-  var r = util.floor(b, 1);
+  if (scale == undefined) scale = 1;
+  var r = util.floor(b, scale);
   if (sep) r = util.formatNumber(r);
   if (sp && u) r += ' ';
   return r + u;
