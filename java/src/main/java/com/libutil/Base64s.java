@@ -40,8 +40,8 @@ public class Base64s {
   public static final String DEFAULT_CHARSET = "UTF-8";
 
   /**
-   * Encodes the given byte array into a String using the Base64 encoding scheme
-   * with XOR. Perform a bitwise XOR prior to encode.<br>
+   * Encodes the given byte array into a String using the Base64 encoding scheme.
+   * Performs a bitwise XOR by source and key before encoding.<br>
    * Note that if the key is empty, it's normal Base64 encoding.
    *
    * @param src
@@ -63,8 +63,8 @@ public class Base64s {
   }
 
   /**
-   * Encodes the specified string into a String using the Base64 encoding scheme
-   * with XOR. Perform a bitwise XOR prior to encode.<br>
+   * Encodes the specified string into a String using the Base64 encoding scheme.
+   * Performs a bitwise XOR by source and key before encoding.<br>
    * Note that if the key is empty, it's normal Base64 encoding.
    *
    * @param src
@@ -78,8 +78,8 @@ public class Base64s {
   }
 
   /**
-   * Encodes the specified string into a String using the Base64 encoding scheme
-   * with XOR. Perform a bitwise XOR prior to encode.<br>
+   * Encodes the specified string into a String using the Base64 encoding scheme.
+   * Performs a bitwise XOR by source and key before encoding.<br>
    * Note that if the key is empty, it's normal Base64 encoding.
    *
    * @param src
@@ -103,8 +103,8 @@ public class Base64s {
 
   /**
    * Decodes a Base64 encoded String into a newly-allocated byte array using the
-   * Base64 encoding scheme with XOR. Perform a bitwise XOR to decoded byte
-   * array.<br>
+   * Base64 encoding scheme. Performs a bitwise XOR by decoded byte array and the
+   * key.<br>
    * Note that if the key is empty, it's normal Base64 decoding.
    *
    * @param src
@@ -128,7 +128,8 @@ public class Base64s {
 
   /**
    * Decodes a Base64 encoded String into an original string using the Base64
-   * encoding scheme with XOR. Perform a bitwise XOR to decoded byte array.<br>
+   * encoding scheme. Performs a bitwise XOR by decoded byte array and the
+   * key.<br>
    * Note that if the key is empty, it's normal Base64 decoding.
    *
    * @param src
@@ -143,7 +144,8 @@ public class Base64s {
 
   /**
    * Decodes a Base64 encoded String into an original string using the Base64
-   * encoding scheme with XOR. Perform a bitwise XOR to decoded byte array.<br>
+   * encoding scheme. Performs a bitwise XOR by decoded byte array and the
+   * key.<br>
    * Note that if the key is empty, it's normal Base64 decoding.
    *
    * @param src
