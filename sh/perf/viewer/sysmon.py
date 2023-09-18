@@ -9,8 +9,10 @@ ROOT_DIR = '../../'
 sys.path.append(os.path.join(os.path.dirname(__file__), ROOT_DIR + 'libs'))
 import util
 
-LOG_DIR = '../../../logs/perf'
-LOG_PATH = LOG_DIR + '/perf.log'
+import conf
+
+LOG_DIR = conf.LOG_DIR
+LOG_PATH = conf.LOG_PATH
 
 #------------------------------------------------------------------------------
 # 2022-08-17T23:28:01.800+09:00  cpu: usage=1% us=0% sy=1% wa=0% st=0%  mem: usage=23%
@@ -130,6 +132,15 @@ input:-webkit-autofill {
   font-family: Consolas;
 }
 
+.log-line:hover {
+  background: #777;
+}
+
+.meter-block {
+  display: inline-block;
+  min-width: 80px;
+}
+
 #perflog {
   min-width: 1520px;
   width: 100%;
@@ -175,14 +186,14 @@ input:-webkit-autofill {
     </div>
 
     <span style="color:#ccc;">
-      <span>CPU:</span><span id="cpu-meter"></span><span id="cpu-val" style="margin-left:4px;">-</span>
-      <span style="margin-left:8px;">MEM:</span><span id="mem-meter"></span><span id="mem-val" style="margin-left:4px;">-</span> / <span id="mem-total-val">-</span>
+      <span>CPU:</span><span class="meter-block"><span id="cpu-meter"></span><span id="cpu-val" style="margin-left:4px;">-</span></span>
+      <span style="margin-left:8px;">MEM:</span><span class="meter-block"><span id="mem-meter"></span><span id="mem-val" style="margin-left:4px;">-</span> / <span id="mem-total-val">-</span></span>
 
-      <span style="margin-left:32px;">Java Heap:</span><span id="java-heap-meter"></span><span id="heap-usage-val" style="margin-left:4px;">-</span>
-      <span style="margin-left:8px;">Eden:</span><span id="java-eden-heap-meter"></span><span id="heap-eden-usage-val" style="margin-left:4px;">-</span>
-      <span style="margin-left:4px;">S0:</span><span id="java-s0-heap-meter"></span><span id="heap-s0-usage-val" style="margin-left:4px;">-</span>
-      <span style="margin-left:4px;">S1:</span><span id="java-s1-heap-meter"></span><span id="heap-s1-usage-val" style="margin-left:4px;">-</span>
-      <span style="margin-left:8px;">Old:</span><span id="java-old-heap-meter"></span><span id="heap-old-usage-val" style="margin-left:4px;">-</span>
+      <span style="margin-left:32px;">Java Heap:</span><span class="meter-block"><span id="java-heap-meter"></span><span id="heap-usage-val" style="margin-left:4px;">-</span></span>
+      <span style="margin-left:8px;">Eden:</span><span class="meter-block"><span id="java-eden-heap-meter"></span><span id="heap-eden-usage-val" style="margin-left:4px;">-</span></span>
+      <span style="margin-left:4px;">S0:</span><span class="meter-block"><span id="java-s0-heap-meter"></span><span id="heap-s0-usage-val" style="margin-left:4px;">-</span></span>
+      <span style="margin-left:4px;">S1:</span><span class="meter-block"><span id="java-s1-heap-meter"></span><span id="heap-s1-usage-val" style="margin-left:4px;">-</span></span>
+      <span style="margin-left:8px;">Old:</span><span class="meter-block"><span id="java-old-heap-meter"></span><span id="heap-old-usage-val" style="margin-left:4px;">-</span></span>
     </span>
 
     <span style="position:absolute;right:8px;">

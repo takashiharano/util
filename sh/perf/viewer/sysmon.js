@@ -57,7 +57,7 @@ window.addEventListener('load', sysmon.onLoad, true);
 var perf = {};
 perf.perfLogConsole = null;
 perf.timerId = 0;
-
+perf.logList = [];
 perf.dndHandler = null;
 perf.autoReload = true;
 perf.xLabels = [];
@@ -131,8 +131,14 @@ perf.setupDnDHandler = function() {
 
 perf.onDropFile = function(data) {
   perf.stopAutoReload();
-  perf.drawLog(data);
-  var obj = perf.convertRawToJsonObject(data);
+  perf.drawData(data);
+};
+
+perf.drawData = function(data) {
+  var logList = util.text2list(data);
+  perf.logList = logList;
+  perf.drawLog(logList);
+  var obj = perf.convertRawToJsonObject(logList);
   perf.draw(obj);
 };
 
@@ -238,8 +244,7 @@ perf.getDataCb = function(xhr, res, req) {
   }
   var maxN = data.max_n;
   var logtext = data.logtext;
-  var logtext = util.decodeBase64(logtext);
-  perf.drawLog(logtext);
+  logtext = util.decodeBase64(logtext);
 
   var info = '';
   if (perf.n != 0) {
@@ -247,8 +252,7 @@ perf.getDataCb = function(xhr, res, req) {
   }
   $el('#perf-hist-info').innerHTML = info;
 
-  var obj = perf.convertRawToJsonObject(logtext);
-  perf.draw(obj);
+  perf.drawData(logtext);
   perf.animation = false;
   util.IntervalProc.next('perf');
 };
@@ -269,7 +273,7 @@ perf.draw = function(dataList) {
   }
   var periodFrom = util.getMidnightTimestamp(oldestTimestamp);
 
-  var data;
+  var data = null;
   var ts;
   var firstData = {};
   var lastData = {};
@@ -374,47 +378,8 @@ perf.draw = function(dataList) {
     chartData.jheapOld.push(null);
   }
 
-  var latestCpuUsage = cpuPercent;
-  var latestMemUsage = memPercent;
-  var latestUsage = jheapUsage;
-  var latestS0Usage = s0Percent;
-  var latestS1Usage = s1Percent;
-  var latestEdenUsage = edenPercent;
-  var latestOldUsage = oldPercent;
-
-  if (latestCpuUsage != undefined) {
-    perf.cpuMeter.setValue(latestCpuUsage);
-    perf.cpuCounter.setValue(latestCpuUsage);
-  }
-
-  if (latestMemUsage != undefined) {
-    perf.memMeter.setValue(latestMemUsage);
-    perf.memCounter.setValue(latestMemUsage);
-  }
-
-  if (latestUsage != undefined) {
-    perf.heapMeter.setValue(latestUsage);
-    perf.heapCounter.setValue(latestUsage);
-  }
-  if (latestEdenUsage != undefined) {
-    perf.heapEdenMeter.setValue(latestEdenUsage);
-    perf.heapEdenCounter.setValue(latestEdenUsage);
-  }
-  if (latestS0Usage != undefined) {
-    perf.heapS0Meter.setValue(latestS0Usage);
-    perf.heapS0Counter.setValue(latestS0Usage);
-  }
-  if (latestS1Usage != undefined) {
-    perf.heapS1Meter.setValue(latestS1Usage);
-    perf.heapS1Counter.setValue(latestS1Usage);
-  }
-  if (latestOldUsage != undefined) {
-    perf.heapOldMeter.setValue(latestOldUsage);
-    perf.heapOldCounter.setValue(latestOldUsage);
-  }
-
+  perf.drawMeters(data);
   $el('#log-date').innerHTML = logDate;
-
   perf.drawChart(xLabels, chartData);
 };
 
@@ -544,19 +509,13 @@ perf.drawChart = function(xLabels, chartData) {
 /**
  * Converts performance data from its original text format to a JSON object.
  */
-perf.convertRawToJsonObject = function(historyTsv) {
+perf.convertRawToJsonObject = function(logList) {
   var obj = [];
-  if (!historyTsv) {
-    return obj;
-  }
-
-  var historyList = util.text2list(historyTsv);
-  for (var i = 0; i < historyList.length; i++) {
-    var record = historyList[i];
+  for (var i = 0; i < logList.length; i++) {
+    var record = logList[i];
     var data = perf.parseData(record);
     obj.push(data);
   }
-
   return obj;
 };
 
@@ -625,8 +584,70 @@ perf.parseInt = function(v, d) {
   return r;
 };
 
-perf.drawLog = function(s) {
-  perf.perfLogConsole.write(s);
+perf.drawLog = function(logList) {
+  var txt = '';
+  for (var i = 0; i < logList.length; i++) {
+    var record = logList[i];
+    var data = perf.parseData(record);
+    var s = '<span class="log-line" onmouseover="perf.onLogHover(' + i + ');" onmouseout="perf.onLogHover(-1);">' + record + '</span>\n';
+    txt += s;
+  }
+  perf.perfLogConsole.write(txt);
+};
+
+perf.onLogHover = function(i) {
+  var idx = i;
+  if(i < 0) {
+    idx = perf.logList.length - 1;
+  }
+  var record = perf.logList[idx];
+  if (!record) return;
+  var data = perf.parseData(record);
+  perf.drawMeters(data);
+};
+
+perf.drawMeters = function(data) {
+  var cpuPercent = 0;
+  var memPercent = 0;
+  var jheapUsage = 0;
+  var edenPercent = 0;
+  var s0Percent = 0;
+  var s1Percent = 0;
+  var oldPercent = 0;
+
+  if (data) {
+    cpuPercent = data.cpu.usage;
+    memPercent = data.mem.usage;
+    var javaHeap = data.java_heap;
+    if (javaHeap) {
+      jheapUsage = javaHeap.usage;
+      edenPercent = javaHeap.eden;
+      s0Percent = javaHeap.s0;
+      s1Percent = javaHeap.s1;
+      oldPercent = javaHeap.old;
+    }
+  }
+
+  perf.cpuMeter.setValue(cpuPercent);
+  perf.cpuCounter.setValue(cpuPercent);
+
+  perf.memMeter.setValue(memPercent);
+  perf.memCounter.setValue(memPercent);
+
+  perf.heapMeter.setValue(jheapUsage);
+  perf.heapCounter.setValue(jheapUsage);
+
+  perf.heapEdenMeter.setValue(edenPercent);
+  perf.heapEdenCounter.setValue(edenPercent);
+
+  perf.heapS0Meter.setValue(s0Percent);
+  perf.heapS0Counter.setValue(s0Percent);
+
+  perf.heapS1Meter.setValue(s1Percent);
+  perf.heapS1Counter.setValue(s1Percent);
+
+  perf.heapOldMeter.setValue(oldPercent);
+  perf.heapOldCounter.setValue(oldPercent);
 };
 
 $onEnterKey = function(e) {
