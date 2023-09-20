@@ -930,6 +930,7 @@ public class FileUtil {
     } catch (UnsupportedEncodingException e) {
       throw new RuntimeException(e);
     }
+    text = removeBom(text);
     return text;
   }
 
@@ -969,7 +970,15 @@ public class FileUtil {
     } catch (IOException e) {
       return null;
     }
-    String[] text = new String[lines.size()];
+
+    int size = lines.size();
+    if (size > 0) {
+      String firstLine = lines.get(0);
+      firstLine = removeBom(firstLine);
+      lines.set(0, firstLine);
+    }
+
+    String[] text = new String[size];
     lines.toArray(text);
     return text;
   }
@@ -1266,6 +1275,13 @@ public class FileUtil {
     } catch (IOException e) {
       throw e;
     }
+  }
+
+  private static String removeBom(String s) {
+    if (s.startsWith("\uFEFF")) {
+      s = s.substring(1);
+    }
+    return s;
   }
 
 }

@@ -1,6 +1,7 @@
 package com.libutil.test.file;
 
 import com.libutil.FileUtil;
+import com.libutil.StrUtil;
 import com.libutil.test.Log;
 
 public class ReadFileAsArrayTest {
@@ -51,6 +52,10 @@ public class ReadFileAsArrayTest {
     readFileAsArrayTest("C:/test/a_gb2312.txt");
     Log.i("");
 
+    Log.i("Zero bytes");
+    readFileAsArrayTest("C:/test/0.txt");
+    Log.i("");
+
     Log.i("NotFound");
     readFileAsArrayTest("C:/test/_.txt");
     Log.i("");
@@ -69,7 +74,12 @@ public class ReadFileAsArrayTest {
       return;
     }
     for (int i = 0; i < text.length; i++) {
-      Log.d((i + 1) + ": " + text[i]);
+      String line = text[i];
+      if (StrUtil.hasBom(line)) {
+        Log.d("BOM");
+      }
+      Log.d("charAt(0)='" + line.charAt(0) + "'");
+      Log.d((i + 1) + ": " + line);
     }
   }
 
