@@ -770,17 +770,102 @@ public class BinUtil {
   }
 
   /**
+   * Inverts the all bits in given byte.
+   *
+   * @param src
+   *          a byte to be converted
+   * @return the bit-flipped byte
+   */
+  public static byte invert(byte src) {
+    return (byte) ((~src) & 255);
+  }
+
+  /**
    * Inverts the all bits in given byte array in 8-bit units.
    *
    * @param src
    *          a byte array to be converted
    * @return the bit-flipped byte array
    */
-  public static byte[] invert(byte src[]) {
+  public static byte[] invertAll(byte src[]) {
     byte[] buf = new byte[src.length];
     for (int i = 0; i < src.length; i++) {
       byte b = src[i];
       buf[i] = (byte) ((~b) & 255);
+    }
+    return buf;
+  }
+
+  /**
+   * Performs a left circular shift on the given byte.
+   *
+   * @param b
+   *          a byte to be converted
+   * @param n
+   *          number of shift: 0-7
+   * @return the bit-rotated byte
+   */
+  public static byte rotateLeft(byte b, int n) {
+    n = n % 8;
+    int v = ((int) b) & 255;
+    byte rb = (byte) (((v << n) | (v >>> (8 - n))) & 255);
+    return rb;
+  }
+
+  /**
+   * Performs left circular shift the specified byte array every 8 bits.
+   *
+   * @param src
+   *          a byte array to be converted
+   * @param n
+   *          number of shift: 0-7
+   * @return the bit-rotated array
+   */
+  public static byte[] rotateLeftAll(byte src[], int n) {
+    n = n % 8;
+    byte[] buf = new byte[src.length];
+    for (int i = 0; i < src.length; i++) {
+      byte b = src[i];
+      int v = ((int) b) & 255;
+      byte rb = (byte) (((v << n) | (v >>> (8 - n))) & 255);
+      buf[i] = rb;
+    }
+    return buf;
+  }
+
+  /**
+   * Performs a right circular shift on the given byte.
+   *
+   * @param b
+   *          a byte to be converted
+   * @param n
+   *          number of shift: 0-7
+   * @return the bit-rotated byte
+   */
+  public static byte rotateRight(byte b, int n) {
+    n = n % 8;
+    int v = ((int) b) & 255;
+    byte rb = (byte) (((v >>> n) | (v << ((8 - n)))) & 255);
+    return rb;
+  }
+
+  /**
+   * Performs right circular shift the specified byte array every 8 bits.
+   *
+   * @param src
+   *          a byte array to be converted
+   * @param n
+   *          number of shift: 0-7
+   * @return the bit-rotated array
+   */
+  public static byte[] rotateRightAll(byte src[], int n) {
+    n = n % 8;
+    byte[] buf = new byte[src.length];
+    for (int i = 0; i < src.length; i++) {
+      byte b = src[i];
+      int v = ((int) b) & 255;
+      byte rb = (byte) (((v >>> n) | (v << ((8 - n)))) & 255);
+      buf[i] = rb;
     }
     return buf;
   }
