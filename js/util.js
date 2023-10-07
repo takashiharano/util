@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202310071737';
+util.v = '202310072011';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -5960,6 +5960,7 @@ util.dialog.sysCbN = function(ctx) {
  *  dialog-content
  *  dialog-button
  *  dialog-textbox
+ *  dialog-textarea
  */
 util.dialog.text = function(a1, a2, a3, a4, a5) {
   var a = [a1, a2, a3, a4, a5];
@@ -5987,9 +5988,10 @@ util.dialog.text = function(a1, a2, a3, a4, a5) {
     k--;
   }
   if (a[k]) opt = a[k];
-  var txtBox = document.createElement('input');
+  var elType = ((opt.type == 'textarea') ? 'textarea' : 'input');
+  var txtBox = document.createElement(elType);
   txtBox.type = (opt.secure ? 'password' : 'text');
-  txtBox.className = 'dialog-textbox';
+  txtBox.className = ((opt.type == 'textarea') ? 'dialog-textarea' : 'dialog-textbox');
   if (opt && opt.style && opt.style.textbox) {
     for (var key in opt.style.textbox) {
       util.setStyle(txtBox, key, opt.style.textbox[key]);
