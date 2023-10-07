@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202309181808';
+util.v = '202310071737';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -101,6 +101,14 @@ util.DateTime = function(src, tzOffset) {
   this.tzOffsetMin = tzOffsetMin;
   this.wday = dt.getDay(); // Sunday=0 - Saturday=6
   this.WDAYS = util.WDAYS;
+
+  this.yyyy = year + '';
+  this.mm = util.lpad(month, '0', 2);
+  this.dd = util.lpad(day, '0', 2);
+  this.hh = util.lpad(hour, '0', 2);
+  this.mi = util.lpad(minute, '0', 2);
+  this.ss = util.lpad(second, '0', 2);
+  this.sss = util.lpad(millisecond, '0', 3);
 };
 util.DateTime.prototype = {
   setWdays: function(wdays) {
@@ -310,6 +318,33 @@ util.getDateTimeString = function(a1, a2, a3) {
 util.getDateTimeFromTime = function(timeString, offset) {
   var t = util.getTimestampOfDay(timeString, offset);
   return util.getDateTime(t);
+};
+
+/**
+ * SUN=0 .. SAT=6
+ * dt: '20231001' -> 0
+ *     '20231002' -> 1
+ *     '20231007' -> 6
+ */
+util.getWday = function(dt) {
+  return util.getDateTime(dt).wday;
+};
+
+/**
+ * dt: '20231001' -> 31
+ *     '20231101' -> 30
+ */
+util.getLastDayOfMonth = function(dt) {
+  var E = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  var v = util.getDateTime(dt);
+  var m = v.month;
+  var d = E[m - 1];
+  if ((m == 2) && util.isLeapYear(v.year)) d = 29;
+  return d;
+};
+
+util.isLeapYear = function(y) {
+  return ((((y % 4) == 0) && ((y % 100) != 0)) || (y % 400 == 0));
 };
 
 /**
