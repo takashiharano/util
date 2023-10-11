@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202309152326
+v = 202310120002
 
 import sys
 import os
@@ -2143,7 +2143,7 @@ def _get_dir_info(path, pattern, recursive, lv, depth):
     return dir_info
 
 # DIR/File Size
-def get_size(path, recursive=False, slink=True):
+def get_path_size(path, recursive=False, slink=True):
     total = 0
     islink = os.path.islink(path)
     if not islink or slink:
@@ -2153,7 +2153,7 @@ def get_size(path, recursive=False, slink=True):
                 islink = os.path.islink(full_path)
                 if not islink or slink:
                     if recursive and os.path.isdir(full_path):
-                        total += get_size(full_path, recursive, slink)
+                        total += get_path_size(full_path, recursive, slink)
                     else:
                         total += os.path.getsize(full_path)
         else:
