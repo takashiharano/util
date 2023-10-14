@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202310072011';
+util.v = '202310141703';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -5717,8 +5717,12 @@ util.dialog.btnHandler = function(el) {
   var ctx = el.ctx;
   var data;
   if (ctx.opt) data = ctx.opt.data;
-  if (el.cb) el.cb(data);
-  ctx.close(ctx);
+  var f = true;
+  if (el.cb) {
+    f = el.cb(data);
+    if (f !== false) f = true;
+  }
+  if (f) ctx.close(ctx);
 };
 
 util.dialog.close = function(btnIdx) {
@@ -5875,8 +5879,8 @@ util.dialog.confirm = function(a1, a2, a3, a4, a5) {
   }
   if (a[k]) opt = a[k];
   var definition = {
-    labelY: 'Yes',
-    labelN: 'No',
+    labelY: (opt.labelY ? opt.labelY : 'Yes'),
+    labelN: (opt.labelN ? opt.labelN : 'No'),
     cbY: util.dialog.sysCbY,
     cbN: util.dialog.sysCbN,
   };
@@ -5920,10 +5924,14 @@ util.dialog.confirmDialog.prototype = {
   }
 };
 util.dialog.sysCbY = function(ctx) {
-  if (ctx.cbY) ctx.cbY(ctx.data);
+  var f;
+  if (ctx.cbY) f = ctx.cbY(ctx.data);
+  return f;
 };
 util.dialog.sysCbN = function(ctx) {
+  var f;
   if (ctx.cbN) ctx.cbN(ctx.data);
+  return f;
 };
 
 //-----------------------------------------------------------
@@ -6032,12 +6040,16 @@ util.dialog.text = function(a1, a2, a3, a4, a5) {
   return dialog;
 };
 util.dialog.text.sysCbOK = function(ctx) {
+  var f;
   var text = ctx.txtBox.value;
-  if (ctx.cbY) ctx.cbY(text, ctx.data);
+  if (ctx.cbY) f = ctx.cbY(text, ctx.data);
+  return f;
 };
 util.dialog.text.sysCbCancel = function(ctx) {
+  var f;
   var text = ctx.txtBox.value;
-  if (ctx.cbN) ctx.cbN(text, ctx.data);
+  if (ctx.cbN) f = ctx.cbN(text, ctx.data);
+  return f;
 };
 
 util.alert = function(a1, a2, a3, a4) {
