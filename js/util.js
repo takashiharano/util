@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202310141703';
+util.v = '202310141907';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3220,7 +3220,7 @@ util.textarea.addStatusInfo = function(textarea, infoarea) {
   infoarea = util.getElement(infoarea);
   if (!infoarea) return;
   textarea.infoarea = infoarea;
-  util.textarea._adqdLIstener(textarea);
+  util.textarea._adqdListener(textarea);
 };
 /**
  * updateTextAreaInfo('#textarea-id')
@@ -3279,7 +3279,7 @@ util.updateTextAreaInfo = function(textarea) {
     listener(data);
   }
 };
-util.textarea._adqdLIstener = function(tgt) {
+util.textarea._adqdListener = function(tgt) {
   tgt.addEventListener('input', util.textarea.onInput);
   tgt.addEventListener('change', util.textarea.onInput);
   tgt.addEventListener('keydown', util.textarea.onInput);
@@ -3293,7 +3293,7 @@ util.textarea.addListener = function(tgt, f) {
   var el = util.getElement(tgt);
   if (el) {
     el.listener = f;
-    util.textarea._adqdLIstener(el);
+    util.textarea._adqdListener(el);
   }
 };
 
@@ -5914,7 +5914,8 @@ util.dialog.confirmDialog = function(title, content, definition, opt) {
     buttons: buttons,
     data: ctx,
     focusEl: definition.focusEl, // prior
-    style: opt.style
+    style: opt.style,
+    onenter: opt.onenter
   };
   ctx.dlg = util.dialog.open(content, dialogOpt);
 };
@@ -5957,7 +5958,8 @@ util.dialog.sysCbN = function(ctx) {
  *     textbox: {
  *       ...
  *     }
- *   }
+ *   },
+ *   onenter: cb
  * };
  *
  * cb = function(data) {}
@@ -6034,6 +6036,10 @@ util.dialog.text = function(a1, a2, a3, a4, a5) {
     focusEl: txtBox
   };
   var dialog = new util.dialog.confirmDialog(title, body, definition, opt);
+  txtBox.ctx = dialog;
+  if (elType == 'input') {
+    txtBox.addEventListener('keydown', util.dialog.text.onEnter);
+  }
   dialog.cbY = cbY;
   dialog.cbN = cbN;
   dialog.txtBox = txtBox;
@@ -6050,6 +6056,15 @@ util.dialog.text.sysCbCancel = function(ctx) {
   var text = ctx.txtBox.value;
   if (ctx.cbN) f = ctx.cbN(text, ctx.data);
   return f;
+};
+util.dialog.text.onEnter = function(e) {
+  if (e.keyCode != 13) return;
+  var dlg = e.target.ctx.dlg;
+  var opt = dlg.opt;
+  if (opt.onenter) {
+    var b = dlg.btnEls[0];
+    util.dialog.btnHandler(b);
+  }
 };
 
 util.alert = function(a1, a2, a3, a4) {
