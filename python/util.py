@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202310120002
+v = 202310240100
 
 import sys
 import os
@@ -146,16 +146,16 @@ def count_str_pattern(string, pattern, flags=0):
     m = re.findall(pattern, string, flags)
     return len(m)
 
-# 'abc123xyz', 'abc(\d+).*'
+# 'abc123xyz', r'abc(\d+).*'
 # -> '123'
-# 'abc123xyz', 'ab(\d+).*'
+# 'abc123xyz', r'ab(\d+).*'
 # -> ''
-# 'aaa of bbb of ccc', '.+? of (.*)'
+# 'aaa of bbb of ccc', r'.+? of (.*)'
 # -> 'bbb of ccc'
 def extract_string(s, pattern, count=0, flags=0):
-    ptn = re.sub(r'(?P<g1>[^(]*)\((?P<g2>.+)[^\\]?\)(?P<g3>.*)', '\g<g1>(?P<g1>\g<g2>)\g<g3>', pattern)
+    ptn = re.sub(r'(?P<g1>[^(]*)\((?P<g2>.+)[^\\]?\)(?P<g3>.*)', r'\g<g1>(?P<g1>\g<g2>)\g<g3>', pattern)
     ret = ''
-    if re.search('\(?P<g1>', ptn):
+    if re.search(r'\(?P<g1>', ptn):
         if re.search(ptn, s, flags):
             ret = re.sub(ptn, r'\g<g1>', s, count, flags)
     else:
@@ -207,7 +207,7 @@ def convert_newline(s, nl):
 
 # ' abc\n123 456 ' -> 'abc123456'
 def remove_space_newline(s):
-    return re.sub('\s', '', s).replace('\r\n', '\n').replace('\r', '\n').replace('\n', '')
+    return re.sub(r'\s', '', s).replace(r'\r\n', '\n').replace(r'\r', '\n').replace(r'\n', '')
 
 # ('abc123aabb', ['^a', '\d'])
 # -> bcaabb
@@ -480,7 +480,7 @@ def plural(s, n):
 # '01AB' or '01 AB' or '0x12 0xAB'
 # -> bytes
 def hex2bytes(h):
-    h = replace(h, '\s', '')
+    h = replace(h, r'\s', '')
     h = replace(h, '0x', '')
     return bytes.fromhex(h)
 
@@ -504,7 +504,7 @@ def bytes2hex(b, upper=True, line_break=16):
 
 # '00000001 00000010 ...' -> bytes
 def bin2bytes(s):
-    s = replace(s, '\s', '')
+    s = replace(s, r'\s', '')
     s = convert_newline(s, '')
     a = bytearray()
     for i in range(0, len(s), 8):
@@ -1106,7 +1106,7 @@ def is_leap_year(year):
 def serialize_datetime(s):
     w = s
     w = w.strip()
-    w = re.sub('\s{2,}', ' ', w)
+    w = re.sub(r'\s{2,}', ' ', w)
     w = re.sub('T', ' ', w)
 
     wk = _split_datetime_and_timezone(w)
@@ -1152,7 +1152,7 @@ def serialize_datetime(s):
     return _serialize_datetime(date + time, tz)
 
 def _serialize_datetime(s, tz):
-    s = re.sub('[-\s:\.]', '', s)
+    s = re.sub(r'[-\s:\.]', '', s)
     s = (s + '0000000000000000')[0:20]
     if s[4:6] == '00':
         s = s[0:4] + '01' + s[6:]
@@ -1816,7 +1816,7 @@ def get_relative_path(base, path):
     base = base.replace('\\', '/')
     if not base.endswith('/'):
         base_name = get_filename(base)
-        if re.search('\.', base_name) is not None:
+        if re.search(r'\.', base_name) is not None:
             base = get_parent_path(base)
     relative_path = os.path.join(base, path)
     return relative_path
@@ -2746,7 +2746,7 @@ def link_urls(s, attr=None):
     if attr != '':
         link += ' ' + attr;
     link += '>\\1</a>';
-    s = replace(s, '(https?:\/\/[!#$%&\'*+,/:;=?@[\]0-9A-Za-z\-._~]+)', link);
+    s = replace(s, r'(https?:\/\/[!#$%&\'*+,/:;=?@[\]0-9A-Za-z\-._~]+)', link);
     return s
 
 #------------------------------------------------------------------------------
