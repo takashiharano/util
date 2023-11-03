@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202310240100
+v = 202311040150
 
 import sys
 import os
@@ -2594,6 +2594,18 @@ def get_request_param(key=None, default=None):
     q = get_query()
     v = get_query_value(q, key, default)
     return v
+
+def get_request_param_as_int(key=None, default=0):
+    p = get_request_param(key)
+    try:
+        v = int(p)
+    except:
+        v = default
+    return v
+
+def get_request_param_as_bool(key=None, as_true='true'):
+    p = get_request_param(key)
+    return p == as_true
 
 # from query string
 def get_query_param(key=None, default=None):
