@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202311121638';
+util.v = '202311122301';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -6930,9 +6930,16 @@ util.Base64.decode = function(str) {
   return arr;
 };
 
-util.encodeBase64 = function(s) {
+util.encodeBase64 = function(s, b) {
+  return (b ? util.encodeBase64fmB(s) : util.encodeBase64fmT(s));
+};
+util.encodeBase64fmT = function(s) {
   if (s == undefined) return '';
   return btoa(encodeURIComponent(s).replace(/%([0-9A-F]{2})/g, function(match, p1) {return String.fromCharCode('0x' + p1);}));
+};
+util.encodeBase64fmB = function(s) {
+  s = util.toBinaryString(s);
+  return btoa(s);
 };
 util.decodeBase64 = function(s, b) {
   return (b ? util.decodeBase64asB(s) : util.decodeBase64asT(s));
@@ -6956,6 +6963,15 @@ util.decodeBase64asB = function(s) {
     a.push(b[i].charCodeAt(0));
   }
   return new Uint8Array(a);
+};
+
+util.toBinaryString = function(a) {
+  var s = '';
+  var b = new Uint8Array(a);
+  for (var i = 0; i < b.byteLength; i++) {
+    s += String.fromCharCode(b[i]);
+  }
+  return s;
 };
 
 //---------------------------------------------------------
