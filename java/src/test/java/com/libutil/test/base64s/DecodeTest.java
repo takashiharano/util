@@ -18,25 +18,26 @@ public class DecodeTest {
     test("", "", "");
     test("", "x", "");
     test("YWJj", "", "abc");
-    test("ABkaGw==", "x", "abc");
-    test("ABkbGQ==", "xyz", "abc");
-    test("ARkbGc4=", "xyz1", "abc");
-    test("/iDNzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczL3A==", "A2345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234#", "a");
+    test("GRobAA==", "x", "abc");
+    test("GRsZAA==", "xyz", "abc");
+    test("GRsZzgE=", "xyz1", "abc");
+    test("IM3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvKycjHxs/OzczLysnIx8bPzs3My8rJyMfGz87NzMvc/g==", "A2345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234#", "a");
+    test("XX==", "x", "");
   }
 
   private static void decodeTestJa() {
     test("44GC44GE44GG", "", "あいう");
-    test("AJv5+pv5/Jv5/g==", "x", "あいう");
-    test("AJv4+Jv4/pv4/A==", "xyz", "あいう");
-    test("AZv4+NKzt9e0sJ4=", "xyz123456a", "あいう");
+    test("m/n6m/n8m/n+AA==", "x", "あいう");
+    test("m/j4m/j+m/j8AA==", "xyz", "あいう");
+    test("m/j40rO317SwngE=", "xyz123456a", "あいう");
   }
 
   private static void decodeBytesTest() {
     byte[] exp = { (byte) 0x61, (byte) 0x62, (byte) 0x63 };
     test("YWJj", "", exp);
-    test("ABkaGw==", "x", exp);
-    test("ABkbGQ==", "xyz", exp);
-    test("AxkbGc7NzA==", "xyz123", exp);
+    test("GRobAA==", "x", exp);
+    test("GRsZAA==", "xyz", exp);
+    test("GRsZzgE=", "xyz1", exp);
   }
 
   private static void test(String s, String k, String expected) {

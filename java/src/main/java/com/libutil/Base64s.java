@@ -172,25 +172,25 @@ public class Base64s {
       return src;
     }
 
-    int p = key.length - src.length;
-    if (p < 0) {
-      p = 0;
+    int d = key.length - src.length;
+    if (d < 0) {
+      d = 0;
     }
 
-    byte[] buf = new byte[src.length + p + 1];
-    buf[0] = (byte) p;
+    byte[] buf = new byte[src.length + d + 1];
 
     int i;
     for (i = 0; i < src.length; i++) {
-      buf[i + 1] = (byte) (src[i] ^ key[i % key.length]);
+      buf[i] = (byte) (src[i] ^ key[i % key.length]);
     }
 
     int j = i;
-    for (i = 0; i < p; i++) {
-      buf[j + 1] = (byte) (255 ^ key[j % key.length]);
+    for (i = 0; i < d; i++) {
+      buf[j] = (byte) (255 ^ key[j % key.length]);
       j++;
     }
 
+    buf[j] = (byte) d;
     return buf;
   }
 
@@ -199,14 +199,15 @@ public class Base64s {
       return src;
     }
 
-    int p = src[0] & 255;
-    int len = src.length - p;
-    byte[] buf = new byte[len - 1];
+    int d = src[src.length - 1] & 255;
+    int len = src.length - d - 1;
+    if (len < 0) {
+      len = 0;
+    }
+    byte[] buf = new byte[len];
 
-    int j = 0;
-    for (int i = 1; i < len; i++) {
-      buf[j] = (byte) (src[i] ^ key[j % key.length]);
-      j++;
+    for (int i = 0; i < len; i++) {
+      buf[i] = (byte) (src[i] ^ key[i % key.length]);
     }
 
     return buf;
