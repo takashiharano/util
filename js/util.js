@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202311212209';
+util.v = '202311270151';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -7977,7 +7977,6 @@ util.dnd.handleDroppedFile = function(e, handler) {
 };
 
 util.loadFile = function(file, handler) {
-  if (file.size == 0) return;
   var fr = new FileReader();
   fr.onload = util.onFileLoaded;
   fr.onloadstart = util.onFileLoadStart;
