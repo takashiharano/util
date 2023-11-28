@@ -15,6 +15,8 @@ public class DecodeTest {
   }
 
   private static void decodeTest() {
+    test(null, "", (String) null);
+    test("YWJj", null, "abc");
     test("", "", "");
     test("", "x", "");
     test("YWJj", "", "abc");

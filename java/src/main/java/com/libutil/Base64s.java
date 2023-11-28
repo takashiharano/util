@@ -116,6 +116,12 @@ public class Base64s {
    *           If failed to decode
    */
   public static byte[] decode(String src, String key) throws RuntimeException {
+    if (src == null) {
+      return null;
+    }
+    if (key == null) {
+      key = "";
+    }
     byte[] k = null;
     try {
       k = key.getBytes(DEFAULT_CHARSET);
@@ -157,6 +163,9 @@ public class Base64s {
    * @return A decoded string
    */
   public static String decodeString(String src, String key, String charsetName) {
+    if (src == null) {
+      return null;
+    }
     String str = null;
     try {
       byte[] decoded = decode(src, key);
