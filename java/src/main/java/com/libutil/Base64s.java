@@ -51,6 +51,12 @@ public class Base64s {
    * @return A String containing the resulting Base64 encoded characters
    */
   public static String encode(byte[] src, String key) {
+    if (src == null) {
+      return null;
+    }
+    if (key == null) {
+      key = "";
+    }
     byte[] k = null;
     try {
       k = key.getBytes(DEFAULT_CHARSET);
@@ -91,6 +97,9 @@ public class Base64s {
    * @return An encoded string
    */
   public static String encode(String src, String key, String charsetName) {
+    if (src == null) {
+      return null;
+    }
     String endoded = null;
     try {
       byte[] srcBytes = src.getBytes(charsetName);

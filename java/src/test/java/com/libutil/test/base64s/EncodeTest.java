@@ -15,6 +15,11 @@ public class EncodeTest {
   }
 
   private static void encodeTest() {
+    test((byte[]) null, null, null);
+    test((String) null, null, null);
+    test((String) null, "", null);
+    test("", null, "");
+    test("abc", null, "YWJj");
     test("", "", "");
     test("", "x", "");
     test("abc", "", "YWJj");
