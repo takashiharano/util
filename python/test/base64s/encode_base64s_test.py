@@ -7,9 +7,12 @@ import util
 def test(s, k, exp):
     b = util.encode_base64s(s, k)
     st = 'OK' if b == exp else 'NG'
-    print('[' + st + '] exp=' + exp + ' got=' + b)
+    print('[' + st + '] exp=' + str(exp) + ' got=' + str(s))
 
 def main():
+    test(None, None, None)
+    test('', None, '')
+    test('abc', None, 'YWJj')
     test('', '', '')
     test('', 'x', '')
     test('abc', '', 'YWJj')
