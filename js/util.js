@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202311270151';
+util.v = '202311281950';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -6959,10 +6959,10 @@ util.encodeBase64fmB = function(s) {
   return btoa(s);
 };
 util.decodeBase64 = function(s, b) {
+  if ((s == null) || (!window.atob)) return null;
   return (b ? util.decodeBase64asB(s) : util.decodeBase64asT(s));
 };
 util.decodeBase64asT = function(s) {
-  if ((s == undefined) || !window.atob) return '';
   var r;
   try {
     r = decodeURIComponent(Array.prototype.map.call(atob(s), function(c) {
@@ -7018,6 +7018,8 @@ util._encodeBase64s = function(a, k) {
   return b;
 };
 util.decodeBase64s = function(s, k, byB) {
+  if (s == null) return null;
+  s = util.convertNewLine(s, '\n').replace(/\n/g, '');
   var b = util.Base64.decode(s);
   var x = util.UTF8.toByteArray(k);
   var a = util._decodeBase64s(b, x);
@@ -7093,7 +7095,7 @@ util.encodeBSB64 = function(s, n) {
   return util.BSB64.encode(a, n);
 };
 util.decodeBSB64 = function(s, n, byB) {
-  if (s == undefined) return '';
+  if (s == null) return null;
   s = util.convertNewLine(s, '\n').replace(/\n/g, '');
   if (s.match(/\$\d+$/)) {
     var v = s.split('$');
