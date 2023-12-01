@@ -7,19 +7,19 @@ import com.libutil.test.Log;
 public class StrUtilTest {
 
   public static void main(String args[]) {
-    text2arrayTest();
+    texttoArrayTest();
     countPatternTest();
     quoteTest();
-    intnum2decimalTest();
+    intToDecimalTest();
     trimZerosTest();
     encodeUriTest();
     decodeUriTest();
     escapeHtmlTest();
   }
 
-  private static void text2arrayTest() {
+  private static void texttoArrayTest() {
     String str = FileUtil.readText("C:/test/a.txt");
-    String[] arr = StrUtil.text2array(str);
+    String[] arr = StrUtil.textToArray(str);
     for (int i = 0; i < arr.length; i++) {
       Log.d("str=" + arr[i]);
     }
@@ -39,19 +39,19 @@ public class StrUtilTest {
     Log.d(StrUtil.quote("a\"b\"'c", "'"));
   }
 
-  private static void intnum2decimalTest() {
+  private static void intToDecimalTest() {
     Log.d("----");
-    Log.d(StrUtil.intnum2decimal(1000, 3));
-    Log.d(StrUtil.intnum2decimal(100, 3));
-    Log.d(StrUtil.intnum2decimal(10, 3));
-    Log.d(StrUtil.intnum2decimal(1, 3));
-    Log.d(StrUtil.intnum2decimal(0, 3));
+    Log.d(StrUtil.intNumToDecimal(1000, 3));
+    Log.d(StrUtil.intNumToDecimal(100, 3));
+    Log.d(StrUtil.intNumToDecimal(10, 3));
+    Log.d(StrUtil.intNumToDecimal(1, 3));
+    Log.d(StrUtil.intNumToDecimal(0, 3));
     Log.d("----");
-    Log.d(StrUtil.intnum2decimal(-1000, 3));
-    Log.d(StrUtil.intnum2decimal(-100, 3));
-    Log.d(StrUtil.intnum2decimal(-10, 3));
-    Log.d(StrUtil.intnum2decimal(-1, 3));
-    Log.d(StrUtil.intnum2decimal(-0, 3));
+    Log.d(StrUtil.intNumToDecimal(-1000, 3));
+    Log.d(StrUtil.intNumToDecimal(-100, 3));
+    Log.d(StrUtil.intNumToDecimal(-10, 3));
+    Log.d(StrUtil.intNumToDecimal(-1, 3));
+    Log.d(StrUtil.intNumToDecimal(-0, 3));
   }
 
   private static void trimZerosTest() {

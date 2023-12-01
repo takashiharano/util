@@ -41,29 +41,29 @@ public class StrUtil {
   public static final String LINE_SEPARATOR = "\n";
 
   /**
-   * String array to string.
+   * String array to text separated by newlines.
    *
    * @param arr
    *          source array
    * @return the text
    */
-  public static String array2text(String[] arr) {
-    return array2text(arr, LINE_SEPARATOR);
+  public static String arrayToText(String[] arr) {
+    return arrayToText(arr, LINE_SEPARATOR);
   }
 
   /**
-   * String array to string.
+   * String array to text separated by newlines.
    *
    * @param arr
    *          source array
-   * @param sep
+   * @param lineSeparator
    *          line separator
    * @return the text
    */
-  public static String array2text(String[] arr, String sep) {
+  public static String arrayToText(String[] arr, String lineSeparator) {
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < arr.length; i++) {
-      sb.append(arr[i] + sep);
+      sb.append(arr[i] + lineSeparator);
     }
     return sb.toString();
   }
@@ -642,7 +642,7 @@ public class StrUtil {
    *          scale
    * @return Decimal formated string
    */
-  public static String intnum2decimal(long number, int scale) {
+  public static String intNumToDecimal(long number, int scale) {
     if (number == 0) {
       return "0";
     }
@@ -2094,7 +2094,7 @@ public class StrUtil {
    *          the string to split
    * @return the split array of strings
    */
-  public static String[] text2array(String src) {
+  public static String[] textToArray(String src) {
     String text = convertNewLine(src, "\n");
     String[] arr = text.split("\n", -1);
     if ((arr.length >= 2) && (arr[arr.length - 1].equals(""))) {

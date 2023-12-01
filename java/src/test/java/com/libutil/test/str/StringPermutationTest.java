@@ -54,7 +54,7 @@ public class StringPermutationTest {
       }
     }
     elapsed = System.currentTimeMillis() - start;
-    String elapsedTime = StrUtil.intnum2decimal(elapsed, 3);
+    String elapsedTime = StrUtil.intNumToDecimal(elapsed, 3);
     System.out.println(elapsedTime + "s");
   }
 
@@ -101,7 +101,7 @@ public class StringPermutationTest {
       a = r.a;
     }
     elapsed = System.currentTimeMillis() - start;
-    String elapsedTime = StrUtil.intnum2decimal(elapsed, 3);
+    String elapsedTime = StrUtil.intNumToDecimal(elapsed, 3);
     System.out.println(elapsedTime + "s");
   }
 
