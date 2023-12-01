@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202311281950';
+util.v = '202312012136';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1559,7 +1559,7 @@ util.divideString = function(s, n) {
   return a;
 };
 
-util.divideChars = function(s) {
+util.str2chars = function(s) {
   return s.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\s\S]/g) || [];
 };
 
@@ -1824,7 +1824,7 @@ util.lenW = function(s) {
 
 util.getUnicodePoints = function(str) {
   var cd = '';
-  var chs = util.divideChars(str);
+  var chs = util.str2chars(str);
   for (var i = 0; i < chs.length; i++) {
     var p = util.getCodePoint(chs[i], true);
     if (i > 0) cd += ' ';
@@ -3254,7 +3254,7 @@ util.updateTextAreaInfo = function(textarea) {
   var st = textarea.selectionStart;
   var ed = textarea.selectionEnd;
   var sl = ed - st;
-  var ch = util.divideChars(txt)[st] || '';
+  var ch = util.str2chars(txt)[st] || '';
   var u10 = util.getCodePoint(ch);
   var u16 = util.getUnicodePoints(ch, true);
   var CTCH = {0: 'NUL', 9: 'TAB', 10: 'LF', 11: 'ESC', 32: 'SP', 127: 'DEL', 12288: 'emSP'};
@@ -7046,7 +7046,7 @@ util.UTF8 = {};
 util.UTF8.toByteArray = function(s) {
   var a = [];
   if (!s) return a;
-  var chs = util.divideChars(s);
+  var chs = util.str2chars(s);
   for (var i = 0; i < chs.length; i++) {
     var ch = chs[i];
     var c = ch.charCodeAt(0);
