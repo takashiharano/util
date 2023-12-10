@@ -327,19 +327,6 @@ public class StrUtil {
   }
 
   /**
-   * Checks if the two strings are not equal.
-   *
-   * @param s1
-   *          the first string, may be null
-   * @param s2
-   *          the second string, may be null
-   * @return true if the strings are not equal (case-sensitive)
-   */
-  public static boolean notEquals(String s1, String s2) {
-    return !equals(s1, s2);
-  }
-
-  /**
    * Compares two strings, ignoring case.<br>
    *
    * <pre>

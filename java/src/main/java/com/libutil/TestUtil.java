@@ -53,7 +53,7 @@ public class TestUtil {
     String op = "==";
     String strExpected = "" + expected;
     String strActual = "" + actual;
-    if (StrUtil.notEquals(strExpected, strActual)) {
+    if (!StrUtil.equals(strExpected, strActual)) {
       ok = true;
       op = "!=";
     }
