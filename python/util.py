@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202312202222
+v = 202312202309
 
 import sys
 import os
@@ -2649,8 +2649,10 @@ def get_request_param_as_dict(q):
     return d
 
 def _get_query_param_as_dict(q):
-    a = q.split('&')
     d = {}
+    if q == '':
+        return d
+    a = q.split('&')
     for i in range(len(a)):
         p = a[i].split('=')
         k = p[0]
