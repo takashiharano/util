@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202311282135
+v = 202312202222
 
 import sys
 import os
@@ -2598,10 +2598,16 @@ def decode_uri(s):
 #------------------------------------------------------------------------------
 # CGI
 #------------------------------------------------------------------------------
-def get_request_param(key=None, default=None):
-    q = get_query()
-    v = get_query_value(q, key, default)
-    return v
+# returns key=None ? q{} : q[key]
+def get_request_param(key=None, default=None, q=None):
+    if q is None:
+        q = get_query()
+    d = get_request_param_as_dict(q)
+    if key is None:
+        return d
+    if key in d:
+        return d[key]
+    return default
 
 def get_request_param_as_int(key=None, default=0):
     p = get_request_param(key)
@@ -2618,13 +2624,16 @@ def get_request_param_as_bool(key=None, as_true='true'):
 # from query string
 def get_query_param(key=None, default=None):
     q = os.environ.get('QUERY_STRING')
-    v = get_query_value(q, key, default)
-    return v
+    d = get_request_param_as_dict(q)
+    if key in d:
+        return d[key]
+    return default
 
 # returns whole query string
 def get_query():
     content_type = os.environ.get('CONTENT_TYPE', '')
     if content_type.startswith('multipart/form-data'):
+        # FieldStorage
         q = get_field_storage()
     elif os.environ.get('REQUEST_METHOD') == 'POST':
         q = read_stdin()
@@ -2632,37 +2641,41 @@ def get_query():
         q = os.environ.get('QUERY_STRING')
     return q
 
-# returns key=None ? s : s[key]
-def get_query_value(s, key=None, default=None):
-    v = s
-    if typename(s) == 'FieldStorage':
-        v = s.getvalue(key, None)
-    elif v is not None and key is not None:
-        v = get_query_param_value(s, key)
-        if v is not None:
-            if typename(v) == 'list':
-                for i in range(len(v)):
-                    v[i] = decode_uri(v[i])
-            else:
-                v = decode_uri(v)
-    if v is None:
-        v = default
-    return v
+def get_request_param_as_dict(q):
+    if typename(q) == 'FieldStorage':
+        d = _get_form_values_as_dict(q)
+    else:
+        d = _get_query_param_as_dict(q)
+    return d
 
-def get_query_param_value(s, key):
-    q = s.split('&')
-    a = []
-    for i in range(len(q)):
-        p = q[i].split('=')
-        if p[0] == key:
-            if len(p) >= 2:
-                a.append(p[1])
-    v = None
-    if len(a) == 1:
-        v = a[0]
-    elif len(a) > 1:
-        v = a
-    return v
+def _get_query_param_as_dict(q):
+    a = q.split('&')
+    d = {}
+    for i in range(len(a)):
+        p = a[i].split('=')
+        k = p[0]
+        v = ''
+        if len(p) >= 2:
+            v = decode_uri(p[1])
+        if k in d:
+            if typename(d[k]) == 'str':
+                d[k] = [d[k]]
+            d[k].append(v)
+        else:
+            d[k] = v
+    return d
+
+def _get_form_values_as_dict(f):
+    d = {}
+    for k in f.keys():
+        v = f.getvalue(k)
+        if k in d:
+            if typename(d[k]) == 'str':
+                d[k] = [d[k]]
+            d[k].append(v)
+        else:
+            d[k] = v
+    return d
 
 # for file upload
 # Exclusive with read_stdin()
