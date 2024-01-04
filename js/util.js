@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202312012136';
+util.v = '202401050054';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -7797,6 +7797,57 @@ util.isForwardMovement = function(azimuth, heading, range) {
     if ((azimuth >= rangeL) && (azimuth <= rangeR)) return true;
   }
   return false;
+};
+
+//---------------------------------------------------------
+util.calcMod10 = function(s, w) {
+  var a = s.split('');
+  var v = [0, 0];
+  var d = 0;
+  for (var i = a.length - 1; i >= 0; i--) {
+    v[d % 2] += a[i] | 0;
+    d++;
+  }
+  var c = v[0] * w + v[1];
+  return ((10 - (c % 10)) % 10);
+};
+
+util.calcMod11 = function(s) {
+  var a = s.split('');
+  var n = 0;
+  var d = 0;
+  for (var i = a.length - 1; i >= 0; i--) {
+    var v = a[i] | 0;
+    n += v * ((d % 6) + 2);
+    d++;
+  }
+  var c = n % 11;
+  return (((c == 0) || (c == 1)) ? 0 : 11 - c);
+};
+
+util.calcMod43 = function(s) {
+  var MOD43TBL = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%';
+  if (s.match(/^".+"$/)) {
+    try {
+      s = eval(s);
+    } catch (e) {return '';}
+  }
+  var a = s.split('');
+  var n = 0;
+  for (var i = 0; i < a.length; i++) {
+    var v = a[i];
+    if (v == '*') {
+      if ((i == 0) || (i == a.length - 1)) {
+        continue;
+      } else {
+        return '';
+      }
+    }
+    var b = MOD43TBL.indexOf(v);
+    if (b == -1) return '';
+    n += b;
+  }
+  return MOD43TBL.charAt(n % 43);
 };
 
 //---------------------------------------------------------
