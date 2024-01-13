@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202312212214
+v = 202401131417
 
 import sys
 import os
@@ -840,18 +840,19 @@ def shell_dict(o):
         d = o[k]
         return d
 
-# [
+# o=[
 #   {'key1', 1, 'key2', 7},
 #   {'key1', 3, 'key2', 5},
 #   {'key1', 2, 'key2', 8},
 # ]
-# -> key1
+# key=key1
+# ->
 # [
 #   {'key1', 1, 'key2', 7},
 #   {'key1', 2, 'key2', 8},
 #   {'key1', 3, 'key2', 5},
 # ]
-def sort_by_value(o, key):
+def sort_object_list(o, key):
     d = sorted(o, key=lambda x:x[key])
     return d
 
