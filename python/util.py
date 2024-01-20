@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202401131417
+v = 202401201424
 
 import sys
 import os
@@ -781,7 +781,10 @@ def load_dict(path, default=None, encoding=None, cls=None, object_hook=None,
             return json.loads(s, cls=cls, object_hook=object_hook,
                               parse_float=parse_float, parse_int=parse_int,
                               parse_constant=parse_constant, object_pairs_hook=object_pairs_hook)
-    return default
+    ret = default
+    if typename(default) == 'dict' or typename(default) == 'list':
+        ret = default.copy()
+    return ret
 
 # Save Dict
 def save_dict(path, obj, skipkeys=False, ensure_ascii=True, check_circular=True,
@@ -1889,6 +1892,8 @@ def read_text_file_as_list(path, default=[], encoding=DEFAULT_ENCODING):
         text_list = text2list(text)
         if len(text_list) == 1 and text_list[0] == '':
             text_list = default
+            if typename(default) == 'list':
+                text_list = default.copy()
     return text_list
 
 # Read file as binary
