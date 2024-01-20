@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202401201424
+v = 202401202342
 
 import sys
 import os
@@ -829,6 +829,18 @@ def append_dict(path, obj, skipkeys=False, ensure_ascii=True, check_circular=Tru
     save_dict(path, new_data, skipkeys=skipkeys, ensure_ascii=ensure_ascii, check_circular=check_circular,
               allow_nan=allow_nan, cls=cls, indent=indent, separators=separators,
               default=default, sort_keys=sort_keys)
+
+# Overwrites only key values that exist in the target.
+def update_dict(tgt, src):
+    for key in tgt:
+        if key in src:
+            if typename(src[key]) == 'dict':
+                tgt[key] = update_dict(tgt[key], src[key])
+            elif typename(src[key]) == 'list':
+                tgt[key] = src[key].copy()
+            else:
+                tgt[key] = src[key]
+    return tgt
 
 # {
 #  "a": {
