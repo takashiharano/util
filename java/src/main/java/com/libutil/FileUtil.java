@@ -338,9 +338,9 @@ public class FileUtil {
   }
 
   /**
-   * Deletes the file or directory denoted by this abstract pathname. If this
-   * pathname denotes a directory, then the directory must be empty in order to be
-   * deleted.
+   * Deletes the file or directory.<br>
+   * If this pathname denotes a directory, then the directory must be empty in
+   * order to be deleted.
    *
    * @param path
    *          the path of file or directory
@@ -351,6 +351,54 @@ public class FileUtil {
     File file = new File(path);
     boolean deleted = file.delete();
     return deleted;
+  }
+
+  /**
+   * Deletes the file or directory.
+   *
+   * @param path
+   *          the file or directory path to delete
+   * @param recursive
+   *          If true, delete recursive
+   * @return true if all files are deleted; false otherwise
+   */
+  public static boolean delete(String path, boolean recursive) {
+    File file = new File(path);
+    return delete(file, recursive);
+  }
+
+  /**
+   * Deletes the file or directory.
+   *
+   * @param file
+   *          the file object to delete
+   * @param recursive
+   *          If true, delete recursive
+   * @return true if all files are deleted; false otherwise
+   */
+  public static boolean delete(File file, boolean recursive) {
+    boolean allDeleted = true;
+    if (recursive && file.isDirectory()) {
+      File[] files = file.listFiles();
+      if (files != null) {
+        for (int i = 0; i < files.length; i++) {
+          File f = files[i];
+          if (f.isDirectory()) {
+            delete(f, recursive);
+          } else {
+            if (!f.delete()) {
+              allDeleted = false;
+            }
+          }
+        }
+      }
+      if (!file.delete()) {
+        allDeleted = false;
+      }
+    } else {
+      allDeleted = file.delete();
+    }
+    return allDeleted;
   }
 
   /**
