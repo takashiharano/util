@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202401201818';
+util.v = '202401221919';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2246,7 +2246,7 @@ util.sortObjectKeyByValue = function(o, desc, asNum) {
   for (var k in o) {
     lst.push({k: k, v: o[k]});
   }
-  lst.sort(function(a, b) {return util._sort(a.v, b.v, desc, asNum);});
+  lst.sort(function(a, b) {return util._cmp(a.v, b.v, desc, asNum);});
   var r = {};
   for (var i = 0; i < lst.length; i++) {
     var w = lst[i];
