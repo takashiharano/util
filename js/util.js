@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202401252020';
+util.v = '202401252317';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2115,7 +2115,7 @@ util.arr.count = function(a, v, f) {
 };
 
 /**
- * ['A', 'B', 'C', 'B', 'A', 'A']
+ * ['A', 'B', 'C', 'C', 'A', 'A']
  * -> {'A': 3, 'B': 2, 'C': 1}
  */
 util.arr.countByValue = function(arr) {
@@ -2208,8 +2208,8 @@ util.removeListItem = function(list, item) {
 };
 
 /**
- * [{id: 'A', cnt: 2}, {id: 'B', cnt: 1}, {id: 'C', cnt: 3}]
- * -> [{id: 'B', cnt: 1}, {id: 'A', cnt: 2}, {id: 'C', cnt: 3}]
+ * [{id: 'A', cnt: 2}, {id: 'C', cnt: 1}, {id: 'B', cnt: 3}]
+ * 'id' -> [{id: 'A', cnt: 2}, {id: 'B', cnt: 3}, {id: 'C', cnt: 1}]
  */
 util.sortObjectList = function(list, key, desc, asNum) {
   list.sort(function(a, b) {return util._sort(a, b, key, desc, asNum);});
@@ -2251,6 +2251,34 @@ util.sortObjectKeyByValue = function(o, desc, asNum) {
   for (var i = 0; i < lst.length; i++) {
     var w = lst[i];
     r[w.k] = w.v;
+  }
+  return r;
+};
+
+/**
+ * ['A', 'B', 'C', 'B', 'A', 'A']
+ * -> {'A': 3, 'B': 2, 'C': 1}
+ *
+ * [{k1: 'A', k2: {k3: 'X'}}, {k1: 'B', k2: {k3: 'Z'}}, {k1: 'C', k2: {k3: 'Y'}}, {k1: 'C', k2: {k3: 'Z'}}, {k1: 'A', k2: {k3: 'Z'}}, {k1: 'A', k2: {k3: 'X'}}]
+ * 'k1' -> {'A': 3, 'B': 1, 'C': 2}
+ * 'k2.k3' -> {'X': 2, 'Z': 3, 'Y': 1}
+ */
+util.countByValue = function(a, k) {
+  return (k ? util.countObjectByValue(a, k) : util.arr.countByValue(a));
+};
+util.countObjectByValue = function(a, k) {
+  var r = {};
+  var w = k.split('.');
+  for (var i = 0; i < a.length; i++) {
+    var v = a[i];
+    for (var j = 0; j < w.length; j++) {
+      if (!v) break;
+      v = v[w[j]];
+    }
+    if (v != null) {
+      if (r[v] == undefined) r[v] = 0;
+      r[v]++;
+    }
   }
   return r;
 };
