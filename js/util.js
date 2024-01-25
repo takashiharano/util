@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202401221919';
+util.v = '202401252020';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2175,7 +2175,7 @@ util.arr.prev = function(a, v) {
 /**
  * ['A', 'B', 'C', 'B', 'A', 'A'] -> ['A', 'B', 'C']
  */
-util.arr2set = function(arr, srt) {
+util.list2set = function(arr, srt) {
   var o = util.arr.countByValue(arr, srt);
   var v = [];
   for (var k in o) {
@@ -6722,7 +6722,7 @@ util.getClientLanguages = function(f) {
     for (i = 0; i < a.length; i++) {
       a[i] = a[i].replace(/-.*/, '');
     }
-    a = util.arr2set(a);
+    a = util.list2set(a);
   }
   return a;
 };
