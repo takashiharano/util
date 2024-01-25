@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202401252326';
+util.v = '202401252348';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2176,7 +2176,7 @@ util.arr.prev = function(a, v) {
  * ['A', 'B', 'C', 'B', 'A', 'A'] -> ['A', 'B', 'C']
  */
 util.list2set = function(arr, srt) {
-  var o = util.arr.countByValue(arr, srt);
+  var o = util.arr.countByValue(arr);
   var v = [];
   for (var k in o) {
     v.push({key: k, cnt: o[k]});
