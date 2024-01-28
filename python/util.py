@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202401202342
+v = 202401282202
 
 import sys
 import os
@@ -490,7 +490,7 @@ def bytes2hex(b, upper=True, line_break=16):
     s = ''
     for i in range(0, byte_len):
         if i > 0:
-            if i % line_break == 0:
+            if line_break > 0 and i % line_break == 0:
                 s += '\n'
             else:
                 s += ' '
@@ -519,7 +519,7 @@ def bytes2bin(b, line_break=16):
     s = ''
     for i in range(0, byte_len):
         if i > 0:
-            if i % line_break == 0:
+            if line_break > 0 and i % line_break == 0:
                 s += '\n'
             else:
                 s += ' '
