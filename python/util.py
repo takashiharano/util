@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = 202401282202
+v = '202401310025'
 
 import sys
 import os
@@ -20,7 +20,6 @@ import json
 import random
 import hashlib
 import socket
-import cgi
 from http import cookies
 import urllib.request
 import urllib.parse
@@ -50,7 +49,7 @@ LOCAL_TZ_OFFSET = datetime.datetime.now(datetime.timezone.utc).astimezone().tzin
 
 sys.dont_write_bytecode = True
 stdin_data = None
-field_storage = None
+multi_part_data = None
 logger = None
 start_time = 0
 res_debug = False
@@ -72,7 +71,7 @@ def append_system_path(_file_, path):
 def read_stdin():
     global stdin_data
     if stdin_data is None:
-        stdin_data = sys.stdin.read()
+        stdin_data = sys.stdin.buffer.read()
     return stdin_data
 
 def free_stdin_data():
@@ -2651,10 +2650,9 @@ def get_query_param(key=None, default=None):
 def get_query():
     content_type = os.environ.get('CONTENT_TYPE', '')
     if content_type.startswith('multipart/form-data'):
-        # FieldStorage
-        q = get_field_storage()
-    elif os.environ.get('REQUEST_METHOD') == 'POST':
         q = read_stdin()
+    elif os.environ.get('REQUEST_METHOD') == 'POST':
+        q = read_stdin().decode()
     else:
         q = os.environ.get('QUERY_STRING')
     return q
@@ -2697,19 +2695,180 @@ def _get_form_values_as_dict(f):
             d[k] = v
     return d
 
-# for file upload
-# Exclusive with read_stdin()
-# returns FieldStorage
-def get_field_storage():
-    global field_storage
-    if field_storage is None:
-        field_storage = cgi.FieldStorage()
-    return field_storage
+#------------------------------------------------------------------------------
+#{
+#  'name1': {
+#    'header': {
+#      'Field-Name1': VALUE1,
+#      'Field-Name1': VALUE2,
+#    },
+#    'body': BODY
+#  },
+#  'name2': {
+#  :
+#}
+def get_multipart_data():
+    content_type = os.environ.get('CONTENT_TYPE', '')
+    global stdin_data
+    global multi_part_data
+    if multi_part_data is None:
+        if stdin_data is None:
+            stdin_data = read_stdin()
+        wk = content_type.split('boundary=')
+        if len(wk) < 2:
+            return None
+        boundary = '--' + wk[1]
+        multi_part_data = parse_multipart_data(stdin_data, boundary)
+    return multi_part_data
 
-def free_field_storage():
-    global field_storage
-    field_storage = None
+def parse_multipart_data(buf, boundary):
+    data = {}
+    search_start_pos = 0
+    while search_start_pos < len(buf):
+        pos = get_next_part_pos(buf, search_start_pos, boundary)
+        if pos is None:
+            break
 
+        part_start_pos = pos['start']
+        part_end_pos = pos['end'] + 1
+        part_buf = buf[part_start_pos:part_end_pos]
+
+        search_start_pos = part_end_pos
+
+        part_data = parse_part_data(part_buf)
+        header = part_data['header']
+        if 'Content-Disposition' not in header:
+            continue
+
+        content_desposition = header['Content-Disposition']
+        disposition = parse_content_desposition(content_desposition)
+        if 'name' in disposition:
+             name = disposition['name']
+             part_data['disposition'] = disposition
+             data[name] = part_data
+    return data
+
+def parse_content_desposition(line):
+    disposition = {}
+    fields = line.split(';')
+    for i in range(len(fields)):
+        field = fields[i].strip()
+        wk = field.split('=')
+        if len(wk) < 2:
+            continue
+        name = wk[0]
+        value = strip_quote(wk[1])
+        disposition[name] = value
+    return disposition
+
+def strip_quote(s, q='"'):
+    if s is None:
+        return None
+    if len(s) < 2:
+        return s
+    if s[0] != q or s[-1] != q:
+        return s
+    return s[1:-1]
+
+def parse_part_data(part_buf):
+    part_data = {
+        'disposition': None,
+        'header': None,
+        'body': None
+    }
+
+    CRLF2_HEX = '0D 0A 0D 0A'
+    crlf2_pos = index_of_hex_pattern(part_buf, 0, CRLF2_HEX)
+    if crlf2_pos == -1:
+        part_data['body'] = part_buf
+        return part_data
+
+    header_end_pos = crlf2_pos
+    header_buf = part_buf[0:header_end_pos]
+    header = parse_part_header(header_buf)
+    part_data['header'] = header
+
+    body_start_pos = crlf2_pos + 4
+    body = part_buf[body_start_pos:]
+    part_data['body'] = body
+
+    return part_data
+
+def parse_part_header(header_buf):
+    header = {}
+    header_str = header_buf.decode()
+    lines = header_str.split('\r\n')
+    for i in range(len(lines)):
+        line = lines[i]
+        wk = line.split(':')
+        name = wk[0]
+        value = ''
+        if len(wk) >= 2:
+            value = wk[1].strip()
+        header[name] = value
+    return header
+
+def get_next_part_pos(buf, start_pos, boundary):
+    CRLF_HEX = '0D 0A'
+    DASH2_HEX = '2D 2D'
+
+    pos = start_pos
+    boundary_s_pos = get_next_boundary_pos(buf, pos, boundary)
+    if boundary_s_pos == -1:
+        return None
+
+    pos += len(boundary)
+    crlf_pos = index_of_hex_pattern(buf, pos, CRLF_HEX)
+    if crlf_pos == -1:
+        return None
+
+    pos += 2
+    part_start_pos = pos
+    boundary_s_pos = get_next_boundary_pos(buf, pos, boundary)
+    if boundary_s_pos == -1:
+        return None
+
+    part_end_pos = boundary_s_pos - 3
+
+    crlf_pos = index_of_hex_pattern(buf, boundary_s_pos, CRLF_HEX)
+    dash2_pos = index_of_hex_pattern(buf, boundary_s_pos, DASH2_HEX)
+    if crlf_pos == -1 and dash2_pos == -1:
+        return None
+
+    return {'start': part_start_pos, 'end': part_end_pos}
+
+def get_next_boundary_pos(buf, start_pos, boundary):
+    boundary_hex = bytes2hex(boundary.encode(), line_break=0)
+    pos = index_of_hex_pattern(buf, start_pos, boundary_hex)
+    return pos
+
+def index_of_hex_pattern(buf, start_pos, hex_ptn_str):
+    for i in range(start_pos, len(buf)):
+        pos = i
+        if match_hex_pattern(buf, pos, hex_ptn_str):
+            return pos
+    return -1
+
+def match_hex_pattern(buf, start_pos, hex_ptn_str):
+    hex_ptn = hex_ptn_str.split(' ')
+    ptn_len = len(hex_ptn)
+    search_len = len(buf) - start_pos
+    if search_len < ptn_len:
+        return False
+
+    for i in range(ptn_len):
+        hex = hex_ptn[i]
+        if hex == 'xx':
+            continue
+
+        pos = start_pos + i
+        v = int('0x' + hex, 16)
+        if v != buf[pos]:
+            return False
+
+    return True
+
+#------------------------------------------------------------------------------
 # Remote IP Address
 def get_ip_addr(default=''):
     return os.environ.get('REMOTE_ADDR', default)
@@ -2868,8 +3027,7 @@ def send_response(content, type='text/plain', status=200, headers=None, encoding
     #  ap_content_length_filter: apr_bucket_read() failed
     #  Failed to flush CGI output to client
     global stdin_data
-    global field_storage
-    if stdin_data is None and field_storage is None:
+    if stdin_data is None:
         stdin_data = sys.stdin.read()
 
     if type == 'application/json':
@@ -2935,8 +3093,7 @@ def send_binary(content, filename='', content_type='application/octet-stream', e
     #  ap_content_length_filter: apr_bucket_read() failed
     #  Failed to flush CGI output to client
     global stdin_data
-    global field_storage
-    if stdin_data is None and field_storage is None:
+    if stdin_data is None:
         stdin_data = sys.stdin.read()
 
     if typename(content) == 'str':
@@ -3419,6 +3576,12 @@ def elapsed_time():
         return ''
     t = end_timetest()
     return sec2str(t)
+
+# HEX dump
+def logb(b, s=0, l=0):
+    a = b[s:]
+    s = hexdump(a, limit=l)
+    log('\n' + s)
 
 if __name__ == '__main__':
     print('util.py')
