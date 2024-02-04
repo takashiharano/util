@@ -7,7 +7,7 @@
 #
 # Usage:
 # [cron]
-# 1 * * * * /path/to/sh/disk/disk_logging.sh append
+# 1 */3 * * * /path/to/sh/disk/disk_logging.sh append
 # 0 0 * * * /path/to/sh/disk/disk_logging.sh reset
 ############################################################################
 
