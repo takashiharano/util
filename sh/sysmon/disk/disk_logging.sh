@@ -15,7 +15,7 @@ DATE_TIME_FORMAT="%Y-%m-%dT%H:%M:%S.%3N%:z"
 
 #---------------------------------------------------------------------------
 LOG_DIR="/path/to/logs/disk"
-FILE_NAME="diskusage.log"
+FILE_NAME="disk.log"
 MAX_N=90
 #---------------------------------------------------------------------------
 
@@ -40,7 +40,6 @@ function reset_log() {
       if [ -e ${file_path} ]; then
         cp -a ${file_path} ${file_path}.1
         rm -f ${file_path}
-        touch ${FILE_NAME}
       fi
     else
       if [ -e ${file_path}.${n} ]; then

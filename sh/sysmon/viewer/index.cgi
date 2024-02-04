@@ -1,5 +1,5 @@
-#!/usr/bin/python3
 #!python
+#!/usr/bin/python3
 
 import os
 import sys
@@ -10,4 +10,4 @@ import util
 
 import sysmon
 
-sysmon.web_process()
+sysmon.main()
