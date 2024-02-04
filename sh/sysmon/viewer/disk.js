@@ -59,10 +59,12 @@ disk.drawLog = function(logtext) {
 disk.parseData = function(logtext) {
   var txtList = util.text2list(logtext);
   var dataList = [];
+  var skip = true;
   for (var i = 0; i < txtList.length; i++) {
     var txt = txtList[i];
     if (!txt) {
       dataList.push(data);
+      skip = true;
       continue;
     }
     if (txt.match(/^\d{4}-\d{2}-\d{2}/)) {
@@ -72,7 +74,8 @@ disk.parseData = function(logtext) {
       };
       continue;
     }
-    if (txt.match(/^Filesystem/)) {
+    if (skip) {
+      skip = false;
       continue;
     }
     txt = txt.replace(/\s{2,}/g, ' ');
