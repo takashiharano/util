@@ -51,11 +51,26 @@ sysmon.showInfotip = function(s) {
   util.infotip.show(s, opt);
 };
 
+sysmon.convDateToN = function(d1) {
+  var dt = util.getDateTime();
+  if (d1.length == 4) {
+    var mmdd = dt.toString('%MM%DD');
+    var y = dt.year;
+    if (d1 > mmdd) y -= 1;
+    d1 = y + d1;
+  }
+  var d0 = dt.toString('%YYYY%MM%DD');
+  var n = util.diffDays(d1, d0);
+  return n;
+};
+
 window.addEventListener('DOMContentLoaded', sysmon.onReady, true);
 window.addEventListener('load', sysmon.onLoad, true);
 
 $onEnterKey = function(e) {
   if ($el('#perf-hist-n').hasFocus()) {
     perf.showData();
+  } else if ($el('#disk-hist-n').hasFocus()) {
+    disk.showData();
   }
 };
