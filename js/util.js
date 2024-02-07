@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202402062328';
+util.v = '202402072347';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -676,7 +676,7 @@ util.Time.prototype = {
    *   to display millis
    *   true: 1d 23h 45m 59s 123
    */
-  toReadableString: function(h, f) {
+  toReadableString: function(h, f, z) {
     var ctx = this;
     var r = (ctx.millis < 0 ? '-' : '');
     var d = 0;
@@ -686,27 +686,27 @@ util.Time.prototype = {
     }
     if (h && (ctx.hours > 0)) {
       d = 1;
-      r += ctx.hours + 'h ';
+      r += ((z && r) ? (('0' + ctx.hours).substr(-2)) : ctx.hours) + 'h ';
     } else if (d || (ctx.hours24 > 0)) {
       d = 1;
-      r += ctx.hours24 + 'h ';
+      r += ((z && r) ? (('0' + ctx.hours24).substr(-2)) : ctx.hours24) + 'h ';
     }
     if (d || (ctx.minutes > 0)) {
       d = 1;
-      r += ctx.minutes + 'm ';
+      r += ((z && r) ? (('0' + ctx.minutes).substr(-2)) : ctx.minutes) + 'm ';
     }
     if (f) {
       if (Math.abs(ctx.millis) >= 1000) {
         if (ctx.milliseconds == 0) {
-          r += ctx.seconds + 's';
+          r += ((z && r) ? (('0' + ctx.seconds).substr(-2)) : ctx.seconds) + 's';
         } else {
-          r += ctx.seconds + 's ' + ctx.milliseconds + 'ms';
+          r += ((z && r) ? (('0' + ctx.seconds).substr(-2)) : ctx.seconds) + 's ' + (z ? ('00' + ctx.milliseconds).substr(-3) : ctx.milliseconds) + 'ms';
         }
       } else {
         r += ctx.milliseconds + 'ms';
       }
     } else {
-      r += ctx.seconds + 's';
+      r += ((z && r) ? (('0' + ctx.seconds).substr(-2)) : ctx.seconds) + 's';
     }
     return r;
   }
@@ -730,7 +730,7 @@ util.ms2str = function(ms, fmt) {
  *   1: s
  *   2: ms
  */
-util.msToReadableString = function(ms, mode, unsigned) {
+util.msToReadableString = function(ms, mode, unsigned, zero) {
   var t = new util.Time(ms);
   var r = '';
   var sn = 0;
@@ -739,12 +739,12 @@ util.msToReadableString = function(ms, mode, unsigned) {
     ms *= (-1);
   }
   if (mode == 2) {
-    r = t.toReadableString(false, true);
+    r = t.toReadableString(false, true, zero);
     if (unsigned) r = r.replace('-', '');
     return r;
   }
   if ((mode == 1) || (ms >= 60000)) {
-    r = t.toReadableString(false, false);
+    r = t.toReadableString(false, false, zero);
     if (unsigned) r = r.replace('-', '');
     return r;
   }
@@ -902,9 +902,9 @@ util.timecounter.restart = function(el) {
 
  * unsigned: true='1m 23s' / false='1m 23s' | '-1m 23s'
  */
-util.timecounter.delta = function(t0, t1, mode, unsigned) {
+util.timecounter.delta = function(t0, t1, mode, unsigned, zero) {
   var ms = util.difftime(t0, t1);
-  return util.msToReadableString(ms, mode, unsigned);
+  return util.msToReadableString(ms, mode, unsigned, zero);
 };
 
 /**
@@ -926,7 +926,7 @@ util.timecounter.getText = function(el) {
   var o = util.timecounter.getObj(el);
   if (o) {
     v = o.update(o);
-    s = util.msToReadableString(v, o.mode, o.unsigned);
+    s = util.msToReadableString(v, o.mode, o.unsigned, o.zero);
   }
   return s;
 };
@@ -949,6 +949,7 @@ util.TimeCounter = function(el, t0, opt) {
   this.interval = opt.interval;
   this.mode = opt.mode;
   this.unsigned = opt.unsigned;
+  this.zero = opt.zero;
   this.cb = opt.cb;
   this.id = '_timecounter-' + util.timecounter.id++;
 };
@@ -961,7 +962,7 @@ util.TimeCounter.prototype = {
   update: function(ctx) {
     var v = Date.now() - ctx.t0;
     var el = util.getElement(ctx.el);
-    if (el) el.innerHTML = util.msToReadableString(v, ctx.mode, ctx.unsigned);
+    if (el) el.innerHTML = util.msToReadableString(v, ctx.mode, ctx.unsigned, ctx.zero);
     if (ctx.cb) ctx.cb(v);
     return v;
   },
