@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202402082153'
+v = '202402082345'
 
 import sys
 import os
@@ -788,12 +788,12 @@ def load_dict(path, default=None, cls=None, object_hook=None,
 # Save Dict
 def save_dict(path, obj, skipkeys=False, ensure_ascii=True, check_circular=True,
               allow_nan=True, cls=None, indent=1, separators=None,
-              default=None, sort_keys=False):
+              default=None, sort_keys=False, sync=True):
     s = json.dumps(obj, skipkeys=skipkeys, ensure_ascii=ensure_ascii,
                    check_circular=check_circular, allow_nan=allow_nan,
                    cls=cls, indent=indent, separators=separators,
                    default=default, sort_keys=sort_keys)
-    write_text_file(path, s)
+    write_text_file(path, s, sync=sync)
 
 # Make Parent Dir
 def make_parent_dir(path):
@@ -804,7 +804,7 @@ def make_parent_dir(path):
 # Append Dict
 def append_dict(path, obj, skipkeys=False, ensure_ascii=True, check_circular=True,
                 allow_nan=True, cls=None, indent=1, separators=None,
-                default=None, sort_keys=False, max=0, reverse=False):
+                default=None, sort_keys=False, max=0, reverse=False, sync=True):
     d = load_dict(path, default=[])
 
     if reverse:
@@ -827,7 +827,7 @@ def append_dict(path, obj, skipkeys=False, ensure_ascii=True, check_circular=Tru
 
     save_dict(path, new_data, skipkeys=skipkeys, ensure_ascii=ensure_ascii, check_circular=check_circular,
               allow_nan=allow_nan, cls=cls, indent=indent, separators=separators,
-              default=default, sort_keys=sort_keys)
+              default=default, sort_keys=sort_keys, sync=sync)
 
 # Overwrites only key values that exist in the target.
 def update_dict(tgt, src):
@@ -1922,28 +1922,31 @@ def read_file_as_base64(path):
     return base64.b64encode(b).decode()
 
 # Write File
-def write_file(path, data, encoding=DEFAULT_ENCODING, make_dir=True, chunk_size=0):
+def write_file(path, data, encoding=DEFAULT_ENCODING, make_dir=True, chunk_size=0, sync=True):
     if typename(data) == 'str':
-        write_text_file(path, data, encoding, make_dir)
+        write_text_file(path, data, encoding, make_dir, sync=sync)
     else:
-        write_binary_file(path, data, make_dir, chunk_size)
+        write_binary_file(path, data, make_dir, chunk_size, sync=sync)
 
 # Write text file
-def write_text_file(path, text, encoding=DEFAULT_ENCODING, make_dir=True):
+def write_text_file(path, text, encoding=DEFAULT_ENCODING, make_dir=True, sync=True):
     if make_dir:
         make_parent_dir(path)
     b = text.encode(encoding=encoding)
     f = open(path, 'wb')
     f.write(b)
+    if sync:
+        f.flush()
+        os.fsync(f.fileno())
     f.close()
 
 # Write text file from list
-def write_text_file_from_list(path, text_list, encoding=DEFAULT_ENCODING, make_dir=True, line_sep='\n'):
+def write_text_file_from_list(path, text_list, encoding=DEFAULT_ENCODING, make_dir=True, line_sep='\n', sync=True):
     text = list2text(text_list, line_sep)
-    write_text_file(path, text, encoding, make_dir)
+    write_text_file(path, text, encoding, make_dir, sync=sync)
 
 # Write binary file
-def write_binary_file(path, data, make_dir=True, chunk_size=0):
+def write_binary_file(path, data, make_dir=True, chunk_size=0, sync=True):
     if make_dir:
         make_parent_dir(path)
     f = open(path, 'wb')
@@ -1953,6 +1956,9 @@ def write_binary_file(path, data, make_dir=True, chunk_size=0):
             f.write(chunk)
     else:
         f.write(data)
+    if sync:
+        f.flush()
+        os.fsync(f.fileno())
     f.close()
 
 def _read_chunk(file_object, chunk_size=0):
@@ -1993,7 +1999,7 @@ def insert_newline(s, pos):
     return ''.join(a)
 
 # Append a line to text file
-def append_line_to_text_file(path, text, encoding=DEFAULT_ENCODING, max=0):
+def append_line_to_text_file(path, text, encoding=DEFAULT_ENCODING, max=0, sync=True):
     text_list = read_text_file_as_list(path, default=[], encoding=encoding)
     new_data = ''
 
@@ -2005,7 +2011,7 @@ def append_line_to_text_file(path, text, encoding=DEFAULT_ENCODING, max=0):
         new_data += text_list[i] + LINE_SEP
 
     new_data = new_data + text + LINE_SEP
-    write_text_file(path, new_data)
+    write_text_file(path, new_data, sync=sync)
     return new_data
 
 def path_exists(path):
