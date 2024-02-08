@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202401310025'
+v = '202402082153'
 
 import sys
 import os
@@ -763,7 +763,7 @@ def to_json(obj, skipkeys=False, ensure_ascii=True, check_circular=True,
                       default=default, sort_keys=sort_keys)
 
 # JSON -> Object
-def from_json(s, encoding=None, cls=None, object_hook=None, parse_float=None,
+def from_json(s, cls=None, object_hook=None, parse_float=None,
               parse_int=None, parse_constant=None, object_pairs_hook=None, default=None):
     if s is None or s == '':
         return default
@@ -772,7 +772,7 @@ def from_json(s, encoding=None, cls=None, object_hook=None, parse_float=None,
                       parse_constant=parse_constant, object_pairs_hook=object_pairs_hook)
 
 # Load Dict
-def load_dict(path, default=None, encoding=None, cls=None, object_hook=None,
+def load_dict(path, default=None, cls=None, object_hook=None,
               parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None):
     if path_exists(path):
         s = read_text_file(path)
