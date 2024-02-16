@@ -235,9 +235,16 @@ perf.draw = function(dataList) {
   $el('#mem-total-val').innerHTML = totalMem;
 
   var tsMn1 = util.getMidnightTimestamp(tsS);
-  var tsMn2 = tsMn1 + util.DAY;
+  var tsMn2 = util.getMidnightTimestamp(tsE) + util.DAY;
   var preMin = ((tsS - tsMn1) / util.MINUTE) | 0;
   var postMin = ((tsMn2 - tsE) / util.MINUTE) | 0;
+
+  if ((tsMn2 - tsMn1) > util.DAY) {
+    var th = 5;
+    if (postMin > (util.DAY / 60000) - th) {
+      postMin = th;
+    }
+  }
 
   var xLabels = [];
   var chartData = {
