@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202402082345'
+v = '202402161251'
 
 import sys
 import os
@@ -1934,6 +1934,7 @@ def write_text_file(path, text, encoding=DEFAULT_ENCODING, make_dir=True, sync=T
         make_parent_dir(path)
     b = text.encode(encoding=encoding)
     f = open(path, 'wb')
+    f.truncate(0)
     f.write(b)
     if sync:
         f.flush()
@@ -1950,6 +1951,7 @@ def write_binary_file(path, data, make_dir=True, chunk_size=0, sync=True):
     if make_dir:
         make_parent_dir(path)
     f = open(path, 'wb')
+    f.truncate(0)
     data_type = typename(data)
     if data_type == 'BufferedWriter' or data_type == 'BytesIO' or data_type == '_TemporaryFileWrapper' or data_type == 'BufferedRandom':
         for chunk in _read_chunk(data, chunk_size):
