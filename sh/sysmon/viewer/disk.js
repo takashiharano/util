@@ -157,6 +157,7 @@ disk.drawDiskUsageMeters = function(index) {
   html += '</tr>';
 
   var usages = usageData.usages;
+  util.sortObjectList(usages, 'mounted_on');
   for (var i = 0; i < usages.length; i++) {
     var usage = usages[i];
     var totalB = util.convByte(usage.total * 1000);
