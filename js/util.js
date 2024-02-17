@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202402122023';
+util.v = '202402180050';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2234,6 +2234,7 @@ util._cmpFn = function(a, b, key, desc, asNum) {
   return util._cmp(a, b, desc, asNum);
 };
 util._cmp = function(a, b, desc, asNum) {
+  if (asNum == undefined) asNum = true;
   if (a == undefined) a = '';
   if (b == undefined) b = '';
   if (a === true) a = 1;
@@ -2241,11 +2242,53 @@ util._cmp = function(a, b, desc, asNum) {
   if (a === false) a = 0;
   if (b === false) b = 0;
   if (asNum) {
-    if (!isNaN(a) && (a !== '')) a = parseFloat(a);
-    if (!isNaN(b) && (b !== '')) b = parseFloat(b);
+    if (util.isNumeric(a) && util.isNumeric(b)) {
+      a = parseFloat(a);
+      b = parseFloat(b);
+    } else if (util._cmpPrefix(a, b)) {
+      a = util._toNumE(a);
+      b = util._toNumE(b);
+    } else if (util._cmpSuffix(a, b)) {
+      a = util._toNumS(a);
+      b = util._toNumS(b);
+    }
   }
   if (a == b) return 0;
   return (desc ? (a < b ? 1 : -1) : (a > b ? 1 : -1));
+};
+util._cmpPrefix = function(a, b) {
+  if ((typeof a != 'string') || (typeof b != 'string')) return false;
+  if (!util._isAN(a) || !util._isAN(b)) return false;
+  var p1 = util._pfx(a);
+  var p2 = util._pfx(b);
+  return (p1 == p2);
+};
+util._cmpSuffix = function(a, b) {
+  if ((typeof a != 'string') || (typeof b != 'string')) return false;
+  if (!util._isNA(a) || !util._isNA(b)) return false;
+  var p1 = util._sfx(a);
+  var p2 = util._sfx(b);
+  return (p1 == p2);
+};
+util._isAN = function(a) {
+  return (a.match(/[^\d]?(\d+)(\.\d+)?$/) ? true : false);
+};
+util._isNA = function(a) {
+  return (a.match(/^(\d+)(\.\d+)?[^\d]/) ? true : false);
+};
+util._pfx = function(a) {
+  return a.replace(/([^\d]+)?(\d+)(\.\d+)?$/, '$1');
+};
+util._sfx = function(a) {
+  return a.replace(/^(\d+)(\.\d+)?([^\d]+)?/, '$3');
+};
+util._toNumE = function(a) {
+  var n = a.replace(/[^\d]+?(\d+)(\.\d+)?$/, '$1$2');
+  return parseFloat(n);
+};
+util._toNumS = function(a) {
+  var n = a.replace(/^(\d+)(\.\d+)?[^\d]+?/, '$1$2');
+  return parseFloat(n);
 };
 
 /**
