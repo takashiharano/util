@@ -149,15 +149,15 @@ disk.drawDiskUsageMeters = function(index) {
   html += '<table>';
   html += '<tr>';
   html += '<th>Filesystem</th>';
-  html += '<th style="text-align:right;padding-right:20px;">Total</th>';
-  html += '<th style="text-align:right;padding-right:10px;">Used</th>';
+  html += '<th style="text-align:right;min-width:50px;padding-right:20px;">Total</th>';
+  html += '<th style="text-align:right;min-width:50px;padding-right:10px;">Used</th>';
   html += '<th colspan="2">&nbsp;</th>';
-  html += '<th style="text-align:right;padding-right:20px;">Free</th>';
+  html += '<th style="text-align:right;min-width:50px;padding-right:20px;">Free</th>';
   html += '<th>Mounted on</th>';
   html += '</tr>';
 
   var usages = usageData.usages;
-  util.sortObjectList(usages, 'mounted_on');
+  usages = util.sortObjectList(usages, 'mounted_on');
   for (var i = 0; i < usages.length; i++) {
     var usage = usages[i];
     var totalB = util.convByte(usage.total * 1000);
