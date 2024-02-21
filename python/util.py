@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202402161251'
+v = '202402220058'
 
 import sys
 import os
@@ -1930,16 +1930,8 @@ def write_file(path, data, encoding=DEFAULT_ENCODING, make_dir=True, chunk_size=
 
 # Write text file
 def write_text_file(path, text, encoding=DEFAULT_ENCODING, make_dir=True, sync=True):
-    if make_dir:
-        make_parent_dir(path)
     b = text.encode(encoding=encoding)
-    f = open(path, 'wb')
-    f.truncate(0)
-    f.write(b)
-    if sync:
-        f.flush()
-        os.fsync(f.fileno())
-    f.close()
+    write_binary_file(path, b, make_dir=make_dir, sync=sync)
 
 # Write text file from list
 def write_text_file_from_list(path, text_list, encoding=DEFAULT_ENCODING, make_dir=True, line_sep='\n', sync=True):
@@ -1950,18 +1942,17 @@ def write_text_file_from_list(path, text_list, encoding=DEFAULT_ENCODING, make_d
 def write_binary_file(path, data, make_dir=True, chunk_size=0, sync=True):
     if make_dir:
         make_parent_dir(path)
-    f = open(path, 'wb')
-    f.truncate(0)
-    data_type = typename(data)
-    if data_type == 'BufferedWriter' or data_type == 'BytesIO' or data_type == '_TemporaryFileWrapper' or data_type == 'BufferedRandom':
-        for chunk in _read_chunk(data, chunk_size):
-            f.write(chunk)
-    else:
-        f.write(data)
-    if sync:
-        f.flush()
-        os.fsync(f.fileno())
-    f.close()
+    with open(path, 'wb') as f:
+        f.truncate(0)
+        data_type = typename(data)
+        if data_type == 'BufferedWriter' or data_type == 'BytesIO' or data_type == '_TemporaryFileWrapper' or data_type == 'BufferedRandom':
+            for chunk in _read_chunk(data, chunk_size):
+                f.write(chunk)
+        else:
+            f.write(data)
+        if sync:
+            f.flush()
+            os.fsync(f.fileno())
 
 def _read_chunk(file_object, chunk_size=0):
     if chunk_size == 0:
