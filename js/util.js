@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202402180050';
+util.v = '202402240030';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -676,7 +676,7 @@ util.Time.prototype = {
    *   to display millis
    *   true: 1d 23h 45m 59s 123
    */
-  toReadableString: function(h, f, z) {
+  toTimeString: function(h, f, z) {
     var ctx = this;
     var r = (ctx.millis < 0 ? '-' : '');
     var d = 0;
@@ -730,7 +730,7 @@ util.ms2str = function(ms, fmt) {
  *   1: s
  *   2: ms
  */
-util.msToReadableString = function(ms, mode, unsigned, zero) {
+util.ms2time = function(ms, mode, unsigned, zero) {
   var t = new util.Time(ms);
   var r = '';
   var sn = 0;
@@ -739,12 +739,12 @@ util.msToReadableString = function(ms, mode, unsigned, zero) {
     ms *= (-1);
   }
   if (mode == 2) {
-    r = t.toReadableString(false, true, zero);
+    r = t.toTimeString(false, true, zero);
     if (unsigned) r = r.replace('-', '');
     return r;
   }
   if ((mode == 1) || (ms >= 60000)) {
-    r = t.toReadableString(false, false, zero);
+    r = t.toTimeString(false, false, zero);
     if (unsigned) r = r.replace('-', '');
     return r;
   }
@@ -904,7 +904,7 @@ util.timecounter.restart = function(el) {
  */
 util.timecounter.delta = function(t0, t1, mode, unsigned, zero) {
   var ms = util.difftime(t0, t1);
-  return util.msToReadableString(ms, mode, unsigned, zero);
+  return util.ms2time(ms, mode, unsigned, zero);
 };
 
 /**
@@ -926,7 +926,7 @@ util.timecounter.getText = function(el) {
   var o = util.timecounter.getObj(el);
   if (o) {
     v = o.update(o);
-    s = util.msToReadableString(v, o.mode, o.unsigned, o.zero);
+    s = util.ms2time(v, o.mode, o.unsigned, o.zero);
   }
   return s;
 };
@@ -962,7 +962,7 @@ util.TimeCounter.prototype = {
   update: function(ctx) {
     var v = Date.now() - ctx.t0;
     var el = util.getElement(ctx.el);
-    if (el) el.innerHTML = util.msToReadableString(v, ctx.mode, ctx.unsigned, ctx.zero);
+    if (el) el.innerHTML = util.ms2time(v, ctx.mode, ctx.unsigned, ctx.zero);
     if (ctx.cb) ctx.cb(v);
     return v;
   },
