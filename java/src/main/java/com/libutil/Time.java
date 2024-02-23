@@ -148,52 +148,6 @@ public class Time {
   }
 
   /**
-   * To human readable string the time.
-   *
-   * @param h
-   *          -ge 24h instead of days. true: 47h 45m 59s
-   * @param f
-   *          to display millis. true: 1d 23h 45m 59s 123
-   * @return the time string
-   */
-  public String toReadableString(boolean h, boolean f) {
-    StringBuilder sb = new StringBuilder();
-    if (this.millis < 0) {
-      sb.append("-");
-    }
-    boolean d = false;
-    if (!h && (this.days > 0)) {
-      d = true;
-      sb.append(this.days + "d ");
-    }
-    if (h && (this.hours > 0)) {
-      d = true;
-      sb.append(this.hours + "h ");
-    } else if (d || (this.hours24 > 0)) {
-      d = true;
-      sb.append(this.hours24 + "h ");
-    }
-    if (d || (this.minutes > 0)) {
-      d = true;
-      sb.append(this.minutes + "m ");
-    }
-    if (f) {
-      if (this.millis >= SECOND) {
-        if (this.milliseconds == 0) {
-          sb.append(this.seconds + "s");
-        } else {
-          sb.append(this.seconds + "s " + this.milliseconds + "ms");
-        }
-      } else {
-        sb.append(this.milliseconds + "ms");
-      }
-    } else {
-      sb.append(this.seconds + "s");
-    }
-    return sb.toString();
-  }
-
-  /**
    * To string the time.
    *
    * @param format
@@ -201,11 +155,11 @@ public class Time {
    * @return the formatted time string
    */
   public String toString(String format) {
-    int snType = getSignType(format);
+    int signType = getSignType(format);
     String sign = "";
     if (millis < 0) {
       sign = "-";
-    } else if (snType == 1) {
+    } else if (signType == 1) {
       sign = "+";
     }
 
@@ -231,7 +185,7 @@ public class Time {
     f3 = f3.substring(f3.length() - 3);
 
     String r = format;
-    if (snType == 0) {
+    if (signType == 0) {
       r = sign + r;
     }
     r = r.replace("D", d);
@@ -244,6 +198,52 @@ public class Time {
     r = r.replace("ss", ss);
     r = r.replace("SSS", f3);
     return r;
+  }
+
+  /**
+   * To string the time with unit.
+   *
+   * @param byHours
+   *          -ge 24h instead of days. true: 47h 45m 59s
+   * @param f
+   *          to display millis. true: 1d 23h 45m 59s 123
+   * @return the time string
+   */
+  public String toStringWithUnit(boolean byHours, boolean f) {
+    StringBuilder sb = new StringBuilder();
+    if (this.millis < 0) {
+      sb.append("-");
+    }
+    boolean d = false;
+    if (!byHours && (this.days > 0)) {
+      d = true;
+      sb.append(this.days + "d ");
+    }
+    if (byHours && (this.hours > 0)) {
+      d = true;
+      sb.append(this.hours + "h ");
+    } else if (d || (this.hours24 > 0)) {
+      d = true;
+      sb.append(this.hours24 + "h ");
+    }
+    if (d || (this.minutes > 0)) {
+      d = true;
+      sb.append(this.minutes + "m ");
+    }
+    if (f) {
+      if (this.millis >= SECOND) {
+        if (this.milliseconds == 0) {
+          sb.append(this.seconds + "s");
+        } else {
+          sb.append(this.seconds + "s " + this.milliseconds + "ms");
+        }
+      } else {
+        sb.append(this.milliseconds + "ms");
+      }
+    } else {
+      sb.append(this.seconds + "s");
+    }
+    return sb.toString();
   }
 
   /**
@@ -535,20 +535,33 @@ public class Time {
   }
 
   /**
-   * Returns human-readable time string.<br>
-   * 171959000 to "1d 23h 45m 59s"
+   * To string the time.
+   *
+   * @param millis
+   *          milliseconds
+   * @param format
+   *          "HH:mm:ss.SSS", "HR:mm:ss.SSS", "Dd HH24:mm:ss.SSS"
+   * @return the formatted time string
+   */
+  public static String toString(long millis, String format) {
+    return (new Time(millis)).toString(format);
+  }
+
+  /**
+   * To string the time with unit.<br>
+   * e.g., 171959000 to "1d 23h 45m 59s"
    *
    * @param millis
    *          milliseconds
    * @return human-readable time string
    */
-  public static String toReadableString(long millis) {
-    return toReadableString(millis, 0);
+  public static String toStringWithUnit(long millis) {
+    return toStringWithUnit(millis, 0);
   }
 
   /**
-   * Returns human-readable time string.<br>
-   * 171959000 to "1d 23h 45m 59s"
+   * To string the time with unit.<br>
+   * e.g., 171959000 to "1d 23h 45m 59s"
    *
    * @param millis
    *          milliseconds
@@ -556,13 +569,13 @@ public class Time {
    *          resolution. 0=auto / 1=millis / 2=secs if gt 60s
    * @return human-readable time string
    */
-  public static String toReadableString(long millis, int mode) {
+  public static String toStringWithUnit(long millis, int mode) {
     Time t = new Time(millis);
     if (mode == 1) {
-      return t.toReadableString(false, true);
+      return t.toStringWithUnit(false, true);
     }
     if ((mode == 2) || (millis >= 60000)) {
-      return t.toReadableString(false, false);
+      return t.toStringWithUnit(false, false);
     }
 
     int ss = t.seconds;
@@ -586,19 +599,6 @@ public class Time {
       }
     }
     return sb.toString();
-  }
-
-  /**
-   * To string the time.
-   *
-   * @param millis
-   *          milliseconds
-   * @param format
-   *          "HH:mm:ss.SSS", "HR:mm:ss.SSS", "Dd HH24:mm:ss.SSS"
-   * @return the formatted time string
-   */
-  public static String toString(long millis, String format) {
-    return (new Time(millis)).toString(format);
   }
 
   private static int getSignType(String s) {
