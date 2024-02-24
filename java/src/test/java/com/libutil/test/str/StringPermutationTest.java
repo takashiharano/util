@@ -3,7 +3,8 @@ package com.libutil.test.str;
 import java.util.List;
 
 import com.libutil.StrUtil;
-import com.libutil.StrUtil.StrPermResult;
+import com.libutil.StringPermutation;
+import com.libutil.StringPermutation.StringPermutationResult;
 
 public class StringPermutationTest {
   public static void main(String args[]) {
@@ -34,16 +35,16 @@ public class StringPermutationTest {
       chars = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
     }
     int digit = target.length();
-    long lastIndex = StrUtil.Permutation.countTotal(chars, digit);
+    long lastIndex = StringPermutation.countTotal(chars, digit);
     System.out.println("lastIndex(total count) =  " + lastIndex);
 
-    long targetIndex = StrUtil.Permutation.getIndex(chars, target);
+    long targetIndex = StringPermutation.getIndex(chars, target);
     System.out.println("targetIndex =  " + targetIndex);
 
     long start = System.currentTimeMillis();
     long elapsed = 0;
     for (int i = 1; i <= lastIndex; i++) {
-      String str = StrUtil.Permutation.getString(chars, i);
+      String str = StringPermutation.getString(chars, i);
       if (str.equals(target)) {
         System.out.println(i + ": " + str);
         break;
@@ -75,19 +76,19 @@ public class StringPermutationTest {
       chars = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
     }
     int digit = target.length();
-    long lastIndex = StrUtil.Permutation.countTotal(chars, digit);
+    long lastIndex = StringPermutation.countTotal(chars, digit);
     System.out.println("lastIndex(total count) =  " + lastIndex);
 
-    long targetIndex = StrUtil.Permutation.getIndex(chars, target);
+    long targetIndex = StringPermutation.getIndex(chars, target);
     System.out.println("targetIndex =  " + targetIndex);
 
-    List<Integer> a = null;
+    List<Integer> indexes = null;
     long start = System.currentTimeMillis();
     long elapsed = 0;
     for (int i = 1; i <= lastIndex; i++) {
-      StrPermResult r = StrUtil.Permutation._getString(chars, i, a);
+      StringPermutationResult r = StringPermutation.getString(chars, i, indexes);
 
-      String str = r.s;
+      String str = r.getString();
       if (str.equals(target)) {
         System.out.println(i + ": " + str);
         break;
@@ -98,7 +99,7 @@ public class StringPermutationTest {
         System.out.println(i + ": " + str + " " + elapsed + "ms");
       }
 
-      a = r.a;
+      indexes = r.getIndexes();
     }
     elapsed = System.currentTimeMillis() - start;
     String elapsedTime = StrUtil.intNumToDecimal(elapsed, 3);
