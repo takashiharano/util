@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202402220058'
+v = '202403021616'
 
 import sys
 import os
@@ -1933,6 +1933,15 @@ def write_text_file(path, text, encoding=DEFAULT_ENCODING, make_dir=True, sync=T
     b = text.encode(encoding=encoding)
     write_binary_file(path, b, make_dir=make_dir, sync=sync)
 
+def append_text_file(path, text, separator='\n', encoding=DEFAULT_ENCODING, make_dir=True, sync=True):
+    s = read_text_file(path, default=None, encoding=encoding)
+    if s is None:
+        s = ''
+    if s != '':
+        s += separator
+    s += text
+    write_text_file(path, s, encoding=encoding, make_dir=make_dir, sync=sync)
+
 # Write text file from list
 def write_text_file_from_list(path, text_list, encoding=DEFAULT_ENCODING, make_dir=True, line_sep='\n', sync=True):
     text = list2text(text_list, line_sep)
@@ -1992,7 +2001,7 @@ def insert_newline(s, pos):
     return ''.join(a)
 
 # Append a line to text file
-def append_line_to_text_file(path, text, encoding=DEFAULT_ENCODING, max=0, sync=True):
+def append_line_to_text_file(path, line_text, encoding=DEFAULT_ENCODING, max=0, sync=True):
     text_list = read_text_file_as_list(path, default=[], encoding=encoding)
     new_data = ''
 
@@ -2003,7 +2012,7 @@ def append_line_to_text_file(path, text, encoding=DEFAULT_ENCODING, max=0, sync=
     for i in range(start, len(text_list)):
         new_data += text_list[i] + LINE_SEP
 
-    new_data = new_data + text + LINE_SEP
+    new_data = new_data + line_text + LINE_SEP
     write_text_file(path, new_data, sync=sync)
     return new_data
 
