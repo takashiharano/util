@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202403090021';
+util.v = '202403090030';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1720,7 +1720,7 @@ util.snip = function(s, n1, n2, c) {
  * abc -> Abc
  */
 util.capitalize = function(s) {
-  return ((s && (typeof s == 'string')) ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s);
+  return (s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : s);
 };
 
 util.null2empty = function(s) {
