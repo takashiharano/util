@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202403090030';
+util.v = '202403091436';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3113,7 +3113,7 @@ util.fn2text = function(f, s, e) {
 };
 
 /**
- * http://xxx/ -> <a href="http://xxx/">http://xxx/</a>
+ * URL -> <a href="URL">URL</a>
  */
 util.linkUrls = function(s, attr) {
   if (attr == undefined) attr = 'target="_blank" rel="noopener"';
