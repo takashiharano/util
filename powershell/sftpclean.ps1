@@ -22,7 +22,7 @@ $EXPIRES_AT = ${NOW} - ${RETENTION_SEC}
 
 #---------------------------------------------------------------------------
 <#
-.Synopsis
+.SYNOPSIS
    Converts to unixtime
 .DESCRIPTION
    Date-Time string to unixtime
