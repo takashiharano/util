@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202403091436';
+util.v = '202405270008';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -4123,12 +4123,53 @@ util.tooltip.cancel = function(obj) {
 util.tooltip.onMouseMove = function(x, y) {
   if (util.tooltip.disabled) return;
   var el = document.elementFromPoint(x, y);
-  var tpData = ((el && el.dataset) ? el.dataset.tooltip : null);
+  var tmr = util.tooltip.tmr;
+  var tpData = null;
+  if (el && el.dataset) {
+    var dtset = el.dataset;
+    if (dtset.tooltip) {
+      tpData = dtset.tooltip;
+    } else if (dtset.tooltip2) {
+      tpData = dtset.tooltip2;
+      util.tooltip.setTimer(el);
+    }
+  }
+  if (el == tmr.el) {
+    if (tmr.st == 0) return;
+  } else {
+    tmr.el = null;
+  }
   if (tpData) {
     util.tooltip.show(el, tpData, x, y);
   } else if (util.tooltip.obj.el.body) {
+    util.tooltip.clearTimer();
     util.tooltip.hide();
   }
+};
+
+util.tooltip.tmr = {id: 0, st: 0, el: null};
+util.tooltip.setTimer = function(el) {
+  var tmr = util.tooltip.tmr;
+  if (tmr.el == el) return;
+  if (tmr.id) {
+    clearTimeout(tmr.id);
+  }
+  tmr.id = setTimeout(util.tooltip.onTimeout, 3000);
+  tmr.st = 1;
+  tmr.el = el;
+};
+util.tooltip.clearTimer = function() {
+  var tmr = util.tooltip.tmr;
+  if (tmr.id) {
+    clearTimeout(tmr.id);
+    tmr.id = 0;
+  }
+};
+util.tooltip.onTimeout = function() {
+  var tmr = util.tooltip.tmr;
+  tmr.id = 0;
+  tmr.st = 0;
+  util.tooltip.hide();
 };
 
 util.tooltip.setDelay = function(ms) {
