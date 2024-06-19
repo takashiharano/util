@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202406122126';
+util.v = '202406192237';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -121,7 +121,7 @@ util.DateTime.prototype = {
   toString: function(fmt) {
     if (!fmt) fmt = '%YYYY-%MM-%DD %HH:%mm:%SS.%sss %Z';
     var yyyy = this.year + '';
-    var yy = yyyy.substr(2);
+    var yy = yyyy.slice(2);
     var M = this.month + '';
     var MM = ('0' + M).slice(-2);
     var mName = util.MONTH[this.month - 1];
@@ -175,13 +175,13 @@ util.str2datestruct = function(s) {
   var a = util.splitDateTimeAndTZ(w);
   w = a[0];
   var tz = a[1];
-  var yyyy = w.substr(0, 4) | 0;
-  var mm = w.substr(4, 2) | 0;
-  var dd = w.substr(6, 2) | 0;
-  var hh = w.substr(8, 2) | 0;
-  var mi = w.substr(10, 2) | 0;
-  var ss = w.substr(12, 2) | 0;
-  var sss = w.substr(14, 3) | 0;
+  var yyyy = w.slice(0, 4) | 0;
+  var mm = w.slice(4, 6) | 0;
+  var dd = w.slice(6, 8) | 0;
+  var hh = w.slice(8, 10) | 0;
+  var mi = w.slice(10, 12) | 0;
+  var ss = w.slice(12, 14) | 0;
+  var sss = w.slice(14, 17) | 0;
   var st = {
     year: yyyy,
     month: mm,
@@ -199,8 +199,8 @@ util.splitDateTimeAndTZ = function(s) {
   var tz = '';
   var tzPos = util._getTzPos(w);
   if (tzPos != -1) {
-    tz = w.substr(tzPos);
-    w = w.substr(0, tzPos);
+    tz = w.slice(tzPos);
+    w = w.slice(0, tzPos);
   }
   return [w, tz];
 };
@@ -257,7 +257,7 @@ util.serializeDateTime = function(s) {
 util._serializeDateTime = function(s, tz) {
   s = s.replace(/-/g, '').replace(/\s/g, '').replace(/:/g, '').replace(/\./g, '');
   tz = util.normalizeTZ(tz);
-  return (s + '000000000').substr(0, 17) + tz;
+  return (s + '000000000').slice(0, 17) + tz;
 };
 
 util.now = function() {
@@ -356,10 +356,10 @@ util.isLeapYear = function(y) {
  */
 util.getTimestampOfDay = function(timeString, offset) {
   var tm = timeString.replace(/:/g, '').replace(/\./, '');
-  var hh = tm.substr(0, 2);
-  var mi = tm.substr(2, 2);
-  var ss = tm.substr(4, 2);
-  var sss = tm.substr(6, 3);
+  var hh = tm.slice(0, 2);
+  var mi = tm.slice(2, 4);
+  var ss = tm.slice(4, 6);
+  var sss = tm.slice(6, 9);
   var d = util.getDateTime();
   var d1 = new Date(d.year, d.month - 1, d.day, hh, mi, ss, sss);
   var ts = d1.getTime();
@@ -410,7 +410,7 @@ util.formatTZ = function(v, e) {
   }
   var f = ((v <= 24) ? util.formatTzH : util.formatTzM);
   var str = s + f(v);
-  if (e) str = str.substr(0, 3) + ':' + str.substr(3, 2);
+  if (e) str = str.slice(0, 3) + ':' + str.slice(3, 5);
   return str;
 };
 util.formatTzH = function(v) {
@@ -433,8 +433,8 @@ util.normalizeTZ = function(s) {
   if (s == 'Z') return '+0000';
   s = s.replace(/:/, '');
   if (!s.match(/^[+-].+/)) return null;
-  var sn = s.substr(0, 1);
-  s = s.substr(1);
+  var sn = s.slice(0, 1);
+  s = s.slice(1);
   if (s.match(/\./)) s = util.hours2clock(s, '');
   var len = s.length;
   if (len == 1) {
@@ -455,8 +455,8 @@ util.normalizeTZ = function(s) {
 util.clock2hours = function(s) {
   s = s.replace(/:/, '');
   var p = s.length - 2;
-  var h = s.substr(0, p) | 0;
-  var m = s.substr(p, 2) | 0;
+  var h = s.slice(0, p) | 0;
+  var m = s.slice(p, p + 2) | 0;
   return h + (m / 60);
 };
 
@@ -468,8 +468,8 @@ util.hours2clock = function(s, sep) {
   s += '';
   var sign = '';
   if (s.match(/^[+-]/)) {
-    sign = s.substr(0, 1);
-    s = s.substr(1);
+    sign = s.slice(0, 1);
+    s = s.slice(1);
   }
   var w = s.split('.');
   var h = w[0] | 0;
@@ -687,27 +687,27 @@ util.Time.prototype = {
     }
     if (h && (ctx.hours > 0)) {
       d = 1;
-      r += ((z && r) ? (('0' + ctx.hours).substr(-2)) : ctx.hours) + 'h ';
+      r += ((z && r) ? (('0' + ctx.hours).slice(-2)) : ctx.hours) + 'h ';
     } else if (d || (ctx.hours24 > 0)) {
       d = 1;
-      r += ((z && r) ? (('0' + ctx.hours24).substr(-2)) : ctx.hours24) + 'h ';
+      r += ((z && r) ? (('0' + ctx.hours24).slice(-2)) : ctx.hours24) + 'h ';
     }
     if (d || (ctx.minutes > 0)) {
       d = 1;
-      r += ((z && r) ? (('0' + ctx.minutes).substr(-2)) : ctx.minutes) + 'm ';
+      r += ((z && r) ? (('0' + ctx.minutes).slice(-2)) : ctx.minutes) + 'm ';
     }
     if (f) {
       if (Math.abs(ctx.millis) >= 1000) {
         if (ctx.milliseconds == 0) {
-          r += ((z && r) ? (('0' + ctx.seconds).substr(-2)) : ctx.seconds) + 's';
+          r += ((z && r) ? (('0' + ctx.seconds).slice(-2)) : ctx.seconds) + 's';
         } else {
-          r += ((z && r) ? (('0' + ctx.seconds).substr(-2)) : ctx.seconds) + 's ' + (z ? ('00' + ctx.milliseconds).substr(-3) : ctx.milliseconds) + 'ms';
+          r += ((z && r) ? (('0' + ctx.seconds).slice(-2)) : ctx.seconds) + 's ' + (z ? ('00' + ctx.milliseconds).slice(-3) : ctx.milliseconds) + 'ms';
         }
       } else {
         r += ctx.milliseconds + 'ms';
       }
     } else {
-      r += ((z && r) ? (('0' + ctx.seconds).substr(-2)) : ctx.seconds) + 's';
+      r += ((z && r) ? (('0' + ctx.seconds).slice(-2)) : ctx.seconds) + 's';
     }
     if (ctx.millis < 0) r = '-' + r;
     return r;
@@ -827,7 +827,7 @@ util.ms2sec = function(ms, toString) {
   if (len <= 3) {
     s = '0.' + ('00' + ms).slice(-3);
   } else {
-    s = ms.substr(0, len - 3) + '.' + ms.substr(len - 3);
+    s = ms.slice(0, len - 3) + '.' + ms.slice(len - 3);
   }
   if (!toString) s = parseFloat(s);
   return s;
@@ -1223,10 +1223,10 @@ util.clock2ms = function(str) {
   var wk = str;
   var sn = false;
   if (wk.charAt(0) == '+') {
-    wk = wk.substr(1);
+    wk = wk.slice(1);
   } else if (wk.charAt(0) == '-') {
     sn = true;
-    wk = wk.substr(1);
+    wk = wk.slice(1);
   }
 
   if (wk.match(/d/)) {
@@ -1238,23 +1238,23 @@ util.clock2ms = function(str) {
   if (wk.match(/\./)) {
     prt = wk.split('.');
     wk = prt[0];
-    msec = (prt[1] + '000').substr(0, 3);
+    msec = (prt[1] + '000').slice(0, 3);
   }
 
   var pos = wk.indexOf(':');
   if (pos != -1) {
-    hour = wk.substr(0, pos);
-    wk = wk.substr(pos + 1).replace(/:/g, '');
+    hour = wk.slice(0, pos);
+    wk = wk.slice(pos + 1).replace(/:/g, '');
   } else {
-    hour = wk.substr(0, 2);
-    wk = wk.substr(2);
+    hour = wk.slice(0, 2);
+    wk = wk.slice(2);
   }
-  wk = (wk + '00').substr(0, 4);
+  wk = (wk + '00').slice(0, 4);
 
   d |= 0;
   hour |= 0;
-  var min = wk.substr(0, 2) | 0;
-  var sec = wk.substr(2, 2) | 0;
+  var min = wk.slice(0, 2) | 0;
+  var sec = wk.slice(2, 4) | 0;
   msec |= 0;
   var ms = (d * util.DAY) + (hour * util.HOUR) + (min * util.MINUTE) + sec * 1000 + msec;
   if (sn) ms *= (-1);
@@ -1277,9 +1277,9 @@ util.calcNextTime = function(times, dfltS) {
   var ret = {time: null, datetime: null};
   for (i = 0; i < tList.length; i++) {
     t = tList[i];
-    var h = t.substr(0, 2);
-    var m = t.substr(2, 2);
-    var s = t.substr(4, 2);
+    var h = t.slice(0, 2);
+    var m = t.slice(2, 4);
+    var s = t.slice(4, 6);
     if (s == '') s = ((dfltS == undefined) ? '59' : dfltS);
     var tmstr = h + m + s + '.999';
     var tgt = util.getDateTimeFromTime(tmstr);
@@ -1557,7 +1557,8 @@ util.divideString = function(s, n) {
   if ((n <= 0) || (s == '')) return [s];
   var a = [];
   for (var i = 0; i < s.length / n; i++) {
-    a.push(s.substr(i * n, n));
+    var st = i * n;
+    a.push(s.slice(st, st + n));
   }
   return a;
 };
@@ -1621,7 +1622,7 @@ util.startsWith = function(s, p, a3, a4) {
     i++;
   }
   var ci = a[i];
-  if (o) s = s.substr(o);
+  if (o) s = s.slice(o);
   if ((s == '') && (p == '')) return true;
   if (p == '') return false;
   var f = (ci ? 'i' : '');
@@ -1644,7 +1645,7 @@ util.endsWith = function(s, p, a3, a4) {
     i++;
   }
   var ci = a[i];
-  if (l) s = s.substr(0, l);
+  if (l) s = s.slice(0, l);
   if ((s == '') && (p == '')) return true;
   if (p == '') return false;
   var f = (ci ? 'i' : '');
@@ -1663,7 +1664,7 @@ util.insertCh = function(s, ch, n) {
   var w = '';
   var p = 0;
   while (p < s.length) {
-    var a = s.substr(p, n);
+    var a = s.slice(p, p + n);
     w += a;
     p += n;
     if (p < s.length) w += ch;
@@ -1684,7 +1685,7 @@ util.lpad = function(str, pad, len, adj) {
   if (d <= 0) return r;
   var pd = util.repeatCh(pad, d);
   r = pd + r;
-  if (adj) r = r.substr(0, len);
+  if (adj) r = r.slice(0, len);
   return r;
 };
 /**
@@ -1700,7 +1701,7 @@ util.rpad = function(str, pad, len, adj) {
   if (d <= 0) return r;
   var pd = util.repeatCh(pad, d);
   r += pd;
-  if (adj) r = r.substr(0, len);
+  if (adj) r = r.slice(0, len);
   return r;
 };
 
@@ -1712,7 +1713,7 @@ util.snip = function(s, n1, n2, c) {
   if (n1 == undefined) n1 = 7;
   if (n2 == undefined) n2 = 7;
   if (c == undefined) c = '..';
-  if (s.length >= (n1 + n2 + c.length)) s = s.substr(0, n1) + c + s.substr(s.length - n2, n2);
+  if (s.length >= (n1 + n2 + c.length)) s = s.slice(0, n1) + c + s.slice(s.length - n2, s.length);
   return s;
 };
 
@@ -1755,7 +1756,7 @@ util.split = function(v, s, l) {
   while (true) {
     var i = v.indexOf(s, p);
     if ((l > 0) && (c >= l - 1) || (i == -1)) {
-      r.push(v.substr(p));
+      r.push(v.slice(p));
       break;
     } else {
       r.push(v.substring(p, i));
@@ -1852,7 +1853,7 @@ util.countLineBreak = function(s) {
 };
 util.clipTextLine = function(s, p) {
   var n = s.indexOf('\n', p);
-  if (n > 0) s = s.substr(0, n);
+  if (n > 0) s = s.slice(0, n);
   return s.replace(/.*\n/g, '');
 };
 
@@ -1953,7 +1954,7 @@ util.convByte = function(v, scale, sep, sp) {
   if ((scale > 0) && (r != 0)) {
     var z = util.repeatCh('0', scale);
     if (w.length > 1) {
-      r = w[0] + '.' + ((w[1] += z).substr(0, scale));
+      r = w[0] + '.' + ((w[1] += z).slice(0, scale));
     } else {
       r += '.' + z;
     }
@@ -2069,7 +2070,7 @@ util.strpIndex = function(tbl, ptn) {
   var idx = 0;
   for (var i = 0; i < len; i++) {
     var d = len - i - 1;
-    var c = ptn.substr(d, 1);
+    var c = ptn.slice(d, d + 1);
     var v = tbl.indexOf(c);
     if (v == -1) return 0;
     v++;
@@ -2422,7 +2423,7 @@ util.http = function(req) {
   }
   if (util.http.logging) {
     var m = '[' + trcid + '] => ' + req.method + ' ' + util.escHtml(url);
-    if (data) m += ' : ' + data.substr(0, util.http.MAX_LOG_LEN);
+    if (data) m += ' : ' + data.slice(0, util.http.MAX_LOG_LEN);
     util._log.v(m);
   }
   if (util.debug) $dbg[trcid] = {req: req};
@@ -2446,7 +2447,7 @@ util.http.onDone = function(xhr, req) {
         if (m.length > util.http.LOG_LIMIT) {
           m = '[size=' + m.length + ']';
         } else if (m.length > util.http.MAX_LOG_LEN) {
-          m = m.substr(0, util.http.MAX_LOG_LEN) + '... (size=' + m.length + ')';
+          m = m.slice(0, util.http.MAX_LOG_LEN) + '... (size=' + m.length + ')';
         }
       }
       m = '<= [' + st + '] ' + util.escHtml(m);
@@ -3268,13 +3269,13 @@ util.color.rgb16to10 = function(rgb16) {
   var r16, g16, b16, r10, g10, b10;
   rgb16 = rgb16.replace(/#/, '').replace(/\s/g, '');
   if (rgb16.length == 6) {
-    r16 = rgb16.substr(0, 2);
-    g16 = rgb16.substr(2, 2);
-    b16 = rgb16.substr(4, 2);
+    r16 = rgb16.slice(0, 2);
+    g16 = rgb16.slice(2, 4);
+    b16 = rgb16.slice(4, 6);
   } else if (rgb16.length == 3) {
-    r16 = rgb16.substr(0, 1);
-    g16 = rgb16.substr(1, 1);
-    b16 = rgb16.substr(2, 1);
+    r16 = rgb16.slice(0, 1);
+    g16 = rgb16.slice(1, 2);
+    b16 = rgb16.slice(2, 3);
     r16 += r16;
     g16 += g16;
     b16 += b16;
@@ -3357,7 +3358,7 @@ util.updateTextAreaInfo = function(textarea) {
   }
   if (textarea.infoarea) {
     var cp = ch + '&nbsp;' + u16 + (u10 ? '(' + u10 + ')' : '');
-    var t = txt.substr(0, st);
+    var t = txt.slice(0, st);
     var l = (t.match(/\n/g) || []).length + 1;
     var c = t.replace(/.*\n/g, '').length + 1;
     var tc = util.clipTextLine(txt, st).length;
@@ -3554,7 +3555,7 @@ util.textseq._reverse = function(ctx) {
 util.textseq.getText = function(ctx) {
   var len = ctx.pos;
   if (ctx.reverse) len++;
-  return ctx.text.substr(0, len);
+  return ctx.text.slice(0, len);
 };
 util.textseq.start = function(el) {
   var ctx = util.getCtx4El(util.textseq.ctxs, el);
@@ -3590,7 +3591,7 @@ util.textseq.onprogress = function(ctx, pos, prevPos, cutLen) {
     st = prevPos;
     if (st < 0) return;
   }
-  var chunk = ctx.text.substr(st, cutLen);
+  var chunk = ctx.text.slice(st, st + cutLen);
   ctx.onprogress(ctx, chunk);
 };
 util.textseq.oncomplete = function(ctx) {
@@ -6808,7 +6809,7 @@ util.getParentPath = function() {
   return location.href.replace(/(.*\/).*/, '$1');
 };
 util.getQuery = function(k) {
-  var s = window.location.search.substr(1);
+  var s = window.location.search.slice(1);
   if (!k) return s;
   var q = s.split('&');
   var a = [];
@@ -6826,7 +6827,7 @@ util.getQuery = function(k) {
 };
 util.getUrlHash = function() {
   var s = window.location.hash;
-  if (s) s = s.substr(1);
+  if (s) s = s.slice(1);
   return s;
 };
 
@@ -7602,7 +7603,7 @@ util.Counter.prototype = {
       v = util.alignDecimal(v, ctx.scale).replace('.', '');
       v = parseInt(v) + 1;
       var s = v + '';
-      v = s.substr(0, s.length - ctx.scale) + '.' + s.slice(ctx.scale * (-1));
+      v = s.slice(0, s.length - ctx.scale) + '.' + s.slice(ctx.scale * (-1));
     }
     ctx.setValue(v);
   },
@@ -7621,7 +7622,7 @@ util.Counter.prototype = {
         v--;
         s = v + '';
       }
-      v = s.substr(0, s.length - ctx.scale) + '.' + s.slice(ctx.scale * (-1));
+      v = s.slice(0, s.length - ctx.scale) + '.' + s.slice(ctx.scale * (-1));
     }
     ctx.setValue(v);
   },
