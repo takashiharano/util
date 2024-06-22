@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202406200000';
+util.v = '202406221430';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3762,6 +3762,8 @@ util.STYLE = function() {/*
   40% {content: "...";}
 }
 .dialog {
+  border-radius: 3px;
+  padding: 10px;
   background: #fff;
   color: #000;
 }
@@ -5701,8 +5703,6 @@ util.dialog.prototype = {
     var style = {
       'display': 'table',
       'position': 'fixed',
-      'border-radius': '3px',
-      'padding': util.dialog.PADDING + 'px',
       'z-index': util.SYSTEM_ZINDEX_BASE + 1
     };
     util.setStyle(base, style);
@@ -5812,7 +5812,6 @@ util.dialog.prototype = {
     util.center(ctx.el);
   }
 };
-util.dialog.PADDING = 10;
 util.dialog.instances = [];
 util.dialog.initFocusEl = null;
 util.dialog.focusBtn = function() {
