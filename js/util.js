@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202406221430';
+util.v = '202406230018';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -5706,7 +5706,7 @@ util.dialog.prototype = {
       'z-index': util.SYSTEM_ZINDEX_BASE + 1
     };
     util.setStyle(base, style);
-
+    if (opt && opt.className) base.className += ' ' + opt.className;
     if (opt && opt.style && opt.style.body) {
       for (var key in opt.style.body) {
         util.setStyle(base, key, opt.style.body[key]);
@@ -5964,6 +5964,7 @@ util.dialog.info = function(a1, a2, a3, a4) {
   var dialogOpt = {
     title: title,
     buttons: [{label: 'OK', focus: true, cb: cb}],
+    className: opt.className,
     style: opt.style
   };
   msg = util.null2empty(msg);
@@ -6068,6 +6069,7 @@ util.dialog.confirmDialog = function(title, content, definition, opt) {
     buttons: buttons,
     data: ctx,
     focusEl: definition.focusEl, // prior
+    className: opt.className,
     style: opt.style,
     onenter: opt.onenter
   };
