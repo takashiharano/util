@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202406230018';
+util.v = '202406270000';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -5773,7 +5773,7 @@ util.dialog.prototype = {
       for (var i = 0; i < buttons.length; i++) {
         var button = buttons[i];
         var btnEl = document.createElement('button');
-        style = {'margin-top': '1em', 'margin-bottom': '0'};
+        style = {'margin-top': '1em', 'margin-bottom': '0.3em'};
         if (i > 0) style['margin-left'] = '0.5em';
         util.setStyle(btnEl, style);
         if (opt && opt.style && opt.style.button) {
