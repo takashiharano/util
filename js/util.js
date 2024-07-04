@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202406270000';
+util.v = '202407042346';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -4132,10 +4132,20 @@ util.tooltip.onMouseMove = function(x, y) {
   if (el && el.dataset) {
     var dtset = el.dataset;
     if (dtset.tooltip) {
+      util.tooltip.clearTimer();
       tpData = dtset.tooltip;
     } else if (dtset.tooltip2) {
       tpData = dtset.tooltip2;
-      util.tooltip.setTimer(el);
+      util.tooltip.setTimer(el, util.tooltip.timeout);
+    } else {
+      for (var k in dtset) {
+        if (k.startsWith('tooltip-')) {
+          var t = k.split('-')[1];
+          tpData = dtset[k];
+          util.tooltip.setTimer(el, t);
+          break;
+        }
+      }
     }
   }
   if (el == tmr.el) {
@@ -4152,13 +4162,13 @@ util.tooltip.onMouseMove = function(x, y) {
 };
 
 util.tooltip.tmr = {id: 0, st: 0, el: null};
-util.tooltip.setTimer = function(el) {
+util.tooltip.setTimer = function(el, t) {
   var tmr = util.tooltip.tmr;
   if (tmr.el == el) return;
   if (tmr.id) {
     clearTimeout(tmr.id);
   }
-  tmr.id = setTimeout(util.tooltip.onTimeout, util.tooltip.timeout);
+  tmr.id = setTimeout(util.tooltip.onTimeout, t);
   tmr.st = 1;
   tmr.el = el;
 };
