@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202407131220';
+util.v = '202407132325';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -4474,9 +4474,8 @@ util.loadingScreen.create = function(msg, m, html) {
     msg.innerHTML = m;
     util.loadingScreen.msg = msg;
   }
-  styles = {background: 'rgba(0,0,0,0.3)'};
   var closeAnywhere = false;
-  var modal = util.modal.show(outerWrp, closeAnywhere, styles);
+  var modal = util.modal.show(outerWrp, closeAnywhere);
   util.loadingScreen.modal = modal;
   util.setStyle(document.body, 'cursor', 'progress');
 };
@@ -5573,17 +5572,18 @@ util.Window.closeAll = function() {
 // Modal
 //---------------------------------------------------------
 util.MODAL_ZINDEX = util.SYSTEM_ZINDEX_BASE;
-util.modal = function(child, addCloseHandler) {
+util.modal = function(child, rmvByClick, rmvByClickCb) {
   this.sig = 'modal';
   var el = document.createElement('div');
   var style = util.copyObject(util.modal.DFLT_STYLE);
   if (util.modal.style) util.copyObject(util.modal.style, style);
   util.setStyle(el, style);
   el.style.opacity = '0';
-  if (addCloseHandler) el.addEventListener('click', this.onClick);
+  if (rmvByClick) el.addEventListener('click', this.onClick);
   if (child) el.appendChild(child);
   el.ctx = this;
   this.el = el;
+  this.rmvByClickCb = rmvByClickCb;
 };
 util.modal.prototype = {
   show: function() {
@@ -5614,11 +5614,15 @@ util.modal.prototype = {
   },
   onClick: function(e) {
     var el = e.target;
-    if (el.ctx && (el.ctx.sig == 'modal')) el.ctx.hide();
+    var ctx = el.ctx;
+    if (ctx && (ctx.sig == 'modal')) {
+      if (ctx.rmvByClickCb) ctx.rmvByClickCb();
+      ctx.hide();
+    }
   }
 };
-util.modal.show = function(el, closeAnywhere) {
-  var m = new util.modal(el, closeAnywhere).show();
+util.modal.show = function(el, closeAnywhere, onclose) {
+  var m = new util.modal(el, closeAnywhere, onclose).show();
   util.modal.ctxs.push(m);
   return m;
 };
@@ -5680,7 +5684,8 @@ util.modal.ctxs = [];
  *       ...
  *     }
  *   },
- *   closeAnywhere: true|false
+ *   closeAnywhere: true|false,
+ *   onclose: function,
  *   data: object
  * }
  *
@@ -5703,7 +5708,7 @@ util.dialog = function(content, opt) {
     if (opt.closeAnywhere) closeAnywhere = true;
   }
 
-  ctx.modal = util.modal.show(ctx.el, closeAnywhere);
+  ctx.modal = util.modal.show(ctx.el, closeAnywhere, opt.onclose);
   setTimeout(util.dialog.focusBtn, 10);
 };
 util.dialog.prototype = {
@@ -5849,13 +5854,8 @@ util.dialog.show = function() {
 //   style: {
 //     styles
 //   },
-//   modal: {
-//     closeAnywhere: true|false,
-//     style: {
-//       name: value,
-//       ...
-//     }
-//   },
+//   closeAnywhere: true|false,
+//   onclose: function,
 //   data: object
 // }
 util.dialog.open = function(content, opt) {
@@ -6074,16 +6074,12 @@ util.dialog.confirmDialog = function(title, content, definition, opt) {
   var focusIdx = 0;
   if (opt.focus == 'no') focusIdx = 1;
   buttons[focusIdx].focus = true;
-  var dialogOpt = {
-    title: title,
-    buttons: buttons,
-    data: ctx,
-    focusEl: definition.focusEl, // prior
-    className: opt.className,
-    style: opt.style,
-    onenter: opt.onenter
-  };
-  ctx.dlg = util.dialog.open(content, dialogOpt);
+  var dlgOpt = opt;
+  dlgOpt.title = title;
+  dlgOpt.buttons = buttons;
+  dlgOpt.data = ctx;
+  dlgOpt.focusEl = definition.focusEl;
+  ctx.dlg = util.dialog.open(content, dlgOpt);
 };
 util.dialog.confirmDialog.prototype = {
   pressButton: function(n) {
