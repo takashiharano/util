@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202407132325';
+util.v = '202407212133';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2286,11 +2286,11 @@ util._sfx = function(a) {
   return a.replace(/^(\d+)(\.\d+)?([^\d]+)?/, '$3');
 };
 util._toNumE = function(a) {
-  var n = a.replace(/[^\d]+?(\d+)(\.\d+)?$/, '$1$2');
+  var n = a.replace(/^.+?(\d+)(\.\d+)?$/, '$1$2');
   return parseFloat(n);
 };
 util._toNumS = function(a) {
-  var n = a.replace(/^(\d+)(\.\d+)?[^\d]+?/, '$1$2');
+  var n = a.replace(/^(\d+)(\.\d+)?.+?$/, '$1$2');
   return parseFloat(n);
 };
 
