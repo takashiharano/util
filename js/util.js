@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202407212133';
+util.v = '202407260114';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -125,6 +125,9 @@ util.DateTime.prototype = {
     var M = this.month + '';
     var MM = ('0' + M).slice(-2);
     var mName = util.MONTH[this.month - 1];
+    var mNameC = util.capitalize(mName);
+    var wName = this.WDAYS[this.wday];
+    var wNameC = util.capitalize(wName);
     var d = this.day;
     var dd = ('0' + d).slice(-2);
     var h = '' + this.hour;
@@ -146,11 +149,13 @@ util.DateTime.prototype = {
     r = r.replace(/%YYYY/g, yyyy);
     r = r.replace(/%YY/g, yy);
     r = r.replace(/%MMM/g, mName);
+    r = r.replace(/%Mmm/g, mNameC);
     r = r.replace(/%MM/g, MM);
     r = r.replace(/%M/g, M);
     r = r.replace(/%DD/g, dd);
     r = r.replace(/%D/g, d);
-    r = r.replace(/%W/g, this.WDAYS[this.wday]);
+    r = r.replace(/%W/g, wName);
+    r = r.replace(/%w/g, wNameC);
     r = r.replace(/%AMPM/g, ampm);
     r = r.replace(/%H12/g, h12);
     r = r.replace(/%HH12/g, hh12);
