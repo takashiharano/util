@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202407190025'
+v = '202408021324'
 
 import sys
 import os
@@ -869,6 +869,96 @@ def shell_dict(o):
 def sort_object_list(o, key):
     d = sorted(o, key=lambda x:x[key])
     return d
+
+#------------------------------------------------------------------------------
+# Properties
+#------------------------------------------------------------------------------
+def load_properties(path, data_strict=None):
+    props = load_properties_file(path)
+    if data_strict is not None:
+        props = to_data_struct(props, data_strict)
+    return props
+
+def load_properties_file(path, default={}):
+    if not path_exists(path):
+        return default
+    props = {}
+    text_list = read_text_file_as_list(path)
+    for i in range(len(text_list)):
+        line = text_list[i]
+        if line.startswith('#'):
+            continue
+        p = line.find('=')
+        if p == -1:
+            raise Exception('load_properties_file(): \'=\' not found: path=' + path + ' text=' + line)
+        key = line[0:p]
+        val = line[p + 1:]
+        props[key] = val
+    return props
+
+def save_properties(path, props):
+    text = ''
+    for key in props:
+        value = props[key]
+        txt_val = str(value)
+        if typename(value) == 'float':
+            txt_val = trim_zeros(txt_val)
+        line = key + '=' + txt_val
+        text += line  + '\n'
+    write_text_file(path, text)
+
+def to_data_struct(obj, data_struct):
+    values = {}
+    for i in range(len(data_struct)):
+        field = data_struct[i]
+        key = field['name']
+        data_type = 'str'
+        as_true = '1'
+
+        if 'type' in field:
+            data_type = field['type']
+            if 'data_type' == 'bool':
+                if 'as_true' in field:
+                    as_true = field['as_true']
+
+        if key in obj:
+            value = obj[key]
+            value = from_text_value(value, data_type, as_true)
+        else:
+            value = get_value_for_default(data_type)
+
+        values[key] = value
+
+    return values
+
+def from_text_value(value, data_type='str', as_true='1'):
+    if data_type == 'int':
+        value = int(value)
+    elif data_type == 'float':
+        value = float(value)
+    elif data_type == 'bool':
+        value = True if value == as_true else False
+    return value
+
+def to_value_text(value, data_type='str', none_value='', as_true='1', as_false='0'):
+    if value is None:
+        return none_value
+    if data_type == 'int' or data_type == 'float':
+        value = str(value)
+    elif data_type == 'bool':
+        value = as_true if value else as_false
+    return value
+
+def get_value_for_default(data_type):
+    values = {
+        'str': '',
+        'int': 0,
+        'float': 0,
+        'bool': False
+    }
+    if data_type in values:
+        return values[data_type]
+    return None
 
 #------------------------------------------------------------------------------
 # List
