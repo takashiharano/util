@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202407260114';
+util.v = '202408042328';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2680,6 +2680,9 @@ $el.fn = {
   fadeOut: function(speed, cb, arg) {
     util.fadeOut(this, speed, cb, arg);
   },
+  updateTooltip: function(s) {
+    util.tooltip.update(this, s);
+  },
   getRect: function() {
     return this.getBoundingClientRect();
   },
@@ -3935,14 +3938,19 @@ util.infotip._show = function(obj, msg, style) {
     obj.el.pre = pre;
     document.body.appendChild(div);
   }
-  msg = (msg + '').replace(/\\n/g, '\n');
-  obj.el.pre.innerHTML = msg;
+  util.infotip.setMsg(obj, msg);
   document.body.appendChild(obj.el.body);
   if (obj.st == util.infotip.ST_SHOW) {
     util.infotip.setHideTimer(obj);
   } else {
     obj.st = util.infotip.ST_FADEIN;
     setTimeout(util.infotip.fadeIn, 10, obj);
+  }
+};
+util.infotip.setMsg = function(obj, msg) {
+  if (obj.el.pre) {
+    msg = (msg + '').replace(/\\n/g, '\n');
+    obj.el.pre.innerHTML = msg;
   }
 };
 
@@ -4193,6 +4201,15 @@ util.tooltip.onTimeout = function() {
 
 util.tooltip.setDelay = function(ms) {
   util.tooltip.DELAY = ms;
+};
+
+util.tooltip.update = function(el, s) {
+  if (!el.dataset.tooltip) return;
+  el.dataset.tooltip = s;
+  var obj = util.tooltip.obj;
+  if ((el == util.tooltip.targetEl) && (obj.st >= util.infotip.ST_OPEN)) {
+    util.infotip.setMsg(obj, s);
+  }
 };
 
 //---------------------------------------------------------
