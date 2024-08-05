@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202408021324'
+v = '202408052245'
 
 import sys
 import os
@@ -3156,7 +3156,12 @@ def send_response(content, type='text/plain', status=200, headers=None, encoding
             for name in header:
                 print(name + ': ' + header[name])
     print()
-    print(content, end='')
+
+    if typename(content) == 'bytes':
+        sys.stdout.flush()
+        sys.stdout.buffer.write(content)
+    else:
+        print(content, end='')
 
 def send_result_json(status, body=None, headers=None, encoding=None):
     result = build_result_object(status, body)
@@ -3181,7 +3186,7 @@ def send_html(html, headers=[]):
     headers.append({'Cache-Control': 'no-cache'})
     send_response(html, 'text/html', headers=headers)
 
-# Send binary response
+# Send binary response as a file
 # content: bytes or hex string
 #        '89 50 4E 47 0D 0A 1A 0A ...'
 # content_type: MIME Type
@@ -3192,7 +3197,7 @@ def send_html(html, headers=[]):
 #   ...
 # }
 # status: HTTP status code for response
-def send_binary(content, filename='', content_type='application/octet-stream', etag='', headers=None, status=200):
+def send_as_file(content, filename='', content_type='application/octet-stream', etag='', headers=None, status=200):
     # Prevent the following error:
     #  ap_content_length_filter: apr_bucket_read() failed
     #  Failed to flush CGI output to client
