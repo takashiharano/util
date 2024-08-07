@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202408052245'
+v = '202408072326'
 
 import sys
 import os
@@ -3060,10 +3060,69 @@ def link_urls(s, attr=None):
         attr = 'target="_blank" rel="noopener"'
     link = '<a href="\\1"'
     if attr != '':
-        link += ' ' + attr;
-    link += '>\\1</a>';
-    s = replace(s, r'(https?:\/\/[!#$%&\'*+,/:;=?@[\]0-9A-Za-z\-._~]+)', link);
+        link += ' ' + attr
+    link += '>\\1</a>'
+    s = replace(s, r'(https?:\/\/[!#$%&\'*+,/:;=?@[\]0-9A-Za-z\-._~]+)', link)
     return s
+
+def get_browser_type(ua):
+    brws = {'name': '', 'version': ''}
+
+    if ua.find('Edge') >= 1:
+        brws['name'] = 'Edge Legacy'
+        ver = extract_string(ua, r'.+Edge\/(.*)')
+        if ver != '':
+            brws['version'] = ver
+        return brws
+
+    if ua.find('Edg') >= 1:
+        brws['name'] = 'Edge'
+        ver = extract_string(ua, r'.+Edg\/(.*)')
+        if ver != '':
+            brws['version'] = ver
+        return brws
+
+    if ua.find('OPR/') >= 1:
+        brws['name'] = 'Opera'
+        ver = extract_string(ua, r'.+OPR\/(.*)')
+        if ver != '':
+            brws['version'] = ver
+        return brws
+
+    if ua.find('Chrome') >= 1:
+        brws['name'] = 'Chrome'
+        ver = extract_string(ua, r'.+Chrome\/(.*)\s.*')
+        if ver != '':
+            brws['version'] = ver
+        return brws
+
+    if ua.find('Firefox') >= 1:
+        brws['name'] = 'Firefox'
+        ver = extract_string(ua, r'.+Firefox\/(.*)')
+        if ver != '':
+            brws['version'] = ver
+        return brws
+
+    if ua.find('Trident/7.') >= 1:
+        brws['name'] = 'IE11'
+        return brws
+
+    if ua.find('Safari') >= 1 and ua.find('Version/') >= 1:
+        brws['name'] = 'Safari'
+        ver = extract_string(ua, r'.+Version\/(.*)\sSafari/.+')
+        if ver != '':
+            brws['version'] = ver
+        return brws
+
+    return brws
+
+def get_browser_short_name(ua):
+    brws = get_browser_type(ua)
+    n = brws['name']
+    v = brws['version']
+    if v != '':
+        n += ' ' + v
+    return n
 
 #------------------------------------------------------------------------------
 # HTTP Response
