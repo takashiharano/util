@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202408072326'
+v = '202408082301'
 
 import sys
 import os
@@ -362,6 +362,16 @@ def to_full_width(text, alphabet=True, number=True, symbol=True):
 
     full = text.translate(table)
     return full
+
+def lenw(s):
+    n = 0
+    for i in range(len(s)):
+        p = ord(s[i])
+        if p <= 0x7F or p >= 0xFF61 and p <= 0xFF9F:
+            n += 1
+        else:
+            n += 2
+    return n
 
 # line1
 # line2
@@ -2087,7 +2097,7 @@ def insert_newline(s, pos):
         if p >= len(a):
             break
         a.insert(p, '\r\n')
-        p = p + 2;
+        p = p + 2
     return ''.join(a)
 
 # Append a line to text file
@@ -2546,7 +2556,7 @@ class RingBuffer:
         return len(self.buf)
 
     def add(self, value):
-        i = self.count % self.size;
+        i = self.count % self.size
         if self.count < self.size:
             self.buf.append(value)
         else:
@@ -3402,7 +3412,7 @@ def write_csv(file_path, data, delimiter=',', quotechar='"', quoting=csv.QUOTE_M
 def quote_csv_field(value, quotechar='"', esc=None):
     if esc is None:
         esc = quotechar
-    s = replace(value, quotechar, esc + quotechar);
+    s = replace(value, quotechar, esc + quotechar)
     s = quotechar + s + quotechar
     return s
 
