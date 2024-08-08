@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202408082301'
+v = '202408090050'
 
 import sys
 import os
@@ -644,6 +644,32 @@ def snip(s, n1=7, n2=7, chars='..'):
     if len(s) >= (n1 + n2 + len(chars)):
         s = s[0:n1] + chars + s[-n2:]
     return s
+
+def align_by_tab(s, n=2):
+    a = s
+    if typename(s) == 'str':
+        a = text2list(s)
+
+    d = ' '
+    c = []
+    for i in range(len(a)):
+      l = a[i].split('\t')
+      for j in range(len(l)):
+          if len(c) < j + 1:
+              c.append(0)
+          b = lenw(l[j])
+          if c[j] < b:
+              c[j] = b
+
+    r = ''
+    for i in range(len(a)):
+        l = a[i].split('\t')
+        for j in range(len(l) - 1):
+            r += rpad(l[j], d, c[j] + n)
+
+        r += l[j] + '\n'
+
+    return r
 
 #------------------------------------------------------------------------------
 # has_item_value(items='AAA|BBB|CCC', item='BBB') = True
