@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202408090050'
+v = '202408090118'
 
 import sys
 import os
@@ -664,10 +664,12 @@ def align_by_tab(s, n=2):
     r = ''
     for i in range(len(a)):
         l = a[i].split('\t')
+        col = 0
         for j in range(len(l) - 1):
             r += rpad(l[j], d, c[j] + n)
+            col += 1
 
-        r += l[j] + '\n'
+        r += l[col] + '\n'
 
     return r
 
