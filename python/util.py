@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202408090118'
+v = '202408102345'
 
 import sys
 import os
@@ -2830,6 +2830,12 @@ def _get_form_values_as_dict(f):
         else:
             d[k] = v
     return d
+
+def has_query_param(key, q=None):
+    v = get_request_param(key, q=q)
+    if v is None:
+        return False
+    return True
 
 #------------------------------------------------------------------------------
 #{
