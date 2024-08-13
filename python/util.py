@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202408102345'
+v = '202408132051'
 
 import sys
 import os
@@ -911,28 +911,41 @@ def sort_object_list(o, key):
 #------------------------------------------------------------------------------
 # Properties
 #------------------------------------------------------------------------------
-def load_properties(path, data_strict=None):
-    props = load_properties_file(path)
+def load_properties(path, data_strict=None, base_dict={}):
+    result = load_properties_file(path, base_dict)
     if data_strict is not None:
-        props = to_data_struct(props, data_strict)
-    return props
+        result['props'] = to_data_struct(result['props'], data_strict)
+
+    if result['error'] == '':
+        result['error'] = None
+    else:
+        result['error'] = 'load_properties_file(): \'=\' not found: path=' + path + ': ' + result['error']
+
+    return result
 
 def load_properties_file(path, default={}):
     if not path_exists(path):
         return default
     props = {}
+    e = ''
     text_list = read_text_file_as_list(path)
     for i in range(len(text_list)):
         line = text_list[i]
-        if line.startswith('#'):
+        if line.startswith('#') or line == '':
             continue
         p = line.find('=')
         if p == -1:
-            raise Exception('load_properties_file(): \'=\' not found: path=' + path + ' text=' + line)
+            if e != '':
+                e += '  '
+            e += 'L=' + str(i + 1) + ': \'=\' not found: text=\'' + line + '\''
         key = line[0:p]
         val = line[p + 1:]
         props[key] = val
-    return props
+    result = {
+        'props': props,
+        'error': e
+    }
+    return result
 
 def save_properties(path, props):
     text = ''
