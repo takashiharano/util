@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202408042328';
+util.v = '202408132339';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -55,7 +55,7 @@ util.DateTime = function(src, tzOffset) {
   } else if (src instanceof Date) {
     dt = src;
   } else {
-    if (util.isFloat(src)) src *= 1000;
+    if (util.isFloat(src)) src = Math.floor(src * 1000);
     dt = new Date(src);
   }
   var timestamp = dt.getTime();
