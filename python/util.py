@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202408132051'
+v = '202408162356'
 
 import sys
 import os
@@ -288,6 +288,40 @@ def trim_zeros(v):
 
     if r != '0':
         r = s + r
+    return r
+
+# -1234.98765 -> '-1,234.98765'
+def format_number(v):
+    v = str(v)
+    if not match(v, '^-?[0-9.]+$'):
+        return v
+
+    sgn = False
+    if v[0] == '-':
+        sgn = True
+        v = v[1:]
+
+    w = v.split('.')
+    vI = w[0]
+    vD = ''
+    if len(w) >= 2:
+        vD = w[1]
+
+    vI = separate_digits(vI)
+    s = '-' if sgn else ''
+    s += vI
+    if vD != '':
+        s += '.' + vD
+
+    return s
+
+def separate_digits(v):
+    l = len(v);
+    r = ''
+    for i in range(l):
+        if i > 0 and ((l - i) % 3 == 0):
+            r += ','
+        r += v[i]
     return r
 
 # !1Aa(Full-Width) -> !1Aa(Half-Width)
