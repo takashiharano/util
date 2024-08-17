@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202408162356'
+v = '202408180115'
 
 import sys
 import os
@@ -3535,21 +3535,27 @@ class Record:
 # [s]234567890123...[e]
 # s: -1 -> '1'
 # e: -1 -> [0-9] of the end position
-def get_seq_bytes(size, s=-1, e=-1):
+def get_seq_bytes(size, s=-1, e=-1, newline=100):
+    newline += 1
     buf = []
-    for i in range(1, size + 1):
-        if i == 1:
+    n = 2
+    for i in range(0, size):
+        if i == 0:
             if s == -1:
                 v = 0x31
             else:
                 v = s
-        elif i == size:
+        elif i == size - 1:
             if e == -1:
-                v = i % 10 + 0x30
+                v = n % 10 + 0x30
             else:
                 v = e
+        elif n % newline == 0:
+            v = 0x0A
+            n = 1
         else:
-            v = i % 10 + 0x30
+            v = n % 10 + 0x30
+            n += 1
         buf.append(v)
     b = bytearray(buf)
     return b
