@@ -236,14 +236,14 @@ perf.draw = function(dataList) {
 
   var tsMn1 = util.getMidnightTimestamp(tsS);
   var tsMn2 = util.getMidnightTimestamp(tsE) + util.DAY;
-  var preMin = ((tsS - tsMn1) / util.MINUTE) | 0;
-  var postMin = ((tsMn2 - tsE) / util.MINUTE) | 0;
+  var preMillis = tsS - tsMn1;
+  var postMillis = tsMn2 - tsE;
+  var preMin = util.round(preMillis / util.MINUTE);
+  var postMin = util.round(postMillis / util.MINUTE);
 
-  if ((tsMn2 - tsMn1) > util.DAY) {
-    var th = 5;
-    if (postMin > (util.DAY / 60000) - th) {
-      postMin = th;
-    }
+  var graphPeriod = tsMn2 - tsMn1;
+  if (graphPeriod > util.DAY) {
+    postMin = 5;
   }
 
   var xLabels = [];
