@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202408191830'
+v = '202408200000'
 
 import sys
 import os
@@ -188,7 +188,7 @@ def str_findall(s, pattern, flags=0):
 # adj:
 # 'ABCEFG' -> False='ABCEFG' / True='ABCEF'
 def lpad(s, ch, ln, adj=False):
-    r = s;
+    r = str(s);
     d = ln - lenw(r)
     if d <= 0:
         return r
@@ -204,7 +204,7 @@ def lpad(s, ch, ln, adj=False):
 # adj:
 # 'ABCEFG' -> False='ABCEFG' / True='ABCEF'
 def rpad(s, ch, ln, adj=False):
-    r = s;
+    r = str(s);
     d = ln - lenw(r)
     if d <= 0:
         return r
