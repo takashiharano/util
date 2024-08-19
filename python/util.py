@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202408180115'
+v = '202408191822'
 
 import sys
 import os
@@ -182,23 +182,44 @@ def str_find(s, pattern, flags=0):
 def str_findall(s, pattern, flags=0):
     return re.findall(pattern, s, flags)
 
-# ('ABC', '0', 5)
-# -> '00ABC'
-# ('ABCDE', '0', 5)
-# -> 'ABCDE'
-# (1, '0', 5)
-# -> '00001'
+# lpad(str, '0', 5)
+# 'ABC'   -> '00ABC'
+# 'ABCEF' -> 'ABCEF'
+# adj:
+# 'ABCEFG' -> False='ABCEFG' / True='ABCEF'
 def lpad(s, ch, len):
-    return str(s).rjust(len, ch)
+    r = s;
+    d = ln - lenw(r)
+    if d <= 0:
+        return r
+    pd = repeat_chr(ch, d)
+    r = pd + r
+    if adj:
+        r = r[0:ln]
+    return r
 
-# ('ABC', '0', 5)
-# -> 'ABC00'
-# ('ABCDE', '0', 5)
-# -> 'ABCDE'
-# (1, '0', 5)
-# -> '10000'
-def rpad(s, ch, len):
-    return str(s).ljust(len, ch)
+# rpad(str, '0', 5)
+# 'ABC'   -> 'ABC00'
+# 'ABCEF' -> 'ABCEF'
+# adj:
+# 'ABCEFG' -> False='ABCEFG' / True='ABCEF'
+def rpad(s, ch, ln, adj=False):
+    r = s;
+    d = ln - lenw(r)
+    if d <= 0:
+        return r
+    pd = repeat_chr(ch, d)
+    r += pd
+    if adj:
+        r = r[0:ln]
+    return r
+
+# '0', 3 -> '000'
+def repeat_chr(c, n):
+    s = '';
+    for i in range(n):
+        s += c
+    return s
 
 # Convert newline
 def convert_newline(s, nl):
@@ -3297,7 +3318,9 @@ def send_response(content, type='text/plain', status=200, headers=None, encoding
     if res_debug:
         log(content)
 
-    st = 'Status: ' + get_status_message(status)
+    status_message =  get_status_message(status)
+    st = 'Status: ' + status_message
+
     print(st)
     print(content_type)
     if headers is not None:
