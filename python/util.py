@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202408200000'
+v = '202408230043'
 
 import sys
 import os
@@ -727,6 +727,14 @@ def align_by_tab(s, n=2):
         r += l[col] + '\n'
 
     return r
+
+def escape_xml(s):
+    s = replace(s, '&', '&amp;')
+    s = replace(s, '<', '&lt;')
+    s = replace(s, '>', '&gt;')
+    s = replace(s, '"', '&quot;')
+    s = replace(s, '\'', '&#39;')
+    return s
 
 #------------------------------------------------------------------------------
 # has_item_value(items='AAA|BBB|CCC', item='BBB') = True
