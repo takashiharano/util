@@ -3,6 +3,8 @@
  * Copyright (c) 2023 Takashi Harano
  */
 var perf = {};
+perf.LED_COLOR_GREN = '#0f0';
+perf.LED_COLOR_RED = '#f88';
 perf.perfLogConsole = null;
 perf.timerId = 0;
 perf.logList = [];
@@ -108,7 +110,7 @@ perf.startAutoReload = function() {
   perf.autoReload = true;
   var updateInterval = sysmon.INTERVAL;
   util.IntervalProc.start('perf', perf.procInterval, updateInterval, null, true);
-  sysmon.led1.blink2();
+  sysmon.led1.blink2(perf.LED_COLOR_GREN);
   sysmon.drawStatus('Watching');
 };
 
@@ -154,8 +156,18 @@ perf.showNext = function() {
   perf.getData(perf.n);
 };
 
+perf.onError = function() {
+  perf.stopAutoReload();
+  sysmon.led1.on(perf.LED_COLOR_RED);
+  sysmon.drawStatus('ERROR');
+};
+
 perf.getDataCb = function(xhr, res, req) {
   util.loader.hide('#perf-chart-area');
+  if (xhr.status != 200) {
+    perf.onError();
+    return;
+  }
 
   if (res.status == 'NOT_FOUND') {
     if (perf.n == 0) {
