@@ -221,8 +221,8 @@ function get_java_heap_usage() {
   #local ygc
   #local ygct
   #local fgc
-  #local fgct
-  #local gct
+  local fgct
+  local gct
 
   vals=(${heap_info//,/ })
   s0c=${vals[0]} # Survisor0: capacity (KB)
@@ -239,9 +239,11 @@ function get_java_heap_usage() {
   #ccsu=${vals[11]} # Compressed class space used (KB)
   #ygc=${vals[12]} # Number of young generation garbage collection events
   #ygct=${vals[13]} # Young generation garbage collection time
-  #fgc=${vals[14]} # Number of full GC events
-  #fgct=${vals[15]} # Full garbage collection time
-  #gct=${vals[16]} # Total garbage collection time
+  fgc=${vals[14]} # Number of full GC events
+  fgct=${vals[15]} # Full garbage collection time
+  #cgc=${vals[16]}
+  #cgct=${vals[17]}
+  gct=${vals[18]} # Total garbage collection time
 
   local new
   local old
@@ -284,7 +286,7 @@ function get_java_heap_usage() {
     op=$(echo "${op}" | sed -E "s/\.00$//")
   fi
 
-  echo "java_heap: usage=${usage}% eden=${ep}% s0=${s0p}% s1=${s1p}% old=${op}%"
+  echo "java_heap: usage=${usage}% eden=${ep}% s0=${s0p}% s1=${s1p}% old=${op}% fgc=${fgc} fgct=${fgct} gct=${gct}"
 }
 
 #######################################
