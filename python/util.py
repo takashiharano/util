@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202408290005'
+v = '202408301942'
 
 import sys
 import os
@@ -2233,8 +2233,11 @@ def file_lock(lock_file_path, retry=0, wait=1):
     LOCK_OUTDATED = 5
     t = now()
     if os.path.exists(lock_file_path):
-        if t - os.path.getmtime(lock_file_path) > LOCK_OUTDATED:
-            file_unlock(lock_file_path)
+        try:
+            if t - os.path.getmtime(lock_file_path) > LOCK_OUTDATED:
+                file_unlock(lock_file_path)
+        except:
+            pass
     cnt = 0
     while True:
         if not os.path.exists(lock_file_path):
