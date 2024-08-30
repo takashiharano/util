@@ -338,7 +338,7 @@ perf.drawChart = function(xLabels, chartData) {
         label: 'CPU usage',
         data: chartData.cpu,
         fill: false,
-        borderColor: '#cff',
+        borderColor: '#b4f8ff',
         lineTension: 0.1,
         borderWidth: 1,
         pointRadius: 0
@@ -347,7 +347,7 @@ perf.drawChart = function(xLabels, chartData) {
         label: 'MEM usage',
         data: chartData.mem,
         fill: false,
-        borderColor: '#cfc',
+        borderColor: '#8e8',
         lineTension: 0.1,
         borderWidth: 1,
         pointRadius: 0
@@ -356,7 +356,7 @@ perf.drawChart = function(xLabels, chartData) {
         label: 'Heap usage (Survivor 0 + Survivor 1 + Eden + Old)',
         data: chartData.jheap,
         fill: false,
-        borderColor: '#bbb',
+        borderColor: '#666',
         lineTension: 0.1,
         borderWidth: 1,
         pointRadius: 0
@@ -374,7 +374,7 @@ perf.drawChart = function(xLabels, chartData) {
         label: 'Old space usage',
         data: chartData.jheapOld,
         fill: false,
-        borderColor: '#567',
+        borderColor: '#67a',
         lineTension: 0.1,
         borderWidth: 1,
         pointRadius: 0,
