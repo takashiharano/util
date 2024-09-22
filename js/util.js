@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202409221333';
+util.v = '202409221724';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1610,6 +1610,10 @@ util.list2text = function(l, nl) {
 util.isAscii = function(s) {
   if (typeof s != 'string') return false;
   return /^[\x20-\x7F\t\r\n]*$/.test(s);
+};
+
+util.isEmailAddress = function(s) {
+  return /^[\x21-\x5B\x5D-\x7E]{1,64}@[0-9A-Za-z.-]{1,189}$/.test(s);
 };
 
 /**
