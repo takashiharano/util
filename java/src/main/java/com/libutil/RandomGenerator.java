@@ -28,7 +28,7 @@ import java.security.SecureRandom;
 /**
  * Generates random values.
  */
-public class Randomizer {
+public class RandomGenerator {
 
   private static SecureRandom r = new SecureRandom();
 
