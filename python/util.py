@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202408301942'
+v = '202409242051'
 
 import sys
 import os
@@ -188,7 +188,7 @@ def str_findall(s, pattern, flags=0):
 # adj:
 # 'ABCEFG' -> False='ABCEFG' / True='ABCEF'
 def lpad(s, ch, ln, adj=False):
-    r = str(s);
+    r = str(s)
     d = ln - lenw(r)
     if d <= 0:
         return r
@@ -204,7 +204,7 @@ def lpad(s, ch, ln, adj=False):
 # adj:
 # 'ABCEFG' -> False='ABCEFG' / True='ABCEF'
 def rpad(s, ch, ln, adj=False):
-    r = str(s);
+    r = str(s)
     d = ln - lenw(r)
     if d <= 0:
         return r
@@ -216,7 +216,7 @@ def rpad(s, ch, ln, adj=False):
 
 # '0', 3 -> '000'
 def repeat_chr(c, n):
-    s = '';
+    s = ''
     for i in range(n):
         s += c
     return s
@@ -337,13 +337,28 @@ def format_number(v):
     return s
 
 def separate_digits(v):
-    l = len(v);
+    l = len(v)
     r = ''
     for i in range(l):
         if i > 0 and ((l - i) % 3 == 0):
             r += ','
         r += v[i]
     return r
+
+# 'abc' -> 'Abc'
+def capitalize(s, d=''):
+    if s is None:
+        return s
+    v = ''
+    if d == '':
+        v = s.capitalize()
+    else:
+        a = s.split(d)
+        for i in range(len(a)):
+            if i > 0:
+                v += d
+            v += a[i].capitalize()
+    return v
 
 # !1Aa(Full-Width) -> !1Aa(Half-Width)
 def to_half_width(text, alphabet=True, number=True, symbol=True):
