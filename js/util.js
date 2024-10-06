@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202409221724';
+util.v = '202410070018';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -4606,6 +4606,8 @@ util.Window = function(opt) {
   util.Window.registerWindow(ctx);
   ctx.id = util.Window.cnt;
   opt = util.copyDefaultProps(util.Window.DFLT_OPT, opt);
+  if (typeof opt.width == 'number') opt.width += 'px';
+  if (typeof opt.height == 'number') opt.height += 'px';
   ctx.opt = opt;
   ctx.name = opt.name;
   ctx.group = opt.group;
@@ -4684,8 +4686,8 @@ util.Window.CHR_WIN_RSTR = '&#x2750;';
 util.Window.DFLT_OPT = {
   name: '',
   group: '',
-  width: 640,
-  height: 400,
+  width: '640px',
+  height: '400px',
   minWidth: 0,
   minHeight: 0,
   maxWidth: 0,
@@ -4758,7 +4760,7 @@ util.Window.prototype = {
       'z-index': util.Window.BASE_ZINDEX
     };
     util.setStyle(win, s);
-    util.setStyle(win, {width: opt.width + 'px', height: opt.height + 'px'}, false);
+    util.setStyle(win, {width: opt.width, height: opt.height}, false);
     util.setStyle(win, opt.style);
     if (opt.className) win.className += ' ' + opt.className;
 
