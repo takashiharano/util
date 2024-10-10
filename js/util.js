@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202410070018';
+util.v = '202410102254';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1498,7 +1498,7 @@ util.toJSON = function(o, r, s) {
 
 util.copyObject = function(src, dst) {
   if (src instanceof Array) {
-    if (!dst) dst = [];
+    if (!(dst instanceof Array)) dst = [];
     for (var i = 0; i < src.length; i++) {
       var v = src[i];
       if (v instanceof Object) {
