@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202501111642';
+util.v = '202501111724';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -339,15 +339,27 @@ util.getWday = function(dt) {
 /**
  * dt: '202501' -> 31
  *     '202502' -> 28
+ *     '2025-01-01' -> 31
+ *     '2025-01-02' -> 31
+ *     '2025-1' -> 31
  */
 util.getLastDayOfMonth = function(dt) {
-  if ((typeof dt == 'string') && (dt.length == 6)) dt += '01';
+  if (typeof dt == 'string') dt = util._toYYYYMM01(dt);
   var E = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   var v = util.getDateTime(dt);
   var m = v.month;
   var d = E[m - 1];
   if ((m == 2) && util.isLeapYear(v.year)) d = 29;
   return d;
+};
+util._toYYYYMM01 = function(s) {
+  if (s.match(/^\d{4}([^\d])\d{1,2}$/)) {
+    var d = s.replace(/^\d{4}([^\d])\d{1,2}$/, '$1');
+    var w = s.split(d);
+    s = w[0] + ('0' + w[1]).slice(-2);
+  }
+  if (s.match(/^\d{6}$/)) s += '01';
+  return s;
 };
 
 util.isLeapYear = function(y) {
