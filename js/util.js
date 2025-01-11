@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202410102254';
+util.v = '202501111642';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -337,10 +337,11 @@ util.getWday = function(dt) {
 };
 
 /**
- * dt: '20231001' -> 31
- *     '20231101' -> 30
+ * dt: '202501' -> 31
+ *     '202502' -> 28
  */
 util.getLastDayOfMonth = function(dt) {
+  if ((typeof dt == 'string') && (dt.length == 6)) dt += '01';
   var E = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   var v = util.getDateTime(dt);
   var m = v.month;
