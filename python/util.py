@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202409242051'
+v = '202501262305'
 
 import sys
 import os
@@ -3342,7 +3342,6 @@ def send_response(content, type='text/plain', status=200, headers=None, encoding
 
     content_type = 'Content-Type: ' + type
     if encoding is not None:
-        set_stdout_encoding(encoding)
         if type.startswith('text'):
             content_type += '; charset=' + encoding
 
@@ -3365,6 +3364,8 @@ def send_response(content, type='text/plain', status=200, headers=None, encoding
         sys.stdout.flush()
         sys.stdout.buffer.write(content)
     else:
+        if encoding is not None:
+            set_stdout_encoding(encoding)
         print(content, end='')
 
 def send_result_json(status, body=None, headers=None, encoding=None):
