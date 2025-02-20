@@ -1,5 +1,3 @@
-#!python
-
 import os
 import sys
 
@@ -35,7 +33,11 @@ def test_file():
     return s
 
 def main():
-    s = test_file()
-    util.send_response('text', s)
+    path = util.get_arg(1)
+    if path == '':
+        s = test_file()
+    else:
+        s = util.to_json(util.get_file_info(path)) + '\n'
+    print(s)
 
 main()

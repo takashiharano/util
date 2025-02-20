@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202501262305'
+v = '202502202240'
 
 import sys
 import os
@@ -2321,13 +2321,13 @@ def get_file_info(path):
         'filename': get_filename(path),
         'name': get_file_name(path),
         'ext': get_file_ext(path),
-        'parent': get_parent_path(path),
+        'isdir': os.path.isdir(path),
+        'islink': os.path.islink(path),
         'size': os.path.getsize(path),
         'ctime': os.path.getctime(path),
         'mtime': os.path.getmtime(path),
         'atime': os.path.getatime(path),
-        'isdir': os.path.isdir(path),
-        'islink': os.path.islink(path)
+        'parent': get_parent_path(path)
     }
     return info
 
@@ -2349,11 +2349,14 @@ def _get_dir_info(path, pattern, recursive, lv, depth):
     filename = get_filename(path)
     islink = os.path.islink(path)
 
+    dir_list = []
+    file_list = []
+
     if os.path.isdir(path):
         dir_info['dirsize'] = 0
         dir_info['dirs'] = 0
         dir_info['files'] = 0
-        dir_info['children'] = {}
+        dir_info['children'] = []
         dir_info['found'] = False
 
         if pattern is None or match(filename, pattern):
@@ -2371,7 +2374,7 @@ def _get_dir_info(path, pattern, recursive, lv, depth):
                             dirsize += info['dirsize']
                             dirs += info['dirs'] + 1
                             files += info['files']
-                            dir_info['children'][p] =info
+                            dir_list.append(info)
                     else:
                         if pattern is None or match(p, pattern):
                             dir_info['found'] = True
@@ -2380,13 +2383,14 @@ def _get_dir_info(path, pattern, recursive, lv, depth):
                             info['dirs'] = 0
                             info['files'] = 0
                             info['children'] = {}
-                            dir_info['children'][p] = info
+                            dir_list.append(info)
                             dirs += 1
                 else:
                     if pattern is None or match(p, pattern):
                         dir_info['found'] = True
                         if depth == 0:
-                            dir_info['children'][p] = get_file_info(full_path)
+                            children = get_file_info(full_path)
+                            file_list.append(children)
                         if not islink:
                             dirsize += os.path.getsize(full_path)
                             files += 1
@@ -2396,6 +2400,10 @@ def _get_dir_info(path, pattern, recursive, lv, depth):
         dir_info['dirsize'] = dirsize
         dir_info['dirs'] = dirs
         dir_info['files'] = files
+
+        sort_object_list(dir_list, 'filename')
+        sort_object_list(file_list, 'filename')
+        dir_info['children'] = dir_list + file_list
 
         if depth > 0 and lv + 1 > depth:
             del dir_info['children']

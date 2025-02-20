@@ -30,7 +30,7 @@ def test_get_dir_info():
 
     s += '\n'
     path = util.get_relative_path(__file__, 'dir2')
-    s += 'get_dir_info(\'' + path + '\', True, pattern=r\'.+\.log\', recursive=0) = ' + util.to_json(util.get_dir_info(path, pattern=r'.+\.log', recursive=0)) + '\n'
+    s += 'get_dir_info(\'' + path + '\', True, pattern=r\'.+\\.log\', recursive=0) = ' + util.to_json(util.get_dir_info(path, pattern=r'.+\\.log', recursive=0)) + '\n'
 
     s += '\n'
     path = util.get_relative_path(__file__, 'dir2')
@@ -71,7 +71,11 @@ def test_file():
     return s
 
 def main():
-    s = test_file()
-    util.send_response('text', s)
+    path = util.get_arg(1)
+    if path == '':
+        s = test_file()
+    else:
+        s = util.to_json(util.get_dir_info(path)) + '\n'
+    print(s)
 
 main()
