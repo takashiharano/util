@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202502202240'
+v = '202502222253'
 
 import sys
 import os
@@ -2041,7 +2041,7 @@ def get_file_ext(file_path):
 # a.txt -> ./
 # ./dir1/a.txt -> ./dir1
 # ./dir1/abc   -> ./dir1
-# ./dir1/dir2/ -> ./dir1/dir2
+# ./dir1/dir2/ -> ./dir1
 def get_parent_path(path):
     path = path.replace('\\', '/')
     if path.endswith('/'):
