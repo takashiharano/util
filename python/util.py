@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202502222253'
+v = '202502222304'
 
 import sys
 import os
@@ -2047,8 +2047,6 @@ def get_parent_path(path):
     if path.endswith('/'):
         path = path[:-1]
     parent_path = os.path.dirname(path)
-    if parent_path == '':
-        parent_path = './'
     return parent_path
 
 # aaa/bbb, abc.txt  -> "aaa/bbb/abc.txt"
