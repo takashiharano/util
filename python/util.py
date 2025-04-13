@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202502222304'
+v = '202504130105'
 
 import sys
 import os
@@ -3320,11 +3320,10 @@ HTTP_STATUS = {
     '505': 'HTTP Version not supported'
 }
 def get_status_message(status):
-    st = str(status)
-    if st in HTTP_STATUS:
-        msg = st + ' ' + HTTP_STATUS[st]
+    if status in HTTP_STATUS:
+        msg = HTTP_STATUS[status]
     else:
-        msg = st
+        msg = ''
     return msg
 
 # headers = [
@@ -3354,10 +3353,11 @@ def send_response(content, type='text/plain', status=200, headers=None, encoding
     if res_debug:
         log(content)
 
-    status_message =  get_status_message(status)
-    st = 'Status: ' + status_message
+    st = str(status)
+    status_message =  get_status_message(st)
+    status_header = 'Status: ' + st + ' ' + status_message
 
-    print(st)
+    print(status_header)
     print(content_type)
     if headers is not None:
         for i in range(len(headers)):
@@ -3421,8 +3421,10 @@ def send_as_file(content, filename='', content_type='application/octet-stream', 
     else:
         b = content
 
-    st = 'Status: ' + get_status_message(status)
-    print(st)
+    st = str(status)
+    status_message =  get_status_message(st)
+    status_header = 'Status: ' + st + ' ' + status_message
+    print(status_header)
 
     if content_type != '':
         print('Content-Type: ' + content_type)
