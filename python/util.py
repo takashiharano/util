@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202504130105'
+v = '202507022011'
 
 import sys
 import os
@@ -985,6 +985,13 @@ def shell_dict(o):
 def sort_object_list(o, key):
     d = sorted(o, key=lambda x:x[key])
     return d
+
+def get_dict_by_key(dictlist, keyname, keyvalue, default=None):
+    for i in range(len(dictlist)):
+        o = dictlist[i]
+        if keyname in o and o[keyname] == keyvalue:
+            return o
+    return default
 
 #------------------------------------------------------------------------------
 # Properties
