@@ -3,7 +3,7 @@
 # Released under the MIT license
 # https://libutil.com/
 # Python 3.4+
-v = '202507022011'
+v = '202507131911'
 
 import sys
 import os
@@ -1053,7 +1053,7 @@ def to_data_struct(obj, data_struct):
 
         if 'type' in field:
             data_type = field['type']
-            if 'data_type' == 'bool':
+            if data_type == 'bool':
                 if 'as_true' in field:
                     as_true = field['as_true']
 
@@ -2640,6 +2640,29 @@ def random_string(min=8, max=None, tbl=[*'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkl
         s += tbl[n]
 
     return s
+
+#------------------------------------------------------------------------------
+# UUID
+#------------------------------------------------------------------------------
+def generate_uuid(version=4, **kwargs):
+    import uuid
+
+    if version == 4:
+        id = str(uuid.uuid4())
+    elif version == 1:
+        id = str(uuid.uuid1())
+    elif version == 3:
+        namespace = kwargs.get('namespace')
+        name = kwargs.get('name')
+        id = str(uuid.uuid3(namespace, name))
+    elif version == 5:
+        namespace = kwargs.get('namespace')
+        name = kwargs.get('name')
+        id = str(uuid.uuid5(namespace, name))
+    else:
+        raise ValueError('Unsupported UUID version: ' + str(version))
+
+    return id
 
 #------------------------------------------------------------------------------
 # Hash
