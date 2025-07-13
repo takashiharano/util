@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202505182326';
+util.v = '202507131539';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1500,6 +1500,10 @@ util.randomString = function(a1, a2, a3) {
     }
   }
   return s;
+};
+
+util.generateUUID = function() {
+  return crypto.randomUUID();
 };
 
 //---------------------------------------------------------
