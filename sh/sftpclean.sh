@@ -2,7 +2,7 @@
 ############################################################################
 # SFTP File Cleaner
 # Copyright 2022 Takashi Harano
-# Released under the MIT license
+# Released under the MIT License
 # https://libutil.com/
 #
 # Created: 2022-11-13
@@ -14,9 +14,9 @@
 # Example:
 # now = 2025-08-01T13:00:00
 # Files older than the retention period (24h) will be removed:
-#   file-20250723-101520.csv   << Remove
-#   file-20250731-125959.csv   << Remove
-#   file-20250801-120000.csv   << Keep
+#   file-20250723-101520.csv  << Remove
+#   file-20250731-125959.csv  << Remove
+#   file-20250801-120000.csv  << Keep
 #
 ############################################################################
 
