@@ -2,11 +2,42 @@
 ############################################################################
 # Serialize Date & Time
 # Copyright 2022 Takashi Harano
-# Released under the MIT license
+# Released under the MIT License
 # https://libutil.com/
+#
+# Created: 2022-11-12
+# Updated: 2025-08-01
+#
+# Usage:
+#   ./serialize_datetime.sh [DATETIME]
+#
+# Example:
+#   ./serialize_datetime.sh 2025-01-02T12:34:56.789
+#   ./serialize_datetime.sh 2025-01-02_12:34:56.789
+#   ./serialize_datetime.sh "2025-01-02 12:34:56.789"
+#
+# Outputs:
+#   -> 20250102123456789
+#
+# Acceptable formats:
+#   DATE:
+#     20250102
+#     2025-01-02
+#     2025/01/02
+#     2025_01_02
+#     2025.01.02
+#
+#  [separator: T | _ | space]
+#
+#  TIME:
+#     123456789
+#     12:34:56.789
+#     12_34_56_789
+#     12.34.56.789
+#
 ############################################################################
 
-function serialize_datetime() {
+serialize_datetime() {
   local w
   local d
   local t
@@ -21,15 +52,14 @@ function serialize_datetime() {
   local dt
 
   w=$1
-  w=$(echo "${w}" | sed -E "s/\s{2,}/ /g")
-  w=$(echo "${w}" | sed -E "s/T/ /")
+  w=$(echo "${w}" | sed -E -e 's/\s{2,}/ /g' -e 's/T/ /' -e 's/_/ /')
 
   if [[ ! ${w} =~ [-/] ]]; then
     echo "$(_serialize_datetime ${w})"
     return
   fi
 
-  prt=($(echo "${w}"))
+  IFS=' ' read -r -a prt <<< "$w"
   d=${prt[0]}
   t=""
   if [ ${#prt[@]} -ge 2 ]; then
@@ -85,7 +115,7 @@ function serialize_datetime() {
   echo "$(_serialize_datetime ${dt})"
 }
 
-function _serialize_datetime() {
+_serialize_datetime() {
   local s
   local w
   local w1
@@ -97,8 +127,7 @@ function _serialize_datetime() {
     s="${s}$2"
   fi
 
-  s=$(echo "${s}" | sed -E "s/\//-/g")
-  s=$(echo "${s}" | sed -E "s/[-\s:\._]//g")
+  s=$(echo "${s}" | sed -E "s/\//-/g; s/[-\s:\._]//g")
   s="${s}0000000000000"
   s="${s:0:17}"
 
@@ -123,39 +152,14 @@ function _serialize_datetime() {
 
 #  1 -> 01
 # 12 -> 12
-function pad_zero() {
-  local s
-  s="00$1"
-  echo "${s: -2:2}"
+pad_zero() {
+  printf "%02d" "$1"
 }
 
-############################################################################
-# ./serialize_datetime.sh [DATETIME]
-#
-# e.g.,
-#  ./serialize_datetime.sh 2022-01-02T12:34:56.789
-#  ./serialize_datetime.sh 2022-01-02_12:34:56.789
-#
-# Outputs:
-# 20220102123456789
-#
-# Acceptable formats:
-#  DATE:
-#   20220102
-#   2022-01-02
-#   2022/01/02
-#   2022_01_02
-#   2022.01.02
-#  [T]
-#  TIME:
-#   123456789
-#   12:34:56.789
-#   12_34_56_789
-#   12.34.56.789
-############################################################################
+#---------------------------------------------------------------------------
 if [ $# -lt 1 ]; then
   echo "Usage: ./serialize_datetime.sh [DATETIME]"
-  echo "e.g., ./serialize_datetime.sh 2022-01-02T12:34:56.789"
+  echo "e.g., ./serialize_datetime.sh 2025-01-02T12:34:56.789"
   exit 1
 fi
 
