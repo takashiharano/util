@@ -27,8 +27,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import javax.xml.bind.DatatypeConverter;
-
 /**
  * This class implements the hash related processing.
  */
@@ -62,9 +60,7 @@ public class HashUtil {
    */
   public static String getHashString(byte[] input, String algorithm) {
     byte[] b = getHash(input, algorithm);
-    String h = DatatypeConverter.printHexBinary(b);
-    String hash = h.toLowerCase();
-    return hash;
+    return toHexString(b);
   }
 
   /**
@@ -86,6 +82,21 @@ public class HashUtil {
       throw new RuntimeException(e);
     }
     return hash;
+  }
+
+  /**
+   * Converts a byte array to lowercase hex string.
+   *
+   * @param bytes
+   *          byte array
+   * @return hex string (lowercase)
+   */
+  private static String toHexString(byte[] bytes) {
+    StringBuilder sb = new StringBuilder(bytes.length * 2);
+    for (byte b : bytes) {
+      sb.append(String.format("%02x", b & 0xff));
+    }
+    return sb.toString();
   }
 
 }

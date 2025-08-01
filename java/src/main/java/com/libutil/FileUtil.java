@@ -44,8 +44,6 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
-import javax.xml.bind.DatatypeConverter;
-
 /**
  * File and directory manipulation.
  */
@@ -601,7 +599,7 @@ public class FileUtil {
     try {
       MessageDigest md = MessageDigest.getInstance(algorithm);
       byte[] h = md.digest(b);
-      hash = DatatypeConverter.printHexBinary(h).toLowerCase();
+      hash = toHexString(h);
     } catch (NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
     }
@@ -1330,6 +1328,21 @@ public class FileUtil {
       s = s.substring(1);
     }
     return s;
+  }
+
+  /**
+   * Converts a byte array to lowercase hex string.
+   *
+   * @param bytes
+   *          byte array
+   * @return hex string (lowercase)
+   */
+  private static String toHexString(byte[] bytes) {
+    StringBuilder sb = new StringBuilder(bytes.length * 2);
+    for (byte b : bytes) {
+      sb.append(String.format("%02x", b & 0xff));
+    }
+    return sb.toString();
   }
 
 }
