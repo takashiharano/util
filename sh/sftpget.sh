@@ -2,11 +2,11 @@
 ############################################################################
 # SFTP File Receiver
 # Copyright 2023 Takashi Harano
-# Released under the MIT license
+# Released under the MIT License
 # https://libutil.com/
 #
 # Usage:
-#   $ sftpget.sh BASE_FILENAME EXTENSION DESTDIR [delete]
+#   $ sftpget.sh [-d]
 ############################################################################
 
 #---------------------------------------------------------------------------
@@ -14,7 +14,12 @@ HOST="localhost"
 USER="user1"
 PVTKEY="~/.ssh/id_ed25519"
 PORT=22
-TARGET_DIR="/path/to"
+SFTP_DIR="/tmp1"
+DEST_DIR="."
+BASE_FILENAME="file-"
+EXTENSION="csv"
+#TIMESTAMP_PATTERN='[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}\.[0-9]{2}\.[0-9]{2}'
+TIMESTAMP_PATTERN='[0-9]{8}-[0-9]{6}'
 #---------------------------------------------------------------------------
 
 LF="
@@ -41,7 +46,7 @@ function exec_sftp_cmd() {
   sftp_ret=$(expect -c "
   set timeout 1
   ${cmd}
-  expect \"sftp&gt;\"
+  expect \"sftp>\"
   ${sftp_cmd}
   send \"bye\r\"
   expect eof
@@ -55,10 +60,10 @@ function exec_sftp_cmd() {
 #
 ###########################################
 function exec_sftp_ls_cmd() {
-  sftp_cmd_ls="send \"cd ${TARGET_DIR}\r\"
-  expect \"sftp&gt;\"
+  sftp_cmd_ls="send \"cd ${SFTP_DIR}\r\"
+  expect \"sftp>\"
   send \"ls -1\r\"
-  expect \"sftp&gt;\"
+  expect \"sftp>\"
   "
 }
 
@@ -72,8 +77,8 @@ function get_files() {
   local cmd_get
 
   cmd_get=$1
-  cmd="  send \"cd ${TARGET_DIR}\r\"
-  expect \"sftp&gt;\"
+  cmd="  send \"cd ${SFTP_DIR}\r\"
+  expect \"sftp>\"
   ${cmd_get}"
 
   exec_sftp_cmd "${cmd}"
@@ -89,8 +94,8 @@ function list_target_files() {
   shopt -s extglob lastpipe
   echo "${sftp_ret}" | while read line; do
     filename=${line}
-    # data-2023-08-20_12.34.56.csv -> (2023-08-20_12.34.56)
-    if [[ ${filename} =~ ${BASE_FILENAME}([0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}\.[0-9]{2}\.[0-9]{2})${EXTENSION} ]]; then
+    # data-20250728-123456.csv -> (20250728-123456)
+    if [[ ${filename} =~ ${BASE_FILENAME}(${TIMESTAMP_PATTERN})\.${EXTENSION} ]]; then
       target_files+=("${filename}")
     fi
   done
@@ -110,7 +115,7 @@ function build_ftp_get_command() {
     filename=${target_files[$i]}
     echo ${filename}
     sftp_get_cmd+=" send \"get ${filename} ${DEST_DIR}\r\"${LF}"
-    sftp_get_cmd+=" expect \"sftp&gt;\"${LF}"
+    sftp_get_cmd+=" expect \"sftp>\"${LF}"
   done
 }
 
@@ -123,11 +128,11 @@ function delete_files() {
   sftp_rm_cmd=""
   for i in "${!target_files[@]}"; do
     sftp_rm_cmd+=" send \"rm ${target_files[$i]}\r\"${LF}"
-    sftp_rm_cmd+=" expect \"sftp&gt;\"${LF}"
+    sftp_rm_cmd+=" expect \"sftp>\"${LF}"
   done
 
-  cmd="  send \"cd ${TARGET_DIR}\r\"
-  expect \"sftp&gt;\"
+  cmd="  send \"cd ${SFTP_DIR}\r\"
+  expect \"sftp>\"
   ${sftp_rm_cmd}"
 
   exec_sftp_cmd "${cmd}"
@@ -138,26 +143,24 @@ function delete_files() {
 # Main
 #
 ###########################################################################
-if [ $# -lt 3 ]; then
-  echo "Usage: sftpget.sh BASE_FILENAME EXTENSION DESTDIR [delete]"
-  exit 1
-fi
-
-BASE_FILENAME=$1
-EXTENSION=$2
-DEST_DIR=$3
 DELETE=false
-if [ $# -ge 4 ] && [ $4 == "delete" ]; then
+if [ "${1:-}" = "-d" ]; then
   DELETE=true
 fi
+
+echo "Connecting to ${USER}@${HOST}"
 
 exec_sftp_ls_cmd
 exec_sftp_cmd "${sftp_cmd_ls}"
 list_target_files
+
+echo "dir = ${SFTP_DIR}"
+echo "file = ${BASE_FILENAME}${TIMESTAMP_PATTERN}.${EXTENSION}"
+
 build_ftp_get_command
 
 if [ -z "${sftp_get_cmd}" ]; then
-  echo "No files to receive"
+  echo "No files to download"
   exit 0
 fi
 
@@ -166,7 +169,7 @@ get_files "${sftp_get_cmd}"
 
 # sftp> rm
 if ${DELETE}; then
-  echo "Deleting the received files on the server..."
+  echo "Deleting downloaded files from the server..."
   delete_files
 fi
 
