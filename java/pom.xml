@@ -4,7 +4,7 @@
 
   <groupId>com.libutil</groupId>
   <artifactId>util</artifactId>
-  <version>1.20.0</version>
+  <version>1.21.0</version>
   <packaging>jar</packaging>
 
   <name>Util</name>
@@ -48,6 +48,7 @@
           <compilerVersion>${java.version}</compilerVersion>
           <source>${java.version}</source>
           <target>${java.version}</target>
+          <release>8</release>
         </configuration>
       </plugin>
 
