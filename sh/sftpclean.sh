@@ -4,43 +4,68 @@
 # Copyright 2022 Takashi Harano
 # Released under the MIT license
 # https://libutil.com/
+#
+# Created: 2022-11-13
+# Updated: 2025-08-01
+#
+# Usage: ./sftpclean.sh
+# (no arguments)
+#
+# Example:
+# now = 2025-08-01T13:00:00
+# Files older than the retention period (24h) will be removed:
+#   file-20250723-101520.csv   << Remove
+#   file-20250731-125959.csv   << Remove
+#   file-20250801-120000.csv   << Keep
+#
 ############################################################################
 
+#--- Basic Connection Settings ---
 HOST="localhost"
-USER="user1"
-#PVTKEY="~/.ssh/id_rsa"
-PVTKEY=""
 PORT=22
-TARGET_DIR="/home/user1/data"
+USER="user1"
+PVTKEY="~/.ssh/id_ed25519"
+
+#--- Target Directory ---
+TARGET_DIR="/tmp1"
+
+#--- Timestamp Pattern and Format ---
+# e.g., 20240801-123456 -> 2024-08-01 12:34:56
+TIMESTAMP_PATTERN='[0-9]{8}-[0-9]{6}'
+DATE_CLEANUP_CMD='s/\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)-\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1-\2-\3 \4:\5:\6/'
+DATE_FORMAT='%Y-%m-%d %H:%M:%S'
+
+# e.g., 2024-08-01_12.34.56 -> 2024-08-01 12:34:56
+#TIMESTAMP_PATTERN='[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}\.[0-9]{2}\.[0-9]{2}'
+#DATE_CLEANUP_CMD='s/_/ /;s/\./:/g'
+
+#--- Retention Policy ---
 RETENTION_SEC=86400
 
+#---------------------------------------------------------------------------
 NOW=$(date +%s)
 EXPIRES_AT=$(echo "${NOW} - ${RETENTION_SEC}" | bc)
 
-sftp_ret=""
-
 ###########################################
 #
-# Converts YYYY-MM-DD_hh.mm.ss to unixtime
+# Converts timestamp string to Unix time using user-defined pattern
 #
 ###########################################
-function to_unixtime() {
-  local datepart
-  local datetime
-  local unixtime
-  local ret
+to_unixtime() {
+  local raw="$1"
+  local dt="$raw"
 
-  # 2022-11-13_12.34.56
-  datepart=$1
-
-  # 20221113T12:34:56
-  datetime=$(echo "${datepart}" | sed -E "s/[:_/T\.\-]//g")
-  if [[ ${datetime} =~ ([0-9]{8})([0-9]{2})([0-9]{2})([0-9]{2}) ]]; then
-    datetime="${BASH_REMATCH[1]} ${BASH_REMATCH[2]}:${BASH_REMATCH[3]}:${BASH_REMATCH[4]}"
+  if [ -n "$DATE_CLEANUP_CMD" ]; then
+    dt=$(echo "$dt" | sed "$DATE_CLEANUP_CMD")
   fi
 
-  ret=$(date +%s --date "${datetime}")
-  echo ${ret}
+  if date --version >/dev/null 2>&1; then
+    # GNU date (Linux)
+    date -d "$dt" +%s 2>/dev/null || echo -1
+  else
+    # BSD date (macOS)
+    date -j -f "$DATE_FORMAT" "$dt" +%s 2>/dev/null || echo -1
+  fi
 }
 
 ###########################################
@@ -48,7 +73,7 @@ function to_unixtime() {
 # Execute command via SFTP
 #
 ###########################################
-function exec_sftp_cmd() {
+exec_sftp_cmd() {
   local sftp_cmd
   local cmd
 
@@ -61,13 +86,17 @@ function exec_sftp_cmd() {
   cmd+=" -P ${PORT} ${USER}@${HOST}"
 
   sftp_ret=$(expect -c "
-  set timeout 1
-  ${cmd}
-  expect \"sftp&gt;\"
-  ${sftp_cmd}
-  send \"bye\r\"
-  expect eof
-  exit
+    set timeout 5
+    if {[catch {
+      ${cmd}
+      expect \"sftp>\"
+      ${sftp_cmd}
+      send \"bye\r\"
+      expect eof
+    } result]} {
+      puts \"SFTP failed: \$result\"
+      exit 1
+    }
   ")
 }
 
@@ -76,17 +105,19 @@ function exec_sftp_cmd() {
 # Removes the files via SFTP
 #
 ###########################################
-function delete_files() {
+delete_files() {
   local cmd
   local cmd_rm
 
   cmd_rm=$1
-  cmd="  send \"cd ${TARGET_DIR}\r\"
-  expect \"sftp&gt;\"
+  cmd="send \"cd ${TARGET_DIR}\r\"
+  expect \"sftp>\"
   ${cmd_rm}"
 
   exec_sftp_cmd "${cmd}"
 }
+
+echo "Connecting to ${USER}@${HOST}"
 
 ###########################################
 #
@@ -94,12 +125,16 @@ function delete_files() {
 #
 ###########################################
 sftp_cmd_ls="send \"cd ${TARGET_DIR}\r\"
-expect \"sftp&gt;\"
+expect \"sftp>\"
 send \"ls -1\r\"
-expect \"sftp&gt;\"
+expect \"sftp>\"
 "
 
 exec_sftp_cmd "${sftp_cmd_ls}"
+
+echo "Target directory  = ${TARGET_DIR}"
+echo "Timestamp pattern = ${TIMESTAMP_PATTERN}"
+echo "Retention period  = ${RETENTION_SEC} sec"
 
 ###########################################
 #
@@ -107,33 +142,50 @@ exec_sftp_cmd "${sftp_cmd_ls}"
 #
 ###########################################
 target_files=()
-shopt -s extglob lastpipe
-echo "${sftp_ret}" | while read line; do
+
+mapfile -t file_lines <<< "${sftp_ret}"
+
+# Inspect file names and extract expired ones
+for line in "${file_lines[@]}"; do
   filename=${line}
+  if [[ $filename =~ ($TIMESTAMP_PATTERN) ]]; then
+    timestamp="${BASH_REMATCH[1]}"
+    unixtime=$(to_unixtime "$timestamp")
 
-  # data-2022-11-13_12.34.56.csv -> (2022-11-13_12.34.56)
-  if [[ ${filename} =~ ([0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}\.[0-9]{2}\.[0-9]{2}) ]]; then
-    # 2022-11-13_12.34.56 -> unixtime (e.g., 1668310496)
-    unixtime=$(to_unixtime "${BASH_REMATCH[1]}")
+    if [ "$unixtime" -eq -1 ]; then
+      echo "Warning: Invalid timestamp for file: $filename" >&2
+      continue
+    fi
 
-    if [ ${unixtime} -lt ${EXPIRES_AT} ]; then
-      target_files+=("${filename}")
+    if [ "$unixtime" -lt "$EXPIRES_AT" ]; then
+      target_files+=("$filename")
     fi
   fi
 done
+
+file_count="${#target_files[@]}"
+
+if [ "$file_count" -eq 0 ]; then
+  echo "No files to be removed"
+else
+  echo "Target files to be removed:"
+  for file in "${target_files[@]}"; do
+    echo "$file"
+  done
+  echo "Total: ${file_count} file(s)"
+fi
 
 ###########################################
 #
 # Prepares the SFTP command for remove
 #
 ###########################################
-LF="
-"
+LF=$'\n'
 
 sftp_rm_cmd=""
 for i in "${!target_files[@]}"; do
   sftp_rm_cmd+=" send \"rm ${target_files[$i]}\r\"${LF}"
-  sftp_rm_cmd+=" expect \"sftp&gt;\"${LF}"
+  sftp_rm_cmd+=" expect \"sftp>\"${LF}"
 done
 
 ###########################################
@@ -143,4 +195,5 @@ done
 ###########################################
 if [ -n "${sftp_rm_cmd}" ]; then
   delete_files "${sftp_rm_cmd}"
+  echo "Cleanup complete"
 fi
