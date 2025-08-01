@@ -22,8 +22,7 @@ EXTENSION="csv"
 TIMESTAMP_PATTERN='[0-9]{8}-[0-9]{6}'
 #---------------------------------------------------------------------------
 
-LF="
-"
+LF=$'\n'
 sftp_ret=""
 
 ###########################################
@@ -91,14 +90,10 @@ function get_files() {
 ###########################################
 function list_target_files() {
   target_files=()
-  shopt -s extglob lastpipe
-  echo "${sftp_ret}" | while read line; do
-    filename=${line}
-    # data-20250728-123456.csv -> (20250728-123456)
-    if [[ ${filename} =~ ${BASE_FILENAME}(${TIMESTAMP_PATTERN})\.${EXTENSION} ]]; then
-      target_files+=("${filename}")
-    fi
-  done
+  local pattern="^${BASE_FILENAME}${TIMESTAMP_PATTERN}\\.${EXTENSION}$"
+  mapfile -t target_files < <(
+    echo "${sftp_ret}" | tr -d '\r' | grep -E "${pattern}"
+  )
 }
 
 ###########################################
