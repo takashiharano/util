@@ -2,36 +2,36 @@
 ############################################################################
 # File Rotator
 # Copyright 2022 Takashi Harano
-# Released under the MIT license
+# Released under the MIT License
 # https://libutil.com/
+#
+# Created: 2022-11-26
+# Updated: 2025-08-02
 ############################################################################
 
 if [ $# -lt 2 ]; then
-  echo "Usage: ./filerotate.sh DIR_PATH FILE_NAME [N]"
+  echo "Usage: ./filerotate.sh DIR_PATH FILE_NAME [N]" >&2
   exit 1
 fi
 
-DIR=$1
-FILE_NAME=$2
-MAX_N=5
+DIR_PATH="$1"
+FILE_NAME="$2"
+MAX_N="${3:-9}"
 
-if [ $# -ge 3 ]; then
-  MAX_N=$3
-fi
+cd "${DIR_PATH}" || exit 1
 
-cd ${DIR}
-file_path="${DIR}/${FILE_NAME}"
-
-for i in $(seq ${MAX_N} -1 1); do
-  n=$((i - 1))
-  if [ ${n} -eq 0 ]; then
-    if [ -e ${file_path} ]; then
-      cp -a ${file_path} ${file_path}.1
-      rm -f ${file_path}
+# Rotate files: FILE.N-1 -> FILE.N ... FILE -> FILE.1
+i=$MAX_N
+while [ "$i" -ge 1 ]; do
+  prev=$((i - 1))
+  if [ "${prev}" -eq 0 ]; then
+    if [ -f "${FILE_NAME}" ]; then
+      mv "${FILE_NAME}" "${FILE_NAME}.1"
     fi
   else
-    if [ -e ${file_path}.${n} ]; then
-      cp -a ${file_path}.${n} ${file_path}."${i}"
+    if [ -f "${FILE_NAME}.${prev}" ]; then
+      mv "${FILE_NAME}.${prev}" "${FILE_NAME}.${i}"
     fi
   fi
+  i=$((i - 1))
 done
