@@ -6,7 +6,7 @@
 # https://libutil.com/
 #
 # Created: 2022-11-13
-# Updated: 2025-08-01
+# Updated: 2025-08-02
 #
 # Usage: ./sftpclean.sh
 # (no arguments)
@@ -17,7 +17,6 @@
 #   file-20250723-101520.csv  << Remove
 #   file-20250731-125959.csv  << Remove
 #   file-20250801-120000.csv  << Keep
-#
 ############################################################################
 
 #--- Basic Connection Settings ---
@@ -53,18 +52,18 @@ EXPIRES_AT=$(echo "${NOW} - ${RETENTION_SEC}" | bc)
 ###########################################
 to_unixtime() {
   local raw="$1"
-  local dt="$raw"
+  local dt="${raw}"
 
-  if [ -n "$DATE_CLEANUP_CMD" ]; then
-    dt=$(echo "$dt" | sed "$DATE_CLEANUP_CMD")
+  if [ -n "${DATE_CLEANUP_CMD}" ]; then
+    dt=$(echo "${dt}" | sed "${DATE_CLEANUP_CMD}")
   fi
 
   if date --version >/dev/null 2>&1; then
     # GNU date (Linux)
-    date -d "$dt" +%s 2>/dev/null || echo -1
+    date -d "${dt}" +%s 2>/dev/null || echo -1
   else
     # BSD date (macOS)
-    date -j -f "$DATE_FORMAT" "$dt" +%s 2>/dev/null || echo -1
+    date -j -f "${DATE_FORMAT}" "${dt}" +%s 2>/dev/null || echo -1
   fi
 }
 
@@ -77,7 +76,7 @@ exec_sftp_cmd() {
   local sftp_cmd
   local cmd
 
-  sftp_cmd=$1
+  sftp_cmd="$1"
 
   cmd="spawn sftp"
   if [ -n "${PVTKEY}" ]; then
@@ -94,7 +93,7 @@ exec_sftp_cmd() {
       send \"bye\r\"
       expect eof
     } result]} {
-      puts \"SFTP failed: \$result\"
+      puts \"SFTP failed: \${result}\"
       exit 1
     }
   ")
@@ -141,36 +140,36 @@ echo "Retention period  = ${RETENTION_SEC} sec"
 # Lists the expired file names
 #
 ###########################################
-target_files=()
+target_file_names=()
 
 mapfile -t file_lines <<< "${sftp_ret}"
 
 # Inspect file names and extract expired ones
 for line in "${file_lines[@]}"; do
   filename=${line}
-  if [[ $filename =~ ($TIMESTAMP_PATTERN) ]]; then
+  if [[ ${filename} =~ (${TIMESTAMP_PATTERN}) ]]; then
     timestamp="${BASH_REMATCH[1]}"
-    unixtime=$(to_unixtime "$timestamp")
+    unixtime=$(to_unixtime "${timestamp}")
 
-    if [ "$unixtime" -eq -1 ]; then
-      echo "Warning: Invalid timestamp for file: $filename" >&2
+    if [ "${unixtime}" -eq -1 ]; then
+      echo "Warning: Invalid timestamp for file: ${filename}" >&2
       continue
     fi
 
-    if [ "$unixtime" -lt "$EXPIRES_AT" ]; then
-      target_files+=("$filename")
+    if [ "${unixtime}" -lt "${EXPIRES_AT}" ]; then
+      target_file_names+=("${filename}")
     fi
   fi
 done
 
-file_count="${#target_files[@]}"
+file_count="${#target_file_names[@]}"
 
-if [ "$file_count" -eq 0 ]; then
+if [ "${file_count}" -eq 0 ]; then
   echo "No files to be removed"
 else
   echo "Target files to be removed:"
-  for file in "${target_files[@]}"; do
-    echo "$file"
+  for filename in "${target_file_names[@]}"; do
+    echo "${filename}"
   done
   echo "Total: ${file_count} file(s)"
 fi
@@ -183,8 +182,8 @@ fi
 LF=$'\n'
 
 sftp_rm_cmd=""
-for i in "${!target_files[@]}"; do
-  sftp_rm_cmd+=" send \"rm ${target_files[$i]}\r\"${LF}"
+for i in "${!target_file_names[@]}"; do
+  sftp_rm_cmd+=" send \"rm ${target_file_names[$i]}\r\"${LF}"
   sftp_rm_cmd+=" expect \"sftp>\"${LF}"
 done
 
