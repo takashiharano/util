@@ -23,7 +23,7 @@
 HOST="localhost"
 PORT=22
 USER="user1"
-PVTKEY="~/.ssh/id_ed25519"
+PRIVATE_KEY="${HOME}/.ssh/id_ed25519"
 
 #--- Target Directory ---
 TARGET_DIR="/tmp1"
@@ -41,9 +41,17 @@ DATE_FORMAT='%Y-%m-%d %H:%M:%S'
 #--- Retention Policy ---
 RETENTION_SEC=86400
 
+TIMEOUT=15
 #---------------------------------------------------------------------------
 NOW=$(date +%s)
 EXPIRES_AT=$(echo "${NOW} - ${RETENTION_SEC}" | bc)
+
+: ${TIMEOUT:=-1}
+
+if [ ! -f "$PRIVATE_KEY" ]; then
+  echo "Error: Private key '${PRIVATE_KEY}' does not exist." >&2
+  exit 1
+fi
 
 ###########################################
 #
@@ -79,13 +87,13 @@ exec_sftp_cmd() {
   sftp_cmd="$1"
 
   cmd="spawn sftp"
-  if [ -n "${PVTKEY}" ]; then
-    cmd+=" -i ${PVTKEY}"
+  if [ -n "${PRIVATE_KEY}" ]; then
+    cmd+=" -i ${PRIVATE_KEY}"
   fi
   cmd+=" -P ${PORT} ${USER}@${HOST}"
 
   sftp_ret=$(expect -c "
-    set timeout 5
+    set timeout ${TIMEOUT}
     if {[catch {
       ${cmd}
       expect \"sftp>\"
@@ -94,9 +102,34 @@ exec_sftp_cmd() {
       expect eof
     } result]} {
       puts \"SFTP failed: \${result}\"
-      exit 1
     }
   ")
+
+  # Comment out for debugging
+  #echo "${sftp_ret}"
+
+  if [ -z "${sftp_ret}" ]; then
+    echo "Error: SFTP command failed or produced no output." >&2
+    exit 9
+  elif echo "${sftp_ret}" | grep -q "'s password:"; then
+    echo "Error: Authentication failed for user '${USER}'." >&2
+    exit 3
+  elif echo "${sftp_ret}" | grep -q "Permission denied"; then
+    echo "Error: Authentication failed for user '${USER}'." >&2
+    exit 3
+  elif echo "${sftp_ret}" | grep -q "Connection refused"; then
+    echo "Error: Connection to '${HOST}:${PORT}' was refused." >&2
+    exit 3
+  elif echo "${sftp_ret}" | grep -q "Could not resolve hostname"; then
+    echo "Error: Unknown host '${HOST}'." >&2
+    exit 3
+  elif echo "${sftp_ret}" | grep -q "No such file or directory"; then
+    echo "Error: Remote path or file not found." >&2
+    exit 4
+  elif echo "${sftp_ret}" | grep -q " not found."; then
+    echo "Error: Remote path or file not found." >&2
+    exit 4
+  fi
 }
 
 ###########################################
@@ -129,11 +162,11 @@ send \"ls -1\r\"
 expect \"sftp>\"
 "
 
-exec_sftp_cmd "${sftp_cmd_ls}"
-
 echo "Target directory  = ${TARGET_DIR}"
 echo "Timestamp pattern = ${TIMESTAMP_PATTERN}"
 echo "Retention period  = ${RETENTION_SEC} sec"
+
+exec_sftp_cmd "${sftp_cmd_ls}"
 
 ###########################################
 #

@@ -96,6 +96,9 @@ exec_sftp_cmd() {
   elif echo "${sftp_ret}" | grep -q "Could not resolve hostname"; then
     echo "Error: Unknown host '${HOST}'." >&2
     exit 3
+  elif echo "${sftp_ret}" | grep -q "No such file or directory"; then
+    echo "Error: Remote path or file not found." >&2
+    exit 4
   elif echo "${sftp_ret}" | grep -q " not found."; then
     echo "Error: Remote path or file not found." >&2
     exit 4
