@@ -8,8 +8,7 @@
 # Created: 2022-11-13
 # Updated: 2025-08-02
 #
-# Usage: ./sftpclean.sh
-# (no arguments)
+# Usage: ./sftpclean.sh [REMOTE_DIR]
 #
 # Example:
 # now = 2025-08-01T13:00:00
@@ -26,7 +25,7 @@ USER="user1"
 PRIVATE_KEY="${HOME}/.ssh/id_ed25519"
 
 #--- Target Directory ---
-TARGET_DIR="/tmp1"
+REMOTE_DIR="/tmp1/d1"
 
 #--- Timestamp Pattern and Format ---
 # e.g., 20240801-123456 -> 2024-08-01 12:34:56
@@ -42,22 +41,10 @@ DATE_FORMAT='%Y-%m-%d %H:%M:%S'
 RETENTION_SEC=86400
 
 TIMEOUT=15
-#---------------------------------------------------------------------------
-NOW=$(date +%s)
-EXPIRES_AT=$(echo "${NOW} - ${RETENTION_SEC}" | bc)
 
-: ${TIMEOUT:=-1}
-
-if [ ! -f "$PRIVATE_KEY" ]; then
-  echo "Error: Private key '${PRIVATE_KEY}' does not exist." >&2
-  exit 1
-fi
-
-###########################################
-#
+###################################################################
 # Converts timestamp string to Unix time using user-defined pattern
-#
-###########################################
+###################################################################
 to_unixtime() {
   local raw="$1"
   local dt="${raw}"
@@ -75,11 +62,9 @@ to_unixtime() {
   fi
 }
 
-###########################################
-#
+###################################################################
 # Execute command via SFTP
-#
-###########################################
+###################################################################
 exec_sftp_cmd() {
   local sftp_cmd
   local cmd
@@ -132,47 +117,54 @@ exec_sftp_cmd() {
   fi
 }
 
-###########################################
-#
+###################################################################
 # Removes the files via SFTP
-#
-###########################################
+###################################################################
 delete_files() {
   local cmd
   local cmd_rm
 
   cmd_rm=$1
-  cmd="send \"cd ${TARGET_DIR}\r\"
+  cmd="send \"cd ${REMOTE_DIR}\r\"
   expect \"sftp>\"
   ${cmd_rm}"
 
   exec_sftp_cmd "${cmd}"
 }
 
+###################################################################
+# Main
+###################################################################
+if [ $# -ge 1 ] && [ -n "$1" ]; then
+  REMOTE_DIR="$1"
+fi
+
+NOW=$(date +%s)
+EXPIRES_AT=$(echo "${NOW} - ${RETENTION_SEC}" | bc)
+
+: ${TIMEOUT:=-1}
+
+if [ ! -f "$PRIVATE_KEY" ]; then
+  echo "Error: Private key '${PRIVATE_KEY}' does not exist." >&2
+  exit 1
+fi
+
 echo "Connecting to ${USER}@${HOST}"
 
-###########################################
-#
 # Lists file names on the SFTP server
-#
-###########################################
-sftp_cmd_ls="send \"cd ${TARGET_DIR}\r\"
+sftp_cmd_ls="send \"cd ${REMOTE_DIR}\r\"
 expect \"sftp>\"
 send \"ls -1\r\"
 expect \"sftp>\"
 "
 
-echo "Target directory  = ${TARGET_DIR}"
+echo "Target directory  = ${REMOTE_DIR}"
 echo "Timestamp pattern = ${TIMESTAMP_PATTERN}"
 echo "Retention period  = ${RETENTION_SEC} sec"
 
 exec_sftp_cmd "${sftp_cmd_ls}"
 
-###########################################
-#
 # Lists the expired file names
-#
-###########################################
 target_file_names=()
 
 mapfile -t file_lines <<< "${sftp_ret}"
@@ -207,11 +199,7 @@ else
   echo "Total: ${file_count} file(s)"
 fi
 
-###########################################
-#
 # Prepares the SFTP command for remove
-#
-###########################################
 LF=$'\n'
 
 sftp_rm_cmd=""
@@ -220,11 +208,7 @@ for i in "${!target_file_names[@]}"; do
   sftp_rm_cmd+=" expect \"sftp>\"${LF}"
 done
 
-###########################################
-#
 # Execute delete files
-#
-###########################################
 if [ -n "${sftp_rm_cmd}" ]; then
   delete_files "${sftp_rm_cmd}"
   echo "Cleanup complete"

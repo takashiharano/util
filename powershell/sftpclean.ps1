@@ -8,7 +8,7 @@
 # Updated: 2025-08-03
 #
 # Usage:
-#  .\sftpclean.ps1
+#  .\sftpclean.ps1 [RemoteDir]
 ############################################################################
 # about_Execution_Policies (https://go.microsoft.com/fwlink/?LinkID=135170)
 # > Set-ExecutionPolicy Unrestricted -Scope CurrentUser
@@ -155,21 +155,25 @@ function Remove-Expired-Files {
         [array]$fileList
     )
 
+    Write-Host "Target remote directory: $RemoteDir"
+
     if (-not $fileList -or $fileList.Count -eq 0) {
         Write-Host "No files to be removed."
         return
     }
 
     Write-Host "Target files to be removed:"
+
     $fileList | ForEach-Object { Write-Host "  $_" }
+
     Write-Host "Total: $($fileList.Count) file(s)"
 
-    $rm_script = "cd $RemoteDir`n"
+    $removeScript = "cd $RemoteDir`n"
     foreach ($filename in $fileList) {
-        $rm_script += "rm $filename`n"
+        $removeScript += "rm $filename`n"
     }
 
-    Invoke-SFTP-Command $rm_script
+    Invoke-SFTP-Command $removeScript
     Write-Host "Cleanup complete"
 }
 
@@ -185,6 +189,11 @@ function Main {
 
     $filesToDelete = Get-Expired-Files -expiresAt $expiresAt
     Remove-Expired-Files -fileList $filesToDelete
+}
+
+# Override remote directory if passed as an argument
+if ($args.Count -ge 1 -and $args[0]) {
+    $RemoteDir = $args[0]
 }
 
 Main
