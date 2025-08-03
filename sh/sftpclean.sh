@@ -6,7 +6,7 @@
 # https://libutil.com/
 #
 # Created: 2022-11-13
-# Updated: 2025-08-02
+# Updated: 2025-08-03
 #
 # Usage: ./sftpclean.sh [REMOTE_DIR]
 #
