@@ -3,29 +3,6 @@ Various functions for performing general functions.
 
 # Implementations
 
-## Java
-
-### Features
-- String
-- Date/Time
-- HTTP
-- Hash
-- CommandExecution
-- Binary Operation
-- Hex Dumper
-- Color
-- Logger
-- ZIP
-
-### Build
-
-```sh
-mvn clean package
-```
-
-### Javadoc
-https://libutil.com/java/apidocs/
-
 ## JavaScript
 - BrowserColor
 - RGB
