@@ -1,9 +1,9 @@
 # util.py
 # Copyright 2018 Takashi Harano
-# Released under the MIT license
+# Released under the MIT License
 # https://libutil.com/
 # Python 3.4+
-v = '202507131911'
+v = '202510050126'
 
 import sys
 import os
@@ -2785,11 +2785,10 @@ def unshift(arr, value, size=0):
 #  {'http': 'http://localhost:8080', 'https': 'https://localhost:8080', 'ftp': 'ftp://localhost:8080'}
 #
 def http(url, method='GET', params=None, data=None, user=None, password=None,
-         headers=None, proxies=None, encoding=DEFAULT_ENCODING,
-         timeout=DEFAULT_HTTP_TIMEOUT, cafile=None, capath=None,
-         cadefault=False, context=None, verifycert=True):
+         headers={}, proxies=None, encoding=DEFAULT_ENCODING,
+         timeout=DEFAULT_HTTP_TIMEOUT, context=None, verifycert=True):
     try:
-        res = http_request(url, method, params, user, password, headers, proxies, encoding, timeout, cafile=cafile, capath=capath, cadefault=cadefault, context=context, verifycert=verifycert)
+        res = http_request(url, method, params, data, user, password, headers, proxies, encoding, timeout, context=context, verifycert=verifycert)
     except socket.timeout:
         raise Exception('TIMEOUT')
     except urllib.error.HTTPError as e:
@@ -2829,9 +2828,8 @@ def http(url, method='GET', params=None, data=None, user=None, password=None,
 #                 messages will be printed to stdout as the response is read and parsed.
 #  closed       - Is True if the stream is closed.
 def http_request(url, method='GET', params=None, data=None, user=None, password=None,
-                 headers=None, proxies=None, encoding=DEFAULT_ENCODING,
-                 timeout=DEFAULT_HTTP_TIMEOUT, cafile=None,
-                 capath=None, cadefault=False, context=None, verifycert=True):
+                 headers={}, proxies=None, encoding=DEFAULT_ENCODING,
+                 timeout=DEFAULT_HTTP_TIMEOUT, context=None, verifycert=True):
 
     if data is None:
         if params is not None:
@@ -2844,15 +2842,12 @@ def http_request(url, method='GET', params=None, data=None, user=None, password=
         if typename(data) == 'str':
             data = data.encode()
 
-    if headers is None:
-        headers = {}
-
     if (not user is None) and (not password is None):
         auth = encode_base64(user + ':' + password)
         headers['Authorization'] = 'Basic ' + auth
 
     req = urllib.request.Request(url, headers=headers, method=method)
-    if headers is None or 'User-Agent' not in headers:
+    if 'User-Agent' not in headers:
         req.add_header('User-Agent', 'Mozilla/5.0')
 
     proxy = urllib.request.ProxyHandler(proxies)
@@ -2862,7 +2857,7 @@ def http_request(url, method='GET', params=None, data=None, user=None, password=
     if not verifycert:
         ssl._create_default_https_context = ssl._create_unverified_context
 
-    res = urllib.request.urlopen(req, data, timeout=timeout, cafile=cafile, capath=capath, cadefault=cadefault, context=context)
+    res = urllib.request.urlopen(req, data, timeout=timeout, context=context)
     return res
 
 def get_response_body(response, encoding=DEFAULT_ENCODING):
@@ -2890,6 +2885,8 @@ def decode_uri(s):
 def get_request_param(key=None, default=None, q=None):
     if q is None:
         q = get_query()
+    if q is None:
+        return default
     d = get_request_param_as_dict(q)
     if key is None:
         return d
