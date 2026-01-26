@@ -7,7 +7,7 @@
 # Usage:
 #   convenc.ps1 IN_PATH IN_ENC_NAME OUT_PATH OUT_ENC_NAME
 # e.g.,
-#   .\convenc.ps1 c:\tmp\a.txt utf-8 c:\tmp\b.txt shift_jis
+#   .\convenc.ps1 c:\tmp\a.txt shift_jis c:\tmp\b.txt utf-8
 ############################################################################
 # about_Execution_Policies (https://go.microsoft.com/fwlink/?LinkID=135170)
 # > Set-ExecutionPolicy Unrestricted -Scope CurrentUser
