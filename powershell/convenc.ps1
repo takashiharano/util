@@ -5,7 +5,7 @@
 # License: MIT
 ############################################################################
 # Usage:
-#   convenc.ps1 IN_PATH IN_ENC_NAME OUT_PATH OUT_ENC_NAME
+#   convenc.ps1 IN_PATH IN_ENCODING_NAME OUT_PATH OUT_ENCODING_NAME
 # e.g.,
 #   .\convenc.ps1 c:\tmp\a.txt shift_jis c:\tmp\b.txt utf-8
 ############################################################################
