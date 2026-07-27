@@ -1,6 +1,6 @@
 /*!
  * System Performance Monitor
- * Copyright (c) 2023 Takashi Harano
+ * Copyright 2023 Takashi Harano
  */
 var perf = {};
 perf.LED_COLOR_GREN = '#0f0';
@@ -267,8 +267,11 @@ perf.draw = function(dataList) {
     jheapOld: []
   };
 
+  var t0 = 0;
   for (i = 0; i < preMin; i++) {
-    dtStr = perf.getDateTimeString(tsMn1 + i * util.MINUTE);
+    var t1 = tsMn1 + i * util.MINUTE;
+    dtStr = perf.getDateTimeString2(t0, t1);
+    t0 = t1;
     xLabels.push(dtStr);
     chartData.cpu.push(null);
     chartData.mem.push(null);
@@ -295,7 +298,9 @@ perf.draw = function(dataList) {
     if ((prevTimestamp != -1) && (diff > (interval * 2))) {
       // Intervals with no data for more than 2 minutes are treated as missing
       for (var j = interval; j < diff; j += interval) {
-        dtStr = perf.getDateTimeString(prevTimestamp + j);
+        t1 = prevTimestamp + j;
+        dtStr = perf.getDateTimeString2(t0, t1);
+        t0 = t1;
         xLabels.push(dtStr);
         chartData.cpu.push(null);
         chartData.mem.push(null);
@@ -312,7 +317,8 @@ perf.draw = function(dataList) {
     oldPercent = (data.java_heap ? data.java_heap.old : 0);
     cpuPercent = data.cpu.usage;
     memPercent = data.mem.usage;
-    dtStr = perf.getDateTimeString(ts);
+    dtStr = perf.getDateTimeString2(t0, ts);
+    t0 = ts;
     xLabels.push(dtStr);
     chartData.cpu.push(cpuPercent);
     chartData.mem.push(memPercent);
@@ -323,7 +329,9 @@ perf.draw = function(dataList) {
   }
 
   for (i = 0; i < postMin; i++) {
-    dtStr = perf.getDateTimeString(tsE + i * util.MINUTE);
+    t1 = tsE + i * util.MINUTE;
+    dtStr = perf.getDateTimeString2(t0, t1);
+    t0 = t1;
     xLabels.push(dtStr);
     chartData.cpu.push(null);
     chartData.mem.push(null);
@@ -339,6 +347,13 @@ perf.draw = function(dataList) {
 
 perf.getDateTimeString = function(t) {
   return util.getDateTime(t).toString('%HH:%mm');
+};
+
+perf.getDateTimeString2 = function(t0, t1) {
+  var s0 = util.getDateTime(t0).toString('%YYYY%MM%DD');
+  var s1 = util.getDateTime(t1).toString('%YYYY%MM%DD');
+  var f = (s0 == s1) ? '%HH:%mm' : '%YYYY-%MM-%DD %HH:%mm';
+  return util.getDateTime(t1).toString(f);
 };
 
 perf.drawChart = function(xLabels, chartData) {

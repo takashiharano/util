@@ -1,6 +1,6 @@
 /*!
  * System Performance Monitor
- * Copyright (c) 2023 Takashi Harano
+ * Copyright 2023 Takashi Harano
  */
 var sysmon = {};
 

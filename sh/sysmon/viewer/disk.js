@@ -1,6 +1,6 @@
 /*!
  * Disk Usage Viewer
- * Copyright (c) 2024 Takashi Harano
+ * Copyright 2024 Takashi Harano
  */
 var disk = {};
 disk.dataList = [];
