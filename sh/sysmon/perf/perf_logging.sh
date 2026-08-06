@@ -2,7 +2,7 @@
 ############################################################################
 # perf_logging.sh
 # Copyright 2023 Takashi Harano
-# Released under the MIT license
+# Released under the MIT License
 # https://libutil.com/
 #
 # Usage:

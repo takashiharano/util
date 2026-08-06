@@ -2,7 +2,7 @@
 ############################################################################
 # perf.sh
 # Copyright 2022 Takashi Harano
-# Released under the MIT license
+# Released under the MIT License
 # https://libutil.com/
 #
 # Usage:

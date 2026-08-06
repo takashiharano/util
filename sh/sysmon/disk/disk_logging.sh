@@ -2,7 +2,7 @@
 ############################################################################
 # disk_logging.sh
 # Copyright 2024 Takashi Harano
-# Released under the MIT license
+# Released under the MIT License
 # https://libutil.com/
 #
 # Usage:
