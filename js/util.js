@@ -1,11 +1,11 @@
 /*!
  * util.js
  * Copyright 2019 Takashi Harano
- * Released under the MIT license
+ * Released under the MIT License
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202507131539';
+util.v = '202608070047';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
