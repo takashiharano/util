@@ -1,6 +1,7 @@
 /*!
  * System Performance Monitor
  * Copyright 2023 Takashi Harano
+ * Released under the MIT License
  */
 var perf = {};
 perf.LED_COLOR_GREN = '#0f0';

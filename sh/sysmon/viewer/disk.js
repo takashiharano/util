@@ -1,6 +1,7 @@
 /*!
  * Disk Usage Viewer
  * Copyright 2024 Takashi Harano
+ * Released under the MIT License
  */
 var disk = {};
 disk.dataList = [];

@@ -1,6 +1,7 @@
 #==============================================================================
 # System Performance Monitor
 # Copyright 2023 Takashi Harano
+# Released under the MIT License
 #==============================================================================
 import os
 import sys
