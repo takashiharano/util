@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.4+
-v = '202510050126'
+v = '202608111353'
 
 import sys
 import os
@@ -823,48 +823,17 @@ def strp_index(chars, pattern):
 
 # Returns a String pattern at the specified position
 def strp(chars, idx):
-    return _strp(chars, idx)['s']
-
-def _strp(chars, idx, a=None):
     if idx <= 0:
-        r = {
-            's': '',
-            'a': None
-        }
-        return r
+        return ''
 
-    tbl = list(chars)
-    tbl_len = len(tbl)
-    if a is None:
-        a = [-1]
-        st = 0
-    else:
-        st = idx - 1
+    rdx = len(chars)
+    result = []
 
-    for i in range(st, idx):
-        j = 0
-        carry_flag = True
-        while j < len(a):
-            if carry_flag:
-                a[j] += 1
-                if a[j] > tbl_len - 1:
-                    a[j] = 0
-                    if len(a) <= j + 1:
-                        a.append(-1)
-                else:
-                    carry_flag = False
-            j += 1
-    s = ''
-    len_a = len(a)
-    last_idx = len_a - 1
-    for i in range(len_a):
-        s += tbl[a[last_idx - i]]
+    while idx > 0:
+        idx, n = divmod(idx - 1, rdx)
+        result.append(chars[n])
 
-    r = {
-        's': s,
-        'a': a
-    }
-    return r
+    return ''.join(reversed(result))
 
 #------------------------------------------------------------------------------
 # Dict/JSON
