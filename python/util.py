@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.4+
-v = '202608111535'
+v = '202608111600'
 
 import sys
 import os
@@ -2379,8 +2379,8 @@ def _get_dir_info(path, pattern, recursive, lv, depth):
         dir_info['dirs'] = dirs
         dir_info['files'] = files
 
-        sort_object_list(dir_list, 'filename')
-        sort_object_list(file_list, 'filename')
+        dir_list = sort_object_list(dir_list, 'filename')
+        file_list = sort_object_list(file_list, 'filename')
         dir_info['children'] = dir_list + file_list
 
         if depth > 0 and lv + 1 > depth:
