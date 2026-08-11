@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.4+
-v = '202608111600'
+v = '202608111634'
 
 import sys
 import os
@@ -192,7 +192,7 @@ def lpad(s, ch, ln, adj=False):
     d = ln - lenw(r)
     if d <= 0:
         return r
-    pd = repeat_chr(ch, d)
+    pd = repeat_char(ch, d)
     r = pd + r
     if adj:
         r = r[0:ln]
@@ -208,18 +208,15 @@ def rpad(s, ch, ln, adj=False):
     d = ln - lenw(r)
     if d <= 0:
         return r
-    pd = repeat_chr(ch, d)
+    pd = repeat_char(ch, d)
     r += pd
     if adj:
         r = r[0:ln]
     return r
 
 # '0', 3 -> '000'
-def repeat_chr(c, n):
-    s = ''
-    for i in range(n):
-        s += c
-    return s
+def repeat_char(c, n):
+    return c * n
 
 # Convert newline
 def convert_newline(s, nl):
@@ -789,12 +786,7 @@ def split_item_value(s, separator):
     return a
 
 def _to_items_str(items, separator='|'):
-    s = ''
-    for i in range(len(items)):
-        if i > 0:
-            s += separator
-        s += items[i]
-    return s
+    return separator.join(items)
 
 #------------------------------------------------------------------------------
 # String permutation

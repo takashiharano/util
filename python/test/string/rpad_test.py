@@ -5,7 +5,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 import util
 
 def test():
-  ret = ''
+    ret = ''
     ret += util.rpad('', '0', 5) + '\n'
     ret += util.rpad('ABC', '0', 5) + '\n'
     ret += util.rpad('ABCDE', '0', 5) + '\n'
