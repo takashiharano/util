@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.4+
-v = '202608111353'
+v = '202608111535'
 
 import sys
 import os
@@ -2127,13 +2127,17 @@ def write_text_file(path, text, encoding=DEFAULT_ENCODING, make_dir=True, sync=T
     write_binary_file(path, b, make_dir=make_dir, sync=sync)
 
 def append_text_file(path, text, separator='\n', encoding=DEFAULT_ENCODING, make_dir=True, sync=True):
-    s = read_text_file(path, default=None, encoding=encoding)
-    if s is None:
-        s = ''
-    if s != '':
-        s += separator
-    s += text
-    write_text_file(path, s, encoding=encoding, make_dir=make_dir, sync=sync)
+    if make_dir:
+        make_parent_dir(path)
+
+    has_data = os.path.exists(path) and os.path.getsize(path) > 0
+    s = (separator if has_data else '') + text
+
+    with open(path, 'ab') as f:
+        f.write(s.encode(encoding))
+        if sync:
+            f.flush()
+            os.fsync(f.fileno())
 
 # Write text file from list
 def write_text_file_from_list(path, text_list, encoding=DEFAULT_ENCODING, make_dir=True, line_sep='\n', sync=True):
