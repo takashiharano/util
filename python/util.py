@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.4+
-v = '202608111634'
+v = '202608111750'
 
 import sys
 import os
@@ -2063,47 +2063,44 @@ def get_datetime_filename(suffix='', fmt='%Y%m%dT%H%M%S', prefix=''):
 #  't' = text
 #  'b' = bin
 def read_file(path, mode='b', default=None, encoding=DEFAULT_ENCODING):
-    if not path_exists(path):
-        return default
     if mode == 't':
-        return read_text_file(path, encoding)
+        return read_text_file(path, default, encoding)
     else:
-        return read_binary_file(path)
+        return read_binary_file(path, default)
 
 # Read file as text
 def read_text_file(path, default=None, encoding=DEFAULT_ENCODING):
-    if not path_exists(path):
+    try:
+        # f = TextIOWrapper
+        with open(path, 'r', encoding=encoding) as f:
+            return f.read()
+    except FileNotFoundError:
         return default
-    # f = TextIOWrapper
-    f = open(path, 'r', encoding=encoding)
-    text = f.read()
-    f.close()
-    return text
 
 # Read text file as list
 def read_text_file_as_list(path, default=[], encoding=DEFAULT_ENCODING):
-    text_list = default
-    if path_exists(path):
-        text = read_text_file(path, encoding=encoding)
-        text_list = text2list(text)
-        if len(text_list) == 1 and text_list[0] == '':
-            text_list = default
-            if typename(default) == 'list':
-                text_list = default.copy()
-    return text_list
+    text = read_text_file(path, default=None, encoding=encoding)
+
+    if text is None or text == '':
+        return default.copy() if type(default) is list else default
+
+    return text2list(text)
 
 # Read file as binary
 # return type: 'bytes'
-def read_binary_file(path):
-    # f = BufferedReader
-    f = open(path, 'rb')
-    b = f.read()
-    f.close()
-    return b
+def read_binary_file(path, default=None):
+    try:
+        # f = BufferedReader
+        with open(path, 'rb') as f:
+            return f.read()
+    except FileNotFoundError:
+        return default
 
 # Read file as Base64
-def read_file_as_base64(path):
-    b = read_binary_file(path)
+def read_file_as_base64(path, default=None):
+    b = read_binary_file(path, default=None)
+    if b is None:
+        return default
     return base64.b64encode(b).decode()
 
 # Write File
@@ -2141,7 +2138,6 @@ def write_binary_file(path, data, make_dir=True, chunk_size=0, sync=True):
     if make_dir:
         make_parent_dir(path)
     with open(path, 'wb') as f:
-        f.truncate(0)
         data_type = typename(data)
         if data_type == 'BufferedWriter' or data_type == 'BytesIO' or data_type == '_TemporaryFileWrapper' or data_type == 'BufferedRandom':
             for chunk in _read_chunk(data, chunk_size):
