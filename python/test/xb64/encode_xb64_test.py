@@ -5,7 +5,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 import util
 
 def test(s, k, exp):
-    b = util.encode_base64s(s, k)
+    b = util.encode_xb64(s, k)
     st = 'OK' if b == exp else 'NG'
     print('[' + st + '] exp=' + str(exp) + ' got=' + str(s))
 

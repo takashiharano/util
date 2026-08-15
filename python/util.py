@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.4+
-v = '202608111750'
+v = '202608151400'
 
 import sys
 import os
@@ -1911,9 +1911,9 @@ def decode_base64(s, encoding=DEFAULT_ENCODING, bin=False, altchars=None, valida
     return decoded
 
 #------------------------------------------------------------------------------
-# Base64s
+# XB64
 #------------------------------------------------------------------------------
-def encode_base64s(s, k='', encoding=DEFAULT_ENCODING):
+def encode_xb64(s, k='', encoding=DEFAULT_ENCODING):
     if s is None:
         return None
     if k is None:
@@ -1922,12 +1922,12 @@ def encode_base64s(s, k='', encoding=DEFAULT_ENCODING):
     if typename(s) == 'str':
         a = s.encode(encoding)
     kb = k.encode(DEFAULT_ENCODING)
-    b = _encode_base64s(a, kb)
+    b = _encode_xb64(a, kb)
     b = base64.b64encode(b)
     b64 = b.decode(encoding)
     return b64
 
-def _encode_base64s(a, k):
+def _encode_xb64(a, k):
     ln = len(a)
     kl = len(k)
     if ln == 0 or kl == 0:
@@ -1949,19 +1949,19 @@ def _encode_base64s(a, k):
     b.append(d)
     return bytearray(b)
 
-def decode_base64s(b64, k='', bin=False, encoding=DEFAULT_ENCODING):
+def decode_xb64(b64, k='', bin=False, encoding=DEFAULT_ENCODING):
     if b64 is None:
         return None
     if k is None:
         k = ''
     b = base64.b64decode(b64)
     kb = k.encode(DEFAULT_ENCODING)
-    d = _decode_base64s(b, kb)
+    d = _decode_xb64(b, kb)
     if not bin:
         d = d.decode(encoding)
     return d
 
-def _decode_base64s(a, k):
+def _decode_xb64(a, k):
     al = len(a)
     kl = len(k)
     if al == 0 or kl == 0:

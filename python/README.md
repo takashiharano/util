@@ -40,7 +40,7 @@ It is engineered with an embedded systems mindset—favoring minimalism, reliabi
 - ✅ Date/time handling (formatting, parsing, rounding, offsets)
 - ✅ CLI/system I/O (stdin, stdout encoding, argv handling)
 - ✅ Path operations (filename, extension, parent path)
-- ✅ Binary encoding (hex, base64, base64s, binary strings)
+- ✅ Binary encoding (hex, base64, xb64, binary strings)
 - ✅ JSON/dict processing and file persistence
 - ✅ Configuration file (Java-style `.properties`) loading/saving
 - ✅ Time arithmetic (clock time math, conversions)
