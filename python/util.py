@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202608312323'
+v = '202608312334'
 
 import sys
 import os
@@ -2776,7 +2776,7 @@ def unshift(arr, value, size=0):
 #  {'http': 'http://localhost:8080', 'https': 'https://localhost:8080', 'ftp': 'ftp://localhost:8080'}
 #
 def http(url, method='GET', params=None, data=None, user=None, password=None,
-         headers={}, proxies=None, encoding=DEFAULT_ENCODING,
+         headers=None, proxies=None, encoding=DEFAULT_ENCODING,
          timeout=DEFAULT_HTTP_TIMEOUT, context=None, verifycert=True):
     try:
         res = http_request(url, method, params, data, user, password, headers, proxies, encoding, timeout, context=context, verifycert=verifycert)
@@ -2819,8 +2819,13 @@ def http(url, method='GET', params=None, data=None, user=None, password=None,
 #                 messages will be printed to stdout as the response is read and parsed.
 #  closed       - Is True if the stream is closed.
 def http_request(url, method='GET', params=None, data=None, user=None, password=None,
-                 headers={}, proxies=None, encoding=DEFAULT_ENCODING,
+                 headers=None, proxies=None, encoding=DEFAULT_ENCODING,
                  timeout=DEFAULT_HTTP_TIMEOUT, context=None, verifycert=True):
+
+    if headers is None:
+        headers = {}
+    else:
+        headers = headers.copy()
 
     if data is None:
         if params is not None:
