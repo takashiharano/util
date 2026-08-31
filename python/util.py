@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.4+
-v = '202608311936'
+v = '202608312246'
 
 import sys
 import os
@@ -2816,7 +2816,7 @@ def http_request(url, method='GET', params=None, data=None, user=None, password=
     urllib.request.install_opener(opener)
 
     if not verifycert:
-        ssl._create_default_https_context = ssl._create_unverified_context
+        context = ssl._create_unverified_context()
 
     res = urllib.request.urlopen(req, data, timeout=timeout, context=context)
     return res
