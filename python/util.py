@@ -2,8 +2,8 @@
 # Copyright 2018 Takashi Harano
 # Released under the MIT License
 # https://libutil.com/
-# Python 3.4+
-v = '202608312246'
+# Python 3.6+
+v = '202608312323'
 
 import sys
 import os
@@ -45,7 +45,7 @@ THURSDAY = 4
 FRIDAY = 5
 SATURDAY = 6
 WDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
-LOCAL_TZ_OFFSET = datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo.utcoffset(None).seconds
+LOCAL_TZ_OFFSET = int(datetime.datetime.now(datetime.timezone.utc).astimezone().utcoffset().total_seconds())
 
 sys.dont_write_bytecode = True
 stdin_data = None
@@ -1107,15 +1107,22 @@ def to_set(arr):
 #     offset: datetime.timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
 class DateTime:
     def __init__(self, src=None, fmt=None, tz=None):
+        if typename(tz) == 'int':
+            tz = datetime.timezone(datetime.timedelta(seconds=tz))
+        elif typename(tz) == 'float':
+            os = int(tz * 3600)
+            tz = datetime.timezone(datetime.timedelta(seconds=os))
+
         if typename(src) == 'datetime':
             dt = src
+            if tz is not None:
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=tz)
+                else:
+                    dt = dt.astimezone(tz)
         else:
-            if typename(tz) == 'int':
-                tz = datetime.timezone(datetime.timedelta(seconds=tz))
-            elif typename(tz) == 'float':
-                os = int(tz * 3600)
-                tz = datetime.timezone(datetime.timedelta(seconds=os))
             dt = get_datetime(src, fmt, tz)
+
         self.timestamp = dt.timestamp()
         self.datetime = dt
         self.year = dt.year
@@ -1128,6 +1135,7 @@ class DateTime:
         self.weekday = dt.isoweekday()
         if self.weekday == 7:
             self.weekday = 0 # 0=SUN, 1=MON, 2=TUE, 3=WED, 4=THU, 5=FRI, 6=SAT
+
         self.yyyy = str(dt.year)
         self.mm = ('0' + str(dt.month))[-2:]
         self.dd = ('0' + str(dt.day))[-2:]
@@ -1135,13 +1143,12 @@ class DateTime:
         self.mi = ('0' + str(dt.minute))[-2:]
         self.ss = ('0' + str(dt.second))[-2:]
         self.us = ('00000' + str(dt.microsecond))[-6:]
-        if tz is None:
+
+        offset = dt.utcoffset()
+        if offset is None:
             self.offset = LOCAL_TZ_OFFSET
         else:
-            offset = tz.utcoffset(None).seconds
-            if offset > 43200:
-                offset = (86400 - offset) * (-1)
-            self.offset = offset
+            self.offset = int(offset.total_seconds())
 
     # 2020-01-02 12:34:56.123456 +09:00
     def to_str(self, fmt='%Y-%m-%d %H:%M:%S.%f %Z'):
@@ -1172,17 +1179,38 @@ def get_unixtime_millis(dt=None, fmt=None):
 # return: datetime
 def get_datetime(src=None, fmt=None, tz=None):
     if src is None:
-        dt = datetime.datetime.today()
-        if tz is not None:
-            ts = dt.timestamp()
-            dt = datetime.datetime.fromtimestamp(ts, tz)
+        if tz is None:
+            dt = datetime.datetime.today()
+        else:
+            dt = datetime.datetime.now(tz)
+
     elif typename(src) == 'str':
         if fmt is None:
             src = serialize_datetime(src)
-            fmt = '%Y%m%d%H%M%S%f'
+            if _get_tz_pos(src) != -1:
+                fmt = '%Y%m%d%H%M%S%f%z'
+            else:
+                fmt = '%Y%m%d%H%M%S%f'
+
         dt = datetime.datetime.strptime(src, fmt)
+
+        if tz is not None:
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=tz)
+            else:
+                dt = dt.astimezone(tz)
+
+    elif typename(src) == 'datetime':
+        dt = src
+        if tz is not None:
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=tz)
+            else:
+                dt = dt.astimezone(tz)
+
     else:
         dt = datetime.datetime.fromtimestamp(src, tz)
+
     return dt
 
 # datetime                  -> '2019-01-02 12:34:56.123456'
@@ -1211,12 +1239,9 @@ def get_timestamp(dt=None, fmt=None):
     if dt is None:
         dt = datetime.datetime.today()
     elif typename(dt) == 'str':
-        if fmt is None:
-            if is_float(dt):
-                return float(dt)
-            dt = serialize_datetime(dt)
-            fmt = '%Y%m%d%H%M%S%f'
-        dt = datetime.datetime.strptime(dt, fmt)
+        if fmt is None and is_float(dt):
+            return float(dt)
+        dt = get_datetime(dt, fmt)
     elif typename(dt) == 'int' or typename(dt) == 'float':
         return dt
     ts = dt.timestamp()
@@ -1314,6 +1339,11 @@ def serialize_datetime(s):
     wk = _split_datetime_and_timezone(w)
     w = wk[0]
     tz = wk[1]
+
+    if tz == 'Z':
+        tz = '+0000'
+    else:
+        tz = re.sub(r'^([+-]\d{2}):(\d{2})$', r'\1\2', tz)
 
     if re.search('[-/:]', w) is None:
         return _serialize_datetime(w, tz)
