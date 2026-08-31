@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202609010051'
+v = '202609010107'
 
 import sys
 import os
@@ -2446,9 +2446,25 @@ def delete(path, force=False):
 # Copy a file or DIR
 def copy(src, dst, overwrite=True):
     if is_dir(src):
+        if path_exists(dst):
+            if not overwrite:
+                return False
+            delete(dst, force=True)
         copy_dir(src, dst)
+
     else:
+        copy_dst = dst
+        if is_dir(dst):
+            copy_dst = join_path(dst, get_filename(src))
+
+        if path_exists(copy_dst):
+            if not overwrite:
+                return False
+            delete(copy_dst, force=True)
+
         copy_file(src, dst)
+
+    return True
 
 # copy_file('a.txt', 'b.txt')
 # copy_file('a.txt', 'd1')

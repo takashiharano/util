@@ -5,7 +5,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 import util
 
 def test_copy_dir():
-    util.copy_dir('d1', 'd3', True)
+    util.copy('d1', 'd3', True)
     return 'copy OK:'
 
 def main():
