@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202609010107'
+v = '202609010127'
 
 import sys
 import os
@@ -3223,7 +3223,7 @@ def get_cookie_val(key, default=None):
 
 # Set Cookie
 def set_cookie(headers, key, value, max_age=None, expires=None, path=None, secure=False, http_only=False):
-    cookie = build_cookie(key, value, max_age=max_age, path=path, http_only=http_only)
+    cookie = build_cookie(key, value, max_age=max_age, expires=expires, path=path, secure=secure, http_only=http_only)
     headers.append({'Set-Cookie': cookie})
     return headers
 
@@ -3235,7 +3235,7 @@ def build_cookie(key, value, max_age=None, expires=None, path=None, secure=False
         s += '; expires=' + expires
 
     if max_age is not None:
-        s += '; max-age=' + max_age
+        s += '; max-age=' + str(max_age)
 
     if path is not None:
         s += '; path=' + path
