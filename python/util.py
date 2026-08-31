@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202609010042'
+v = '202609010051'
 
 import sys
 import os
@@ -3437,6 +3437,11 @@ def send_response_debug(enable=True):
     res_debug = enable
 
 def send_html(html, headers=[]):
+    if headers is None:
+        headers = []
+    else:
+        headers = headers.copy()
+
     headers.append({'Cache-Control': 'no-cache'})
     send_response(html, 'text/html', headers=headers)
 
