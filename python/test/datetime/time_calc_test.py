@@ -107,6 +107,9 @@ def test_time_sub():
     s += _test_calc_time('sub', '000530.700000', '000520.400000', False, '00:00:10.300000')
     s += _test_calc_time('sub', '1500', '1200', False, '03:00:00.000000')
 
+    s += '\n--------------------\n'
+    s += _test_calc_time('sub', '01:00', '49:00', True, '00:00:00.000000 (-2 Days)')
+
     return s
 
 def _test_calc_time(type, t1, t2, by_the_day, expected):

@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202608312337'
+v = '202608312355'
 
 import sys
 import os
@@ -1632,17 +1632,9 @@ def time_sub(t1, t2):
     s1 = clock2sec(t1)
     s2 = clock2sec(t2)
     total_secs = s1 - s2
-    wk_secs = total_secs
-    days = 0
 
-    if wk_secs < 0:
-        wk_secs *= -1
-        days = int(wk_secs / DAY)
-        days = days + (0 if (wk_secs % DAY == 0) else 1)
-        if s1 != 0:
-            if wk_secs % DAY == 0 and wk_secs != DAY:
-                days += 1
-        wk_secs = DAY - (wk_secs - days * DAY)
+    day_offset, wk_secs = divmod(total_secs, DAY)
+    days = abs(int(day_offset))
 
     return _calc_time(total_secs, wk_secs, days)
 
