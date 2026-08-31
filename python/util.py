@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202608312355'
+v = '202609010042'
 
 import sys
 import os
@@ -875,7 +875,7 @@ def save_dict(path, obj, skipkeys=False, ensure_ascii=True, check_circular=True,
 # Make Parent Dir
 def make_parent_dir(path):
     parent_path = get_parent_path(path)
-    if not path_exists(parent_path):
+    if parent_path and not path_exists(parent_path):
         mkdir(parent_path)
 
 # Append Dict
