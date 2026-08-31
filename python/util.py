@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.4+
-v = '202608151400'
+v = '202608311936'
 
 import sys
 import os
@@ -2845,15 +2845,44 @@ def decode_uri(s):
 # returns key=None ? q{} : q[key]
 def get_request_param(key=None, default=None, q=None):
     if q is None:
-        q = get_query()
-    if q is None:
-        return default
-    d = get_request_param_as_dict(q)
+        content_type = os.environ.get('CONTENT_TYPE', '')
+        if content_type.startswith('multipart/form-data'):
+            d = _get_multipart_param_as_dict()
+        else:
+            q = get_query()
+            if q is None:
+                return default
+            d = get_request_param_as_dict(q)
+    else:
+        d = get_request_param_as_dict(q)
+
     if key is None:
         return d
+
     if key in d:
         return d[key]
+
     return default
+
+def _get_multipart_param_as_dict():
+    d = {}
+    data = get_multipart_data()
+    if data is None:
+        return d
+
+    for k in data:
+        part = data[k]
+        v = part['body']
+        disposition = part.get('disposition', {})
+
+        # 通常のフォームフィールドは文字列として返す
+        # ファイルはbytesのまま返す
+        if 'filename' not in disposition:
+            v = v.decode(DEFAULT_ENCODING)
+
+        d[k] = v
+
+    return d
 
 def get_request_param_as_int(key=None, default=0):
     p = get_request_param(key)
@@ -2878,9 +2907,7 @@ def get_query_param(key=None, default=None):
 # returns whole query string
 def get_query():
     content_type = os.environ.get('CONTENT_TYPE', '')
-    if content_type.startswith('multipart/form-data'):
-        q = read_stdin()
-    elif os.environ.get('REQUEST_METHOD') == 'POST':
+    if os.environ.get('REQUEST_METHOD') == 'POST' and not content_type.startswith('multipart/form-data'):
         q = read_stdin().decode()
     else:
         q = os.environ.get('QUERY_STRING')
@@ -2895,7 +2922,7 @@ def get_request_param_as_dict(q):
 
 def _get_query_param_as_dict(q):
     d = {}
-    if q == '':
+    if not q:
         return d
     a = q.split('&')
     for i in range(len(a)):
