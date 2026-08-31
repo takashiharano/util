@@ -2016,7 +2016,7 @@ def get_file_name(file_path):
     if len(parts) == 1:
         return filename
     ext = '.' + parts[-1]
-    return re.sub(ext, '', filename)
+    return filename[:-len(ext)]
 
 # Extension
 # './aaa/abc.txt' -> 'txt'

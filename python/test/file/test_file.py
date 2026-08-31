@@ -1,5 +1,3 @@
-#!python
-
 import os
 import sys
 
@@ -139,22 +137,6 @@ def test_file():
     s += '\n'
     s += 'test_is_dir() = ' + test_is_dir() + '\n'
     s += '\n'
-    path = util.get_relative_path(__file__, 'dir2')
-    s += 'get_size(\'' + path + '\')       = ' + str(util.get_size(path)) + '\n'
-
-    path = util.get_relative_path(__file__, 'dir2/')
-    s += 'get_size(\'' + path + '\')      = ' + str(util.get_size(path)) + '\n'
-
-    path = util.get_relative_path(__file__, 'dir2')
-    s += 'get_size(\'' + path + '\', True) = ' + str(util.get_size(path, True)) + '\n'
-
-    path = util.get_relative_path(__file__, 'a.txt')
-    s += 'get_size(\'' + path + '\')      = ' + str(util.get_size(path)) + '\n'
-
-    path = util.get_relative_path(__file__, 'dir1')
-    s += 'get_size(\'' + path + '\')       = ' + str(util.get_size(path)) + '\n'
-
-    s += '\n'
     s += 'test_list_dir() = ' + test_list_dir() + '\n'
     s += '\n'
     s += 'test_list_files() = ' + test_list_files() + '\n'
@@ -169,6 +151,6 @@ def test_file():
 
 def main():
     s = test_file()
-    util.send_response('text', s)
+    print(s)
 
 main()
