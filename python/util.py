@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202608312334'
+v = '202608312337'
 
 import sys
 import os
@@ -3034,15 +3034,16 @@ def parse_multipart_data(buf, boundary):
 
         part_data = parse_part_data(part_buf)
         header = part_data['header']
-        if 'Content-Disposition' not in header:
+        if header is None or 'Content-Disposition' not in header:
             continue
 
         content_desposition = header['Content-Disposition']
         disposition = parse_content_desposition(content_desposition)
         if 'name' in disposition:
-             name = disposition['name']
-             part_data['disposition'] = disposition
-             data[name] = part_data
+            name = disposition['name']
+            part_data['disposition'] = disposition
+            data[name] = part_data
+
     return data
 
 def parse_content_desposition(line):
