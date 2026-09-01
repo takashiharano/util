@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202609012228'
+v = '202609012300'
 
 import sys
 import os
@@ -2508,13 +2508,16 @@ def move(src, dst, force=False):
 # Rename file/dir
 def rename(src, dst, force=False):
     if path_exists(dst):
-        if force:
-            if is_file(src) == is_file(dst):
-                delete_file(dst)
-            else:
-                return False
+        if not force:
+            return False
+
+        if is_file(src) and is_file(dst):
+            delete_file(dst)
+        elif is_dir(src) and is_dir(dst):
+            rmdir(dst, force=True)
         else:
             return False
+
     os.rename(src, dst)
     return True
 
