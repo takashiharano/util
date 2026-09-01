@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202609012300'
+v = '202609020004'
 
 import sys
 import os
@@ -2983,21 +2983,28 @@ def get_request_param_as_dict(q):
 
 def _get_query_param_as_dict(q):
     d = {}
+
     if not q:
         return d
+
     a = q.split('&')
+
     for i in range(len(a)):
-        p = a[i].split('=')
-        k = p[0]
+        p = a[i].split('=', 1)
+
+        k = urllib.parse.unquote_plus(p[0])
+
         v = ''
         if len(p) >= 2:
-            v = decode_uri(p[1])
+            v = urllib.parse.unquote_plus(p[1])
+
         if k in d:
             if typename(d[k]) == 'str':
                 d[k] = [d[k]]
             d[k].append(v)
         else:
             d[k] = v
+
     return d
 
 def _get_form_values_as_dict(f):
