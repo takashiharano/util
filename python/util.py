@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202609010127'
+v = '202609011958'
 
 import sys
 import os
@@ -1216,20 +1216,35 @@ def get_datetime(src=None, fmt=None, tz=None):
 # datetime                  -> '2019-01-02 12:34:56.123456'
 # 1546400096.123456 (float) -> '2019-01-02 12:34:56.123456'
 def get_datetime_str(dt=None, fmt='%Y-%m-%d %H:%M:%S.%f', tz=None):
-    s = None
     if dt is None:
-        dt = datetime.datetime.today()
+        if tz is None:
+            dt = datetime.datetime.today()
+        else:
+            dt = datetime.datetime.now(tz)
+
     elif typename(dt) == 'float' or typename(dt) == 'int':
         dt = datetime.datetime.fromtimestamp(dt, tz)
+
     elif typename(dt) == 'str':
         if match(dt, '%'):
             fmt = dt
-            dt = datetime.datetime.today()
+            if tz is None:
+                dt = datetime.datetime.today()
+            else:
+                dt = datetime.datetime.now(tz)
+        elif is_float(dt):
+            dt = datetime.datetime.fromtimestamp(float(dt), tz)
         else:
-            dt = get_timestamp(dt)
-            dt = datetime.datetime.fromtimestamp(dt, tz)
-    s = dt.strftime(fmt)
-    return s
+            dt = get_datetime(dt, tz=tz)
+
+    elif typename(dt) == 'datetime':
+        if tz is not None:
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=tz)
+            else:
+                dt = dt.astimezone(tz)
+
+    return dt.strftime(fmt)
 
 # POSIX timestamp (float)
 # datetime                     -> 1546400096.123456
