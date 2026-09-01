@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202609011958'
+v = '202609012228'
 
 import sys
 import os
@@ -1502,55 +1502,53 @@ def next_timestamp(time_list, offset=1, moment=None, tz=None):
     return dt.timestamp()
 
 def next_datetime(time_list, offset=1, moment=None, tz=None):
-    if moment is None:
-        moment = datetime.datetime.today()
-    elif typename(moment) == 'float' or typename(moment) == 'int':
-        moment = datetime.datetime.fromtimestamp(moment, tz)
-    elif typename(moment) == 'str':
-        moment = get_datetime(moment)
+    moment = get_datetime(moment, tz=tz)
 
     time_list = sorted(time_list)
-    last_index = len(time_list) - 1
+
+    candidate_tz = tz
+    if candidate_tz is None:
+        candidate_tz = moment.tzinfo
+
     year = moment.year
     month = moment.month
     day = moment.day
-    timestamp = moment.timestamp()
 
     found = False
+    n = 0
+
     for i in range(len(time_list)):
-        date_time = _get_next_datetime(year, month, day, time_list, i)
-        if timestamp <= date_time.timestamp():
+        date_time = _get_next_datetime(year, month, day, time_list, i, candidate_tz)
+
+        if moment <= date_time:
+            n = i
             found = True
             break
 
-    if found:
-        n = i
-    else:
+    day_offset = 0
+    if not found:
         n = 0
+        day_offset = 1
 
     if offset > 0:
-        index = (n + offset - 1) % len(time_list)
+        pos = n + offset - 1
     else:
-        index = (n + offset) % len(time_list)
-    if n > last_index:
-        index = n - (last_index - 1)
+        pos = n + offset
 
-    date_time = _get_next_datetime(year, month, day, time_list, index)
+    days, index = divmod(pos, len(time_list))
+    day_offset += days
 
-    if n + offset < 0:
-        date_time = date_time + datetime.timedelta(days=-1)
-    elif not found:
-        date_time = date_time + datetime.timedelta(days=1)
+    date = moment.date() + datetime.timedelta(days=day_offset)
 
-    return date_time
+    return _get_next_datetime(date.year, date.month, date.day, time_list, index, candidate_tz)
 
-def _get_next_datetime(year, month, day, time_list, index):
+def _get_next_datetime(year, month, day, time_list, index, tz=None):
     hhmm = time_list[index]
     hour = int(hhmm[0:2])
     min = int(hhmm[2:4])
     sec = 0
     usec = 0
-    return datetime.datetime(year, month, day, hour, min, sec, usec)
+    return datetime.datetime(year, month, day, hour, min, sec, usec, tzinfo=tz)
 
 # ['20190627T090000', '20190627T123000', '20190628T010000']
 # '20190627T150000' -> '20190627T123000'
