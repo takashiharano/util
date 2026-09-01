@@ -1868,16 +1868,18 @@ def clock2float(s, ndigits=None):
     a = s.split(':')
     hh = a[0]
     mm = a[1]
-    h = int(hh)
+
+    sign = -1 if hh.startswith('-') else 1
+
+    h = abs(int(hh))
     m = int(mm)
-    sign = 1
-    if h < 0:
-        h *= -1
-        sign = -1
+
     f = (h + m / 60) * sign
     r = f
+
     if ndigits is not None:
         r = round(f, ndigits)
+
     return r
 
 #  7    -> '07:00'
