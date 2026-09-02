@@ -2528,7 +2528,7 @@ def rename(src, dst, force=False):
 # replace_file('a.txt', r"(?P<p1>.*\.v\s+=\s+').*(?P<p2>';)", r'\g<p1>20190101-1234\g<p2>')
 def replace_file(path, pattern, repl, count=0, flags=0):
     text = read_text_file(path)
-    if re.search(pattern, text, re.MULTILINE) is None:
+    if re.search(pattern, text, flags) is None:
         return False
     else:
         new_text = re.sub(pattern, repl, text, count, flags)
