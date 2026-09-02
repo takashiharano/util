@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202609022210'
+v = '202609022225'
 
 import sys
 import os
@@ -191,11 +191,12 @@ def lpad(s, ch, ln, adj=False):
     r = str(s)
     d = ln - lenw(r)
     if d <= 0:
+        if adj:
+            r = r[0:ln]
         return r
+
     pd = repeat_char(ch, d)
     r = pd + r
-    if adj:
-        r = r[0:ln]
     return r
 
 # rpad(str, '0', 5)
@@ -207,11 +208,12 @@ def rpad(s, ch, ln, adj=False):
     r = str(s)
     d = ln - lenw(r)
     if d <= 0:
+        if adj:
+            r = r[0:ln]
         return r
+
     pd = repeat_char(ch, d)
     r += pd
-    if adj:
-        r = r[0:ln]
     return r
 
 # '0', 3 -> '000'
