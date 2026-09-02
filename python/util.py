@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202609022225'
+v = '202609022234'
 
 import sys
 import os
@@ -3494,10 +3494,10 @@ def send_html(html, headers=[]):
 # content_type: MIME Type
 # filename: default filename to download
 # etag: "xyzzy"
-# headers: {
-#   'Field-Name': 'Field-Value',
+# headers: [
+#   {'Field-Name': 'Field-Value'},
 #   ...
-# }
+# ]
 # status: HTTP status code for response
 def send_as_file(content, filename='', content_type='application/octet-stream', etag='', headers=None, status=200):
     # Prevent the following error:
@@ -3513,14 +3513,24 @@ def send_as_file(content, filename='', content_type='application/octet-stream', 
         b = content
 
     st = str(status)
-    status_message =  get_status_message(st)
+    status_message = get_status_message(st)
     status_header = 'Status: ' + st + ' ' + status_message
     print(status_header)
 
     if content_type != '':
         print('Content-Type: ' + content_type)
 
-    if headers is None or 'Content-Length' not in headers:
+    has_content_length = False
+    if headers is not None:
+        for header in headers:
+            for name in header:
+                if name.lower() == 'content-length':
+                    has_content_length = True
+                    break
+            if has_content_length:
+                break
+
+    if not has_content_length:
         content_len = len(b)
         print('Content-Length: ' + str(content_len))
 
