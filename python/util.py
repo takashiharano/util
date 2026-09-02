@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202609022300'
+v = '202609022311'
 
 import sys
 import os
@@ -962,7 +962,7 @@ def get_dict_by_key(dictlist, keyname, keyvalue, default=None):
 #------------------------------------------------------------------------------
 # Properties
 #------------------------------------------------------------------------------
-def load_properties(path, data_strict=None, base_dict={}):
+def load_properties(path, data_strict=None, base_dict=None):
     result = load_properties_file(path, base_dict)
     if data_strict is not None:
         result['props'] = to_data_struct(result['props'], data_strict)
@@ -974,9 +974,18 @@ def load_properties(path, data_strict=None, base_dict={}):
 
     return result
 
-def load_properties_file(path, default={}):
+def load_properties_file(path, default=None):
+    if default is None:
+        default = {}
+    else:
+        default = default.copy()
+
     if not path_exists(path):
-        return default
+        return {
+            'props': default,
+            'error': ''
+        }
+
     props = {}
     e = ''
     text_list = read_text_file_as_list(path)
@@ -984,14 +993,18 @@ def load_properties_file(path, default={}):
         line = text_list[i]
         if line.startswith('#') or line == '':
             continue
+
         p = line.find('=')
         if p == -1:
             if e != '':
                 e += '  '
             e += 'L=' + str(i + 1) + ': \'=\' not found: text=\'' + line + '\''
+            continue
+
         key = line[0:p]
         val = line[p + 1:]
         props[key] = val
+
     result = {
         'props': props,
         'error': e
