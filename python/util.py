@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202609022154'
+v = '202609022210'
 
 import sys
 import os
@@ -621,6 +621,10 @@ def split_keywords(s, limit=0):
     ch = ''
     val = ''
     s = s.strip()
+
+    if limit == 1:
+        return [s]
+
     for i in range(len(s)):
         val_len += 1
         ch = s[i]
@@ -642,8 +646,7 @@ def split_keywords(s, limit=0):
                         val = s[start:start + val_len]
                         val = extract_quoted_string(val, quoted_ch)
                         vals.append(val)
-                        quoted_ch = None
-                        i = len(s)
+                    return vals
 
         elif ch == '(':
             if srch:
