@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202609022234'
+v = '202609022300'
 
 import sys
 import os
@@ -2860,8 +2860,8 @@ def http_request(url, method='GET', params=None, data=None, user=None, password=
             q = urllib.parse.urlencode(params, doseq=True)
             if method == 'POST':
                 data = q.encode(encoding)
-            else:
-                url += '?' + q
+            elif q != '':
+                url += ('&' if '?' in url else '?') + q
     else:
         if typename(data) == 'str':
             data = data.encode()
@@ -2874,14 +2874,18 @@ def http_request(url, method='GET', params=None, data=None, user=None, password=
     if 'User-Agent' not in headers:
         req.add_header('User-Agent', 'Mozilla/5.0')
 
-    proxy = urllib.request.ProxyHandler(proxies)
-    opener = urllib.request.build_opener(proxy)
-    urllib.request.install_opener(opener)
-
     if not verifycert:
         context = ssl._create_unverified_context()
 
-    res = urllib.request.urlopen(req, data, timeout=timeout, context=context)
+    proxy = urllib.request.ProxyHandler(proxies)
+
+    if context is not None:
+        https = urllib.request.HTTPSHandler(context=context)
+        opener = urllib.request.build_opener(proxy, https)
+    else:
+        opener = urllib.request.build_opener(proxy)
+
+    res = opener.open(req, data, timeout=timeout)
     return res
 
 def get_response_body(response, encoding=DEFAULT_ENCODING):
