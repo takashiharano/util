@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202609020004'
+v = '202609022154'
 
 import sys
 import os
@@ -1623,11 +1623,8 @@ def add_time(t1, t2):
 # * Returns ClockTime object
 def time_add(t1, t2):
     total_secs = add_time(t1, t2)
-    wk_secs = total_secs
-    days = 0
-    if wk_secs >= DAY:
-        days = int(wk_secs / DAY)
-        wk_secs -= days * DAY
+    day_offset, wk_secs = divmod(total_secs, DAY)
+    days = abs(int(day_offset))
     return _calc_time(total_secs, wk_secs, days)
 
 # Subtraction
