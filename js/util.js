@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609051850';
+util.v = '202609060147';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1316,6 +1316,10 @@ util.floor = function(num, scale) {
 
 util.ceil = function(num, scale) {
   return util._shift(Math.ceil(util._shift(num, scale, false)), scale, true);
+};
+
+util.trunc = function(num, scale) {
+  return util._shift(Math.trunc(util._shift(num, scale, false)), scale, true);
 };
 
 util._shift = function(num, scale, reverseShift) {
@@ -7653,34 +7657,14 @@ util.Counter.prototype = {
   },
   up: function() {
     var ctx = this;
-    var v = ctx.v;
-    if (ctx.scale == 0) {
-      v++;
-    } else {
-      v = util.alignDecimal(v, ctx.scale).replace('.', '');
-      v = parseInt(v) + 1;
-      var s = v + '';
-      v = s.slice(0, s.length - ctx.scale) + '.' + s.slice(ctx.scale * (-1));
-    }
+    var v = util.trunc(parseFloat(ctx.v), ctx.scale);
+    v = util.round(v + Math.pow(10, -ctx.scale), ctx.scale);
     ctx.setValue(v);
   },
   down: function() {
     var ctx = this;
-    var v = ctx.v;
-    if (ctx.scale == 0) {
-      v--;
-    } else {
-      v = util.alignDecimal(v, ctx.scale).replace('.', '');
-      v = parseInt(v);
-      if (v <= 0) {
-        v = v * (-1) + 1;
-        var s = '-' + util.lpad(v, '0', ctx.scale);
-      } else {
-        v--;
-        s = v + '';
-      }
-      v = s.slice(0, s.length - ctx.scale) + '.' + s.slice(ctx.scale * (-1));
-    }
+    var v = util.trunc(parseFloat(ctx.v), ctx.scale);
+    v = util.round(v - Math.pow(10, -ctx.scale), ctx.scale);
     ctx.setValue(v);
   },
   setText: function(s) {
