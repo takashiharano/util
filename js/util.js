@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202608151400';
+util.v = '202609051428';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1030,7 +1030,7 @@ util.clock.stop = function(el) {
 util.Clock = function(el, opt) {
   if (typeof opt == 'string') {
     opt = {fmt: opt};
-  } else if (typeof a1 == 'number') {
+  } else if (typeof opt == 'number') {
     opt = {offset: opt};
   }
   opt = util.copyDefaultProps(util.Clock.DFLT_OPT, opt);
