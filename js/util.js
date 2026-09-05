@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609051659';
+util.v = '202609051706';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -4661,6 +4661,9 @@ util.Window = function(opt) {
   ctx.win = this.createWin(ctx, opt);
   ctx.win.ctx = ctx;
   document.body.appendChild(ctx.win);
+  var w = ctx.win.offsetWidth - util.Window.WIN_BORDER * 2;
+  var h = ctx.win.offsetHeight - util.Window.WIN_BORDER * 2;
+  ctx.size(w, h);
   ctx.moveToInitPos();
   ctx.initWidth = ctx.win.offsetWidth - util.Window.WIN_BORDER * 2;
   ctx.initHeight = ctx.win.offsetHeight - util.Window.WIN_BORDER * 2;
@@ -5407,7 +5410,7 @@ util.Window.prototype = {
     if (w) {
       if (w < ctx.computedMinW) {
         w = ctx.computedMinW;
-      } else if ((ctx.computedMaxW > 0) && (h > ctx.computedMaxW)) {
+      } else if ((ctx.computedMaxW > 0) && (w > ctx.computedMaxW)) {
         w = ctx.computedMaxW;
       }
       ctx.win.style.width = w + 'px';
