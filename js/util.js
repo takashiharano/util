@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609051815';
+util.v = '202609051850';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -39,7 +39,7 @@ util.MONTH = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OC
  * src:
  *  timestamp (millis from 1970-01-01T00:00:00Z) / Date-Time-String / Date object
  * tzOffset: (OPT)
- *  -480='-0800' / 0='+0000'='Z' / 540='+0900'
+ *  -8='-0800' / 0='+0000'='Z' / 9='+0900' / 9.5='+0930'
  */
 util.DateTime = function(src, tzOffset) {
   var dt, st;
@@ -48,7 +48,7 @@ util.DateTime = function(src, tzOffset) {
     dt = new Date();
   } else if (typeof src == 'string') {
     if (tzOffset != undefined) {
-      src += tzOffset;
+      src += ((typeof tzOffset == 'number') ? util.formatTZ(tzOffset) : tzOffset);
       tzOffset = undefined;
     }
     st = util.str2datestruct(src);
@@ -64,8 +64,7 @@ util.DateTime = function(src, tzOffset) {
   if (tzOffset == undefined) {
     tzOffset = ((st && st.tz) ? st.tz : util.getLocalTZ());
   } else {
-    var os = tzOffset;
-    if (typeof os == 'string') os = util.getOffsetFromLocalTz(os);
+    var os = util.getOffsetFromLocalTz(tzOffset);
     dt = new Date(timestamp + os);
     timestamp = dt.getTime();
   }
@@ -80,8 +79,7 @@ util.DateTime = function(src, tzOffset) {
   }
 
   if (srcType) timestamp = src;
-  var tzOffsetMin = tzOffset;
-  if (typeof tzOffset == 'string') tzOffsetMin = util.tz2ms(tzOffset) / 60000;
+  if (typeof tzOffset == 'string') tzOffset = util.tz2ms(tzOffset) / util.HOUR;
   var year = dt.getFullYear();
   var month = dt.getMonth() + 1;
   var day = dt.getDate();
@@ -99,7 +97,6 @@ util.DateTime = function(src, tzOffset) {
   this.second = second;
   this.millisecond = millisecond;
   this.tzOffset = tzOffset;
-  this.tzOffsetMin = tzOffsetMin;
   this.wday = dt.getDay(); // Sunday=0 - Saturday=6
   this.WDAYS = util.WDAYS;
 
@@ -117,7 +114,7 @@ util.DateTime.prototype = {
   },
   // -> '+0900' / ext=true: '+09:00'
   getTZ: function(ext) {
-    return util.formatTZ(this.tzOffsetMin, ext);
+    return util.formatTZ(this.tzOffset, ext);
   },
   toString: function(fmt) {
     if (!fmt) fmt = '%YYYY-%MM-%DD %HH:%mm:%SS.%sss %Z';
@@ -412,13 +409,10 @@ util.getMidnightTimestamp = function(dt, offset) {
 };
 
 /**
- * Returns time zone offset string from hours/minutes
+ * Returns time zone offset string from hours
  * -8         -> -0800
  *  9         -> +0900
  *  9, true   -> +09:00
- * -480       -> -0800
- *  540       -> +0900
- *  540, true -> +09:00
  */
 util.formatTZ = function(v, e) {
   var s = '+';
@@ -427,8 +421,7 @@ util.formatTZ = function(v, e) {
     s = '-';
     v *= -1;
   }
-  var f = ((v <= 24) ? util.formatTzH : util.formatTzM);
-  var str = s + f(v);
+  var str = s + util.formatTzH(v);
   if (e) str = str.slice(0, 3) + ':' + str.slice(3, 5);
   return str;
 };
@@ -436,11 +429,6 @@ util.formatTzH = function(v) {
   var w = ('' + v).split('.');
   var h = +w[0];
   var m = +('0.' + (w[1] | 0)) * 60;
-  return ('0' + h).slice(-2) + ('0' + m).slice(-2);
-};
-util.formatTzM = function(v) {
-  var h = (v / 60) | 0;
-  var m = v - h * 60;
   return ('0' + h).slice(-2) + ('0' + m).slice(-2);
 };
 
@@ -513,7 +501,7 @@ util.hours2clock = function(s, sep) {
  * ext=true: +09:00
  */
 util.getLocalTZ = function(ext) {
-  return util.formatTZ(new Date().getTimezoneOffset() * (-1), ext);
+  return util.formatTZ(new Date().getTimezoneOffset() / -60, ext);
 };
 
 /**
@@ -531,15 +519,6 @@ util.getLocalTzName = function() {
   var n = Intl.DateTimeFormat().resolvedOptions().timeZone;
   if (!n) n = '';
   return n;
-};
-
-/**
- * Returns local TZ offset in minutes
- * at +0900 ->  540
- * at -0800 -> -480
- */
-util.getLocalTzOffsetMin = function() {
-  return new Date().getTimezoneOffset() * -1;
 };
 
 /**
