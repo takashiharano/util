@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609051713';
+util.v = '202609051755';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -139,12 +139,10 @@ util.DateTime.prototype = {
     var SS = ('0' + S).slice(-2);
     var sss = ('00' + this.millisecond).slice(-3);
     var s = util.trimTrailingZeros(sss);
-    var ampm = 'AM';
-    var h12 = '' + this.hour;
-    if (this.hour >= 12) {
-      ampm = 'PM';
-      h12 = (this.hour - 12) + '';
-    }
+    var ampm = (this.hour >= 12) ? 'PM' : 'AM';
+    var h12 = this.hour % 12;
+    if (h12 == 0) h12 = 12;
+    h12 += '';
     var hh12 = ('0' + h12).slice(-2);
     var r = fmt;
     r = r.replace(/%YYYY/g, yyyy);
