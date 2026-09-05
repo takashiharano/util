@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609051709';
+util.v = '202609051713';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -8213,7 +8213,7 @@ util.dnd.onDrop = function(e) {
     handler = handlers[i];
     if (util.isTargetEl(e.target, handler.el)) break;
   }
-  if (i == handlers) return;
+  if (i == handlers.length) return;
   var cb = handler.cb;
   if (handler.mode == 'evt') {
     if (cb) cb(e);
