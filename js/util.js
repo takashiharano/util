@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609051706';
+util.v = '202609051709';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -6575,7 +6575,7 @@ util.Meter.prototype = {
     this.redraw();
   },
   setOptimum: function(v) {
-    this.optimum = v | 0;
+    this.opt.optimum = v | 0;
     this.redraw();
   },
   setSpeed: function(v) {
