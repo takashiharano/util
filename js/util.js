@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609061838';
+util.v = '202609061857';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1545,12 +1545,23 @@ util.copyObject = function(src, dst) {
 };
 
 util.copyDefaultProps = function(dflt, tgt) {
-  if (!tgt) tgt = {};
+  var type = util.objtype(dflt);
+  if (!tgt) tgt = ((type == '[object Array]') ? [] : {});
   for (var k in dflt) {
-    if (!(k in tgt)) {
-      tgt[k] = dflt[k];
-    } else if (tgt[k] instanceof Object) {
-      util.copyDefaultProps(dflt[k], tgt[k]);
+    if (!Object.prototype.hasOwnProperty.call(dflt, k)) continue;
+    var v = dflt[k];
+    var vType = util.objtype(v);
+    if (k in tgt) {
+      var tType = util.objtype(tgt[k]);
+      if ((vType == tType) && ((vType == '[object Object]') || (vType == '[object Array]'))) {
+        util.copyDefaultProps(v, tgt[k]);
+      }
+    } else {
+      if ((vType == '[object Object]') || (vType == '[object Array]')) {
+        tgt[k] = util.copyDefaultProps(v);
+      } else {
+        tgt[k] = v;
+      }
     }
   }
   return tgt;
