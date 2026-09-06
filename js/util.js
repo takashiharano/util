@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609061929';
+util.v = '202609061940';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -5702,7 +5702,7 @@ util.modal.prototype = {
     var ctx = el.ctx;
     if (ctx && (ctx.sig == 'modal')) {
       if (ctx.rmvByClickCb) ctx.rmvByClickCb();
-      ctx.hide();
+      util.modal.hide(ctx);
     }
   }
 };
@@ -5787,13 +5787,19 @@ util.dialog = function(content, opt) {
   ctx.el = ctx.create(ctx, o.boby, opt);
   ctx.btnEls = o.btnEls;
   ctx.open = true;
-
   var closeAnywhere = false;
   if (opt) {
     if (opt.closeAnywhere) closeAnywhere = true;
   }
-
-  ctx.modal = util.modal.show(ctx.el, closeAnywhere, opt.onclose);
+  var onclose = null;
+  if (closeAnywhere) {
+    onclose = function() {
+      util.dialog.remove(ctx);
+      ctx.open = false;
+      if (opt.onclose) opt.onclose();
+    };
+  }
+  ctx.modal = util.modal.show(ctx.el, closeAnywhere, onclose);
   setTimeout(util.dialog.focusBtn, 10);
 };
 util.dialog.prototype = {
