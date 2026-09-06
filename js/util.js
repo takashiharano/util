@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609070038';
+util.v = '202609070054';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -6093,6 +6093,7 @@ util.dialog.info = function(a1, a2, a3, a4) {
     title: title,
     buttons: [{label: 'OK', focus: true, cb: cb}],
     className: opt.className,
+    data: opt.data,
     style: opt.style
   };
   msg = util.null2empty(msg);
