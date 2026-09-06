@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609062318';
+util.v = '202609070008';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3529,13 +3529,18 @@ util._clearHTML = function(el) {
  */
 util.textseq = function(el, text, opt) {
   el = util.getElement(el);
+  var textseqCtx = el.$$textseqCtx;
+  if (textseqCtx) {
+    if (textseqCtx.tmrId > 0) clearTimeout(textseqCtx.tmrId);
+    delete el.$$textseqCtx;
+  }
   if (!opt) opt = {};
   var cursor = opt.cursor;
   if (typeof opt.cursor == 'number') delete opt.cursor;
   util.copyDefaultProps(util.textseq.DFLT_OPT, opt);
   if (typeof cursor == 'number') opt.cursor.n = cursor;
   if (text instanceof Array) {
-    el.$$textseqCtx = {textList: text, idx: 0, opt: opt};
+    el.$$textseqCtx = {textList: text, idx: 0, opt: opt, tmrId: 0};
     text = text[0];
   }
   return util.textseq1(el, text, opt);
@@ -3659,18 +3664,25 @@ util.textseq.onprogress = function(ctx, pos, prevPos, cutLen) {
 util.textseq.oncomplete = function(ctx) {
   var el = ctx.el;
   var i = util.getCtxIdx4El(util.textseq.ctxs, el);
+  if ((i < 0) || (util.textseq.ctxs[i] != ctx)) return;
   util.textseq.ctxs.splice(i, 1);
   var textseqCtx = el.$$textseqCtx;
   var idx;
   if (textseqCtx) idx = textseqCtx.idx;
   if (ctx.oncomplete) ctx.oncomplete(ctx, idx);
-  if (textseqCtx) {
-    textseqCtx.idx++;
-    if (textseqCtx.idx < textseqCtx.textList.length) {
-      if (!textseqCtx.opt.cursor.repeat) textseqCtx.opt.cursor.n = 0;
-      setTimeout(util.textseq1, textseqCtx.opt.pause, el, textseqCtx.textList[textseqCtx.idx], textseqCtx.opt);
-    }
+  if (!textseqCtx || (el.$$textseqCtx != textseqCtx)) return;
+  textseqCtx.idx++;
+  if (textseqCtx.idx < textseqCtx.textList.length) {
+    if (!textseqCtx.opt.cursor.repeat) textseqCtx.opt.cursor.n = 0;
+    textseqCtx.tmrId = setTimeout(util.textseq.next, textseqCtx.opt.pause, el, textseqCtx);
+  } else {
+    delete el.$$textseqCtx;
   }
+};
+util.textseq.next = function(el, ctx) {
+  if (el.$$textseqCtx != ctx) return;
+  ctx.tmrId = 0;
+  util.textseq1(el, ctx.textList[ctx.idx], ctx.opt);
 };
 util.textseq.createCtx = function(el, text, opt) {
   if (!opt) opt = {};
