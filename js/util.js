@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609061143';
+util.v = '202609061154';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -7570,7 +7570,7 @@ util.Counter = function(el, opt) {
   if (typeof opt.duration == 'number') {
     opt.duration = {min: opt.duration, max: opt.duration};
   }
-  var v = opt.value;
+  var v = util.trunc(parseFloat(opt.value), opt.scale);
   ctx.dMin = opt.duration.min;
   ctx.dMax = opt.duration.max;
   ctx.R = 20;
@@ -7607,7 +7607,7 @@ util.Counter.prototype = {
   },
   setValue: function(v, dur) {
     var ctx = this;
-    v = util.floor(parseFloat(v), ctx.scale);
+    v = util.trunc(parseFloat(v), ctx.scale);
     ctx._stopTmr(ctx);
     ctx.v = v;
     var dMax = (dur == undefined ? ctx.dMax : dur);
