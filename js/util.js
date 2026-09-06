@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609061857';
+util.v = '202609061906';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3367,6 +3367,7 @@ util.color.getS = function(r, g, b) {
   var a = util.color.sortRGB(r, g, b);
   var min = a[0];
   var max = a[2];
+  if (max == 0) return 0;
   var s = (max - min) / max;
   return Math.round(s * 255);
 };
