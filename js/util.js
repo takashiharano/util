@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609062245';
+util.v = '202609062300';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -4284,7 +4284,7 @@ util.fadeIn = function(el, speed, cb, arg) {
     el.fadeTimerId = 0;
   }
   util.addClass(el, 'fadeout');
-  setTimeout(util._fadeIn, 0, el, speed, cb, arg);
+  el.fadeTimerId = setTimeout(util._fadeIn, 0, el, speed, cb, arg);
 };
 util._fadeIn = function(el, speed, cb, arg) {
   var t = speed / 1000;
@@ -4308,7 +4308,7 @@ util.fadeOut = function(el, speed, cb, arg) {
     el.fadeTimerId = 0;
   }
   util.removeClass(el, 'fadein');
-  setTimeout(util._fadeOut, 0, el, speed, cb, arg);
+  el.fadeTimerId = setTimeout(util._fadeOut, 0, el, speed, cb, arg);
 };
 util._fadeOut = function(el, speed, cb, arg) {
   var t = speed / 1000;
