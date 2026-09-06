@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609070008';
+util.v = '202609070038';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -7425,9 +7425,18 @@ util.RingBuffer.prototype = {
     ctx.buffer[i] = data;
   },
   get: function(idx) {
-    if (this.len < this.cnt) idx += this.cnt;
-    idx %= this.len;
-    return this.buffer[idx];
+    var ctx = this;
+    if (idx < 0) {
+      idx *= -1;
+      if (((ctx.cnt < ctx.len) && (idx > ctx.cnt)) || ((ctx.cnt >= ctx.len) && (idx > ctx.len))) {
+        return;
+      }
+      idx = ctx.cnt - idx;
+    } else {
+      if (ctx.len < ctx.cnt) idx += ctx.cnt;
+    }
+    idx %= ctx.len;
+    return ctx.buffer[idx];
   },
   getAll: function() {
     var buf = [];
