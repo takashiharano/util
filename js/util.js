@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609062300';
+util.v = '202609062310';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -5497,7 +5497,7 @@ util.Window.prototype = {
     var ctx = this;
     if (!util.Window.isContext(ctx)) ctx = util.Window.getContext(this);
     if ((f == true) || (util.callFn(ctx.opt.onbeforeclose, ctx) !== false)) {
-      util.modal.hide(ctx.modal);
+      if (ctx.modal) util.modal.hide(ctx.modal);
       util.fadeOut(ctx.win, 200, ctx._close, ctx);
     }
   },
