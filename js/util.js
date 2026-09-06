@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609061824';
+util.v = '202609061838';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2501,7 +2501,7 @@ util.http.onDone = function(xhr, req) {
     util._log.v('[' + req.trcid + '] ' + m);
   }
   if (util.http.onReceive(xhr, res, req)) {
-    if (st == 200) {
+    if ((st >= 200) && (st < 300)) {
       if (util.http.isJSONable(xhr, req)) {
         try {
           res = util.fromJSON(res);
