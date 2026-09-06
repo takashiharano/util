@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609061909';
+util.v = '202609061929';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2645,7 +2645,7 @@ util.http.listeners = {
 //---------------------------------------------------------
 var $el = function(tgt, idx) {
   var el = util.getElement(tgt, idx);
-  if (el) {
+  if (el && ((el.toString() != '[object NodeList]') || (el.length > 0))) {
     for (var k in $el.fn) {
       if (el[k] == undefined) el[k] = $el.fn[k];
     }
