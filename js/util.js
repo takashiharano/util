@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609061330';
+util.v = '202609061355';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2779,14 +2779,14 @@ util.getElement = function(tgt, idx) {
   return el;
 };
 
-util.callFn4El = function(f, el, a1, a2) {
+util.callFn4El = function(f, el, a1, a2, a3) {
   var r;
   if (el.toString() == '[object NodeList]') {
     for (var i = 0; i < el.length; i++) {
-      r = f(el[i], a1, a2);
+      r = f(el[i], a1, a2, a3);
     }
   } else {
-    r = f(el, a1, a2);
+    r = f(el, a1, a2, a3);
   }
   return r;
 };
@@ -7439,8 +7439,8 @@ util.Console = function(el, opt) {
   var fontFamily = (opt.fontFamily == undefined ? 'Consolas, Monaco, Menlo, monospace, sans-serif' : opt.fontFamily);
 
   var pre = document.createElement('pre');
-  pre.width = '100%';
-  pre.height = '100%';
+  pre.style.width = '100%';
+  pre.style.height = '100%';
   pre.style.margin = 0;
   pre.style.padding = 0;
   pre.style.fontFamily = fontFamily;
