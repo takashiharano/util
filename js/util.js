@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609061355';
+util.v = '202609061410';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3863,11 +3863,11 @@ util.setupStyle = function() {
 };
 
 util.setStyle = function(el, a1, a2, a3) {
+  el = util.getElement(el);
+  if (!el) return;
   util.callFn4El(util._setStyle, el, a1, a2, a3);
 };
 util._setStyle = function(el, a1, a2, a3) {
-  el = util.getElement(el);
-  if (!el) return;
   var imp = true;
   if ((a1 === false) || (a2 === false) || (a3 === false)) imp = false;
   if (a1 instanceof Object) {
