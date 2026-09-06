@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609061906';
+util.v = '202609061909';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1534,8 +1534,7 @@ util.copyObject = function(src, dst) {
     if (!dst) dst = {};
     for (var k in src) {
       if (src[k] instanceof Object) {
-        dst[k] = {};
-        util.copyObject(src[k], dst[k]);
+        dst[k] = util.copyObject(src[k]);
       } else {
         dst[k] = src[k];
       }
