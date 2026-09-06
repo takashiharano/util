@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609061200';
+util.v = '202609061330';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -387,27 +387,34 @@ util.getTimestampOfDay = function(timeString, offset) {
 
 /**
  * Returns the midnight timestamp of the date-time.
- * dt: date-time string or timestamp in millis
- * offset: TZ offset. '-1200' to '+1400' (abs) / -12 to 14 (rel)
+ * dt: date-time string / timestamp in millis / Date object
+ * offset: TZ offset. -12 or '-1200' to 14 or '+1400'
  * 1628679929040 -> 1628640000000 (offset='+0000')
  */
 util.getMidnightTimestamp = function(dt, offset) {
-  var ms = dt;
-  var os = 0;
+  var ms;
   if (dt == undefined) {
-    dt = util.getDateTime();
+    ms = Date.now();
   } else if (typeof dt == 'string') {
-    dt = util.getDateTime(dt);
-    ms = dt.timestamp;
-    if ((offset == undefined) && dt.tz) os = util.getOffsetFromLocalTz(dt.tz);
+    var t = util.getDateTime(dt);
+    if (offset == undefined) {
+      if (t.tz) offset = t.tz;
+    } else if (!t.tz) {
+      t = util.getDateTime(dt, offset);
+    }
+    ms = t.timestamp;
+  } else if (dt instanceof Date) {
+    ms = dt.getTime();
+  } else {
+    ms = dt;
   }
-  if (offset != undefined) {
-    os = ((typeof offset == 'string') ? util.getOffsetFromLocalTz(offset) : offset * 3600000);
+  if (offset == undefined) {
+    var d = new Date(ms);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
   }
-  var t = ((typeof dt == 'number') ? util.getDateTime(ms) : dt);
-  var d = new Date(t.year, t.month - 1, t.day);
-  var r = new util.DateTime(d).timestamp;
-  return r - os;
+  var os = ((typeof offset == 'string') ? util.tz2ms(offset) : offset * util.HOUR);
+  d = new Date(ms + os);
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - os;
 };
 
 /**
