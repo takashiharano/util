@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609072110';
+util.v = '202609072230';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1492,7 +1492,6 @@ util.randomString = function(a1, a2, a3) {
   }
   if (typeof a3 == 'number') max = a3;
   if (!tbl) tbl = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  if (typeof tbl == 'string') tbl = tbl.split('');
   if (min == -1) min = DFLT_LEN;
   if (max == -1) max = min;
   var s = '';
@@ -2089,7 +2088,6 @@ util.xlscolShift = function(c, o) {
  * strp('ABC', 4) -> 'AA'
  */
 util.strp = function(tbl, idx) {
-  if (typeof tbl == 'string') tbl = tbl.split('');
   var len = tbl.length;
   var a = [-1];
   for (var i = 0; i < idx; i++) {
@@ -2122,7 +2120,6 @@ util.strp = function(tbl, idx) {
  * strpIndex('ABC', 'AA') -> 4
  */
 util.strpIndex = function(tbl, ptn) {
-  if (typeof tbl == 'string') tbl = tbl.split('');
   var len = ptn.length;
   var rdx = tbl.length;
   var idx = 0;
@@ -2144,7 +2141,6 @@ util.strpIndex = function(tbl, ptn) {
  * strpTotal('ABC', 2) -> 12
  */
 util.strpTotal = function(tbl, d) {
-  if (typeof tbl == 'string') tbl = tbl.split('');
   var c = tbl.length;
   var n = 0;
   for (var i = 1; i <= d; i++) {
@@ -8059,11 +8055,10 @@ util.isForwardMovement = function(azimuth, heading, range) {
 
 //---------------------------------------------------------
 util.calcMod10 = function(s, w) {
-  var a = s.split('');
   var v = [0, 0];
   var d = 0;
-  for (var i = a.length - 1; i >= 0; i--) {
-    v[d % 2] += a[i] | 0;
+  for (var i = s.length - 1; i >= 0; i--) {
+    v[d % 2] += s[i] | 0;
     d++;
   }
   var c = v[0] * w + v[1];
@@ -8071,11 +8066,10 @@ util.calcMod10 = function(s, w) {
 };
 
 util.calcMod11 = function(s) {
-  var a = s.split('');
   var n = 0;
   var d = 0;
-  for (var i = a.length - 1; i >= 0; i--) {
-    var v = a[i] | 0;
+  for (var i = s.length - 1; i >= 0; i--) {
+    var v = s[i] | 0;
     n += v * ((d % 6) + 2);
     d++;
   }
@@ -8090,12 +8084,11 @@ util.calcMod43 = function(s) {
       s = eval(s);
     } catch (e) {return '';}
   }
-  var a = s.split('');
   var n = 0;
-  for (var i = 0; i < a.length; i++) {
-    var v = a[i];
+  for (var i = 0; i < s.length; i++) {
+    var v = s[i];
     if (v == '*') {
-      if ((i == 0) || (i == a.length - 1)) {
+      if ((i == 0) || (i == s.length - 1)) {
         continue;
       } else {
         return '';
