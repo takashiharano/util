@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609070054';
+util.v = '202609072110';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -7782,12 +7782,9 @@ util.Counter.prototype = {
 //---------------------------------------------------------
 // Interval Proc
 //---------------------------------------------------------
-// Start  : util.IntervalProc.start('<PROC_ID>', fn, 1000, ARG, [async(true|false)]);
+// Start  : util.IntervalProc.start('<PROC_ID>', fn, 1000, ARG, [manualNext(true|false)]);
 // Stop   : util.IntervalProc.stop('<PROC_ID>');
 // Restart: util.IntervalProc.start('<PROC_ID>');
-//
-// Async:
-// -> call in fn: util.IntervalProc.next('<PROC_ID>');
 //---------------------------------------------------------
 util.IntervalProc = {};
 
@@ -7796,7 +7793,8 @@ util.IntervalProc = {};
 //     fn: function(),
 //     interval: millis,
 //     arg: argument for fn,
-//     async: true|false,
+//     manualNext: true|false, // true: next() must be called manually
+//     active: true|false,
 //     tmrId: timer-id
 //   }
 // }
@@ -7805,12 +7803,13 @@ util.IntervalProc.procs = {};
 /**
  * Register an interval proc.
  */
-util.IntervalProc.register = function(id, fn, interval, arg, async) {
+util.IntervalProc.register = function(id, fn, interval, arg, manualNext) {
   util.IntervalProc.procs[id] = {
     fn: fn,
     interval: interval,
     arg: arg,
-    async: (async ? true : false),
+    manualNext: (manualNext ? true : false),
+    active: false,
     tmrId: 0
   };
 };
@@ -7825,11 +7824,12 @@ util.IntervalProc.remove = function(id) {
 /**
  * Start an interval proc.
  */
-util.IntervalProc.start = function(id, fn, interval, arg, async) {
-  if (fn) util.IntervalProc.register(id, fn, interval, arg, async);
+util.IntervalProc.start = function(id, fn, interval, arg, manualNext) {
+  if (fn) util.IntervalProc.register(id, fn, interval, arg, manualNext);
   var p = util.IntervalProc.procs[id];
   if (p) {
     util.IntervalProc._stop(p);
+    p.active = true;
     util.IntervalProc.exec(id);
   }
 };
@@ -7839,7 +7839,10 @@ util.IntervalProc.start = function(id, fn, interval, arg, async) {
  */
 util.IntervalProc.stop = function(id) {
   var p = util.IntervalProc.procs[id];
-  if (p) util.IntervalProc._stop(p);
+  if (p) {
+    p.active = false;
+    util.IntervalProc._stop(p);
+  }
 };
 util.IntervalProc._stop = function(p) {
   if (p.tmrId > 0) {
@@ -7853,7 +7856,7 @@ util.IntervalProc._stop = function(p) {
  */
 util.IntervalProc.next = function(id, interval) {
   var p = util.IntervalProc.procs[id];
-  if (p) {
+  if (p && p.active) {
     util.IntervalProc._stop(p);
     if (interval == undefined) interval = p.interval;
     p.tmrId = setTimeout(util.IntervalProc.exec, interval, id);
@@ -7873,9 +7876,11 @@ util.IntervalProc.setInterval = function(id, interval) {
  */
 util.IntervalProc.exec = function(id) {
   var p = util.IntervalProc.procs[id];
-  if (p) {
+  if (p && p.active) {
     p.fn(p.arg);
-    if (!p.async) util.IntervalProc.next(id);
+    if ((util.IntervalProc.procs[id] == p) && p.active && !p.manualNext) {
+      util.IntervalProc.next(id);
+    }
   }
 };
 
