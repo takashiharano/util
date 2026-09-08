@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609081236';
+util.v = '202609081925';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1346,12 +1346,15 @@ util._shift = function(num, scale, reverseShift) {
 // 123   , 1 -> '123.0'
 // 123.4 , 1 -> '123.4'
 // 123.45, 1 -> '123.5'
-// type: 0=floor / 1=round / 2=ceil
+// type: 'round'|'floor'|'ceil'|'trunc' (default='round')
 // zero: true=0 / false=0.0
 util.alignDecimal = function(v, scale, type, zero) {
-  var F = [util.floor, util.round, util.ceil];
-  var f = F[type | 0];
-  if (!f) f = F[0];
+  var f = util.round;
+  switch (type) {
+    case 'floor': f = util.floor; break;
+    case 'ceil': f = util.ceil; break;
+    case 'trunc': f = util.trunc; break;
+  }
   v = f(v, scale);
   if (zero && v == 0) return 0;
   return util.alignDecimalZero(v, scale);
