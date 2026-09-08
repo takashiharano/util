@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609082039';
+util.v = '202609082057';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3372,6 +3372,7 @@ util.color.sortRGB = function(r, g, b) {
 
 //---------------------------------------------------------
 util.textarea = {};
+util.textarea.CTCH = {0: 'NUL', 9: 'TAB', 10: 'LF', 11: 'ESC', 32: 'SP', 127: 'DEL', 12288: 'emSP'};
 /**
  * addStatusInfo('#textarea-id', '#infoarea-id')
  */
@@ -3401,12 +3402,11 @@ util.updateTextAreaInfo = function(textarea) {
   var ch = util.str2chars(txt)[st] || '';
   var u10 = util.getCodePoint(ch);
   var u16 = util.getUnicodePoints(ch, true);
-  var CTCH = {0: 'NUL', 9: 'TAB', 10: 'LF', 11: 'ESC', 32: 'SP', 127: 'DEL', 12288: 'emSP'};
   if (isNaN(u10)) {
     ch = '[END]';
     u16 = 'U+----';
-  } else if (CTCH[u10]) {
-    ch = CTCH[u10];
+  } else if (util.textarea.CTCH[u10]) {
+    ch = util.textarea.CTCH[u10];
   }
   if (textarea.infoarea) {
     var cp = ch + '&nbsp;' + u16 + (u10 ? '(' + u10 + ')' : '');
@@ -3414,9 +3414,12 @@ util.updateTextAreaInfo = function(textarea) {
     var l = (t.match(/\n/g) || []).length + 1;
     var c = t.replace(/.*\n/g, '').length + 1;
     var tc = util.clipTextLine(txt, st).length;
-    var slT = txt.substring(st, ed);
-    var slL = util.countLineBreak(slT) + 1;
-    var slct = (sl ? ' SEL:' + ('LEN=' + sl + '/L=' + slL) : '');
+    var slct = '';
+    if (sl) {
+      var slT = txt.substring(st, ed);
+      var slL = util.countLineBreak(slT) + 1;
+      slct = ' SEL:LEN=' + sl + '/L=' + slL;
+    }
     var s = cp;
     s += ' ' + l + ':' + c + ' ';
     s += ' C=' + tc + ' L=' + tl;
