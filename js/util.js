@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609072230';
+util.v = '202609081236';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -889,14 +889,13 @@ util.timecounter.start = function(el, t0, opt) {
  * Stop displaying the time difference
  */
 util.timecounter.stop = function(el, t0, opt) {
-  var v = 0;
   var o = util.timecounter.getObj(el);
   if (!o) {
     o = new util.TimeCounter(el, t0, opt);
     util.timecounter.objs[o.id] = o;
   }
   if (t0 != undefined) o.t0 = t0;
-  v = o.update(o);
+  var v = o.update(o);
   o.stop();
   delete util.timecounter.objs[o.id];
   return v;
@@ -1947,8 +1946,7 @@ util.formatNumber = function(v) {
   if (!v.match(/\d+/)) return v;
   var d = v.replace(/.*?(\d+).*/, '$1');
   var f = util.separateDigits(d);
-  var re = new RegExp(d);
-  return v.replace(re, f);
+  return v.replace(d, f);
 };
 util.separateDigits = function(v) {
   var len = v.length;
@@ -7918,11 +7916,10 @@ util.event.send = function(name, data) {
 util.event._send = function() {
   var ev = util.event.events.shift();
   if (!ev) return;
-  var e = {name: ev.name, data: ev.data};
   var listeners = util.event.listeners[ev.name];
-  if (listeners) util.event.callListeners(listeners, e);
+  if (listeners) util.event.callListeners(listeners, ev);
   listeners = util.event.listeners['*'];
-  if (listeners) util.event.callListeners(listeners, e);
+  if (listeners) util.event.callListeners(listeners, ev);
 };
 
 util.event.callListeners = function(listeners, e) {
