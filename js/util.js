@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609081941';
+util.v = '202609082022';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3547,10 +3547,9 @@ util.textseq.DFLT_OPT = {
   oncomplete: null // <callback-function(ctx)>
 };
 util.textseq1 = function(el, text, opt) {
-  var ctx = util.getCtx4El(util.textseq.ctxs, el);
-  if (ctx) util.textseq._stop(ctx);
-  ctx = util.textseq.createCtx(el, text, opt);
   var i = util.getCtxIdx4El(util.textseq.ctxs, el);
+  if (i >= 0) util.textseq._stop(util.textseq.ctxs[i]);
+  var ctx = util.textseq.createCtx(el, text, opt);
   if (i < 0) {
     util.textseq.ctxs.push(ctx);
   } else {
