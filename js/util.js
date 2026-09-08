@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609082057';
+util.v = '202609082106';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2065,9 +2065,7 @@ util.xlscolA2N = function(c) {
   return util.strpIndex(util.A2Z, c.trim().toUpperCase());
 };
 util.xlscolN2A = function(n) {
-  var a = util.strp(util.A2Z, n);
-  if (n <= 0) a = '';
-  return a;
+  return ((n > 0) ? util.strp(util.A2Z, n) : '');
 };
 util.xlscolShift = function(c, o) {
   var n = util.xlscolA2N(c);
@@ -2119,12 +2117,10 @@ util.strpIndex = function(tbl, ptn) {
   var idx = 0;
   for (var i = 0; i < len; i++) {
     var d = len - i - 1;
-    var c = ptn.slice(d, d + 1);
-    var v = tbl.indexOf(c);
+    var v = tbl.indexOf(ptn[d]);
     if (v == -1) return 0;
     v++;
-    var n = v * Math.pow(rdx, i);
-    idx += n;
+    idx += v * Math.pow(rdx, i);
   }
   return idx;
 };
