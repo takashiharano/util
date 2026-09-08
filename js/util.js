@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609081933';
+util.v = '202609081941';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1656,20 +1656,17 @@ util.isEmailAddress = function(s) {
  */
 util.startsWith = function(s, p, a3, a4) {
   if (s == null) return false;
-  var a = [a3, a4];
   var o = 0;
-  var i = 0;
+  var ci = a3;
   if (typeof a3 == 'number') {
     o = a3;
-    i++;
+    ci = a4;
   }
-  var ci = a[i];
   if (o) s = s.slice(o);
   if ((s == '') && (p == '')) return true;
   if (p == '') return false;
-  var f = (ci ? 'i' : '');
-  var re = new RegExp('^' + p, f);
-  return s.match(re) != null;
+  var re = new RegExp('^' + p, ci ? 'i' : '');
+  return re.test(s);
 };
 
 /**
@@ -1679,20 +1676,17 @@ util.startsWith = function(s, p, a3, a4) {
  */
 util.endsWith = function(s, p, a3, a4) {
   if (s == null) return false;
-  var a = [a3, a4];
   var l = 0;
-  var i = 0;
+  var ci = a3;
   if (typeof a3 == 'number') {
     l = a3;
-    i++;
+    ci = a4;
   }
-  var ci = a[i];
   if (l) s = s.slice(0, l);
   if ((s == '') && (p == '')) return true;
   if (p == '') return false;
-  var f = (ci ? 'i' : '');
-  var re = new RegExp(p + '$', f);
-  return s.match(re) != null;
+  var re = new RegExp(p + '$', ci ? 'i' : '');
+  return re.test(s);
 };
 
 util.repeatCh = function(c, n) {
