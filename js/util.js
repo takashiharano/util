@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609120041';
+util.v = '202609120210';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -7150,8 +7150,8 @@ util.rot47 = function(s, n) {
 //---------------------------------------------------------
 // Base64
 //---------------------------------------------------------
-util.Base64 = {};
-util.Base64.encode = function(arr) {
+util.base64 = {};
+util.base64.encode = function(arr) {
   var len = arr.length;
   if (len == 0) return '';
   var tbl = {64: 61, 63: 47, 62: 43};
@@ -7169,7 +7169,7 @@ util.Base64.encode = function(arr) {
   }
   return str;
 };
-util.Base64.decode = function(str) {
+util.base64.decode = function(str) {
   var arr = [];
   if (str.length == 0) return arr;
   for (var i = 0; i < str.length; i++) {
@@ -7253,8 +7253,8 @@ util.toBinaryString = function(a) {
 util.xb64 = {};
 util.xb64.encode = function(src, key) {
   if (src == null) return null;
-  if (typeof src == 'string') src = util.UTF8.toByteArray(src);
-  var k = util.UTF8.toByteArray(key);
+  if (typeof src == 'string') src = util.utf8.toByteArray(src);
+  var k = util.utf8.toByteArray(key);
   var ln = src.length;
   var kl = k.length;
   if ((ln == 0) || (kl == 0)) {
@@ -7271,12 +7271,12 @@ util.xb64.encode = function(src, key) {
     }
     b.push(d);
   }
-  return util.Base64.encode(b);
+  return util.base64.encode(b);
 };
 util.xb64.decode = function(src, key) {
   if (src == null) return null;
-  var a = util.Base64.decode(src);
-  var k = util.UTF8.toByteArray(key);
+  var a = util.base64.decode(src);
+  var k = util.utf8.toByteArray(key);
   var al = a.length;
   var kl = k.length;
   if ((al == 0) || (kl == 0)) return a.slice();
@@ -7291,14 +7291,14 @@ util.xb64.decode = function(src, key) {
 util.xb64.decodeToString = function(src, key) {
   if (src == null) return null;
   var a = util.xb64.decode(src, key);
-  return util.UTF8.fromByteArray(a);
+  return util.utf8.fromByteArray(a);
 };
 
 //---------------------------------------------------------
 // UTF-8
 //---------------------------------------------------------
-util.UTF8 = {};
-util.UTF8.toByteArray = function(s) {
+util.utf8 = {};
+util.utf8.toByteArray = function(s) {
   var a = [];
   if (!s) return a;
   var chs = util.str2chars(s);
@@ -7317,7 +7317,7 @@ util.UTF8.toByteArray = function(s) {
   }
   return a;
 };
-util.UTF8.fromByteArray = function(b) {
+util.utf8.fromByteArray = function(b) {
   if (!b) return null;
   var e = '';
   for (var i = 0; i < b.length; i++) {
@@ -7346,7 +7346,7 @@ util.bit8.invert = function(v) {
 // BSB64
 //---------------------------------------------------------
 util.encodeBSB64 = function(s, n) {
-  var a = ((typeof s == 'string') ? util.UTF8.toByteArray(s) : s);
+  var a = ((typeof s == 'string') ? util.utf8.toByteArray(s) : s);
   return util.BSB64.encode(a, n);
 };
 util.decodeBSB64 = function(s, n, byB) {
@@ -7358,7 +7358,7 @@ util.decodeBSB64 = function(s, n, byB) {
     n = v[1];
   }
   var a = util.BSB64.decode(s, n);
-  if (!byB) a = util.UTF8.fromByteArray(a);
+  if (!byB) a = util.utf8.fromByteArray(a);
   return a;
 };
 util.BSB64 = {};
@@ -7369,12 +7369,12 @@ util.BSB64.encode = function(a, n) {
   for (var i = 0; i < a.length; i++) {
     b.push(fn(a[i], n));
   }
-  return util.Base64.encode(b);
+  return util.base64.encode(b);
 };
 util.BSB64.decode = function(s, n) {
   var fn = util.bit8.rotateR;
   if (n % 8 == 0) fn = util.bit8.invert;
-  var b = util.Base64.decode(s);
+  var b = util.base64.decode(s);
   var a = [];
   for (var i = 0; i < b.length; i++) {
     a.push(fn(b[i], n));
