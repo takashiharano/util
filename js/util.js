@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609082154';
+util.v = '202609120041';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -7250,42 +7250,36 @@ util.toBinaryString = function(a) {
 //---------------------------------------------------------
 // XB64
 //---------------------------------------------------------
-util.encodeXB64 = function(s, k) {
-  var a = ((typeof s == 'string') ? util.UTF8.toByteArray(s) : s);
-  var x = util.UTF8.toByteArray(k);
-  var b = util._encodeXB64(a, x);
+util.xb64 = {};
+util.xb64.encode = function(src, key) {
+  if (src == null) return null;
+  if (typeof src == 'string') src = util.UTF8.toByteArray(src);
+  var k = util.UTF8.toByteArray(key);
+  var ln = src.length;
+  var kl = k.length;
+  if ((ln == 0) || (kl == 0)) {
+    var b = src;
+  } else {
+    var d = kl - ln;
+    if (d < 0) d = 0;
+    b = [];
+    for (var i = 0; i < ln; i++) {
+      b.push(src[i] ^ k[i % kl]);
+    }
+    for (i = 0; i < d; i++) {
+      b.push(255 ^ k[(ln + i) % kl]);
+    }
+    b.push(d);
+  }
   return util.Base64.encode(b);
 };
-util._encodeXB64 = function(a, k) {
-  var ln = a.length;
-  var kl = k.length;
-  if ((ln == 0) || (kl == 0)) return a;
-  var d = kl - ln;
-  if (d < 0) d = 0;
-  var b = [];
-  for (var i = 0; i < ln; i++) {
-    b.push(a[i] ^ k[i % kl]);
-  }
-  var n = i;
-  for (i = 0; i < d; i++) {
-    b.push(255 ^ k[(n + i) % kl]);
-  }
-  b.push(d);
-  return b;
-};
-util.decodeXB64 = function(s, k, byB) {
-  if (s == null) return null;
-  s = util.convertNewLine(s, '\n').replace(/\n/g, '');
-  var b = util.Base64.decode(s);
-  var x = util.UTF8.toByteArray(k);
-  var a = util._decodeXB64(b, x);
-  if (!byB) a = util.UTF8.fromByteArray(a);
-  return a;
-};
-util._decodeXB64 = function(a, k) {
+util.xb64.decode = function(src, key) {
+  if (src == null) return null;
+  var a = util.Base64.decode(src);
+  var k = util.UTF8.toByteArray(key);
   var al = a.length;
   var kl = k.length;
-  if ((al == 0) || (kl == 0)) return a;
+  if ((al == 0) || (kl == 0)) return a.slice();
   var d = a[al - 1];
   var ln = al - d - 1;
   var b = [];
@@ -7293,6 +7287,11 @@ util._decodeXB64 = function(a, k) {
     b.push(a[i] ^ k[i % kl]);
   }
   return b;
+};
+util.xb64.decodeToString = function(src, key) {
+  if (src == null) return null;
+  var a = util.xb64.decode(src, key);
+  return util.UTF8.fromByteArray(a);
 };
 
 //---------------------------------------------------------
