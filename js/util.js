@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609120210';
+util.v = '202609121203';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -7330,11 +7330,11 @@ util.utf8.fromByteArray = function(b) {
 // bit operation
 //---------------------------------------------------------
 util.bit8 = {};
-util.bit8.rotateL = function(v, n) {
+util.bit8.rotateLeft = function(v, n) {
   n = n % 8;
   return ((v << n) | (v >> (8 - n))) & 255;
 };
-util.bit8.rotateR = function(v, n) {
+util.bit8.rotateRight = function(v, n) {
   n = n % 8;
   return ((v >> n) | (v << (8 - n))) & 255;
 };
@@ -7345,41 +7345,35 @@ util.bit8.invert = function(v) {
 //---------------------------------------------------------
 // BSB64
 //---------------------------------------------------------
-util.encodeBSB64 = function(s, n) {
-  var a = ((typeof s == 'string') ? util.utf8.toByteArray(s) : s);
-  return util.BSB64.encode(a, n);
-};
-util.decodeBSB64 = function(s, n, byB) {
-  if (s == null) return null;
-  s = util.convertNewLine(s, '\n').replace(/\n/g, '');
-  if (s.match(/\$\d+$/)) {
-    var v = s.split('$');
-    s = v[0];
-    n = v[1];
+util.bsb64 = {};
+util.bsb64.encode = function(src, n) {
+  if (typeof src == 'string') src = util.utf8.toByteArray(src);
+  var fn = util.bit8.rotateLeft;
+  if (n % 8 == 0) {
+    fn = util.bit8.invert;
   }
-  var a = util.BSB64.decode(s, n);
-  if (!byB) a = util.utf8.fromByteArray(a);
-  return a;
-};
-util.BSB64 = {};
-util.BSB64.encode = function(a, n) {
-  var fn = util.bit8.rotateL;
-  if (n % 8 == 0) fn = util.bit8.invert;
-  var b = [];
-  for (var i = 0; i < a.length; i++) {
-    b.push(fn(a[i], n));
+  var buf = [];
+  for (var i = 0; i < src.length; i++) {
+    buf.push(fn(src[i], n));
   }
-  return util.base64.encode(b);
+  var str = util.base64.encode(buf);
+  return str;
 };
-util.BSB64.decode = function(s, n) {
-  var fn = util.bit8.rotateR;
-  if (n % 8 == 0) fn = util.bit8.invert;
-  var b = util.base64.decode(s);
-  var a = [];
-  for (var i = 0; i < b.length; i++) {
-    a.push(fn(b[i], n));
+util.bsb64.decode = function(src, n) {
+  var fn = util.bit8.rotateRight;
+  if (n % 8 == 0) {
+    fn = util.bit8.invert;
   }
-  return a;
+  var buf = util.base64.decode(src);
+  var arr = [];
+  for (var i = 0; i < buf.length; i++) {
+    arr.push(fn(buf[i], n));
+  }
+  return arr;
+};
+util.bsb64.decodeToString = function(src, n) {
+  var arr = util.bsb64.decode(src, n);
+  return util.utf8.fromByteArray(arr);
 };
 
 //---------------------------------------------------------
