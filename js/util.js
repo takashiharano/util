@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609121203';
+util.v = '202609122321';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -7252,7 +7252,6 @@ util.toBinaryString = function(a) {
 //---------------------------------------------------------
 util.xb64 = {};
 util.xb64.encode = function(src, key) {
-  if (src == null) return null;
   if (typeof src == 'string') src = util.utf8.toByteArray(src);
   var k = util.utf8.toByteArray(key);
   var ln = src.length;
@@ -7274,7 +7273,6 @@ util.xb64.encode = function(src, key) {
   return util.base64.encode(b);
 };
 util.xb64.decode = function(src, key) {
-  if (src == null) return null;
   var a = util.base64.decode(src);
   var k = util.utf8.toByteArray(key);
   var al = a.length;
@@ -7289,7 +7287,6 @@ util.xb64.decode = function(src, key) {
   return b;
 };
 util.xb64.decodeToString = function(src, key) {
-  if (src == null) return null;
   var a = util.xb64.decode(src, key);
   return util.utf8.fromByteArray(a);
 };
@@ -7318,7 +7315,6 @@ util.utf8.toByteArray = function(s) {
   return a;
 };
 util.utf8.fromByteArray = function(b) {
-  if (!b) return null;
   var e = '';
   for (var i = 0; i < b.length; i++) {
     e += '%' + util.toHex(b[i], true, 2);
