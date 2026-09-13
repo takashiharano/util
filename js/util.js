@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609122321';
+util.v = '202609131800';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -7254,41 +7254,27 @@ util.xb64 = {};
 util.xb64.encode = function(src, key) {
   if (typeof src == 'string') src = util.utf8.toByteArray(src);
   var k = util.utf8.toByteArray(key);
-  var ln = src.length;
-  var kl = k.length;
-  if ((ln == 0) || (kl == 0)) {
-    var b = src;
-  } else {
-    var d = kl - ln;
-    if (d < 0) d = 0;
-    b = [];
-    for (var i = 0; i < ln; i++) {
-      b.push(src[i] ^ k[i % kl]);
-    }
-    for (i = 0; i < d; i++) {
-      b.push(255 ^ k[(ln + i) % kl]);
-    }
-    b.push(d);
-  }
+  var b = util.xor(src, k);
   return util.base64.encode(b);
 };
 util.xb64.decode = function(src, key) {
   var a = util.base64.decode(src);
   var k = util.utf8.toByteArray(key);
-  var al = a.length;
-  var kl = k.length;
-  if ((al == 0) || (kl == 0)) return a.slice();
-  var d = a[al - 1];
-  var ln = al - d - 1;
-  var b = [];
-  for (var i = 0; i < ln; i++) {
-    b.push(a[i] ^ k[i % kl]);
-  }
-  return b;
+  return util.xor(a, k);
 };
 util.xb64.decodeToString = function(src, key) {
   var a = util.xb64.decode(src, key);
   return util.utf8.fromByteArray(a);
+};
+util.xor = function(src, key) {
+  var ln = src.length;
+  var kl = key.length;
+  if ((ln == 0) || (kl == 0)) return src.slice();
+  var b = [];
+  for (var i = 0; i < ln; i++) {
+    b.push(src[i] ^ key[i % kl]);
+  }
+  return b;
 };
 
 //---------------------------------------------------------
