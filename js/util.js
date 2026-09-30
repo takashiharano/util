@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202609131800';
+util.v = '202610010022';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -7248,6 +7248,46 @@ util.toBinaryString = function(a) {
 };
 
 //---------------------------------------------------------
+// BSB64
+//---------------------------------------------------------
+util.bsb64 = {};
+util.bsb64.encode = function(src, n) {
+  if (typeof src == 'string') src = util.utf8.toByteArray(src);
+  var buf = util.bsb64.shiftBits(src, n);
+  return util.base64.encode(buf);
+};
+util.bsb64.decode = function(src, n) {
+  var buf = util.base64.decode(src);
+  return util.bsb64.unshiftBits(buf, n);
+};
+util.bsb64.decodeToString = function(src, n) {
+  var arr = util.bsb64.decode(src, n);
+  return util.utf8.fromByteArray(arr);
+};
+util.bsb64.shiftBits = function(src, n) {
+  var fn = util.bit8.rotateLeft;
+  if (n % 8 == 0) {
+    fn = util.bit8.invert;
+  }
+  var buf = [];
+  for (var i = 0; i < src.length; i++) {
+    buf.push(fn(src[i], n));
+  }
+  return buf;
+};
+util.bsb64.unshiftBits = function(src, n) {
+  var fn = util.bit8.rotateRight;
+  if (n % 8 == 0) {
+    fn = util.bit8.invert;
+  }
+  var buf = [];
+  for (var i = 0; i < src.length; i++) {
+    buf.push(fn(src[i], n));
+  }
+  return buf;
+};
+
+//---------------------------------------------------------
 // XB64
 //---------------------------------------------------------
 util.xb64 = {};
@@ -7322,40 +7362,6 @@ util.bit8.rotateRight = function(v, n) {
 };
 util.bit8.invert = function(v) {
   return (~v) & 255;
-};
-
-//---------------------------------------------------------
-// BSB64
-//---------------------------------------------------------
-util.bsb64 = {};
-util.bsb64.encode = function(src, n) {
-  if (typeof src == 'string') src = util.utf8.toByteArray(src);
-  var fn = util.bit8.rotateLeft;
-  if (n % 8 == 0) {
-    fn = util.bit8.invert;
-  }
-  var buf = [];
-  for (var i = 0; i < src.length; i++) {
-    buf.push(fn(src[i], n));
-  }
-  var str = util.base64.encode(buf);
-  return str;
-};
-util.bsb64.decode = function(src, n) {
-  var fn = util.bit8.rotateRight;
-  if (n % 8 == 0) {
-    fn = util.bit8.invert;
-  }
-  var buf = util.base64.decode(src);
-  var arr = [];
-  for (var i = 0; i < buf.length; i++) {
-    arr.push(fn(buf[i], n));
-  }
-  return arr;
-};
-util.bsb64.decodeToString = function(src, n) {
-  var arr = util.bsb64.decode(src, n);
-  return util.utf8.fromByteArray(arr);
 };
 
 //---------------------------------------------------------
