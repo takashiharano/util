@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202610010022';
+util.v = '202610102048';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -4172,7 +4172,7 @@ util.tooltip._show = function(msg) {
   }
   var x = util.mouseX;
   var y = util.mouseY;
-  var el = document.elementFromPoint(x, y);
+  var el = util.tooltip.getTargetElement(x, y);
   if (!el || (el != util.tooltip.targetEl)) {
     util.tooltip.cancel(obj);
     return;
@@ -4195,9 +4195,24 @@ util.tooltip.cancel = function(obj) {
   util.infotip.__hide(obj);
 };
 
+util.tooltip.getTargetElement = function(x, y) {
+  var el = document.elementFromPoint(x, y);
+  while (el) {
+    if (el.dataset) {
+      var dtset = el.dataset;
+      if (('tooltip' in dtset) || ('tooltip2' in dtset)) return el;
+      for (var k in dtset) {
+        if (k.startsWith('tooltip-')) return el;
+      }
+    }
+    el = el.parentElement;
+  }
+  return null;
+};
+
 util.tooltip.onMouseMove = function(x, y) {
   if (util.tooltip.disabled) return;
-  var el = document.elementFromPoint(x, y);
+  var el = util.tooltip.getTargetElement(x, y);
   var tmr = util.tooltip.tmr;
   var tpData = null;
   if (el && el.dataset) {
@@ -4219,16 +4234,15 @@ util.tooltip.onMouseMove = function(x, y) {
       }
     }
   }
-  if (el == tmr.el) {
-    if (tmr.st == 0) return;
-  } else {
-    tmr.el = null;
-  }
+  if (el && (el == tmr.el) && (tmr.st == 0)) return;
+  if (el != tmr.el) tmr.el = null;
   if (tpData) {
     util.tooltip.show(el, tpData, x, y);
-  } else if (util.tooltip.obj.el.body) {
+  } else {
     util.tooltip.clearTimer();
-    util.tooltip.hide();
+    util.tooltip.cancel(util.tooltip.obj);
+    tmr.el = null;
+    tmr.st = 0;
   }
 };
 
@@ -4249,6 +4263,8 @@ util.tooltip.clearTimer = function() {
     clearTimeout(tmr.id);
     tmr.id = 0;
   }
+  tmr.el = null;
+  tmr.st = 0;
 };
 util.tooltip.onTimeout = function() {
   var tmr = util.tooltip.tmr;
