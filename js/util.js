@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202610201255';
+util.v = '202610202109';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3376,28 +3376,36 @@ util.textarea.CTCH = {0: 'NUL', 9: 'TAB', 10: 'LF', 11: 'ESC', 32: 'SP', 127: 'D
 /**
  * addStatusInfo('#textarea-id', '#infoarea-id')
  */
-util.textarea.addStatusInfo = function(textarea, infoarea) {
-  textarea = util.getElement(textarea);
-  if (!textarea) return;
+util.textarea.addStatusInfo = function(txtarea, infoarea) {
+  txtarea = util.getElement(txtarea);
+  if (!txtarea) return;
   infoarea = util.getElement(infoarea);
   if (!infoarea) return;
-  textarea.infoarea = infoarea;
-  util.textarea._adqdListener(textarea);
+  txtarea.infoarea = infoarea;
+  util.textarea._addListener(txtarea);
+};
+util.textarea.removeStatusInfo = function(txtarea) {
+  txtarea = util.getElement(txtarea);
+  if (!txtarea) return;
+  infoarea = txtarea.infoarea;
+  if (!infoarea) return;
+  util.textarea._removeListener(txtarea);
+  infoarea.innerHTML = '';
 };
 /**
  * updateTextAreaInfo('#textarea-id')
  */
-util.updateTextAreaInfo = function(textarea) {
-  textarea = util.getElement(textarea);
-  if (!textarea) return;
-  var txt = textarea.value;
+util.updateTextAreaInfo = function(txtarea) {
+  txtarea = util.getElement(txtarea);
+  if (!txtarea) return;
+  var txt = txtarea.value;
   var len = txt.length;
   var lenB = util.lenB(txt);
   var lfCnt = util.countLineBreak(txt);
   var chrs = len - lfCnt;
   var tl = (len == 0 ? 0 : lfCnt + 1);
-  var st = textarea.selectionStart;
-  var ed = textarea.selectionEnd;
+  var st = txtarea.selectionStart;
+  var ed = txtarea.selectionEnd;
   var sl = ed - st;
   var ch = util.str2chars(txt)[st] || '';
   var u10 = util.getCodePoint(ch);
@@ -3408,7 +3416,7 @@ util.updateTextAreaInfo = function(textarea) {
   } else if (util.textarea.CTCH[u10]) {
     ch = util.textarea.CTCH[u10];
   }
-  if (textarea.infoarea) {
+  if (txtarea.infoarea) {
     var cp = ch + '&nbsp;' + u16 + (u10 ? '(' + u10 + ')' : '');
     var t = txt.slice(0, st);
     var l = (t.match(/\n/g) || []).length + 1;
@@ -3426,9 +3434,9 @@ util.updateTextAreaInfo = function(textarea) {
     s += ' LEN=' + len;
     s += ' CHARS=' + chrs;
     s += ' bytes=' + lenB;
-    textarea.infoarea.innerHTML = s + slct;
+    txtarea.infoarea.innerHTML = s + slct;
   }
-  var listener = textarea.listener;
+  var listener = txtarea.listener;
   if (listener) {
     var data = {
       codePoint: u10,
@@ -3443,12 +3451,19 @@ util.updateTextAreaInfo = function(textarea) {
     listener(data);
   }
 };
-util.textarea._adqdListener = function(tgt) {
+util.textarea._addListener = function(tgt) {
   tgt.addEventListener('input', util.textarea.onInput);
   tgt.addEventListener('change', util.textarea.onInput);
   tgt.addEventListener('keydown', util.textarea.onInput);
   tgt.addEventListener('keyup', util.textarea.onInput);
   tgt.addEventListener('click', util.textarea.onInput);
+};
+util.textarea._removeListener = function(tgt) {
+  tgt.removeEventListener('input', util.textarea.onInput);
+  tgt.removeEventListener('change', util.textarea.onInput);
+  tgt.removeEventListener('keydown', util.textarea.onInput);
+  tgt.removeEventListener('keyup', util.textarea.onInput);
+  tgt.removeEventListener('click', util.textarea.onInput);
 };
 util.textarea.onInput = function(e) {
   util.updateTextAreaInfo(e.target);
@@ -3457,7 +3472,7 @@ util.textarea.addListener = function(tgt, f) {
   var el = util.getElement(tgt);
   if (el) {
     el.listener = f;
-    util.textarea._adqdListener(el);
+    util.textarea._addListener(el);
   }
 };
 
