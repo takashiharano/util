@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202610202109';
+util.v = '202610202230';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -1904,9 +1904,11 @@ util.countLineBreak = function(s) {
   return (s.match(/\n/g) || []).length;
 };
 util.clipTextLine = function(s, p) {
-  var n = s.indexOf('\n', p);
-  if (n > 0) s = s.slice(0, n);
-  return s.replace(/.*\n/g, '');
+  if (p == undefined) p = 0;
+  var st = (p > 0) ? s.lastIndexOf('\n', p - 1) + 1 : 0;
+  var ed = s.indexOf('\n', p);
+  if (ed < 0) ed = s.length;
+  return s.slice(st, ed);
 };
 
 util.toBin = function(v, d, pFix) {
@@ -3372,7 +3374,30 @@ util.color.sortRGB = function(r, g, b) {
 
 //---------------------------------------------------------
 util.textarea = {};
-util.textarea.CTCH = {0: 'NUL', 9: 'TAB', 10: 'LF', 11: 'ESC', 32: 'SP', 127: 'DEL', 12288: 'emSP'};
+util.textarea.CTCH = {
+  0: 'NUL',
+  9: 'TAB',
+  10: 'LF',
+  11: 'VT',
+  27: 'ESC',
+  32: 'SP',
+  127: 'DEL',
+  160: 'NBSP',
+  173: 'SHY',
+  8194: 'ENSP',
+  8195: 'EMSP',
+  8199: 'FIGSP',
+  8201: 'THSP',
+  8203: 'ZWSP',
+  8204: 'ZWNJ',
+  8205: 'ZWJ',
+  8206: 'LRM',
+  8207: 'RLM',
+  8239: 'NNBSP',
+  8288: 'WJ',
+  12288: 'IDSP',
+  65279: 'BOM'
+};
 /**
  * addStatusInfo('#textarea-id', '#infoarea-id')
  */
@@ -3383,14 +3408,16 @@ util.textarea.addStatusInfo = function(txtarea, infoarea) {
   if (!infoarea) return;
   txtarea.infoarea = infoarea;
   util.textarea._addListener(txtarea);
+  util.updateTextAreaInfo(txtarea);
 };
 util.textarea.removeStatusInfo = function(txtarea) {
   txtarea = util.getElement(txtarea);
   if (!txtarea) return;
-  infoarea = txtarea.infoarea;
+  var infoarea = txtarea.infoarea;
   if (!infoarea) return;
   util.textarea._removeListener(txtarea);
   infoarea.innerHTML = '';
+  txtarea.infoarea = null;
 };
 /**
  * updateTextAreaInfo('#textarea-id')
@@ -3402,25 +3429,30 @@ util.updateTextAreaInfo = function(txtarea) {
   var len = txt.length;
   var lenB = util.lenB(txt);
   var lfCnt = util.countLineBreak(txt);
-  var chrs = len - lfCnt;
+  var chrs = 0;
+  for (var i = 0; i < len; i++) {
+    if (txt.charCodeAt(i) == 10) continue;
+    chrs++;
+    if (txt.codePointAt(i) > 0xFFFF) i++;
+  }
   var tl = (len == 0 ? 0 : lfCnt + 1);
   var st = txtarea.selectionStart;
   var ed = txtarea.selectionEnd;
   var sl = ed - st;
-  var ch = util.str2chars(txt)[st] || '';
+  var ch = util.str2chars(txt.slice(st, st + 2))[0] || '';
   var u10 = util.getCodePoint(ch);
   var u16 = util.getUnicodePoints(ch, true);
   if (isNaN(u10)) {
     ch = '[END]';
     u16 = 'U+----';
   } else if (util.textarea.CTCH[u10]) {
-    ch = util.textarea.CTCH[u10];
+    ch = '[' + util.textarea.CTCH[u10] + ']';
   }
   if (txtarea.infoarea) {
-    var cp = ch + '&nbsp;' + u16 + (u10 ? '(' + u10 + ')' : '');
+    var cp = ch + '&nbsp;' + u16 + (isNaN(u10) ? '' : '(' + u10 + ')');
     var t = txt.slice(0, st);
     var l = (t.match(/\n/g) || []).length + 1;
-    var c = t.replace(/.*\n/g, '').length + 1;
+    var c = st - t.lastIndexOf('\n');
     var tc = util.clipTextLine(txt, st).length;
     var slct = '';
     if (sl) {
