@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202610202230';
+util.v = '202610212141';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -3454,18 +3454,19 @@ util.updateTextAreaInfo = function(txtarea) {
     var l = (t.match(/\n/g) || []).length + 1;
     var c = st - t.lastIndexOf('\n');
     var tc = util.clipTextLine(txt, st).length;
+    var fmt = util.formatNumber;
     var slct = '';
     if (sl) {
       var slT = txt.substring(st, ed);
       var slL = util.countLineBreak(slT) + 1;
-      slct = ' SEL:LEN=' + sl + '/L=' + slL;
+      slct = ' SEL:LEN=' + fmt(sl) + '/L=' + fmt(slL);
     }
     var s = cp;
-    s += ' ' + l + ':' + c + ' ';
-    s += ' C=' + tc + ' L=' + tl;
-    s += ' LEN=' + len;
-    s += ' CHARS=' + chrs;
-    s += ' bytes=' + lenB;
+    s += ' ' + fmt(l) + ':' + fmt(c) + ' ';
+    s += ' C=' + fmt(tc) + ' L=' + fmt(tl);
+    s += ' LEN=' + fmt(len);
+    s += ' CHARS=' + fmt(chrs);
+    s += ' bytes=' + fmt(lenB);
     txtarea.infoarea.innerHTML = s + slct;
   }
   var listener = txtarea.listener;
@@ -3483,19 +3484,18 @@ util.updateTextAreaInfo = function(txtarea) {
     listener(data);
   }
 };
+util.textarea.ev = ['input', 'change', 'keyup', 'click', 'selectionchange'];
 util.textarea._addListener = function(tgt) {
-  tgt.addEventListener('input', util.textarea.onInput);
-  tgt.addEventListener('change', util.textarea.onInput);
-  tgt.addEventListener('keydown', util.textarea.onInput);
-  tgt.addEventListener('keyup', util.textarea.onInput);
-  tgt.addEventListener('click', util.textarea.onInput);
+  var ev = util.textarea.ev;
+  for (var i = 0; i < ev.length; i++) {
+    tgt.addEventListener(ev[i], util.textarea.onInput);
+  }
 };
 util.textarea._removeListener = function(tgt) {
-  tgt.removeEventListener('input', util.textarea.onInput);
-  tgt.removeEventListener('change', util.textarea.onInput);
-  tgt.removeEventListener('keydown', util.textarea.onInput);
-  tgt.removeEventListener('keyup', util.textarea.onInput);
-  tgt.removeEventListener('click', util.textarea.onInput);
+  var ev = util.textarea.ev;
+  for (var i = 0; i < ev.length; i++) {
+    tgt.removeEventListener(ev[i], util.textarea.onInput);
+  }
 };
 util.textarea.onInput = function(e) {
   util.updateTextAreaInfo(e.target);
