@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202609121757'
+v = '202610280049'
 
 import sys
 import os
@@ -3397,14 +3397,13 @@ def send_response(content, type='text/plain', status=200, headers=None, encoding
     status_message =  get_status_message(st)
     status_header = 'Status: ' + st + ' ' + status_message
 
-    print(status_header)
-    print(content_type)
+    response_headers = [status_header, content_type]
     if headers is not None:
-        for i in range(len(headers)):
-            header = headers[i]
+        for header in headers:
             for name in header:
-                print(name + ': ' + header[name])
-    print()
+                response_headers.append(name + ': ' + header[name])
+
+    _write_response_headers(response_headers)
 
     if typename(content) == 'bytes':
         sys.stdout.flush()
@@ -3469,10 +3468,10 @@ def send_as_file(content, filename='', content_type='application/octet-stream', 
     st = str(status)
     status_message = get_status_message(st)
     status_header = 'Status: ' + st + ' ' + status_message
-    print(status_header)
+    response_headers = [status_header]
 
     if content_type != '':
-        print('Content-Type: ' + content_type)
+        response_headers.append('Content-Type: ' + content_type)
 
     has_content_length = False
     if headers is not None:
@@ -3486,23 +3485,31 @@ def send_as_file(content, filename='', content_type='application/octet-stream', 
 
     if not has_content_length:
         content_len = len(b)
-        print('Content-Length: ' + str(content_len))
+        response_headers.append('Content-Length: ' + str(content_len))
 
     if filename != '':
-        print('Content-Disposition: attachment;filename="' + filename + '"')
+        response_headers.append('Content-Disposition: attachment;filename="' + filename + '"')
 
     if etag != '':
-        print('ETag: "' + etag + '"')
+        response_headers.append('ETag: "' + etag + '"')
 
     if headers is not None:
-        for i in range(len(headers)):
-            header = headers[i]
+        for header in headers:
             for name in header:
-                print(name + ': ' + header[name])
+                response_headers.append(name + ': ' + header[name])
 
-    print()
+    _write_response_headers(response_headers)
     sys.stdout.flush()
     sys.stdout.buffer.write(b)
+
+def _write_response_headers(response_headers):
+    for line in response_headers:
+        if '\r' in line or '\n' in line:
+            raise ValueError('Invalid HTTP header: CR/LF characters detected')
+
+    for line in response_headers:
+        print(line)
+    print()
 
 #------------------------------------------------------------------------------
 # Location
