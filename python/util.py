@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202610282317'
+v = '202610290031'
 
 import sys
 import os
@@ -15,6 +15,7 @@ import re
 import datetime
 import time
 import shutil
+import tempfile
 import base64
 import json
 import random
@@ -1011,7 +1012,7 @@ def load_properties_file(path, default=None):
     }
     return result
 
-def save_properties(path, props):
+def save_properties(path, props, atomic=False):
     text = ''
     for key in props:
         value = props[key]
@@ -1020,7 +1021,10 @@ def save_properties(path, props):
             txt_val = trim_zeros(txt_val)
         line = key + '=' + txt_val
         text += line  + '\n'
-    write_text_file(path, text)
+    if atomic:
+        write_file_atomically(path, text)
+    else:
+        write_text_file(path, text)
 
 def to_data_struct(obj, data_struct):
     values = {}
@@ -2115,6 +2119,22 @@ def write_file(path, data, encoding=DEFAULT_ENCODING, make_dir=True, chunk_size=
     else:
         write_binary_file(path, data, make_dir, chunk_size, sync=sync)
 
+# Write File Atomically
+def write_file_atomically(path, data, encoding=DEFAULT_ENCODING, make_dir=True, chunk_size=0, sync=True):
+    if make_dir:
+        make_parent_dir(path)
+    abs_path = os.path.abspath(path)
+    dir_path = os.path.dirname(abs_path)
+    prefix = '.' + os.path.basename(path) + '.'
+    fd, tmp_path = tempfile.mkstemp(prefix=prefix, suffix='.tmp', dir=dir_path)
+    os.close(fd)
+    try:
+        write_file(tmp_path, data, encoding=encoding, make_dir=False, chunk_size=chunk_size, sync=sync)
+        os.replace(tmp_path, path)
+    finally:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
 # Write text file
 def write_text_file(path, text, encoding=DEFAULT_ENCODING, make_dir=True, sync=True):
     b = text.encode(encoding=encoding)
@@ -2134,9 +2154,12 @@ def append_text_file(path, text, separator='\n', encoding=DEFAULT_ENCODING, make
             os.fsync(f.fileno())
 
 # Write text file from list
-def write_text_file_from_list(path, text_list, encoding=DEFAULT_ENCODING, make_dir=True, line_sep='\n', sync=True):
+def write_text_file_from_list(path, text_list, encoding=DEFAULT_ENCODING, make_dir=True, line_sep='\n', sync=True, atomic=False):
     text = list2text(text_list, line_sep)
-    write_text_file(path, text, encoding, make_dir, sync=sync)
+    if atomic:
+        write_file_atomically(path, text, encoding=encoding, make_dir=make_dir, sync=sync)
+    else:
+        write_text_file(path, text, encoding, make_dir, sync=sync)
 
 # Write binary file
 def write_binary_file(path, data, make_dir=True, chunk_size=0, sync=True):
