@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202610280049'
+v = '202610282317'
 
 import sys
 import os
@@ -2043,6 +2043,22 @@ def get_datetime_filename(suffix='', fmt='%Y%m%dT%H%M%S', prefix=''):
     strtime = get_datetime_str(fmt=fmt)
     filename = prefix + strtime + suffix
     return filename
+
+def is_unsafe_path_component(name):
+    if name == '':
+        return True
+    if any(c in name for c in '/\\:<>"|?*'):
+        return True
+    if any(ord(c) < 32 or ord(c) == 127 for c in name):
+        return True
+    if name.startswith(' ') or name.endswith(('.', ' ')):
+        return True
+    base_name = name.split('.', 1)[0].rstrip(' ').upper()
+    if base_name in ('CON', 'PRN', 'AUX', 'NUL', 'CONIN$', 'CONOUT$'):
+        return True
+    if re.fullmatch(r'(COM|LPT)[1-9]', base_name):
+        return True
+    return False
 
 #------------------------------------------------------------------------------
 # File
