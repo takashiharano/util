@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202610292321';
+util.v = '202610292323';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -7004,7 +7004,13 @@ util.getQuery = function(k) {
   var a = [];
   for (var i = 0; i < q.length; i++) {
     var p = q[i].split('=');
-    if (p[0] == k) a.push(p[1]);
+    var name;
+    try {
+      name = decodeURIComponent(p[0].replace(/\+/g, ' '));
+    } catch (e) {
+      continue;
+    }
+    if (name == k) a.push(p.length > 1 ? p.slice(1).join('=') : undefined);
   }
   var v = null;
   if (a.length == 1) {
