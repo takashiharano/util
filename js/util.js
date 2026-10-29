@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202610292325';
+util.v = '202610292354';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -8462,8 +8462,8 @@ util.$onBeforeUnload = function(e) {
   var fn = window.$onBeforeUnload;
   if (fn) fn(e);
 };
-util.$onUnload = function(e) {
-  var fn = window.$onUnload;
+util.$onPagehide = function(e) {
+  var fn = window.$onPagehide;
   if (fn) fn(e);
 };
 util.$onKeyDown = function(e) {
@@ -8556,7 +8556,7 @@ util.init = function() {
   window.addEventListener('DOMContentLoaded', util.$onReady, true);
   window.addEventListener('load', util.$onLoad, true);
   window.addEventListener('beforeunload', util.$onBeforeUnload, true);
-  window.addEventListener('unload', util.$onUnload, true);
+  window.addEventListener('pagehide', util.$onPagehide, true);
   window.addEventListener('keydown', util.$onKeyDown, true);
   window.addEventListener('keypress', util.$onKeyPress, true);
   window.addEventListener('keyup', util.$onKeyUp, true);
