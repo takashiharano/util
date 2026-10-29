@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202610230836';
+util.v = '202610292128';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2540,7 +2540,7 @@ util.http.buildQueryString = function(p) {
   var cnt = 0;
   for (var k in p) {
     if (cnt > 0) s += '&';
-    s += k + '=' + encodeURIComponent(p[k]);
+    s += encodeURIComponent(k) + '=' + encodeURIComponent(p[k]);
     cnt++;
   }
   return s;
