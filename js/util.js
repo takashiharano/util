@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202610292128';
+util.v = '202610292140';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -4979,8 +4979,8 @@ util.Window.prototype = {
     b.innerHTML = btn;
     b.onclick = fn;
     b.className = 'win-nomove';
-    b.onmouseover = new Function('util.setStyle(this, \'color\', \'#fff\');');
-    b.onmouseout = new Function('util.setStyle(this, \'color\', \'' + btnStyle.color + '\');');
+    b.onmouseover = function() {util.setStyle(this, 'color', '#fff');};
+    b.onmouseout = function() {util.setStyle(this, 'color', btnStyle.color);};
     return b;
   },
   updateWinCtrlBtns: function(ctx) {
@@ -5010,8 +5010,8 @@ util.Window.prototype = {
     b.innerText = 'x';
     b.className = 'win-nomove';
     b.onclick = ctx.close;
-    b.onmouseover = new Function('util.setStyle(this, \'color\', \'#faa\');');
-    b.onmouseout = new Function('util.setStyle(this, \'color\', \'' + btnStyle.color + '\');');
+    b.onmouseover = function() {util.setStyle(this, 'color', '#faa');};
+    b.onmouseout = function() {util.setStyle(this, 'color', btnStyle.color);};
     return b;
   },
 
@@ -8120,7 +8120,7 @@ util.calcMod43 = function(s) {
   var MOD43TBL = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%';
   if (s.match(/^".+"$/)) {
     try {
-      s = eval(s);
+      s = JSON.parse(s);
     } catch (e) {return '';}
   }
   var n = 0;
