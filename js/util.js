@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202610292140';
+util.v = '202610292321';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2445,7 +2445,14 @@ util.http = function(req) {
   if (data instanceof Object) data = util.http.buildQueryString(data);
   var url = req.url;
   if (data && (req.method == 'GET')) {
-    url += (url.match(/\?/) ? '&' : '?') + data;
+    var hash = '';
+    var hashIdx = url.indexOf('#');
+    if (hashIdx >= 0) {
+      hash = url.slice(hashIdx);
+      url = url.slice(0, hashIdx);
+    }
+    var sep = (url.indexOf('?') < 0 ? '?' : (/[?&]$/.test(url) ? '' : '&'));
+    url += sep + data + hash;
     data = null;
   }
   if (req.async == undefined) req.async = true;
