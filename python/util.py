@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202610290031'
+v = '202610312255'
 
 import sys
 import os
@@ -2251,7 +2251,7 @@ def file_lock(lock_file_path, retry=0, wait=1):
     while True:
         if not os.path.exists(lock_file_path):
             try:
-                mkdir(lock_file_path)
+                os.makedirs(lock_file_path)
                 return True
             except:
                 pass
