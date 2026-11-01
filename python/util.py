@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202610312255'
+v = '202611011917'
 
 import sys
 import os
@@ -2423,9 +2423,8 @@ def get_path_size(path, recursive=False, slink=True):
     return total
 
 # Make DIR
-def mkdir(path):
-    if not is_dir(path):
-        os.makedirs(path)
+def mkdir(path, exist_ok=True):
+    os.makedirs(path, exist_ok=exist_ok)
 
 # Delete DIR
 # force=True: delete recursively
