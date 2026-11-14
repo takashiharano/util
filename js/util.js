@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202611142022';
+util.v = '202611142102';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -7244,34 +7244,34 @@ util.base64.encode = function(arr) {
   for (var i = 0; i < 62; i++) {
     tbl[i] = (i < 26 ? i + 65 : (i < 52 ? i + 71 : i - 4));
   }
-  var str = '';
+  var s = '';
   for (i = 0; i < len; i += 3) {
-    str += String.fromCharCode(
+    s += String.fromCharCode(
       tbl[arr[i] >>> 2],
       tbl[(arr[i] & 3) << 4 | arr[i + 1] >>> 4],
       tbl[(i + 1) < len ? (arr[i + 1] & 15) << 2 | arr[i + 2] >>> 6 : 64],
       tbl[(i + 2) < len ? (arr[i + 2] & 63) : 64]
     );
   }
-  return str;
+  return s;
 };
-util.base64.decode = function(str) {
+util.base64.decode = function(s) {
   var arr = [];
-  var len = str.length;
+  var len = s.length;
   if (len == 0) return arr;
   if (len % 4 == 1) {
     throw new Error('invalid Base64 length: ' + len);
   }
   for (var i = 0; i < len; i++) {
-    var c = str.charCodeAt(i);
+    var c = s.charCodeAt(i);
     if (!(((c >= 0x30) && (c <= 0x39)) || ((c >= 0x41) && (c <= 0x5A)) || ((c >= 0x61) && (c <= 0x7A)) || (c == 0x2B) || (c == 0x2F) || (c == 0x3D))) {
       throw new Error('invalid Base64 char: 0x' + c.toString(16).toUpperCase() + ' at ' + i);
     }
   }
-  var padIndex = str.indexOf('=');
+  var padIndex = s.indexOf('=');
   if (padIndex >= 0) {
     var padCount = len - padIndex;
-    if ((len % 4 != 0) || (padCount > 2) || ((padCount == 2) && (str.charAt(len - 1) != '='))) {
+    if ((len % 4 != 0) || (padCount > 2) || ((padCount == 2) && (s.charAt(len - 1) != '='))) {
       throw new Error('invalid Base64 padding at ' + padIndex);
     }
   }
@@ -7280,9 +7280,9 @@ util.base64.decode = function(str) {
     tbl[i < 26 ? i + 65 : (i < 52 ? i + 71 : i - 4)] = i;
   }
   var buf = [];
-  for (i = 0; i < str.length; i += 4) {
+  for (i = 0; i < s.length; i += 4) {
     for (var j = 0; j < 4; j++) {
-      buf[j] = (i + j < str.length ? tbl[str.charCodeAt(i + j)] : 64);
+      buf[j] = (i + j < s.length ? tbl[s.charCodeAt(i + j)] : 64);
     }
     arr.push(
       buf[0] << 2 | (buf[1] & 63) >>> 4,
