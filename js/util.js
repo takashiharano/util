@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202611031022';
+util.v = '202611142022';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -7257,12 +7257,22 @@ util.base64.encode = function(arr) {
 };
 util.base64.decode = function(str) {
   var arr = [];
-  if (str.length == 0) return arr;
-  for (var i = 0; i < str.length; i++) {
+  var len = str.length;
+  if (len == 0) return arr;
+  if (len % 4 == 1) {
+    throw new Error('invalid Base64 length: ' + len);
+  }
+  for (var i = 0; i < len; i++) {
     var c = str.charCodeAt(i);
     if (!(((c >= 0x30) && (c <= 0x39)) || ((c >= 0x41) && (c <= 0x5A)) || ((c >= 0x61) && (c <= 0x7A)) || (c == 0x2B) || (c == 0x2F) || (c == 0x3D))) {
-      util._log.e('invalid b64 char: 0x' + c.toString(16).toUpperCase() + ' at ' + i);
-      return arr;
+      throw new Error('invalid Base64 char: 0x' + c.toString(16).toUpperCase() + ' at ' + i);
+    }
+  }
+  var padIndex = str.indexOf('=');
+  if (padIndex >= 0) {
+    var padCount = len - padIndex;
+    if ((len % 4 != 0) || (padCount > 2) || ((padCount == 2) && (str.charAt(len - 1) != '='))) {
+      throw new Error('invalid Base64 padding at ' + padIndex);
     }
   }
   var tbl = {61: 64, 47: 63, 43: 62};
@@ -7355,9 +7365,9 @@ util.bsb64.shiftBits = function(src, n) {
   if (n % 8 == 0) {
     fn = util.bit8.invert;
   }
-  var buf = [];
+  var buf = new Array(src.length);
   for (var i = 0; i < src.length; i++) {
-    buf.push(fn(src[i], n));
+    buf[i] = fn(src[i], n);
   }
   return buf;
 };
@@ -7366,9 +7376,9 @@ util.bsb64.unshiftBits = function(src, n) {
   if (n % 8 == 0) {
     fn = util.bit8.invert;
   }
-  var buf = [];
+  var buf = new Array(src.length);
   for (var i = 0; i < src.length; i++) {
-    buf.push(fn(src[i], n));
+    buf[i] = fn(src[i], n);
   }
   return buf;
 };
@@ -7396,9 +7406,14 @@ util.xor = function(src, key) {
   var ln = src.length;
   var kl = key.length;
   if ((ln == 0) || (kl == 0)) return src.slice();
-  var b = [];
+  var b = new Array(ln);
+  var kIdx = 0;
   for (var i = 0; i < ln; i++) {
-    b.push(src[i] ^ key[i % kl]);
+    b[i] = src[i] ^ key[kIdx];
+    kIdx++;
+    if (kIdx == kl) {
+      kIdx = 0;
+    }
   }
   return b;
 };
