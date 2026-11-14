@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202611011917'
+v = '202611141700'
 
 import sys
 import os
@@ -1078,6 +1078,92 @@ def get_value_for_default(data_type):
     if data_type in values:
         return values[data_type]
     return None
+
+#------------------------------------------------------------------------------
+# HeaderedText
+#------------------------------------------------------------------------------
+def load_headered_text(path, header_only=False, encoding=DEFAULT_ENCODING):
+    try:
+        with open(path, 'r', encoding=encoding) as stream:
+            result = _parse_headered_text_stream(stream, header_only)
+    except FileNotFoundError:
+        result = None
+    return result
+
+def parse_headered_text(text, header_only=False):
+    with io.StringIO(text, newline=None) as stream:
+        return _parse_headered_text_stream(stream, header_only)
+
+def _parse_headered_text_stream(stream, header_only=False):
+    headers = {}
+    sep_found = False
+
+    for line in stream:
+        line = line.rstrip('\r\n')
+        if line == '':
+            sep_found = True
+            break
+
+        pos = line.find(':')
+        if pos <= 0:
+            continue
+
+        name = line[:pos]
+        if any(ch.isspace() for ch in name):
+            continue
+
+        value = line[pos + 1:].strip(' \t')
+        headers[name] = value
+
+    if header_only:
+        return headers
+
+    body = None
+    if sep_found:
+        body = stream.read()
+
+    result = {
+        'headers': headers,
+        'body': body
+    }
+    return result
+
+def serialize_headered_text(data):
+    headers = data.get('headers')
+    if headers is None:
+        headers = {}
+
+    text = ''
+    for name in headers:
+        has_invalid_char = False
+
+        for ch in name:
+            if ch == ':' or ch.isspace():
+                has_invalid_char = True
+                break
+
+        if not name or has_invalid_char:
+            raise ValueError('INVALID_HEADER_NAME: ' + repr(name))
+
+        value = str(headers[name])
+        value = convert_newline(value, ' ')
+        value = value.strip(' \t')
+
+        line = name + ': ' + value
+        text += line + '\n'
+
+    body = data.get('body')
+    if body is not None:
+        text += '\n' + body
+
+    return text
+
+def save_headered_text(path, data, encoding=DEFAULT_ENCODING, atomic=False, sync=True):
+    text = serialize_headered_text(data)
+    if atomic:
+        write_file_atomically(path, text, encoding=encoding, sync=sync)
+    else:
+        write_text_file(path, text, encoding=encoding, sync=sync)
 
 #------------------------------------------------------------------------------
 # List
