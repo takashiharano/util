@@ -3,7 +3,7 @@
 # Released under the MIT License
 # https://libutil.com/
 # Python 3.6+
-v = '202611141700'
+v = '202611252138'
 
 import sys
 import os
@@ -837,7 +837,7 @@ def strp(chars, idx):
 # Dict/JSON
 #------------------------------------------------------------------------------
 # Object -> JSON
-def to_json(obj, skipkeys=False, ensure_ascii=True, check_circular=True,
+def to_json(obj, skipkeys=False, ensure_ascii=False, check_circular=True,
             allow_nan=True, cls=None, indent=None, separators=None,
             default=None, sort_keys=False):
     return json.dumps(obj, skipkeys=skipkeys, ensure_ascii=ensure_ascii,
@@ -869,7 +869,7 @@ def load_dict(path, default=None, cls=None, object_hook=None,
     return ret
 
 # Save Dict
-def save_dict(path, obj, skipkeys=False, ensure_ascii=True, check_circular=True,
+def save_dict(path, obj, skipkeys=False, ensure_ascii=False, check_circular=True,
               allow_nan=True, cls=None, indent=1, separators=None,
               default=None, sort_keys=False, sync=True):
     s = json.dumps(obj, skipkeys=skipkeys, ensure_ascii=ensure_ascii,
@@ -885,7 +885,7 @@ def make_parent_dir(path):
         mkdir(parent_path)
 
 # Append Dict
-def append_dict(path, obj, skipkeys=False, ensure_ascii=True, check_circular=True,
+def append_dict(path, obj, skipkeys=False, ensure_ascii=False, check_circular=True,
                 allow_nan=True, cls=None, indent=1, separators=None,
                 default=None, sort_keys=False, max=0, reverse=False, sync=True):
     d = load_dict(path, default=[])
@@ -3537,7 +3537,7 @@ def send_response(content, type='text/plain', status=200, headers=None, encoding
             set_stdout_encoding(encoding)
         print(content, end='')
 
-def send_result_json(status, body=None, headers=None, encoding=None):
+def send_result_json(status, body=None, headers=None, encoding=DEFAULT_ENCODING):
     result = build_result_object(status, body)
     content = to_json(result)
     send_response(content, 'application/json', headers=headers, encoding=encoding)
