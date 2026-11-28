@@ -5,7 +5,7 @@
  * https://libutil.com/
  */
 var util = util || {};
-util.v = '202611142102';
+util.v = '202611281707';
 
 util.SYSTEM_ZINDEX_BASE = 0x7ffffff0;
 util.DFLT_FADE_SPEED = 500;
@@ -2673,7 +2673,7 @@ $el.fn = {
     if (speed == undefined) speed = 0;
     util.callFn4El(util.writeHTML, this, html, speed);
   },
-  clear: function(speed) { // Not available for <pre> on IE11
+  clear: function(speed) {
     util.callFn4El(util.elClear, this, speed);
   },
   disable: function() {
@@ -7068,46 +7068,40 @@ util.getBrowserInfo = function(ua) {
   if (ua == undefined) ua = navigator.userAgent;
   var ver;
   var brws = {name: '', version: ''};
-  if (ua.indexOf('Edge') >= 1) {
-    brws.name = 'Edge Legacy';
-    ver = ua.match(/Edge\/(.*)/);
-    if (ver) brws.version = ver[1];
-    return brws;
-  }
-  if (ua.indexOf('Edg') >= 1) {
+  ver = ua.match(/(?:^|\s)Edg\/([^\s/()]+)/);
+  if (ver) {
     brws.name = 'Edge';
-    ver = ua.match(/Edg\/(.*)/);
-    if (ver) brws.version = ver[1];
+    brws.version = ver[1];
     return brws;
   }
-  if (ua.indexOf('OPR/') >= 1) {
+  ver = ua.match(/(?:^|\s)OPR\/([^\s/()]+)/);
+  if (ver) {
     brws.name = 'Opera';
-    ver = ua.match(/OPR\/(.*)/);
-    if (ver) brws.version = ver[1];
+    brws.version = ver[1];
     return brws;
   }
-  if (ua.indexOf('Chrome') >= 1) {
+  ver = ua.match(/(?:^|\s)Chrome\/([^\s/()]+)/);
+  if (ver) {
     brws.name = 'Chrome';
-    ver = ua.match(/Chrome\/(.*)\s/);
-    if (ver) brws.version = ver[1];
+    brws.version = ver[1];
     return brws;
   }
-  if (ua.indexOf('Firefox') >= 1) {
+  ver = ua.match(/(?:^|\s)Firefox\/([^\s/()]+)/);
+  if (ver) {
     brws.name = 'Firefox';
-    ver = ua.match(/Firefox\/(.*)/);
-    if (ver) brws.version = ver[1];
+    brws.version = ver[1];
     return brws;
   }
-  if (ua.indexOf('Trident/7.') >= 1) {
-    brws.name = 'IE11';
-    brws.family = 'IE';
-    return brws;
-  }
-  if ((ua.indexOf('Safari/') >= 1) && (ua.indexOf('Version/') >= 1)) {
+  ver = ua.match(/(?:^|\s)Version\/([^\s/()]+)/);
+  if (ver && /(?:^|\s)Safari\//.test(ua)) {
     brws.name = 'Safari';
-    ver = ua.match(/Version\/(.*)\sSafari/);
-    if (ver) brws.version = ver[1];
+    brws.version = ver[1];
     return brws;
+  }
+  var prod = ua.match(/^([^\s/()]+)(?:\/([^\s/()]+))?/);
+  if (prod) {
+    brws.name = prod[1];
+    if (prod[2]) brws.version = prod[2];
   }
   return brws;
 };
@@ -7121,21 +7115,19 @@ util.getColoredBrowserName = function(n, dark) {
   switch (n) {
     case 'Chrome':
       if (dark) {
-        s = '<span style="color:#f44">Ch</span><span style="color:#ff0">ro</span><span style="color:#4f4">m</span><span style="color:#6cf">e</span>';
+        var _c = ['#f44', '#ff0', '#4f4', '#6cf'];
       } else {
-        s = '<span style="color:#f44">Ch</span><span style="color:#cc0">ro</span><span style="color:#2d2">m</span><span style="color:#0af">e</span>';
+        _c = ['#f44', '#cc0', '#2d2', '#0af'];
       }
+      s = '<span style="color:' + _c[0] + '">Ch</span><span style="color:' + _c[1] + '">ro</span><span style="color:' + _c[2] + '">m</span><span style="color:' + _c[3] + '">e</span>';
       break;
     case 'Edge':
       if (dark) {
-        s = '<span style="color:#4e7">E</span><span style="color:#3df">d</span><span style="color:#0af">ge</span>';
+        _c = ['#4e7', '#3df', '#0af'];
       } else {
-        s = '<span style="color:#2c4">E</span><span style="color:#0cf">d</span><span style="color:#08d">ge</span>';
+        _c = ['#2c4', '#0cf', '#08d'];
       }
-      break;
-    case 'Edge Legacy':
-      c = (dark ? '#0af' : '#08d');
-      s = '<span style="color:' + c + '">Edge</span>';
+      s = '<span style="color:' + _c[0] + '">E</span><span style="color:' + _c[1] + '">d</span><span style="color:' + _c[2] + '">ge</span>';
       break;
     case 'Firefox':
       c = (dark ? '#e57f25' : '#e60');
@@ -7145,16 +7137,16 @@ util.getColoredBrowserName = function(n, dark) {
       c = (dark ? '#f44' : '#ff1b2c');
       s = '<span style="color:' + c + '">' + n + '</span>';
       break;
-    case 'IE11':
-      c = (dark ? '#61d5f8' : '#0af');
-      s = '<span style="color:' + c + '">' + n + '</span>';
-      break;
     case 'Safari':
       s = '<span style="color:#86c8e8">Safa</span><span style="color:#dd5651">r</span><span style="color:#ececec">i</span>';
       break;
     default:
       b = util.getBrowserInfo(n);
-      if (b.name) s = util.getColoredBrowserName(b.name);
+      if (b.name && b.name != n) {
+        s = util.getColoredBrowserName(b.name, dark);
+      } else {
+        s = util.escHtml(n);
+      }
   }
   return s;
 };
